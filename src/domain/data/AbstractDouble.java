@@ -1,15 +1,14 @@
 package domain.data;
 
-public interface AbstractDouble<Type> {
+public interface AbstractDouble<Type> extends Comparable<Type> {
 
 
-    public AbstractDouble add(Type value);
+    AbstractDouble add(Type value);
 
-    public AbstractDouble substract(Type value);
+    AbstractDouble substract(Type value);
 
-    public AbstractDouble multiply(Type value);
+    AbstractDouble multiply(Type value);
 
-    public AbstractDouble divide(Type value);
-        
+    AbstractDouble divide(Type value);
 
 }

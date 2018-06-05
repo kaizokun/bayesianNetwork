@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ProbabilityCompute {
 
-    AbstractDouble getProbability(List<Variable> dependencies, Variable value);
+    AbstractDouble getProbability(Variable value);
 }

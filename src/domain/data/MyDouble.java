@@ -38,4 +38,10 @@ public class MyDouble implements AbstractDouble<MyDouble> {
 
         return this.value.toString();
     }
+
+    @Override
+    public int compareTo(MyDouble o) {
+
+        return this.value.compareTo(o.value);
+    }
 }

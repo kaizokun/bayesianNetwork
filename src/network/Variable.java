@@ -125,7 +125,7 @@ public class Variable {
 
     public AbstractDouble getProbabilityForCurrentValue(){
 
-        return probabilityCompute.getProbability(this.dependencies,this);
+        return probabilityCompute.getProbability(this);
     }
 
     public IDomain getDomain() {

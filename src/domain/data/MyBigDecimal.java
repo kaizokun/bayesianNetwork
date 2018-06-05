@@ -1,7 +1,6 @@
 package domain.data;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
 
@@ -45,5 +44,10 @@ public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
     public String toString() {
 
         return this.bigDecimal.toString();
+    }
+
+    @Override
+    public int compareTo(MyBigDecimal o) {
+        return this.bigDecimal.compareTo(o.bigDecimal);
     }
 }

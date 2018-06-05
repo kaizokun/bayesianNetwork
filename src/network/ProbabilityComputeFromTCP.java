@@ -9,7 +9,9 @@ import java.util.*;
 
 public class ProbabilityComputeFromTCP implements ProbabilityCompute{
 
-    protected Hashtable<String, Hashtable<String, AbstractDouble>> TCP;
+    protected Hashtable<String, Hashtable<Domain.DomainValue, AbstractDouble>> TCP;
+
+    protected AbstractDoubleFactory doubleFactory;
 
     public ProbabilityComputeFromTCP( IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory){
 
@@ -17,6 +19,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute{
     }
 
     public ProbabilityComputeFromTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory){
+
+        this.doubleFactory = doubleFactory;
 
         this.TCP = new Hashtable<>();
 
@@ -51,6 +55,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute{
         //la deuxiemme correspond aux probabilités pour les valeurs du domaine de la variable
 
 
+
         //quand le dernier parent a été atteind on à une combinaison de valeur pour chaque parent
         //formant la clé d'une entrée ou ligne de la TCP
         if(iDep == dependencies.size()){
@@ -65,7 +70,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute{
             //table indexé par valeur prises par la variable et contenant la probabilité en fonction des valeurs
             //prises par les parents
 
-            Hashtable<String, AbstractDouble> row = new Hashtable<>();
+            Hashtable<Domain.DomainValue, AbstractDouble> row = new Hashtable<>();
 
             //pour chaque valeur du domaine de la variable
             //on enregistre la probabilité
@@ -76,7 +81,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute{
                 //il faudrait mieux encapsuler les valeur de domaines dans une classe
                 //qui contiendrait la aleur sous forme d'objet et un alias plus court
                 //pour l'indexation
-                String domainValue = varDom.getObjectValue(j).toString();
+                Domain.DomainValue domainValue = (Domain.DomainValue) varDom.getValue(j);
 
                 AbstractDouble prob = doubleFactory.getNew(entries[iRow][j]);
 
@@ -102,8 +107,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute{
 
     }
 
-    @Override
-    public AbstractDouble getProbability(List<Variable> dependencies, Variable var) {
+
+    private String getDependenciesKey(List<Variable> dependencies){
 
         //création de la clé correspondant à la combinaison de valeur des parents
         List<String> keyParts = new LinkedList<>();
@@ -113,14 +118,53 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute{
             keyParts.add(dep.getValue().toString());
         }
 
-        String depKey = getDependenciesValuesKey(keyParts);
+        return getDependenciesValuesKey(keyParts);
+    }
 
-        String varKey = var.getValueKey();
+    @Override
+    public AbstractDouble getProbability( Variable var) {
 
-        //System.out.println("depkey "+depKey);
-        //System.out.println("varkey "+varKey);
+        String depKey = getDependenciesKey(var.dependencies);
 
-        return this.TCP.get(depKey).get(varKey);
+        Domain.DomainValue value = var.getDomainValue();
+
+        return this.TCP.get(depKey).get(value);
+    }
+
+    public void initRandomValue(Variable var){
+
+        String depKey = getDependenciesKey(var.dependencies);
+        //récupere la distribution de la variable pour l'assignation courante des parents
+        Map<Domain.DomainValue, AbstractDouble> distrib = this.TCP.get(depKey);
+        //total initialisé à zero correspond à un seuil à atteindre
+        //à ce total est ajouté chaque frequence pour une valeur de la distribution
+        //dans l'odre au fur et à mesure
+        //exemple avec une distribution a = 0.2, b = 0.6, c = 0.2
+        //si on genere àléatoirement un nombre entre [0; 0.2] ou [0.8; 1]
+        //ces chances sont identiques et on à trois fois plus de chance de generer un nombre entre [0.2; 0.8]
+        // par exemple on genere 0.6 : 0.2 ne passe pas mais 0.8 (0.6 + 0.2) passe
+        // par exemple on genere 0.9 : 0.8 ne passe pas mais 1 (0.2 + 0.2 + 0.6) passe
+
+        //exemple avec une distribution a = 0.33, b = 0.33, c = 0.33
+        //chances identique spour chaque valeur
+        //en generant un nombre < 0.33 on obtient a
+        //[0.33, 0.66] on obtient b sinon c
+
+        AbstractDouble total = doubleFactory.getNew(0.0);
+
+        AbstractDouble rdm = doubleFactory.getNew(new Random().nextDouble());
+
+        for(Map.Entry<Domain.DomainValue, AbstractDouble> entry : distrib.entrySet()){
+
+            total = total.add(entry.getValue());
+
+            if(total.compareTo(rdm) >= 0 ){
+
+                var.setDomainValue(entry.getKey());
+
+                return;
+            }
+        }
     }
 
     @Override
@@ -137,7 +181,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute{
                 builder.append(" : ");
             }
 
-            for(Map.Entry<String, AbstractDouble> row : this.TCP.get(key).entrySet()){
+            for(Map.Entry<Domain.DomainValue, AbstractDouble> row : this.TCP.get(key).entrySet()){
 
                 builder.append(row.getKey()+" = "+row.getValue());
 
