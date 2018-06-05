@@ -89,6 +89,8 @@ public class EnumerationAsk {
             total = total.add(entry.getValue());
         }
 
+        //System.out.println(distribution.get(requestKey)+" "+total);
+
         return distribution.get(requestKey).divide(total);
 
     }

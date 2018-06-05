@@ -12,25 +12,19 @@ public class MyDouble implements AbstractDouble<MyDouble> {
     @Override
     public AbstractDouble add(MyDouble value) {
 
-        this.value += value.value;
-
-        return this;
+        return new MyDouble(this.value + value.value );
     }
 
     @Override
     public AbstractDouble substract(MyDouble value) {
 
-        this.value -= value.value;
-
-        return this;
+        return new MyDouble(this.value - value.value );
     }
 
     @Override
     public AbstractDouble multiply(MyDouble value) {
 
-        this.value *= value.value;
-
-        return this;
+        return new MyDouble(this.value * value.value );
     }
 
     @Override
