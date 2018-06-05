@@ -1,0 +1,155 @@
+Facteur de variables
+---------------------
+
+Un facteur est composé : 
+
+- d'une liste de variable
+- d'une matrice sous forme de tableau d'Object à plusieurs 
+	dimension la dernier dimension contenant les probabilités pour une combinaison de valeur des variables
+- d'une table de hachage permettant de recuperer l'indice d'une variable dans la matrice.
+- un identifiant unique : un numéro utilisé le reseau baysiens pour contabiliser les facteurs à leur création et leur suppression
+	donc passer par le reseau baysiens pour créer les facteurs. Ou utiliser une varible statique dans la classe facteur pour comptabiliser.
+
+=======================================================================
+Créer un facteur à partir d'une variable : matrice, liste des variables, indice de variable IV
+=======================================================================
+variable <- récuperer la premiere variable de la liste
+
+- enregistrer l'indice IV dans la table d'indice à l'entrée correspondant au label de la variable
+- ou si on copie les variables permettant la création du facteur on pourrait enregistrer l'indice
+	dans l'instance de variable.
+	
+Pour chaque valeur I du domaine de la variable dans l'ordre
+	
+	variable <- une valeur
+	
+	Si il ne reste plus de variable
+		enregistrer la valeur de la probabilité de la variable à partir de la combinaison de valeurs
+		à l'indice I de la matrice
+	Sinon
+		Créer une nouvelle matrice de la taille du domaine de la variable
+		Enregistrer cette matrice à l'indice I de la matrice précédente
+		Rapelle la fonction avec la nouvelle matrice, la liste de variables, l'indice IV incrémenté de 1
+	Fin Si	
+		
+Fin Pour
+
+mettre la valeur de la variable à nul
+remettre la variable en début de liste
+
+=======================================================================
+Créer un facteur initialisé à zero à partir des plusieurs variables 
+=======================================================================
+
+identique à la procédure du dessus sauf que l'on enregistre zero à la place d'une probabilité
+
+======================================================================================
+Calculer la valeur d'une entrée d'un facteur dont les variables ont été initialisé
+======================================================================================
+
+iVar <- 0
+
+(Objet) prob = matrix
+
+Pour chaque variable du facteur
+	
+	récuperer la valeur de la variable
+	
+	récuper l'indice iV de la valeur dans son domaine
+	
+	prob = matrix[iVar][iV]
+
+	iVar ++;
+	
+Fin Pour
+
+retourner (Double) prob
+
+=========================================================================================
+Créer un facteur à partir des plusieurs autres facteurs et d'une variable à éliminer
+=========================================================================================
+
+Initialiser une liste de facteurs à multiplier Lf1
+
+Pour chaque facteur de la liste globale
+
+	Si le facteur contient la variable à éliminer (table de hachage du facteur ?)
+		on ajoute le facteur dans la liste de facteur à multiplier
+	Fin Si
+
+Fin pour
+
+On retire la liste des facteurs à multiplier de la liste des facteurs globale
+
+On crée une Set de variables Sv1 (LinkHashSet)
+
+Pour chaque facteur à multiplier
+	
+	Pour chaque variable du facteur
+	
+		ajouter la variable à Sv1.
+		
+	FIn Pour
+	
+FinPour
+
+Retirer la variable a supprimer du set Sv1
+
+Creer une liste de variables à partir de Sv1 (LinkedList)Lv1
+
+Ajouter la variable à supprimer en début de liste (indice 0)
+
+Creer un tableau de Set de facteurs à traiter indexé par nombre de variable initialisés T1
+
+iVar <- 0
+
+Pour i allant de 0 à nombre de variables dans Lv1
+	
+	pour chaque facteur
+		Si le facteur contient toutes les variables de Lv1[0-i]
+		Ajouter le facteur dans le Set d'indice iVar dans T1
+	Fin Pour
+	
+	iVar ++
+
+Fin Pour
+
+Créer un facteur Frs à partir de Sv1 en respectant l'ordre des variables et en initialisant 
+les entres à zéro
+
+retourner Frs
+
+=========================================================================================
+Sommation et multiplication des facteurs : Frs, T1, Lv1, mul (init = 1), iVar (init = 0)
+=========================================================================================
+
+Si Lv1 est vide : toutes les variables sont assignées
+
+	Pour l'assignation de valeur courante ajouter mul à la valeur enregistré dans
+	le facteur final
+	
+	Retour
+
+Fin Si
+
+variable <-  Lv1[iVar]
+	
+Pour chaque valeur de la variable
+		
+	variable <- valeur	
+		
+		Pour chaque facteur de T1[iVar]
+			
+			mul *= facteur.valeur_assignation_courante
+		
+		Fin Pour
+		
+	Sommation et multiplication des facteurs : Frs, T1, Lv1, mul, iVar + 1
+	
+Fin Pour
+	
+variable.clear
+
+
+=========================================================================================
+=========================================================================================
