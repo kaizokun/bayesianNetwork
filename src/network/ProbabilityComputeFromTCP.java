@@ -200,38 +200,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         AbstractDouble rdm = doubleFactory.getNew(new Random().nextDouble());
 
-        Domain.DomainValue domainValue = this.dichotomicSearch(rangevalues, rdm, 0, rangevalues.size());
+        return this.dichotomicSearch(rangevalues, rdm, 0, rangevalues.size());
 
-        /*
-        boolean cambrio = var.getLabel().equals(BayesianNetworkFactory.ALARM_NETWORK_VARS.CAMBRIOLAGE.toString()) ;
-        boolean trueVal = domainValue.getValue().equals(1);
-
-        if( cambrio ){
-
-            initPrint = trueVal;
-        }
-
-        if(initPrint ) {
-
-            initPrint = true;
-
-            System.out.println("    ****************************");
-
-            System.out.println("    VARIABLE " + var);
-
-            System.out.println("    Random " + rdm);
-
-            System.out.println("    VALUE GENERATED " + domainValue);
-
-            System.out.println("    ****************************");
-
-        }
-*/
-
-
-
-
-        return domainValue;
 
 /*
         for(Map.Entry<Domain.DomainValue, AbstractDouble> entry : distrib.entrySet()){

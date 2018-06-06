@@ -17,7 +17,7 @@ public class Variable {
 
     protected String label;
 
-    protected Domain.DomainValue value;
+    protected Domain.DomainValue value, originValue;
 
     protected List<Variable> dependencies;
 
@@ -27,7 +27,7 @@ public class Variable {
     //utilisé dans la recuperation des noeuds dans l'odre topologique
     //pour savoir si ils ont été ajoutés, pas vraiment une propriété mais plus pratique que de créer
     //des tables de hachages à chaque.
-    protected boolean added, important;
+    protected boolean added, important, isObs;
 
     protected int tempIndex;
 
@@ -87,6 +87,19 @@ public class Variable {
     public Object getValue() {
 
         return value.getValue();
+    }
+
+    public Domain.DomainValue getOriginValue() {
+        return originValue;
+    }
+
+    public void setOriginValue(Domain.DomainValue originValue) {
+        this.originValue = originValue;
+    }
+
+    public void saveOriginValue() {
+
+        this.setOriginValue(this.getDomainValue());
     }
 
     public int getValueId() {
@@ -267,5 +280,19 @@ public class Variable {
 
     public void setTempIndex(int tempIndex) {
         this.tempIndex = tempIndex;
+    }
+
+    public boolean isObs() {
+        return isObs;
+    }
+
+    public void setObs(boolean obs) {
+        isObs = obs;
+    }
+
+
+    public boolean originalValuematch() {
+
+       return this.originValue.equals(this.getDomainValue());
     }
 }

@@ -77,7 +77,7 @@ public class InferenceTest {
 
         long t1 = System.currentTimeMillis();
 
-        AbstractDouble rs = SamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
+        AbstractDouble rs = SamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 1000000);
 
         System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
 

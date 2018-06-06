@@ -1,7 +1,6 @@
 package inference.approximation;
 
 import domain.data.AbstractDouble;
-import domain.data.AbstractDoubleFactory;
 import network.BayesianNetwork;
 import network.Variable;
 
@@ -95,6 +94,10 @@ public class SamplingAsk {
 
         for(Variable obsVar : obs){
 
+            obsVar.setObs(true);
+
+            obsVar.saveOriginValue();
+
             saveObs.add(obsVar.sampleCopy());
         }
 
@@ -104,13 +107,34 @@ public class SamplingAsk {
 
         for(int s = 0 ; s < maxSample ; s ++){
 
-            for(Variable var : variablesTab){
+            boolean nextSample = false;
 
+            for(Variable var : variablesTab){
+                //il est possible de detecter plus rapidement qu'un echantillon ne correspond pas aux observation
+                //sans obtenir un echantillon complet
                 var.initRdmValue();
+                //si la variable est d'observation est que sa valeur echantillonée ne correspond pas à celle d'origine
+                if(var.isObs() && !var.originalValuematch()){
+                    //on arrete l'echantillonage
+                    //et passe au prochain
+                    nextSample = true;
+
+                    break;
+                }
             }
 
+            if(nextSample){
+
+                continue;
+            }
+
+            //si on passe ce cap l'echantillon correspond aux observations
+            totalMatchSamplesObs ++;
+
+            //reste à verifier si la requete correspond
             int totalMatchVars = 0;
 
+/*
             for(Variable o : saveObs){
 
                 if(variablesTab.get(o.getTempIndex()).getValue().equals(o.getValue())){
@@ -118,12 +142,11 @@ public class SamplingAsk {
                     totalMatchVars ++;
                 }
             }
+*/
 
-            if(totalMatchVars == saveObs.size()){
+           // if(totalMatchVars == saveObs.size()){
 
-                totalMatchSamplesObs ++;
-
-                totalMatchVars = 0;
+               // totalMatchSamplesObs ++;
 
                 for(Variable req : saveReq){
 
@@ -137,7 +160,7 @@ public class SamplingAsk {
 
                     totalMatchSamplesObsReq ++;
                 }
-            }
+           // }
         }
 
         AbstractDouble num = network.getDoubleFactory().getNew(totalMatchSamplesObsReq);
