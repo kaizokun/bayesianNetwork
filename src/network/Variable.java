@@ -117,6 +117,11 @@ public class Variable {
         this.setDomainValue(this.domain.getDomainValue(value));
     }
 
+    public boolean originalValueMatch() {
+
+        return this.originValue.equals(this.getDomainValue());
+    }
+
     public void checkActiveFactors(){
 
         for(Factor factor : factors){
@@ -290,9 +295,4 @@ public class Variable {
         isObs = obs;
     }
 
-
-    public boolean originalValuematch() {
-
-       return this.originValue.equals(this.getDomainValue());
-    }
 }

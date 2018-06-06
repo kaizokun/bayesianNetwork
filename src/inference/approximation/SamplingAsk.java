@@ -12,162 +12,68 @@ public class SamplingAsk {
 
     public static AbstractDouble ask(List<Variable> request, List<Variable> obs, BayesianNetwork network, int maxSample) {
 
-/*
-
-        récuperer les variables importantes dans l'ordre topologique dans un tableau
-
-        pour chaque variable dans l'ordre topologique
-            enregistrer le numero d'ordre dans la variable
-         Fin pour
-
-        sauvegarder des copies des variables de la requete
-        sauvegarder des copies des variables d'observations
-        (initialisées avec uniquement la valeur et l'indice temporaire)
-
-        totalSampleMatchObservation <- 0
-        totalSampleMatchObservationAndRequest <- 0
-
-        pour un certain nombre d' échantillons
-
-            pour chaque variable dans l'ordre topologique
-
-                echantilloner une valeur pour la variable et lui assigner
-
-            Fin pour
-
-            totalMatch <- 0;
-
-            Pour chaque variable d'observation
-                recuperer l'indice de la variable
-                et comparer sa valeur à la valeur echantilloné
-                Si correspondance  inrementer total match
-            Fin Pour
-
-            si totalMatch est égal au nombre de variable d'observation
-            compter un echantillon correspondant
-                incrementer totalSampleMatchObservation
-            fin si
-
-           totalMatch <- 0;
-
-           Pour chaque variable de requete
-                recuperer l'indice de la variable
-                et comparer sa valeur à la valeur echantilloné
-                Si correspondance  inrementer total match
-            Fin Pour
-
-            si totalMatch est égal au nombre de variable de requete
-            compter un echantillon correspondant
-                incrementer totalSampleMatchObservationAndRequest
-            fin si
-
-        fin pour
-
-
-*/
-
         network.markImportantVars(request, obs);
 
         List<Variable> variables = network.getTopologicalOrder();
+        //sauvegarde les valeurs originales des variables de requete et d'observation
+        for (Variable reqVar : request) {
 
-        List<Variable> variablesTab = new ArrayList<>(Arrays.asList(new Variable[variables.size()]));
-
-        int i = 0;
-
-        for(Variable variable : variables){
-
-            variable.setTempIndex(i);
-
-            variablesTab.set(i, variable);
-
-            i++;
+            reqVar.saveOriginValue();
         }
 
-        List<Variable> saveReq = new ArrayList<>();
-
-        List<Variable> saveObs = new ArrayList<>();
-
-        for(Variable reqVar : request){
-
-            saveReq.add(reqVar.sampleCopy());
-        }
-
-        for(Variable obsVar : obs){
-
-            obsVar.setObs(true);
+        for (Variable obsVar : obs) {
 
             obsVar.saveOriginValue();
-
-            saveObs.add(obsVar.sampleCopy());
         }
 
         double totalMatchSamplesObs = 0;
 
         double totalMatchSamplesObsReq = 0;
 
-        for(int s = 0 ; s < maxSample ; s ++){
+        for (int s = 0; s < maxSample; s++) {
 
+            ///echantillonage des variables
+            for (Variable var : variables) {
+
+                var.initRdmValue();
+            }
+
+            //passe au prochain sample
             boolean nextSample = false;
 
-            for(Variable var : variablesTab){
-                //il est possible de detecter plus rapidement qu'un echantillon ne correspond pas aux observation
-                //sans obtenir un echantillon complet
-                var.initRdmValue();
-                //si la variable est d'observation est que sa valeur echantillonée ne correspond pas à celle d'origine
-                if(var.isObs() && !var.originalValuematch()){
-                    //on arrete l'echantillonage
-                    //et passe au prochain
-                    nextSample = true;
+            for (Variable o : obs) {
+                //si la valeur de la variable d'observation ne correspond plus
+                // on passe au prochain echantillon
+                if (!o.originalValueMatch()) {
 
-                    break;
+                    nextSample = true; break;
                 }
             }
 
-            if(nextSample){
+            if (nextSample) continue;
 
-                continue;
-            }
+            //si on passe se cap on compte un echantillon valide
+            //et on test les variables de requete
 
-            //si on passe ce cap l'echantillon correspond aux observations
-            totalMatchSamplesObs ++;
+            totalMatchSamplesObs++;
+            //même principe on passe à l'echantillon suivant si une variable de requete ne correspond pas
+            for (Variable req : request) {
 
-            //reste à verifier si la requete correspond
-            int totalMatchVars = 0;
+                if (!req.originalValueMatch()) {
 
-/*
-            for(Variable o : saveObs){
-
-                if(variablesTab.get(o.getTempIndex()).getValue().equals(o.getValue())){
-
-                    totalMatchVars ++;
+                    nextSample = true; break;
                 }
             }
-*/
 
-           // if(totalMatchVars == saveObs.size()){
+            if (nextSample) continue;
 
-               // totalMatchSamplesObs ++;
+            totalMatchSamplesObsReq++;
 
-                for(Variable req : saveReq){
-
-                    if(variablesTab.get(req.getTempIndex()).getValue().equals(req.getValue())){
-
-                        totalMatchVars ++;
-                    }
-                }
-
-                if(totalMatchVars == saveReq.size()){
-
-                    totalMatchSamplesObsReq ++;
-                }
-           // }
         }
 
         AbstractDouble num = network.getDoubleFactory().getNew(totalMatchSamplesObsReq);
 
         AbstractDouble denom = network.getDoubleFactory().getNew(totalMatchSamplesObs);
-
-        System.out.println(totalMatchSamplesObsReq+" / "+totalMatchSamplesObs);
 
         return num.divide(denom);
     }
