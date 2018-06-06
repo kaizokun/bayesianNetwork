@@ -4,8 +4,6 @@ import domain.data.AbstractDouble;
 import network.BayesianNetwork;
 import network.Variable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SamplingAsk {
@@ -70,6 +68,10 @@ public class SamplingAsk {
             totalMatchSamplesObsReq++;
 
         }
+
+        System.out.println("MAX SAMPLE "+maxSample);
+        System.out.println("OBS SAMPLE "+totalMatchSamplesObs);
+        System.out.println("REQ SAMPLE "+totalMatchSamplesObsReq);
 
         AbstractDouble num = network.getDoubleFactory().getNew(totalMatchSamplesObsReq);
 

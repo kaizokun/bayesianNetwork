@@ -34,7 +34,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
     }
 
 
-    private void initCTP(List<Variable> dependencies, IDomain varDom, Double[][] entries, LinkedList<String> keyParts, int iDep, AbstractDoubleFactory doubleFactory) {
+    private void initCTP(List<Variable> dependencies, IDomain varDom, Double[][] entries, LinkedList<String> keyParts,
+                         int iDep, AbstractDoubleFactory doubleFactory) {
 
         //Double[][] entries : valeur de la TCP : la premier dimension correspond à une combinaison de valeur pour les parents
         //la deuxiemme correspond aux probabilités pour les valeurs du domaine de la variable
@@ -198,24 +199,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         //AbstractDouble total = doubleFactory.getNew(0.0);
 
-        AbstractDouble rdm = doubleFactory.getNew(new Random().nextDouble());
-
-        return this.dichotomicSearch(rangevalues, rdm, 0, rangevalues.size());
-
-
-/*
-        for(Map.Entry<Domain.DomainValue, AbstractDouble> entry : distrib.entrySet()){
-
-            total = total.add(entry.getValue());
-
-            if(total.compareTo(rdm) >= 0 ){
-
-                var.setDomainValue(entry.getKey());
-
-                return;
-            }
-        }
-        */
+        return this.dichotomicSearch(rangevalues,  doubleFactory.getNew(new Random().nextDouble()), 0, rangevalues.size());
 
     }
 

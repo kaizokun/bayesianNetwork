@@ -29,8 +29,6 @@ public class Variable {
     //des tables de hachages à chaque.
     protected boolean added, important, isObs;
 
-    protected int tempIndex;
-
     //facteur actif une fois arrivé à cette variable dans la sous procédure
     // de sommation de l'algorithme d'elimination de variables
     //peut etre pas ca place ici car lié à un algorithme specifique
@@ -226,19 +224,6 @@ public class Variable {
         return new Variable(this);
     }
 
-    public Variable sampleCopy(){
-
-        Variable variable = new Variable();
-
-        variable.setDomainValue(this.value);
-
-        variable.setLabel(this.label);
-
-        variable.setTempIndex(this.tempIndex);
-
-        return variable;
-    }
-
     public String getValueKey() {
 
         return this.getValue().toString();
@@ -277,14 +262,6 @@ public class Variable {
 
         //inutile de reinitialiser le compteur de variables initialisés pour ces facteurs
         //qui passeront au ramasse miettes
-    }
-
-    public int getTempIndex() {
-        return tempIndex;
-    }
-
-    public void setTempIndex(int tempIndex) {
-        this.tempIndex = tempIndex;
     }
 
     public boolean isObs() {

@@ -2,11 +2,13 @@ package test.inference;
 
 import domain.data.AbstractDouble;
 import inference.approximation.SamplingAsk;
+import inference.approximation.SimilaritySamplingAsk;
 import inference.exact.EliminationAsk;
 import inference.exact.EnumerationAsk;
 import network.BayesianNetwork;
 import network.BayesianNetworkFactory;
 import network.Variable;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -31,8 +33,10 @@ public class InferenceTest {
     }
 
     @Test
+    @Ignore
     public void alarmTestEliminationAsk() {
 
+        System.out.println();
         System.out.println("====================");
         System.out.println("ELIMINATION ASK");
         System.out.println("====================");
@@ -51,6 +55,7 @@ public class InferenceTest {
     @Test
     public void alarmTestEnumerationAsk() {
 
+        System.out.println();
         System.out.println("====================");
         System.out.println("ENUMERATION ASK");
         System.out.println("====================");
@@ -69,6 +74,7 @@ public class InferenceTest {
     @Test
     public void alarmTestSampleAsk(){
 
+        System.out.println();
         System.out.println("====================");
         System.out.println("SAMPLE ASK");
         System.out.println("====================");
@@ -77,7 +83,26 @@ public class InferenceTest {
 
         long t1 = System.currentTimeMillis();
 
-        AbstractDouble rs = SamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 1000000);
+        AbstractDouble rs = SamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
+
+        System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
+
+        System.out.println("RESULTAT : " + rs);
+    }
+
+    @Test
+    public void alarmTestSimilarSampleAsk(){
+
+        System.out.println();
+        System.out.println("====================");
+        System.out.println("SIMILAR ASK");
+        System.out.println("====================");
+
+        TestBayesianNetwork test = alarmTest();
+
+        long t1 = System.currentTimeMillis();
+
+        AbstractDouble rs = SimilaritySamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
 
         System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
 
@@ -95,7 +120,7 @@ public class InferenceTest {
 
         Variable cambriolage = alarmNetwork.getVariable(CAMBRIOLAGE.toString());
 
-        Variable tremblementDeTerre = alarmNetwork.getVariable(TREMBLEMENT_DE_TERRE.toString());
+        //Variable tremblementDeTerre = alarmNetwork.getVariable(TREMBLEMENT_DE_TERRE.toString());
 
         //observations
 
