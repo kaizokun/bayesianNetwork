@@ -29,6 +29,8 @@ public class Variable {
     //des tables de hachages à chaque.
     protected boolean added, important;
 
+    protected int tempIndex;
+
     //facteur actif une fois arrivé à cette variable dans la sous procédure
     // de sommation de l'algorithme d'elimination de variables
     //peut etre pas ca place ici car lié à un algorithme specifique
@@ -38,7 +40,10 @@ public class Variable {
     //facteurs lié à cette variable
     protected List<Factor> factors = new LinkedList<>();
 
-    public Variable( String label, IDomain domain, ProbabilityCompute probabilityCompute) {
+    public Variable() {
+    }
+
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
 
        this(label, domain, probabilityCompute, new ArrayList<>());
     }
@@ -128,6 +133,11 @@ public class Variable {
         return probabilityCompute.getProbability(this);
     }
 
+    public void initRdmValue(){
+
+        this.setDomainValue(this.probabilityCompute.getRandomValue(this));
+    }
+
     public IDomain getDomain() {
         return domain;
     }
@@ -175,6 +185,10 @@ public class Variable {
         return label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public int getDepth() {
         return depth;
     }
@@ -186,13 +200,25 @@ public class Variable {
     @Override
     public String toString() {
 
-        return this.label;//+"=======\n"+this.probabilityCompute.toString();
-
+        return this.label+" "+this.value;//+"=======\n"+this.probabilityCompute.toString();
     }
 
     public Variable simpleCopy(){
 
         return new Variable(this);
+    }
+
+    public Variable sampleCopy(){
+
+        Variable variable = new Variable();
+
+        variable.setDomainValue(this.value);
+
+        variable.setLabel(this.label);
+
+        variable.setTempIndex(this.tempIndex);
+
+        return variable;
     }
 
     public String getValueKey() {
@@ -233,5 +259,13 @@ public class Variable {
 
         //inutile de reinitialiser le compteur de variables initialisés pour ces facteurs
         //qui passeront au ramasse miettes
+    }
+
+    public int getTempIndex() {
+        return tempIndex;
+    }
+
+    public void setTempIndex(int tempIndex) {
+        this.tempIndex = tempIndex;
     }
 }

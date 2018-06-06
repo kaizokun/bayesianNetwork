@@ -8,14 +8,43 @@ import domain.data.MyDoubleFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 
 public class BayesianNetworkFactory {
+
+    public enum ABCD_NETWORK_VARS{
+
+        VAR_A
+    }
+
+    public static BayesianNetwork getABCDNetwork(){
+
+        //reseau
+
+        BayesianNetwork network = new BayesianNetwork(new MyDoubleFactory());
+
+        //domain.Domain abcd commun à toutes les variables
+
+        IDomain abcdDomain = DomainFactory.getABCDDomain();
+
+        //----------------- var_a
+
+        ProbabilityCompute tcpVarA = network.getTCP(
+                abcdDomain,
+                new Double[][]{{0.1, 0.4, 0.3, 0.2}});
+
+        network.addRootVariable(VAR_A.toString(), abcdDomain, tcpVarA);
+
+        return network;
+    }
+
 
     public enum ALARM_NETWORK_VARS{
 
         CAMBRIOLAGE, TREMBLEMENT_DE_TERRE, ALARM, JEAN_CALL, MARIE_CALL
     }
+
 
     public static BayesianNetwork getAlarmNetwork(){
 
@@ -92,4 +121,7 @@ public class BayesianNetworkFactory {
         return network;
 
     }
+
+
+
 }

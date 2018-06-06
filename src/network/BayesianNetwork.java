@@ -88,6 +88,8 @@ public class BayesianNetwork {
         }
     }
 
+
+
     public LinkedList<Variable> getTopologicalOrder(){
 
         //list des noeuds racines

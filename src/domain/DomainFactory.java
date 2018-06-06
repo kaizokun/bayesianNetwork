@@ -6,4 +6,9 @@ public class DomainFactory {
 
         return new Domain(1, 0);
     }
+
+    public static IDomain getABCDDomain(){
+
+        return new Domain('a', 'b', 'c', 'd');
+    }
 }
