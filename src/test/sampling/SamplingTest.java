@@ -10,6 +10,17 @@ import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 
 public class SamplingTest {
 
+    @Test
+    public void markovCumulativeFrequenciesTest(){
+
+        BayesianNetwork alarmNetwork = BayesianNetworkFactory.getAlarmNetwork();
+
+        Variable alarm = alarmNetwork.getVariable(ALARM.toString());
+
+        alarm.initCumulativeMarkovFrequencies();
+
+        alarm.showCumulativeMarkovFrequencies();
+    }
 
     @Test
     public void abcdSampleTest(){
@@ -65,5 +76,6 @@ public class SamplingTest {
 
         System.out.println("Frequence : "+((double)totatValue / samples));
     }
+
 
 }

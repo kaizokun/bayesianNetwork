@@ -1,6 +1,7 @@
 package test.inference;
 
 import domain.data.AbstractDouble;
+import inference.approximation.GibbsAsk;
 import inference.approximation.SamplingAsk;
 import inference.approximation.SimilaritySamplingAsk;
 import inference.exact.EliminationAsk;
@@ -103,6 +104,27 @@ public class InferenceTest {
         long t1 = System.currentTimeMillis();
 
         AbstractDouble rs = SimilaritySamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
+
+        System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
+
+        System.out.println("RESULTAT : " + rs);
+    }
+
+
+
+    @Test
+    public void alarmTestGibbsAsk(){
+
+        System.out.println();
+        System.out.println("====================");
+        System.out.println("GIBBS ASK");
+        System.out.println("====================");
+
+        TestBayesianNetwork test = alarmTest();
+
+        long t1 = System.currentTimeMillis();
+
+        AbstractDouble rs = GibbsAsk.ask(test.request, test.obs, test.bayesianNetwork, 20);
 
         System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
 

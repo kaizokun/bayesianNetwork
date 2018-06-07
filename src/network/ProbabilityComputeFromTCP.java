@@ -11,7 +11,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
     protected Hashtable<String, Hashtable<Domain.DomainValue, AbstractDouble>> TCP;
 
-    protected Hashtable<String, List<Map.Entry<Domain.DomainValue, FrequencyRange>>> cumulativeFrequences;
+    protected Hashtable<String, List<Map.Entry<Domain.DomainValue, FrequencyRange>>> cumulativeFrequencies;
 
     protected AbstractDoubleFactory doubleFactory;
 
@@ -28,7 +28,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         this.initCTP(dependencies, varDom, entries, new LinkedList<>(), 0, doubleFactory);
 
-        this.cumulativeFrequences = new Hashtable<>();
+        this.cumulativeFrequencies = new Hashtable<>();
 
         this.initCulumativeFrequencies(varDom);
     }
@@ -121,10 +121,9 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
                 i++;
             }
 
-            this.cumulativeFrequences.put(entry.getKey(), frequencies);
+            this.cumulativeFrequencies.put(entry.getKey(), frequencies);
         }
     }
-
 
     /**
      * Génere une clé à partir d'une combinaison de valeurs pour les variables parents
@@ -178,7 +177,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         String depKey = getDependenciesKey(var.dependencies);
         //récupere la distribution de la variable pour l'assignation courante des parents
-        List<Map.Entry<Domain.DomainValue, FrequencyRange>> rangevalues = this.cumulativeFrequences.get(depKey);
+        List<Map.Entry<Domain.DomainValue, FrequencyRange>> rangevalues = this.cumulativeFrequencies.get(depKey);
         //total initialisé à zero correspond à un seuil à atteindre
         //à ce total est ajouté chaque frequence pour une valeur de la distribution dans l'ordre
         /*
@@ -202,7 +201,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         return this.dichotomicSearch(rangevalues,  doubleFactory.getNew(new Random().nextDouble()), 0, rangevalues.size());
 
     }
-
+    
     private Domain.DomainValue dichotomicSearch(List<Map.Entry<Domain.DomainValue, FrequencyRange>> rangeEntries, AbstractDouble search, int s, int e) {
 
         int middle = s + ((e - s) / 2);
@@ -223,6 +222,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
                 return dichotomicSearch(rangeEntries, search, middle + 1, e);
         }
     }
+
+
 
     @Override
     public String toString() {
@@ -254,7 +255,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         return builder.toString();
     }
 
-    private class FrequencyRange {
+    static class FrequencyRange {
 
         private AbstractDouble min, max;
 
@@ -289,7 +290,38 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
             return 0;
         }
+
+        public AbstractDouble getMin() {
+            return min;
+        }
+
+        public void setMin(AbstractDouble min) {
+            this.min = min;
+        }
+
+        public AbstractDouble getMax() {
+            return max;
+        }
+
+        public void setMax(AbstractDouble max) {
+            this.max = max;
+        }
+
+        @Override
+        public String toString() {
+
+            return "["+this.min+" - "+this.max+"]";
+        }
     }
 
+    @Override
+    public AbstractDoubleFactory getDoubleFactory() {
+        return doubleFactory;
+    }
 
+    @Override
+    public Hashtable<String, Hashtable<Domain.DomainValue, AbstractDouble>> getTCP() {
+
+        return TCP;
+    }
 }
