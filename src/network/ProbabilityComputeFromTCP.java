@@ -310,7 +310,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
     }
 
     @Override
-    public Domain.DomainValue getValueFromMarkovCover(Variable variable) {
+    public Domain.DomainValue getRandomValueFromMarkovCover(Variable variable) {
 
         AbstractDouble rdm = doubleFactory.getNew(new Random().nextDouble());
 
@@ -432,5 +432,9 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
     /**------------------------- ACCESSORS-------------------------*/
 
+    @Override
+    public AbstractDoubleFactory getDoubleFactory() {
+        return doubleFactory;
+    }
 
 }

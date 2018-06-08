@@ -1,118 +1,17 @@
 package test.inference;
 
-import domain.data.AbstractDouble;
-import inference.approximation.GibbsAsk;
-import inference.approximation.SamplingAsk;
-import inference.approximation.SimilaritySamplingAsk;
-import inference.exact.EliminationAsk;
-import inference.exact.EnumerationAsk;
 import network.BayesianNetwork;
 import network.BayesianNetworkFactory;
 import network.Variable;
-import org.junit.Ignore;
-import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 
 public class InferenceTest {
 
-
-    //@Test
-    public void rdmNumbers(){
-
-        for(int i = 0 ; i < 10000 ; i ++){
-
-            double rdm = new Random().nextDouble();
-
-            if(rdm < 0.001) {
-
-                System.out.println(rdm);
-            }
-        }
-    }
-
-    @Test
-    @Ignore
-    public void alarmTestEliminationAsk() {
-
-        System.out.println();
-        System.out.println("====================");
-        System.out.println("ELIMINATION ASK");
-        System.out.println("====================");
-
-        TestBayesianNetwork test = alarmTest();
-
-        AbstractDouble rs = EliminationAsk.ask(test.request,test.obs,test.bayesianNetwork);
-
-        System.out.println("RESULTAT : " + rs);
-    }
-
-    @Test
-    public void alarmTestEnumerationAsk() {
-
-        System.out.println();
-        System.out.println("====================");
-        System.out.println("ENUMERATION ASK");
-        System.out.println("====================");
-
-        TestBayesianNetwork test = alarmTest();
-
-        AbstractDouble rs = EnumerationAsk.ask(test.request, test.obs, test.bayesianNetwork);
-
-        System.out.println("RESULTAT : " + rs);
-    }
-
-    @Test
-    @Ignore
-    public void alarmTestSampleAsk(){
-
-        System.out.println();
-        System.out.println("====================");
-        System.out.println("SAMPLE ASK");
-        System.out.println("====================");
-
-        TestBayesianNetwork test = alarmTest();
-
-        AbstractDouble rs = SamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
-
-        System.out.println("RESULTAT : " + rs);
-    }
-
-    @Test
-    @Ignore
-    public void alarmTestSimilarSampleAsk(){
-
-        System.out.println();
-        System.out.println("====================");
-        System.out.println("SIMILAR ASK");
-        System.out.println("====================");
-
-        TestBayesianNetwork test = alarmTest();
-
-        AbstractDouble rs = SimilaritySamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
-
-        System.out.println("RESULTAT : " + rs);
-    }
-
-    @Test
-    public void alarmTestGibbsAsk(){
-
-        System.out.println();
-        System.out.println("====================");
-        System.out.println("GIBBS ASK");
-        System.out.println("====================");
-
-        TestBayesianNetwork test = alarmTest();
-
-        AbstractDouble rs = GibbsAsk.ask(test.request, test.obs, test.bayesianNetwork, 10000);
-
-        System.out.println("RESULTAT : " + rs);
-    }
-
-
-    private TestBayesianNetwork alarmTest(){
+    public static TestBayesianNetwork alarmTest(){
 
         BayesianNetwork alarmNetwork = BayesianNetworkFactory.getAlarmNetwork();
 
@@ -153,7 +52,7 @@ public class InferenceTest {
     }
 
 
-    private class TestBayesianNetwork {
+    public static class TestBayesianNetwork {
 
         public BayesianNetwork bayesianNetwork;
 

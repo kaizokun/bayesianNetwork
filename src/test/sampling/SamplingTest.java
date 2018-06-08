@@ -5,6 +5,7 @@ import network.BayesianNetworkFactory;
 import network.Variable;
 import org.junit.Test;
 
+import java.util.LinkedList;
 
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
@@ -18,9 +19,7 @@ public class SamplingTest {
 
         Variable alarm = alarmNetwork.getVariable(ALARM.toString());
 
-        alarm.loadMarkovCover();
-
-        alarm.initCumulativeMarkovFrequencies();
+        alarm.initCumulativeMarkovFrequencies(new LinkedList<>());
 
         //alarm.showCumulativeMarkovFrequencies();
     }

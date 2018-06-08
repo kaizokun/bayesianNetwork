@@ -4,9 +4,6 @@ import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 public interface ProbabilityCompute {
 
@@ -18,5 +15,7 @@ public interface ProbabilityCompute {
 
     void initCumulativeMarkovFrequencies(Variable variable);
 
-    Domain.DomainValue getValueFromMarkovCover(Variable variable);
+    Domain.DomainValue getRandomValueFromMarkovCover(Variable variable);
+
+    AbstractDoubleFactory getDoubleFactory();
 }

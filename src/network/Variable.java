@@ -3,6 +3,7 @@ package network;
 import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDouble;
+import domain.data.AbstractDoubleFactory;
 
 import java.util.*;
 
@@ -24,6 +25,8 @@ public class Variable {
 
     protected ProbabilityCompute probabilityCompute;
 
+    protected MarkovCoverDistributionCompute markovCoverDistributionCompute;
+
     protected Set<Variable> markovKover;
 
     //utilisé dans la recuperation des noeuds dans l'odre topologique
@@ -43,12 +46,12 @@ public class Variable {
     public Variable() {
     }
 
-    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute ) {
 
         this(label, domain, probabilityCompute, new ArrayList<>());
     }
 
-    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies) {
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies ) {
 
         this.label = label;
 
@@ -179,19 +182,14 @@ public class Variable {
         this.markovKover.removeAll(obs);
     }
 
-    public void initCumulativeMarkovFrequencies() {
+    public void initCumulativeMarkovFrequencies(List<Variable> obs) {
 
-        this.probabilityCompute.initCumulativeMarkovFrequencies(this);
+        this.markovCoverDistributionCompute.initCumulativeMarkovFrequencies(obs, this);
     }
 
-    public void showCumulativeMarkovFrequencies(){
+    public void initRandomValueFromMarkovCover() {
 
-        this.probabilityCompute.showCumulativeMarkovFrequencies();
-    }
-
-    public void initValueFromMarkovCover() {
-
-        this.setDomainValue(this.probabilityCompute.getValueFromMarkovCover(this));
+       this.setDomainValue(this.markovCoverDistributionCompute.getRandomValueFromMarkovCover(this));
     }
 
     public void initRdmValue() {
@@ -316,9 +314,13 @@ public class Variable {
     public void setObs(boolean obs) {
         isObs = obs;
     }
-/*
+
     public AbstractDoubleFactory doubleFactory(){
 
        return this.probabilityCompute.getDoubleFactory();
-    }*/
+    }
+
+    public void setMarkovCoverDistributionCompute(MarkovCoverDistributionCompute markovCoverDistributionCompute) {
+        this.markovCoverDistributionCompute = markovCoverDistributionCompute;
+    }
 }

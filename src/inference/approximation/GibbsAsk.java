@@ -2,13 +2,15 @@ package inference.approximation;
 
 import domain.data.AbstractDouble;
 import network.BayesianNetwork;
+import network.MarkovCoverDistributionCompute;
 import network.Variable;
 
 import java.util.List;
 
 public class GibbsAsk {
 
-    public static AbstractDouble ask(List<Variable> request, List<Variable> obs, BayesianNetwork network, int maxSample) {
+    public static AbstractDouble ask(List<Variable> request, List<Variable> obs, BayesianNetwork network, int maxSample,
+                                     MarkovCoverDistributionCompute markovCoverDistributionCompute) {
 
         network.markImportantVars(request, obs);
 
@@ -22,10 +24,10 @@ public class GibbsAsk {
         }
 
         for(Variable hiddenVar : variables){
+            //initialise la maniere dont est calculé la distribution en focntion de la couverture de markov
+            hiddenVar.setMarkovCoverDistributionCompute(markovCoverDistributionCompute);
 
-            hiddenVar.loadMarkovCover(obs);
-
-            hiddenVar.initCumulativeMarkovFrequencies();
+            hiddenVar.initCumulativeMarkovFrequencies(obs);
 
             hiddenVar.initRdmValue();
         }
@@ -36,7 +38,7 @@ public class GibbsAsk {
 
             for(Variable hiddenVar : variables){
 
-                hiddenVar.initValueFromMarkovCover();
+                hiddenVar.initRandomValueFromMarkovCover();
             }
 
             boolean sampleOk = true;
