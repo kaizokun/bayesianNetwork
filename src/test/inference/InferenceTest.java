@@ -44,11 +44,7 @@ public class InferenceTest {
 
         TestBayesianNetwork test = alarmTest();
 
-        long t1 = System.currentTimeMillis();
-
         AbstractDouble rs = EliminationAsk.ask(test.request,test.obs,test.bayesianNetwork);
-
-        System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
 
         System.out.println("RESULTAT : " + rs);
     }
@@ -63,16 +59,13 @@ public class InferenceTest {
 
         TestBayesianNetwork test = alarmTest();
 
-        long t1 = System.currentTimeMillis();
-
         AbstractDouble rs = EnumerationAsk.ask(test.request, test.obs, test.bayesianNetwork);
-
-        System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
 
         System.out.println("RESULTAT : " + rs);
     }
 
     @Test
+    @Ignore
     public void alarmTestSampleAsk(){
 
         System.out.println();
@@ -82,16 +75,13 @@ public class InferenceTest {
 
         TestBayesianNetwork test = alarmTest();
 
-        long t1 = System.currentTimeMillis();
-
         AbstractDouble rs = SamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
-
-        System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
 
         System.out.println("RESULTAT : " + rs);
     }
 
     @Test
+    @Ignore
     public void alarmTestSimilarSampleAsk(){
 
         System.out.println();
@@ -101,16 +91,10 @@ public class InferenceTest {
 
         TestBayesianNetwork test = alarmTest();
 
-        long t1 = System.currentTimeMillis();
-
         AbstractDouble rs = SimilaritySamplingAsk.ask(test.request, test.obs, test.bayesianNetwork, 500000);
-
-        System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
 
         System.out.println("RESULTAT : " + rs);
     }
-
-
 
     @Test
     public void alarmTestGibbsAsk(){
@@ -122,11 +106,7 @@ public class InferenceTest {
 
         TestBayesianNetwork test = alarmTest();
 
-        long t1 = System.currentTimeMillis();
-
-        AbstractDouble rs = GibbsAsk.ask(test.request, test.obs, test.bayesianNetwork, 20);
-
-        System.out.println("TEMPS "+(System.currentTimeMillis() - t1));
+        AbstractDouble rs = GibbsAsk.ask(test.request, test.obs, test.bayesianNetwork, 10000);
 
         System.out.println("RESULTAT : " + rs);
     }

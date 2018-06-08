@@ -6,6 +6,7 @@ import domain.data.AbstractDoubleFactory;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public interface ProbabilityCompute {
 
@@ -13,7 +14,9 @@ public interface ProbabilityCompute {
 
     Domain.DomainValue getRandomValue(Variable var);
 
-    AbstractDoubleFactory getDoubleFactory();
+    void showCumulativeMarkovFrequencies();
 
-    Hashtable<String, Hashtable<Domain.DomainValue, AbstractDouble>> getTCP();
+    void initCumulativeMarkovFrequencies(Variable variable);
+
+    Domain.DomainValue getValueFromMarkovCover(Variable variable);
 }

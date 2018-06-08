@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java" afterDir="false" />
+    <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="frequence cumulée pour une couverture de markov">
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/network/ProbabilityCompute.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/ProbabilityCompute.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/network/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/Variable.java" afterDir="false" />
@@ -30,87 +30,17 @@
       <file leaf-file-name="BayesianNetworkFactory.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="771">
-              <caret line="82" column="53" lean-forward="true" selection-start-line="82" selection-start-column="53" selection-end-line="82" selection-end-column="53" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="54">
+              <caret line="3" column="22" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Variable.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
+      <file leaf-file-name="InferenceTest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/test/inference/InferenceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="731">
-              <caret line="219" column="45" selection-start-line="219" selection-start-column="45" selection-end-line="219" selection-end-column="45" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#3253#3254#0" expanded="true" />
-                <element signature="e#3286#3287#0" expanded="true" />
-                <element signature="e#7078#7079#0" expanded="true" />
-                <element signature="e#7107#7108#0" expanded="true" />
-                <element signature="e#7576#7577#0" expanded="true" />
-                <element signature="e#7607#7608#0" expanded="true" />
-                <element signature="e#7639#7640#0" expanded="true" />
-                <element signature="e#7667#7668#0" expanded="true" />
-                <element signature="e#7710#7711#0" expanded="true" />
-                <element signature="e#7744#7745#0" expanded="true" />
-                <element signature="e#7780#7781#0" expanded="true" />
-                <element signature="e#7812#7813#0" expanded="true" />
-                <element signature="e#7863#7864#0" expanded="true" />
-                <element signature="e#7905#7906#0" expanded="true" />
-                <element signature="e#7937#7938#0" expanded="true" />
-                <element signature="e#7965#7966#0" expanded="true" />
-                <element signature="e#8007#8008#0" expanded="true" />
-                <element signature="e#8041#8042#0" expanded="true" />
-                <element signature="e#8070#8071#0" expanded="true" />
-                <element signature="e#8098#8099#0" expanded="true" />
-                <element signature="e#8137#8138#0" expanded="true" />
-                <element signature="e#8171#8172#0" expanded="true" />
-                <element signature="e#9209#9210#0" expanded="true" />
-                <element signature="e#9237#9238#0" expanded="true" />
-                <element signature="e#9276#9277#0" expanded="true" />
-                <element signature="e#9303#9304#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProbabilityComputeFromTCP.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="65">
-              <caret line="281" lean-forward="true" selection-start-line="281" selection-end-line="281" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#9670#9671#0" expanded="true" />
-                <element signature="e#9704#9705#0" expanded="true" />
-                <element signature="e#9754#9755#0" expanded="true" />
-                <element signature="e#9792#9793#0" expanded="true" />
-                <element signature="e#9834#9835#0" expanded="true" />
-                <element signature="e#9868#9869#0" expanded="true" />
-                <element signature="e#9918#9919#0" expanded="true" />
-                <element signature="e#9956#9957#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SimilaritySamplingAsk.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/SimilaritySamplingAsk.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="828">
-              <caret line="50" column="42" selection-start-line="50" selection-start-column="42" selection-end-line="50" selection-end-column="42" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GibbsAsk.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="45" column="49" lean-forward="true" selection-start-line="45" selection-start-column="49" selection-end-line="45" selection-end-column="49" />
+            <state relative-caret-position="90">
+              <caret line="81" lean-forward="true" selection-start-line="81" selection-end-line="81" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -121,8 +51,17 @@
       <file leaf-file-name="SamplingTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/test/sampling/SamplingTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="19" column="25" selection-start-line="19" selection-start-column="25" selection-end-line="19" selection-end-column="25" />
+            <state relative-caret-position="126">
+              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Variable.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="213">
+              <caret line="189" column="5" lean-forward="true" selection-start-line="189" selection-start-column="5" selection-end-line="189" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -130,38 +69,51 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JUnit4Builder.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/builders/JUnit4Builder.class">
+      <file leaf-file-name="GibbsAsk.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="16" selection-start-line="16" selection-end-line="16" />
+            <state relative-caret-position="83">
+              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AllDefaultPossibilitiesBuilder.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/builders/AllDefaultPossibilitiesBuilder.class">
+      <file leaf-file-name="ProbabilityComputeFromTCP.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="396">
-              <caret line="31" selection-start-line="31" selection-end-line="31" />
+            <state relative-caret-position="461">
+              <caret line="318" column="69" selection-start-line="318" selection-start-column="69" selection-end-line="318" selection-end-column="69" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClassRequest.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/requests/ClassRequest.class">
+      <file leaf-file-name="Domain.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/domain/Domain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="32" selection-start-line="32" selection-end-line="32" />
+            <state relative-caret-position="335">
+              <caret line="54" column="36" lean-forward="true" selection-start-line="54" selection-start-column="36" selection-end-line="54" selection-end-column="36" />
+              <folding>
+                <element signature="e#1683#1684#0" expanded="true" />
+                <element signature="e#1730#1731#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FilterRequest.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/requests/FilterRequest.class">
+      <file leaf-file-name="ProbabilityCompute.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityCompute.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="24" selection-start-line="24" selection-end-line="24" />
+            <state relative-caret-position="360">
+              <caret line="20" column="22" selection-start-line="20" selection-start-column="22" selection-end-line="20" selection-end-column="22" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -180,7 +132,10 @@
     <findStrings>
       <find>doubleFactory</find>
       <find>1-0-0-1-1-0</find>
+      <find>0.05643000000000005</find>
+      <find>ALARM : 1-0-JEAN_CALL : 1-MARIE_CALL : 1-JEAN_CALL-0-MARIE_CALL-0</find>
       <find>ALARM : 1-0-JEAN_CALL : 0-MARIE_CALL : 0-JEAN_CALL-0-MARIE_CALL-0</find>
+      <find>0.028199999999999996</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -195,15 +150,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/domain/data/Double.java" />
-        <option value="$PROJECT_DIR$/src/domain/data/BigDecimal.java" />
-        <option value="$PROJECT_DIR$/src/domain/data/myBigDecimalFactory.java" />
-        <option value="$PROJECT_DIR$/src/domain/data/MyBigDecimal.java" />
-        <option value="$PROJECT_DIR$/src/domain/data/MyDouble.java" />
-        <option value="$PROJECT_DIR$/src/domain/data/AbstractDoubleFactory.java" />
-        <option value="$PROJECT_DIR$/src/domain/data/MyDoubleFactory.java" />
-        <option value="$PROJECT_DIR$/src/domain/data/MyBigDecimalFactory.java" />
-        <option value="$PROJECT_DIR$/src/inference/exact/EliminationAsk.java" />
         <option value="$PROJECT_DIR$/src/domain/data/AbstractDouble.java" />
         <option value="$PROJECT_DIR$/src/network/BayesianNetworkFactory.java" />
         <option value="$PROJECT_DIR$/src/network/Factor.java" />
@@ -240,12 +186,21 @@
         <option value="$PROJECT_DIR$/src/inference/approximation/SamplingAsk.java" />
         <option value="$PROJECT_DIR$/src/inference/approximation/SimilaritySamplingAsk.java" />
         <option value="$PROJECT_DIR$/src/test/inference/InferenceTest.java" />
-        <option value="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" />
-        <option value="$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java" />
-        <option value="$PROJECT_DIR$/../probability/src/test/inference/InferenceTest.java" />
-        <option value="$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java" />
+        <option value="$PROJECT_DIR$/src/network/BayesianNetwork.java" />
+        <option value="$PROJECT_DIR$/src/network/ProbabilityCompute.java" />
+        <option value="$PROJECT_DIR$/src/network/Variable.java" />
+        <option value="$PROJECT_DIR$/src/test/sampling/SamplingTest.java" />
+        <option value="$PROJECT_DIR$/src/network/ProbabilityComputeFromTCP.java" />
+        <option value="$PROJECT_DIR$/src/test/inference/InferenceTest.java" />
+        <option value="$PROJECT_DIR$/src/inference/approximation/GibbsAsk.java" />
+        <option value="$PROJECT_DIR$/src/network/ProbabilityComputeFromTCP.java" />
+        <option value="$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java" />
         <option value="$PROJECT_DIR$/../probability/src/test/sampling/SamplingTest.java" />
+        <option value="$PROJECT_DIR$/../probability/src/test/inference/InferenceTest.java" />
+        <option value="$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java" />
+        <option value="$PROJECT_DIR$/../probability/src/network/ProbabilityCompute.java" />
         <option value="$PROJECT_DIR$/../probability/src/network/Variable.java" />
+        <option value="$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java" />
       </list>
     </option>
   </component>
@@ -275,6 +230,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -343,7 +299,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -380,7 +335,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.SamplingTest.markovCumulativeFrequenciesTest">
+  <component name="RunManager" selected="JUnit.InferenceTest">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
     </configuration>
@@ -456,29 +411,6 @@
       </option>
       <patterns />
     </configuration>
-    <configuration name="InferenceTest.alarmTestSampleAsk" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="probability" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="test.inference.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="test.inference" />
-      <option name="MAIN_CLASS_NAME" value="test.inference.InferenceTest" />
-      <option name="METHOD_NAME" value="alarmTestSampleAsk" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <patterns />
-    </configuration>
     <configuration name="InferenceTest.alarmTestSimilarSampleAsk" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="probability" />
       <extension name="coverage">
@@ -515,6 +447,29 @@
       <option name="PACKAGE_NAME" value="test.sampling" />
       <option name="MAIN_CLASS_NAME" value="test.sampling.SamplingTest" />
       <option name="METHOD_NAME" value="markovCumulativeFrequenciesTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <patterns />
+    </configuration>
+    <configuration name="SamplingTest.markovLoadTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="probability" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="test.sampling.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="test.sampling" />
+      <option name="MAIN_CLASS_NAME" value="test.sampling.SamplingTest" />
+      <option name="METHOD_NAME" value="markovLoadTest" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
@@ -564,19 +519,19 @@
       <listeners />
     </configuration>
     <list>
-      <item itemvalue="JUnit.InferenceTest.alarmTestSampleAsk" />
       <item itemvalue="JUnit.InferenceTest" />
       <item itemvalue="JUnit.InferenceTest.alarmTestSimilarSampleAsk" />
       <item itemvalue="JUnit.InferenceTest.alarmTestGibbsAsk" />
       <item itemvalue="JUnit.SamplingTest.markovCumulativeFrequenciesTest" />
+      <item itemvalue="JUnit.SamplingTest.markovLoadTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.SamplingTest.markovCumulativeFrequenciesTest" />
-        <item itemvalue="JUnit.InferenceTest.alarmTestGibbsAsk" />
         <item itemvalue="JUnit.InferenceTest" />
+        <item itemvalue="JUnit.InferenceTest.alarmTestGibbsAsk" />
         <item itemvalue="JUnit.InferenceTest.alarmTestSimilarSampleAsk" />
-        <item itemvalue="JUnit.InferenceTest.alarmTestSampleAsk" />
+        <item itemvalue="JUnit.SamplingTest.markovCumulativeFrequenciesTest" />
+        <item itemvalue="JUnit.SamplingTest.markovLoadTest" />
       </list>
     </recent_temporary>
   </component>
@@ -624,7 +579,9 @@
       <workItem from="1528285826741" duration="258000" />
       <workItem from="1528295033195" duration="6651000" />
       <workItem from="1528354480218" duration="2334000" />
-      <workItem from="1528360355691" duration="16643000" />
+      <workItem from="1528360355691" duration="27595000" />
+      <workItem from="1528405998071" duration="979000" />
+      <workItem from="1528442247309" duration="5522000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1527758342873</created>
@@ -801,43 +758,50 @@
       <option name="project" value="LOCAL" />
       <updated>1528300496588</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="frequence cumulée pour une couverture de markov">
+      <created>1528386359832</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1528386359833</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 20m 16s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 43m 22s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 20m 40s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 43m 30s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 20m 49s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 43m 32s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 21m 21s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 43m 34s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 21m 36s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 43m 35s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 22m 41s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 43m 58s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 23m 51s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 44m 01s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 31m 41s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 44m 02s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 16h 32m 49s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 44m 03s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SamplingTest_markovCumulativeFrequenciesTest - 2018.06.07 at 17h 01m 32s.xml">
-      <configuration name="SamplingTest.markovCumulativeFrequenciesTest" configurationId="JUnit" />
+    <history-entry file="InferenceTest - 2018.06.08 at 10h 44m 05s.xml">
+      <configuration name="InferenceTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="138393000" />
+    <option name="totallyTimeSpent" value="155846000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -862,11 +826,11 @@
       <window_info anchor="right" id="Maven Projects" order="7" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.22320442" />
-      <window_info anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" weight="0.18412349" />
+      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.18412349" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14605543" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14925373" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -942,22 +906,15 @@
     <MESSAGE value="sampleAsk optimisation qui stop l'echantillonage et pass au suivant si une observation ne correspond pas" />
     <MESSAGE value="sampleAsk simplification" />
     <MESSAGE value="add similarity sampling" />
-    <option name="LAST_COMMIT_MESSAGE" value="add similarity sampling" />
+    <MESSAGE value="frequence cumulée pour une couverture de markov" />
+    <option name="LAST_COMMIT_MESSAGE" value="frequence cumulée pour une couverture de markov" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../probability/src/domain/DomainFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/Factor.java" />
     <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1116">
@@ -1133,13 +1090,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/domain/Domain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="21" column="9" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/inference/exact/EliminationAsk.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="317">
@@ -1157,13 +1107,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityCompute.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
         </state>
       </provider>
     </entry>
@@ -1188,26 +1131,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/SamplingAsk.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="10" selection-start-line="10" selection-end-line="10" selection-end-column="122" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/test/inference/InferenceTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="605">
-          <caret line="126" column="89" selection-start-line="126" selection-start-column="89" selection-end-line="126" selection-end-column="89" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/../Program Files/Java/jdk1.8.0_141/src.zip!/java/lang/Comparable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="736">
@@ -1215,62 +1138,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="29" column="33" selection-start-line="29" selection-start-column="33" selection-end-line="29" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="281" lean-forward="true" selection-start-line="281" selection-end-line="281" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#9670#9671#0" expanded="true" />
-            <element signature="e#9704#9705#0" expanded="true" />
-            <element signature="e#9754#9755#0" expanded="true" />
-            <element signature="e#9792#9793#0" expanded="true" />
-            <element signature="e#9834#9835#0" expanded="true" />
-            <element signature="e#9868#9869#0" expanded="true" />
-            <element signature="e#9918#9919#0" expanded="true" />
-            <element signature="e#9956#9957#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/SimilaritySamplingAsk.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="828">
           <caret line="50" column="42" selection-start-line="50" selection-start-column="42" selection-end-line="50" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="45" column="49" lean-forward="true" selection-start-line="45" selection-start-column="49" selection-end-line="45" selection-end-column="49" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/builders/JUnit4Builder.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="16" selection-start-line="16" selection-end-line="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/builders/AllDefaultPossibilitiesBuilder.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
         </state>
       </provider>
     </entry>
@@ -1288,10 +1159,48 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/test/sampling/SamplingTest.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/builders/JUnit4Builder.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" column="25" selection-start-line="19" selection-start-column="25" selection-end-line="19" selection-end-column="25" />
+        <state relative-caret-position="198">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/org/junit/internal/builders/AllDefaultPossibilitiesBuilder.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="31" selection-start-line="31" selection-end-line="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/SamplingAsk.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="10" selection-start-line="10" selection-end-line="10" selection-end-column="122" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../Program Files/Java/jdk1.8.0_141/src.zip!/java/lang/StringBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="252" selection-start-line="252" selection-end-line="252" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../Program Files/Java/jdk1.8.0_141/src.zip!/java/lang/AbstractStringBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="823" selection-start-line="823" selection-end-line="823" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="321">
+          <caret line="53" column="25" selection-start-line="53" selection-start-column="25" selection-end-line="53" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1300,8 +1209,53 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="771">
-          <caret line="82" column="53" lean-forward="true" selection-start-line="82" selection-start-column="53" selection-end-line="82" selection-end-column="53" />
+        <state relative-caret-position="54">
+          <caret line="3" column="22" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/domain/Domain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="335">
+          <caret line="54" column="36" lean-forward="true" selection-start-line="54" selection-start-column="36" selection-end-line="54" selection-end-column="36" />
+          <folding>
+            <element signature="e#1683#1684#0" expanded="true" />
+            <element signature="e#1730#1731#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/inference/InferenceTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="81" lean-forward="true" selection-start-line="81" selection-end-line="81" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/sampling/SamplingTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/inference/approximation/GibbsAsk.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="83">
+          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityCompute.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="20" column="22" selection-start-line="20" selection-start-column="22" selection-end-line="20" selection-end-column="22" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1310,36 +1264,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="219" column="45" selection-start-line="219" selection-start-column="45" selection-end-line="219" selection-end-column="45" />
+        <state relative-caret-position="213">
+          <caret line="189" column="5" lean-forward="true" selection-start-line="189" selection-start-column="5" selection-end-line="189" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3253#3254#0" expanded="true" />
-            <element signature="e#3286#3287#0" expanded="true" />
-            <element signature="e#7078#7079#0" expanded="true" />
-            <element signature="e#7107#7108#0" expanded="true" />
-            <element signature="e#7576#7577#0" expanded="true" />
-            <element signature="e#7607#7608#0" expanded="true" />
-            <element signature="e#7639#7640#0" expanded="true" />
-            <element signature="e#7667#7668#0" expanded="true" />
-            <element signature="e#7710#7711#0" expanded="true" />
-            <element signature="e#7744#7745#0" expanded="true" />
-            <element signature="e#7780#7781#0" expanded="true" />
-            <element signature="e#7812#7813#0" expanded="true" />
-            <element signature="e#7863#7864#0" expanded="true" />
-            <element signature="e#7905#7906#0" expanded="true" />
-            <element signature="e#7937#7938#0" expanded="true" />
-            <element signature="e#7965#7966#0" expanded="true" />
-            <element signature="e#8007#8008#0" expanded="true" />
-            <element signature="e#8041#8042#0" expanded="true" />
-            <element signature="e#8070#8071#0" expanded="true" />
-            <element signature="e#8098#8099#0" expanded="true" />
-            <element signature="e#8137#8138#0" expanded="true" />
-            <element signature="e#8171#8172#0" expanded="true" />
-            <element signature="e#9209#9210#0" expanded="true" />
-            <element signature="e#9237#9238#0" expanded="true" />
-            <element signature="e#9276#9277#0" expanded="true" />
-            <element signature="e#9303#9304#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="461">
+          <caret line="318" column="69" selection-start-line="318" selection-start-column="69" selection-end-line="318" selection-end-column="69" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

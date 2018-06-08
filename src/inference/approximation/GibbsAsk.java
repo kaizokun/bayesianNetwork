@@ -23,10 +23,12 @@ public class GibbsAsk {
 
         for(Variable hiddenVar : variables){
 
+            hiddenVar.loadMarkovCover(obs);
+
+            hiddenVar.initCumulativeMarkovFrequencies();
+
             hiddenVar.initRdmValue();
         }
-
-        //System.out.println("INIT RANDOM "+variables);
 
         double totalSampleReq = 0;
 
@@ -34,10 +36,8 @@ public class GibbsAsk {
 
             for(Variable hiddenVar : variables){
 
-                hiddenVar.initvalueFromMarkovCover();
+                hiddenVar.initValueFromMarkovCover();
             }
-
-            System.out.println("MARKOV SAMPLE "+variables);
 
             boolean sampleOk = true;
 
@@ -58,6 +58,7 @@ public class GibbsAsk {
         }
 
         System.out.println("MAX : "+maxSample);
+
         System.out.println("TOTAL : "+totalSampleReq);
 
         double rs = totalSampleReq / maxSample;

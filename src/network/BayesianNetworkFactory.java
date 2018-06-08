@@ -2,7 +2,6 @@ package network;
 
 import domain.DomainFactory;
 import domain.IDomain;
-import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
 
 import java.util.ArrayList;
