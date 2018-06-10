@@ -9,8 +9,6 @@ import java.util.*;
 
 public class Variable {
 
-    protected int depth;
-
     protected IDomain domain;
 
     protected String label;
@@ -18,8 +16,6 @@ public class Variable {
     protected Domain.DomainValue value, originValue;
 
     protected List<Variable> dependencies;
-
-    protected Hashtable<Variable,Integer> dependenciesOrderNumber;
 
     protected List<Variable> children;
 
@@ -44,6 +40,10 @@ public class Variable {
     protected List<Factor> factors = new LinkedList<>();
 
     public Variable() {
+
+        this.dependencies = new ArrayList<>();
+
+        this.children = new ArrayList<>();
     }
 
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute ) {
@@ -63,13 +63,7 @@ public class Variable {
 
         this.children = new ArrayList<>();
 
-        this.dependenciesOrderNumber = new Hashtable<>();
-
-        int i = 0;
-
         for (Variable parent : dependencies) {
-
-            this.dependenciesOrderNumber.put(parent, i++);
 
             parent.addChild(this);
         }
@@ -248,14 +242,6 @@ public class Variable {
         this.label = label;
     }
 
-    public int getDepth() {
-        return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
-    }
-
     @Override
     public String toString() {
 
@@ -277,9 +263,21 @@ public class Variable {
         return this.domain.getValues().size();
     }
 
+    public void setDomain(IDomain domain) {
+        this.domain = domain;
+    }
+
     public Iterable<Domain.DomainValue> getDomainValues() {
 
         return this.domain.getValues();
+    }
+
+    public ProbabilityCompute getProbabilityCompute() {
+        return probabilityCompute;
+    }
+
+    public void setProbabilityCompute(ProbabilityCompute probabilityCompute) {
+        this.probabilityCompute = probabilityCompute;
     }
 
     public void addFactor(Factor factor) {

@@ -39,7 +39,7 @@ public class InferenceTest {
 
         List<Variable> request = new ArrayList<>();
 
-        cambriolage.setValue(1);
+        cambriolage.setValue(0);
 
         //tremblementDeTerre.setValue(0);
 

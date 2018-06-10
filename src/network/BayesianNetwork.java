@@ -7,8 +7,6 @@ import java.util.*;
 
 public class BayesianNetwork {
 
-    private AbstractDoubleFactory doubleFactory;
-
     public BayesianNetwork() {
     }
 
@@ -16,6 +14,8 @@ public class BayesianNetwork {
 
         this.doubleFactory = doubleFactory;
     }
+
+    private AbstractDoubleFactory doubleFactory;
 
     protected List<Variable> roots = new ArrayList<>();
 
@@ -25,7 +25,6 @@ public class BayesianNetwork {
 
         return new ProbabilityComputeFromTCP(booleanDomain, doubles, this.doubleFactory);
     }
-
 
     public ProbabilityCompute getTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries){
 
