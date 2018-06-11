@@ -43,6 +43,11 @@ public class Variable {
     //facteurs lié à cette variable
     protected List<Factor> factors = new LinkedList<>();
 
+    public Variable(String label){
+
+        this.label = label;
+    }
+
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute ) {
 
         this(label, domain, probabilityCompute, new ArrayList<>(),0);
@@ -72,10 +77,12 @@ public class Variable {
         int i = 0;
 
         for (Variable parent : dependencies) {
-
+            //ajout de la variable courante comme enfant du parent
             parent.addChild(this);
-
-            this.dependenciesIndex.put(parent.getLabel()+"_"+time, i);
+            //enregistre l'id du parent dans le tableau
+            //ici plusieurs meme variable peuvent avoir des temps differents
+            //donc on recupere une clé composée du label suivit du temps de la variable parent
+            this.dependenciesIndex.put(getvarTimeId(parent, parent.time), i ++);
         }
     }
 
@@ -91,9 +98,11 @@ public class Variable {
         return variable.getLabel()+"_"+time;
     }
 
-    public Variable getParent(Variable variable, int time){
+    public Variable getParent(int time){
 
-        int indexId = this.dependenciesIndex.get(getvarTimeId(variable, time));
+        String varTimeId = getvarTimeId(this, time);
+
+        int indexId = this.dependenciesIndex.get(varTimeId);
 
         return this.dependencies.get(indexId);
     }
@@ -267,7 +276,7 @@ public class Variable {
     @Override
     public String toString() {
 
-        return this.label + " " + this.value;//+"=======\n"+this.probabilityCompute.toString();
+        return this.label+"_"+this.time;
     }
 
     public Variable simpleCopy() {

@@ -21,6 +21,11 @@ public class Model {
         this.dependencies = new LinkedList<>();
     }
 
+    public void addDependencie(Variable variable){
+
+        this.addDependencie(variable, 1);
+    }
+
     public void addDependencie(Variable variable, int markovOrder){
 
         this.dependencies.add(new Dependency(variable, markovOrder));
@@ -57,7 +62,9 @@ public class Model {
         private int markovOrder;
 
         public Dependency(Variable dependency, int markovOrder) {
+
             this.dependency = dependency;
+
             this.markovOrder = markovOrder;
         }
 
