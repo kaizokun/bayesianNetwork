@@ -25,6 +25,10 @@ public class Variable {
 
     protected Set<Variable> markovKover;
 
+    protected Hashtable<String, Integer> dependenciesIndex;
+
+    protected int time;
+
     //utilisé dans la recuperation des noeuds dans l'odre topologique
     //pour savoir si ils ont été ajoutés, pas vraiment une propriété mais plus pratique que de créer
     //des tables de hachages à chaque.
@@ -39,19 +43,17 @@ public class Variable {
     //facteurs lié à cette variable
     protected List<Factor> factors = new LinkedList<>();
 
-    public Variable() {
-
-        this.dependencies = new ArrayList<>();
-
-        this.children = new ArrayList<>();
-    }
-
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute ) {
 
-        this(label, domain, probabilityCompute, new ArrayList<>());
+        this(label, domain, probabilityCompute, new ArrayList<>(),0);
     }
 
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies ) {
+
+        this(label, domain, probabilityCompute, dependencies,0);
+    }
+
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies, int time ) {
 
         this.label = label;
 
@@ -63,9 +65,17 @@ public class Variable {
 
         this.children = new ArrayList<>();
 
+        this.dependenciesIndex = new Hashtable<>();
+
+        this.time = time;
+
+        int i = 0;
+
         for (Variable parent : dependencies) {
 
             parent.addChild(this);
+
+            this.dependenciesIndex.put(parent.getLabel()+"_"+time, i);
         }
     }
 
@@ -74,6 +84,18 @@ public class Variable {
         this.value = variable.value;
 
         this.label = variable.label;
+    }
+
+    private String getvarTimeId(Variable variable, int time){
+
+        return variable.getLabel()+"_"+time;
+    }
+
+    public Variable getParent(Variable variable, int time){
+
+        int indexId = this.dependenciesIndex.get(getvarTimeId(variable, time));
+
+        return this.dependencies.get(indexId);
     }
 
     private void addChild(Variable child) {
@@ -280,6 +302,14 @@ public class Variable {
         this.probabilityCompute = probabilityCompute;
     }
 
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
     public void addFactor(Factor factor) {
 
         this.factors.add(factor);
@@ -320,5 +350,10 @@ public class Variable {
 
     public void setMarkovCoverDistributionCompute(MarkovCoverDistributionCompute markovCoverDistributionCompute) {
         this.markovCoverDistributionCompute = markovCoverDistributionCompute;
+    }
+
+    public boolean hasDependencies() {
+
+        return !this.dependencies.isEmpty();
     }
 }
