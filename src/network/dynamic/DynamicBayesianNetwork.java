@@ -11,9 +11,9 @@ import java.util.*;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
-    protected int time;
+    protected int time = 0;
 
-    protected Map<Variable, Variable> lastTimeVars = new Hashtable<>();
+    protected Map<Integer, Map<Variable, Variable>> timeVariables = new Hashtable<>();
 
     protected Map<Variable, List<Model>> transitionModels = new Hashtable<>();
 
@@ -28,9 +28,23 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         Variable root = super.addRootVariable(label, domain, probabilityCompute);
 
-        this.lastTimeVars.put(root, root);
+        this.getTimeVariable(this.time).put(root, root);
 
         return root;
+    }
+
+    private Map<Variable, Variable> getTimeVariable(int time){
+
+        Map<Variable, Variable> variables = this.timeVariables.get(time);
+
+        if(variables == null && time <= this.time){
+
+            variables = new Hashtable<>();
+
+            this.timeVariables.put(time, variables);
+        }
+
+        return variables;
     }
 
     /**
@@ -64,7 +78,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     /**
      * ! ou avec cette méthode l'ordre croissant n'est pas obligatoire
      * mais obliger d'indiquer le maximum de modele pour une variable
-     *//*
+     */
+    /*
     public void addTransitionModel(Variable variable, Model model, int time, int maxModels) {
         //recupere la liste des modeles par limite de temps atteinte pour une variable
         List<Model> varModels = this.transitionModels.get(variable);
@@ -112,13 +127,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         this.time ++;
 
-        this.extend(this.transitionModels);
+        this.extend(this.transitionModels, this.time - 1);
 
-        this.extend(this.captorsModels);
-
+        this.extend(this.captorsModels, this.time);
     }
 
-    private void extend(Map<Variable, List<Model>> models){
+    private void extend(Map<Variable, List<Model>> models, int timeParent){
 
         List<Variable> newVars = new LinkedList<>();
 
@@ -150,7 +164,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //en correspondance avec les entrées TCP
             for (Dependency dependencie : model.getDependencies()) {
 
-                Variable lastDep = this.lastTimeVars.get(dependencie.getDependency());
+                Variable lastDep = this.getTimeVariable(timeParent).get(dependencie.getDependency());
 
                // System.out.println("       DEP : "+dependencie.getDependency()+" "+dependencie.getMarkovOrder());
 
@@ -173,10 +187,10 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             newVars.add(newVar);
         }
 
-        //remplacement des observations précédentes
+        //enregistrement des variables pour access rapide
         for (Variable newVar : newVars) {
 
-            this.lastTimeVars.put(newVar, newVar);
+            this.getTimeVariable(time).put(newVar, newVar);
         }
 
         //(1)
@@ -188,6 +202,57 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //avec des ordres différents et des TCP differentes pour les differents temps
         //en tout cas au début jusqu'à atteindre un temps qu permette d'avoir les
         //dependances completes
+    }
+
+    public void filter(List<Variable> request, List<Variable> observation){
+
+        //on etend le graphe
+        this.extend();
+
+        /*
+        *
+        * premierement initialiser les observations à l'instant t à partir de valeur de la liste recu en parametre
+        * idem pour la requete en sauvegardant les valeur precedentes
+        *
+        * Recuperer toutes les combinaison de valeur pour les variable de la requete via une méthode recursive
+        *
+        * total pour toutes les combinaisons
+        *
+        * Pour chaque combinaisons
+        *
+        *   initialiser les variables de la requete
+        *
+        *   totalCapteur <- 1.0
+        *
+        *   Pour chaque observation
+        *
+        *       totalCapteur = totalCapteur * Cacluler la probabilité de l'observation
+        *                      en fonction de le valeur des variables d'états parent PO (normalement une etat par capteur)
+        *
+        *       SumHiddenState <- 0;
+        *
+        *       Pour chaque valeur pour la variable parent de PO PO2
+        *           //cependant PO pourrait avoir plusieurs parents et il faudrait sommer sur chaque combinaison
+        *           //de valeur pour les parents de PO
+        *
+        *           PO_value <- calculer la valeur de PO en fonction de PO2
+        *
+        *           probPO2 <- appel recursif de la fonction avec comme requete les variables PO2 et les observations liés à PO2
+        *
+        *           SumHiddenState <- SumHiddenState + ( PO_value * probPO2 )
+        *
+        *       Fin Pour
+        *
+        *   Fin Pour
+
+        * Fin Pour
+        *
+        *
+        *
+        *
+        *
+        * */
+
     }
 
     @Override
