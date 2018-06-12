@@ -7,6 +7,7 @@ import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.Model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
@@ -16,12 +17,12 @@ import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
 
 public class BayesianNetworkFactory {
 
-    public enum ABCD_NETWORK_VARS{
+    public enum ABCD_NETWORK_VARS {
 
         VAR_A
     }
 
-    public static BayesianNetwork getABCDNetwork(){
+    public static BayesianNetwork getABCDNetwork() {
 
         //reseau
 
@@ -43,13 +44,13 @@ public class BayesianNetworkFactory {
     }
 
 
-    public enum ALARM_NETWORK_VARS{
+    public enum ALARM_NETWORK_VARS {
 
         CAMBRIOLAGE, TREMBLEMENT_DE_TERRE, ALARM, JEAN_CALL, MARIE_CALL
     }
 
 
-    public static BayesianNetwork getAlarmNetwork(){
+    public static BayesianNetwork getAlarmNetwork() {
 
         //reseau
 
@@ -89,7 +90,7 @@ public class BayesianNetworkFactory {
                         {0.95, 1 - 0.95},
                         {0.94, 1 - 0.94},
                         {0.29, 1 - 0.29},
-                        {0.001, 1- 0.001}});
+                        {0.001, 1 - 0.001}});
 
         Variable alarm = network.addVariable(ALARM.toString(), booleanDomain, tcpAlarm, alarmDependencies);
 
@@ -126,12 +127,12 @@ public class BayesianNetworkFactory {
     }
 
 
-    public enum UMBRELLA_NETWORK_VARS{
+    public enum UMBRELLA_NETWORK_VARS {
 
         UMBRELLA, RAIN
     }
 
-    public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder1(){
+    public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder1() {
 
         DynamicBayesianNetwork network = new DynamicBayesianNetwork(new MyDoubleFactory());
 
@@ -146,10 +147,18 @@ public class BayesianNetworkFactory {
 
         //Models
         //Rain time 1
+
+        //Rain 1 dependencies
+
+        List<Variable> dependencies = new LinkedList<>();
+
+        dependencies.add(rain);
+
         ProbabilityCompute tcpRain = network.getTCP(
+                dependencies,
                 booleanDomain,
                 new Double[][]{{0.7, 1 - 0.7},
-                               {0.3, 1 - 0.3}});
+                        {0.3, 1 - 0.3}});
         //création du model avec la tcp associé
         Model rainExtensionModel = new Model(tcpRain);
         //ajoute une dependence à la variable avec une profondeur de 1
@@ -159,9 +168,10 @@ public class BayesianNetworkFactory {
 
         //Umbrella time 1
 
-        Variable umbrella = new Variable(UMBRELLA.toString());
+        Variable umbrella = new Variable(UMBRELLA.toString(), booleanDomain);
 
         ProbabilityCompute tcpUmbrella = network.getTCP(
+                dependencies,
                 booleanDomain,
                 new Double[][]{{0.9, 1 - 0.9},
                         {0.2, 1 - 0.2}});
@@ -176,7 +186,7 @@ public class BayesianNetworkFactory {
     }
 
 
-    public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2(){
+    public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2() {
 
         DynamicBayesianNetwork network = new DynamicBayesianNetwork(new MyDoubleFactory());
 
@@ -202,17 +212,17 @@ public class BayesianNetworkFactory {
 
         //Rain time 2
         /*
-        * VV : pluie les deux jours precedents
-        * VF : pluie il y a deux jour mais pas la veille
-        * FV : pas de pluie il y a deux jour mais la veille
-        * FF : pas de pluie les deux derniers jours
-        * */
+         * VV : pluie les deux jours precedents
+         * VF : pluie il y a deux jour mais pas la veille
+         * FV : pas de pluie il y a deux jour mais la veille
+         * FF : pas de pluie les deux derniers jours
+         * */
         ProbabilityCompute tcpRain2 = network.getTCP(
                 booleanDomain,
                 new Double[][]{{0.9, 1 - 0.9},
-                               {0.3, 1 - 0.3},
-                               {0.7, 1 - 0.7},
-                               {0.1, 1 - 0.9}});
+                        {0.3, 1 - 0.3},
+                        {0.7, 1 - 0.7},
+                        {0.1, 1 - 0.9}});
         //création du model avec la tcp associé
         Model rainExtensionModel2 = new Model(tcpRain2);
         //ajoute une dependence à la variable avec une profondeur de 1

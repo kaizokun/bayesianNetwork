@@ -45,6 +45,13 @@ public class Variable {
     //facteurs lié à cette variable
     protected List<Factor> factors = new LinkedList<>();
 
+    public Variable(String label, IDomain domain){
+
+        this.domain = domain;
+
+        this.label = label;
+    }
+
     public Variable(String label){
 
         this.label = label;
@@ -280,7 +287,7 @@ public class Variable {
     @Override
     public String toString() {
 
-        return this.label+"_"+this.time;
+        return this.label+"_"+this.time+" = "+this.value;
     }
 
     public Variable simpleCopy() {

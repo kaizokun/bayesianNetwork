@@ -1,8 +1,17 @@
 package test.dynamic;
 
+import domain.DomainFactory;
+import domain.data.AbstractDouble;
 import network.BayesianNetworkFactory;
+import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 import org.junit.Test;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.RAIN;
+import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
 
 public class DynamicBayesianNetworkTest  {
 
@@ -11,16 +20,42 @@ public class DynamicBayesianNetworkTest  {
 
         DynamicBayesianNetwork network = BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder1();
 
-        for(int e = 0 ; e < 5 ; e ++) {
+        for(int e = 0 ; e < 2 ; e ++) {
 
             network.extend();
-
-            System.out.println(network.toString());
-
         }
 
-    }
+        //initialisation des observations
 
+        Variable umbrella = new Variable(UMBRELLA.toString());
+
+        Variable umbrella1 = network.getVariable(1, umbrella);
+
+        Variable umbrella2 = network.getVariable(2, umbrella);
+
+        umbrella1.setValue(1);
+
+        umbrella2.setValue(1);
+
+        //initialisation de la requete
+
+        List<Variable> requests = new LinkedList<>();
+
+        Variable rain = new Variable(RAIN.toString());
+
+        Variable rain2 = network.getVariable(2, rain);
+
+        rain2.setValue(1);
+
+        requests.add(rain2);
+
+        System.out.println(network.toString());
+
+        AbstractDouble prob = network.filter(requests);
+
+        System.out.println("request prob : "+prob);
+
+    }
 
     @Test
     public void DynamicBayesianNetworkUmbrellaOrder2Test(){

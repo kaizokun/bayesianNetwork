@@ -49,6 +49,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return variables;
     }
 
+    public Variable getVariable(int time, Variable variable){
+
+        return this.timeVariables.get(time).get(variable);
+    }
+
     /**
      * ! les modeles doivent être ajoutés dans l'ordre de temps d'utilisation
      */
@@ -211,8 +216,15 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-
     public AbstractDouble filter(List<Variable> requests) {
+
+        return this.filter(requests, 0);
+    }
+
+    private AbstractDouble filter(List<Variable> requests, int depth) {
+
+        System.out.println();
+        System.out.println(getIdent(depth)+"INITIAL REQUEST : "+requests);
 
         List<Variable> requestObservations = new LinkedList<>();
 
@@ -224,6 +236,10 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
 
         if (requestObservations.isEmpty()) {
+
+            System.out.println();
+            System.out.println(getIdent(depth)+"VALUE : "+requests+" = "+requests.get(0).getProbabilityForCurrentValue());
+
             //en principe une seule variable
             //dan sl'appel recursif chaque variable caché et calculé séparemment en fonction des observations liées
             return requests.get(0).getProbabilityForCurrentValue();
@@ -244,6 +260,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 req.setDomainValue(requestValues.get(i ++));
             }
 
+            System.out.println();
+            System.out.println(getIdent(depth)+"COMBINAISON : "+requests);
+
             AbstractDouble probRequestCombinaison = this.doubleFactory.getNew(1.0);
 
             for(Variable observation : requestObservations){
@@ -252,7 +271,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 Variable obsParentState = observation.getDependencies().get(0);
 
-                AbstractDouble obsParentStateValuesSum = doubleFactory.getNew(0.0);
+                AbstractDouble obsParentStateValuesSum = this.doubleFactory.getNew(0.0);
 
                 //on somme ensuite sur les dependances de la dependence de l'observation
                 //une variable etat parent d'une observation peut avoir plusieurs autres états comme parents
@@ -266,7 +285,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                     int j = 0;
 
-                    for (Variable obsParentStateDep : obsParentState.getDependencies()) {
+                    for(Variable obsParentStateDep : obsParentState.getDependencies()){
 
                         obsParentStateDep.setDomainValue(domainValues.get(j ++));
                     }
@@ -279,7 +298,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                         newRequests.add(obsParentStateDep);
 
-                        obsParentStateValuesSum = obsParentStateValuesSum.multiply(filter(newRequests));
+                        obsParentStateValuesSum = obsParentStateValuesSum.multiply(filter(newRequests, depth + 1));
                     }
                 }
 
@@ -304,6 +323,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 probRequest = probRequestCombinaison;
             }
+
+            System.out.println();
+            System.out.println(getIdent(depth)+"VALUE : "+requests+" = "+probRequestCombinaison);
 
         }
 
@@ -399,7 +421,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             builder.append(ident);
 
-            builder.append(var.getLabel() + " " + var.getTime() + "\n");
+            builder.append(var+ "\n");
 
             loadTree(var.getChildren(), builder, depth + 1);
         }
