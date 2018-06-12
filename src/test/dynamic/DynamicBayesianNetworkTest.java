@@ -1,5 +1,6 @@
 package test.dynamic;
 
+import domain.Domain;
 import domain.DomainFactory;
 import domain.data.AbstractDouble;
 import network.BayesianNetworkFactory;
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.RAIN;
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
@@ -51,9 +53,11 @@ public class DynamicBayesianNetworkTest  {
 
         System.out.println(network.toString());
 
-        AbstractDouble prob = network.filter(requests);
+        Map<Domain.DomainValue, AbstractDouble> distribution = network.filter(requests);
 
-        System.out.println("request prob : "+prob);
+        System.out.println();
+
+        System.out.println("request prob : "+distribution);
 
     }
 

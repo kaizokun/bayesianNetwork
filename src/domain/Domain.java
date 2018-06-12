@@ -61,6 +61,10 @@ public class Domain implements IDomain {
         public DomainValue() {
         }
 
+        public DomainValue(Object value) {
+            this.value = value;
+        }
+
         public DomainValue(Object value, int index) {
 
             this.value = value;
@@ -103,7 +107,6 @@ public class Domain implements IDomain {
 
         @Override
         public int hashCode() {
-
             return Objects.hash(value);
         }
     }

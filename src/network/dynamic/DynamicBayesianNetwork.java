@@ -13,6 +13,8 @@ import java.util.*;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
+    protected static String TOTAL_VALUE = "total";
+
     protected int time = 0;
 
     protected Map<Integer, Map<Variable, Variable>> timeVariables = new Hashtable<>();
@@ -206,7 +208,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
 
         //(1)
-        //cependant peut poser problème en cas d'ancetre insuffisant
+        //cependant peut poser problème en    cas d'ancetre insuffisant
         //par exemple une variable qui aurait un modele de transition d'ordre 2 par exemple
         //lors du deploiement de la variable t1 il ne pourrait récuperer q'un seul parent
         //en t0 par consequent il faudrait une TCP pour ces cas particulier
@@ -216,15 +218,16 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-    public AbstractDouble filter(List<Variable> requests) {
+    public  Map<Domain.DomainValue, AbstractDouble> filter(List<Variable> requests) {
 
         return this.filter(requests, 0);
     }
 
-    private AbstractDouble filter(List<Variable> requests, int depth) {
+    private Map<java.lang.String, Map<Domain.DomainValue, AbstractDouble>> forwardDistribSaved = new Hashtable<>();
 
-        System.out.println();
-        System.out.println(getIdent(depth)+"INITIAL REQUEST : "+requests);
+    private  Map<Domain.DomainValue, AbstractDouble> filter(List<Variable> requests, int depth) {
+
+        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>();
 
         List<Variable> requestObservations = new LinkedList<>();
 
@@ -237,19 +240,40 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         if (requestObservations.isEmpty()) {
 
-            System.out.println();
-            System.out.println(getIdent(depth)+"VALUE : "+requests+" = "+requests.get(0).getProbabilityForCurrentValue());
+           // System.out.println();
+           // System.out.println(getIdent(depth)+"VALUE : "+requests+" = "+requests.get(0).getProbabilityForCurrentValue());
 
             //en principe une seule variable
             //dan sl'appel recursif chaque variable caché et calculé séparemment en fonction des observations liées
-            return requests.get(0).getProbabilityForCurrentValue();
+
+            System.out.print(" "+requests.get(0).getProbabilityForCurrentValue()+" ");
+
+            AbstractDouble total = doubleFactory.getNew(0.0);
+
+            for(Domain.DomainValue domainValue : requests.get(0).getDomainValues()){
+
+                requests.get(0).setDomainValue(domainValue);
+
+                AbstractDouble valueProb = requests.get(0).getProbabilityForCurrentValue();
+
+                distribution.put(domainValue, valueProb);
+
+                total = total.add(valueProb);
+            }
+
+            distribution.put(new Domain.DomainValue(TOTAL_VALUE), total);
+
+           // System.out.println();
+           // System.out.println(requests+" "+distribution);
+          //  System.out.println();
+            return distribution;
         }
 
         List<List<Domain.DomainValue>> requestValuesList = BayesianNetwork.requestValuesCombinaisons(requests);
 
         AbstractDouble totalCombinaisons = this.doubleFactory.getNew(0.0);
 
-        AbstractDouble probRequest = this.doubleFactory.getNew(0.0);
+        //AbstractDouble probRequest = this.doubleFactory.getNew(0.0);
 
         for (List<Domain.DomainValue> requestValues : requestValuesList) {
 
@@ -260,16 +284,20 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 req.setDomainValue(requestValues.get(i ++));
             }
 
-            System.out.println();
-            System.out.println(getIdent(depth)+"COMBINAISON : "+requests);
+           // System.out.println();
+           // System.out.println(getIdent(depth)+"COMBINAISON : "+requests);
 
             AbstractDouble probRequestCombinaison = this.doubleFactory.getNew(1.0);
 
             for(Variable observation : requestObservations){
 
-                probRequestCombinaison = probRequestCombinaison.multiply( observation.getProbabilityForCurrentValue());
+                System.out.print(" {C} "+probRequestCombinaison+" * "+observation.getProbabilityForCurrentValue());
+
+                probRequestCombinaison = probRequestCombinaison.multiply( observation.getProbabilityForCurrentValue() );
 
                 Variable obsParentState = observation.getDependencies().get(0);
+
+                System.out.print(" * SUM [ ");
 
                 AbstractDouble obsParentStateValuesSum = this.doubleFactory.getNew(0.0);
 
@@ -279,9 +307,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 //dans ce cas peut être multiplier les resultats de chacune des sommations
                 //pour l'instant on s'en tiens à un seul etat parent par observation
 
-                List<List<Domain.DomainValue>> parentStateValues = BayesianNetwork.requestValuesCombinaisons(obsParentState.getDependencies());
+                List<List<Domain.DomainValue>> obsParentStateDependenciesValues = BayesianNetwork.requestValuesCombinaisons(obsParentState.getDependencies());
 
-                for(List<Domain.DomainValue> domainValues : parentStateValues){
+                int b = 1;
+
+                for(List<Domain.DomainValue> domainValues : obsParentStateDependenciesValues){
 
                     int j = 0;
 
@@ -290,7 +320,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                         obsParentStateDep.setDomainValue(domainValues.get(j ++));
                     }
 
-                    obsParentStateValuesSum = obsParentStateValuesSum.add(obsParentState.getProbabilityForCurrentValue());
+                    AbstractDouble mulTransitionForward = doubleFactory.getNew(1.0);
+
+                    mulTransitionForward = mulTransitionForward.multiply(obsParentState.getProbabilityForCurrentValue());
+
+                    System.out.print(" {T} "+obsParentState.getProbabilityForCurrentValue()+" * ( ");
+
+                    int a = 1;
 
                     for(Variable obsParentStateDep : obsParentState.getDependencies()){
 
@@ -298,15 +334,63 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                         newRequests.add(obsParentStateDep);
 
-                        obsParentStateValuesSum = obsParentStateValuesSum.multiply(filter(newRequests, depth + 1));
+                        AbstractDouble forward;
+
+                        String varKey = obsParentStateDep.getLabel()+"_"+obsParentStateDep.getTime();
+
+                        if(forwardDistribSaved.containsKey(varKey)){
+
+                            Map<Domain.DomainValue, AbstractDouble> distrib = forwardDistribSaved.get(varKey);
+
+                            forward = distrib.get(obsParentStateDep.getDomainValue()).divide(distrib.get(new Domain.DomainValue(TOTAL_VALUE)));
+
+                            System.out.print(forward);
+
+                        }else {
+
+                            Map<Domain.DomainValue, AbstractDouble> distrib = filter(newRequests, depth + 1);
+
+                            forwardDistribSaved.put(varKey, distrib);
+
+                            forward = distrib.get(obsParentStateDep.getDomainValue()).divide(distrib.get(new Domain.DomainValue(TOTAL_VALUE)));
+                        }
+
+                        if(a < obsParentState.getDependencies().size()){
+
+                            System.out.print(" * ");
+                        }
+
+                        obsParentStateValuesSum = obsParentStateValuesSum.add( mulTransitionForward.multiply(forward) );
+
+                        a++;
                     }
+
+                    System.out.print(" ) ");
+
+                    if(b < obsParentStateDependenciesValues.size()) {
+
+                        System.out.print(" + ");
+                    }
+
+                    b ++;
                 }
+
+                System.out.print(" ]");
 
                 probRequestCombinaison = probRequestCombinaison.multiply( obsParentStateValuesSum);
             }
 
-            totalCombinaisons = totalCombinaisons.add(probRequestCombinaison);
+            if(requests.size() == 1){
 
+                distribution.put(requests.get(0).getDomainValue(), probRequestCombinaison);
+
+            }else if(requests.size() > 1){
+
+                distribution.put(new Domain.DomainValue(requestValues), probRequestCombinaison);
+            }
+
+            totalCombinaisons = totalCombinaisons.add(probRequestCombinaison);
+/*
             boolean match = true;
 
             for(Variable request : requests){
@@ -323,13 +407,28 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 probRequest = probRequestCombinaison;
             }
-
-            System.out.println();
-            System.out.println(getIdent(depth)+"VALUE : "+requests+" = "+probRequestCombinaison);
+*/
+           // System.out.println();
+          //  System.out.println(getIdent(depth)+"VALUE : "+requests+" = "+probRequestCombinaison);
 
         }
 
-        return probRequest.divide(totalCombinaisons);
+        distribution.put(new Domain.DomainValue(TOTAL_VALUE), totalCombinaisons);
+
+        for (Variable req : requests) {
+
+            req.setDomainValue(req.getOriginValue());
+        }
+
+      //  System.out.println();
+      //  System.out.println(requests+" : "+distribution);
+      //  System.out.println();
+        return distribution;
+
+        /*
+        *
+        *
+        * */
 
         /*
         *
