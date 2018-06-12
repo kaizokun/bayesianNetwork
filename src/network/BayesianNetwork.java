@@ -1,5 +1,6 @@
 package network;
 
+import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
 
@@ -19,6 +20,7 @@ public class BayesianNetwork {
     protected List<Variable> roots = new ArrayList<>();
 
     protected Hashtable<String, Variable> variables = new Hashtable<>();
+
 
     public ProbabilityCompute getTCP(IDomain booleanDomain, Double[][] doubles) {
 
@@ -155,4 +157,42 @@ public class BayesianNetwork {
     public AbstractDoubleFactory getDoubleFactory() {
         return doubleFactory;
     }
+
+
+
+    /*=================================UTILS=======================================*/
+
+    public static void requestValuesCombinaisons(List<List<Object>> requestValuesCombinaisons, LinkedList<Object> varsValues, List<Variable> variables, int iVar){
+
+        //si aucune variable restantes
+        //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
+        if(variables.size() == iVar){
+
+            requestValuesCombinaisons.add(new ArrayList<>(varsValues));
+
+            return;
+        }
+
+        Variable var = variables.get(iVar);
+
+        for(Domain.DomainValue domainValue : var.getDomainValues()){
+
+            varsValues.addLast(domainValue.getValue());
+
+            requestValuesCombinaisons(requestValuesCombinaisons, varsValues, variables, iVar + 1);
+
+            varsValues.removeLast();
+        }
+    }
+
+    public static List<List<Object>> requestValuesCombinaisons(List<Variable> variables){
+
+        //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
+        List<List<Object>> requestValuesCombinaisons = new LinkedList<>();
+
+        requestValuesCombinaisons(requestValuesCombinaisons, new LinkedList<>(), variables, 0);
+
+        return requestValuesCombinaisons;
+    }
+
 }

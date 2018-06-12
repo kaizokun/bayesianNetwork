@@ -22,39 +22,6 @@ public class EnumerationAsk {
         return builder.toString();
     }
 
-    private static List<List<Object>> requestValuesCombinaisons(List<Variable> variables){
-
-        //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
-        List<List<Object>> requestValuesCombinaisons = new LinkedList<>();
-
-        requestValuesCombinaisons(requestValuesCombinaisons, new LinkedList<>(), variables, 0);
-
-        return requestValuesCombinaisons;
-    }
-
-    private static void requestValuesCombinaisons(List<List<Object>> requestValuesCombinaisons , LinkedList<Object> varsValues, List<Variable> variables, int iVar){
-
-        //si aucune variable restantes
-        //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
-        if(variables.size() == iVar){
-
-            requestValuesCombinaisons.add(new ArrayList<>(varsValues));
-
-            return;
-        }
-
-        Variable var = variables.get(iVar);
-
-        for(Domain.DomainValue domainValue : var.getDomainValues()){
-
-            varsValues.addLast(domainValue.getValue());
-
-            requestValuesCombinaisons(requestValuesCombinaisons, varsValues, variables, iVar + 1);
-
-            varsValues.removeLast();
-        }
-    }
-
     //request : une liste de preference ArrayList
     public static AbstractDouble ask(List<Variable> request, List<Variable> observations, BayesianNetwork network){
 
@@ -67,7 +34,7 @@ public class EnumerationAsk {
 
         LinkedList<Variable> vars = network.getTopologicalOrder();
 
-        List<List<Object>> requestValuesCombinaisons = requestValuesCombinaisons(request);
+        List<List<Object>> requestValuesCombinaisons = BayesianNetwork.requestValuesCombinaisons(request);
 
         //pour chaque combinaison de valeur
         for(List<Object> requestValues : requestValuesCombinaisons){

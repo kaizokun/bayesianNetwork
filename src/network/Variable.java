@@ -27,6 +27,8 @@ public class Variable {
 
     protected Hashtable<String, Integer> dependenciesIndex;
 
+    protected List<Variable> observations;
+
     protected int time;
 
     //utilisé dans la recuperation des noeuds dans l'odre topologique
@@ -71,6 +73,8 @@ public class Variable {
         this.children = new ArrayList<>();
 
         this.dependenciesIndex = new Hashtable<>();
+
+        this.observations = new LinkedList<>();
 
         this.time = time;
 
@@ -364,5 +368,13 @@ public class Variable {
     public boolean hasDependencies() {
 
         return !this.dependencies.isEmpty();
+    }
+
+    public void saveObservation() {
+
+        for(Variable dep : dependencies){
+
+            dep.observations.add(this);
+        }
     }
 }

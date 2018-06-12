@@ -127,12 +127,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         this.time ++;
 
-        this.extend(this.transitionModels, this.time - 1);
+        this.extend(this.transitionModels, this.time - 1, false);
 
-        this.extend(this.captorsModels, this.time);
+        this.extend(this.captorsModels, this.time, true);
     }
 
-    private void extend(Map<Variable, List<Model>> models, int timeParent){
+    private void extend(Map<Variable, List<Model>> models, int timeParent, boolean captors){
 
         List<Variable> newVars = new LinkedList<>();
 
@@ -184,6 +184,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             Variable newVar = new Variable(variable.getLabel(), variable.getDomain(), model.getProbabilityCompute(),
                     newDependencies, this.time);
 
+            if(captors){
+                //pour les variables d'observation enregistre dans les variables parents leur indice
+                //dans la liste des enfants
+                newVar.saveObservation();
+            }
+
             newVars.add(newVar);
         }
 
@@ -204,21 +210,31 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-    public void filter(List<Variable> request, List<Variable> observation){
+    public void filter(List<Variable> request){
 
         //on etend le graphe
         this.extend();
 
         /*
         *
-        * premierement initialiser les observations à l'instant t à partir de valeur de la liste recu en parametre
-        * idem pour la requete en sauvegardant les valeur precedentes
+        * Recuperer les observations des variables de la requete
         *
-        * Recuperer toutes les combinaison de valeur pour les variable de la requete via une méthode recursive
+        * Si aucune observation
+        *
+        *   retourner directement la probabilité de la variable
+        *
+        * Fin Si
+        *
+        *
+        * le filtrage est appelée après avoir fourni les observations en t au reseaux
+        * la requete se fait sur des variables pour lesquelles des observatiosn sont disponible en t
+        *
+        * Recuperer toutes les combinaison de valeur pour les variable de la requete
+        *
         *
         * total pour toutes les combinaisons
         *
-        * Pour chaque combinaisons
+        * Pour chaque combinaison
         *
         *   initialiser les variables de la requete
         *
@@ -231,23 +247,39 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         *
         *       SumHiddenState <- 0;
         *
-        *       Pour chaque valeur pour la variable parent de PO PO2
-        *           //cependant PO pourrait avoir plusieurs parents et il faudrait sommer sur chaque combinaison
-        *           //de valeur pour les parents de PO
+        *       Recuperer les combinaison de valeurs parents pour les parents de PO
         *
-        *           PO_value <- calculer la valeur de PO en fonction de PO2
+        *       Pour chaque combinaison de valeur pour les variables parent de PO POPs
         *
-        *           probPO2 <- appel recursif de la fonction avec comme requete les variables PO2 et les observations liés à PO2
+        *           initialiser les valeurs des variables de POPs
         *
-        *           SumHiddenState <- SumHiddenState + ( PO_value * probPO2 )
+        *           PO_value <- calculer la valeur de PO en fonction de POPs
         *
+        *           //on passe à l'appel récursif on il faudrait multiplier les valeurs retournées par la fonciton
+        *           //pour chaque parent de PO en fonction des observations qui lui sont liés
+
+        *           Pour chaque variable parent de POPs
+        *
+        *               PO_value <- PO_value * appel recursif de la fonction avec comme requete une variable PO2
+        *
+        *           Fin Pour
+        *
+        *           SumHiddenState <- SumHiddenState + PO_value
+
         *       Fin Pour
         *
+        *       totalCapteur = totalCapteur * SumHiddenState;
+        *
         *   Fin Pour
+
+            enregistrer totalCapteur pour la combinaison de variables
 
         * Fin Pour
         *
         *
+        * diviser la valeur obtenu pour la combinaison de valeur de la requete d'origine par le total de toutes les combinaisons
+        *
+        * pour obtenir la probabilité de la requete
         *
         *
         *
