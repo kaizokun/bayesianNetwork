@@ -1,6 +1,8 @@
 package network.dynamic;
 
+import domain.Domain;
 import domain.IDomain;
+import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import network.BayesianNetwork;
 import network.ProbabilityCompute;
@@ -33,11 +35,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return root;
     }
 
-    private Map<Variable, Variable> getTimeVariable(int time){
+    private Map<Variable, Variable> getTimeVariable(int time) {
 
         Map<Variable, Variable> variables = this.timeVariables.get(time);
 
-        if(variables == null && time <= this.time){
+        if (variables == null && time <= this.time) {
 
             variables = new Hashtable<>();
 
@@ -60,7 +62,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         addModel(variable, model, captorsModels);
     }
 
-    private void addModel(Variable variable, Model model, Map<Variable,List<Model>> models){
+    private void addModel(Variable variable, Model model, Map<Variable, List<Model>> models) {
 
         List<Model> varModels = models.get(variable);
 
@@ -110,7 +112,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         varModels.set(time, model);
     }
 */
-
     private void addDeeperDependencies(Variable lastDep, LinkedList<Variable> timeDependencies, int limit) {
 
         if (limit > 0) {
@@ -125,14 +126,14 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public void extend() {
 
-        this.time ++;
+        this.time++;
 
         this.extend(this.transitionModels, this.time - 1, false);
 
         this.extend(this.captorsModels, this.time, true);
     }
 
-    private void extend(Map<Variable, List<Model>> models, int timeParent, boolean captors){
+    private void extend(Map<Variable, List<Model>> models, int timeParent, boolean captors) {
 
         List<Variable> newVars = new LinkedList<>();
 
@@ -166,7 +167,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 Variable lastDep = this.getTimeVariable(timeParent).get(dependencie.getDependency());
 
-               // System.out.println("       DEP : "+dependencie.getDependency()+" "+dependencie.getMarkovOrder());
+                // System.out.println("       DEP : "+dependencie.getDependency()+" "+dependencie.getMarkovOrder());
 
                 //dependances à la même variable mais à des temps plus eloignés
                 LinkedList<Variable> timeDependencies = new LinkedList<>();
@@ -184,7 +185,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             Variable newVar = new Variable(variable.getLabel(), variable.getDomain(), model.getProbabilityCompute(),
                     newDependencies, this.time);
 
-            if(captors){
+            if (captors) {
                 //pour les variables d'observation enregistre dans les variables parents leur indice
                 //dans la liste des enfants
                 newVar.saveObservation();
@@ -210,10 +211,103 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-    public void filter(List<Variable> request){
 
-        //on etend le graphe
-        this.extend();
+    public AbstractDouble filter(List<Variable> requests) {
+
+        List<Variable> requestObservations = new LinkedList<>();
+
+        for (Variable req : requests) {
+
+            req.saveOriginValue();
+
+            requestObservations.addAll(req.getObservations());
+        }
+
+        if (requestObservations.isEmpty()) {
+            //en principe une seule variable
+            //dan sl'appel recursif chaque variable caché et calculé séparemment en fonction des observations liées
+            return requests.get(0).getProbabilityForCurrentValue();
+        }
+
+        List<List<Domain.DomainValue>> requestValuesList = BayesianNetwork.requestValuesCombinaisons(requests);
+
+        AbstractDouble totalCombinaisons = this.doubleFactory.getNew(0.0);
+
+        AbstractDouble probRequest = this.doubleFactory.getNew(0.0);
+
+        for (List<Domain.DomainValue> requestValues : requestValuesList) {
+
+            int i = 0;
+
+            for (Variable req : requests) {
+
+                req.setDomainValue(requestValues.get(i ++));
+            }
+
+            AbstractDouble probRequestCombinaison = this.doubleFactory.getNew(1.0);
+
+            for(Variable observation : requestObservations){
+
+                probRequestCombinaison = probRequestCombinaison.multiply( observation.getProbabilityForCurrentValue());
+
+                Variable obsParentState = observation.getDependencies().get(0);
+
+                AbstractDouble obsParentStateValuesSum = doubleFactory.getNew(0.0);
+
+                //on somme ensuite sur les dependances de la dependence de l'observation
+                //une variable etat parent d'une observation peut avoir plusieurs autres états comme parents
+                //une observation pourrait également avoir plusieurs états comme parent
+                //dans ce cas peut être multiplier les resultats de chacune des sommations
+                //pour l'instant on s'en tiens à un seul etat parent par observation
+
+                List<List<Domain.DomainValue>> parentStateValues = BayesianNetwork.requestValuesCombinaisons(obsParentState.getDependencies());
+
+                for(List<Domain.DomainValue> domainValues : parentStateValues){
+
+                    int j = 0;
+
+                    for (Variable obsParentStateDep : obsParentState.getDependencies()) {
+
+                        obsParentStateDep.setDomainValue(domainValues.get(j ++));
+                    }
+
+                    obsParentStateValuesSum = obsParentStateValuesSum.add(obsParentState.getProbabilityForCurrentValue());
+
+                    for(Variable obsParentStateDep : obsParentState.getDependencies()){
+
+                        List<Variable> newRequests = new LinkedList<>();
+
+                        newRequests.add(obsParentStateDep);
+
+                        obsParentStateValuesSum = obsParentStateValuesSum.multiply(filter(newRequests));
+                    }
+                }
+
+                probRequestCombinaison = probRequestCombinaison.multiply( obsParentStateValuesSum);
+            }
+
+            totalCombinaisons = totalCombinaisons.add(probRequestCombinaison);
+
+            boolean match = true;
+
+            for(Variable request : requests){
+
+                if(!request.originalValueMatch()){
+
+                    match = false;
+
+                    break;
+                }
+            }
+
+            if(match){
+
+                probRequest = probRequestCombinaison;
+            }
+
+        }
+
+        return probRequest.divide(totalCombinaisons);
 
         /*
         *
@@ -301,26 +395,26 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         String ident = getIdent(depth);
 
-        for(Variable var : vars){
+        for (Variable var : vars) {
 
             builder.append(ident);
 
-            builder.append(var.getLabel()+" "+var.getTime()+"\n");
+            builder.append(var.getLabel() + " " + var.getTime() + "\n");
 
             loadTree(var.getChildren(), builder, depth + 1);
         }
     }
 
-    private String getIdent(int depth){
+    private String getIdent(int depth) {
 
         StringBuilder ident = new StringBuilder();
 
-        for( int i = 0 ; i < depth - 1 ; i ++ ){
+        for (int i = 0; i < depth - 1; i++) {
 
             ident.append("             ");
         }
 
-        if(depth > 0) {
+        if (depth > 0) {
 
             ident.append("[____________");
         }

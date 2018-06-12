@@ -377,4 +377,9 @@ public class Variable {
             dep.observations.add(this);
         }
     }
+
+    public List<Variable> getObservations() {
+
+        return observations;
+    }
 }

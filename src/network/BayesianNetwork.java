@@ -15,7 +15,7 @@ public class BayesianNetwork {
         this.doubleFactory = doubleFactory;
     }
 
-    private AbstractDoubleFactory doubleFactory;
+    protected AbstractDoubleFactory doubleFactory;
 
     protected List<Variable> roots = new ArrayList<>();
 
@@ -162,13 +162,13 @@ public class BayesianNetwork {
 
     /*=================================UTILS=======================================*/
 
-    public static void requestValuesCombinaisons(List<List<Object>> requestValuesCombinaisons, LinkedList<Object> varsValues, List<Variable> variables, int iVar){
+    public static void requestValuesCombinaisons(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar){
 
         //si aucune variable restantes
         //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
         if(variables.size() == iVar){
 
-            requestValuesCombinaisons.add(new ArrayList<>(varsValues));
+            requestValuesCombinaisons.add(new ArrayList(varsValues));
 
             return;
         }
@@ -177,7 +177,7 @@ public class BayesianNetwork {
 
         for(Domain.DomainValue domainValue : var.getDomainValues()){
 
-            varsValues.addLast(domainValue.getValue());
+            varsValues.addLast(domainValue);
 
             requestValuesCombinaisons(requestValuesCombinaisons, varsValues, variables, iVar + 1);
 
@@ -185,10 +185,10 @@ public class BayesianNetwork {
         }
     }
 
-    public static List<List<Object>> requestValuesCombinaisons(List<Variable> variables){
+    public static List<List<Domain.DomainValue>> requestValuesCombinaisons(List<Variable> variables){
 
         //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
-        List<List<Object>> requestValuesCombinaisons = new LinkedList<>();
+        List<List<Domain.DomainValue>> requestValuesCombinaisons = new LinkedList<>();
 
         requestValuesCombinaisons(requestValuesCombinaisons, new LinkedList<>(), variables, 0);
 

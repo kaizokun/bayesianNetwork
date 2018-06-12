@@ -34,14 +34,14 @@ public class EnumerationAsk {
 
         LinkedList<Variable> vars = network.getTopologicalOrder();
 
-        List<List<Object>> requestValuesCombinaisons = BayesianNetwork.requestValuesCombinaisons(request);
+        List<List<Domain.DomainValue>> requestValuesCombinaisons = BayesianNetwork.requestValuesCombinaisons(request);
 
         //pour chaque combinaison de valeur
-        for(List<Object> requestValues : requestValuesCombinaisons){
+        for(List<Domain.DomainValue> requestValues : requestValuesCombinaisons){
 
             for(int i = 0 ; i < requestValues.size() ; i ++){
                 //initialise une variable de la requete
-                request.get(i).setValue(requestValues.get(i));
+                request.get(i).setDomainValue(requestValues.get(i));
             }
 
             String requestValuesKey = requestKey(request);
