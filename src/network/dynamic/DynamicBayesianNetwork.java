@@ -527,6 +527,94 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return hiddenVarsSum;
     }
 
+
+    public void backWard(){
+
+        /*
+        * Backward sur plusieurs
+        *
+        * à l'origine si il y a plusieurs variables dans la requete
+        * faire plusieurs appels de base à backward pour chaque variable et recuperer une distribution sur la variable
+        * qu'il faudra combiner à la fin en multipliant les valeurs pour chaque combinaison de valeur de la requete
+        * et recreer une distribution composée
+        *
+        * Backward sur une seule variable
+        *
+        * récuperer toutes les observations de la variable état si tenté qu'il y en a plus d'une ...
+        *
+        * pour le temps suivant
+        *
+        * creer une distribution sur les valeurs de la requete
+        *
+        * sauvegarder la valeur de la requete
+        *
+        * initialiser un total TOTAL_REQUEST : le total de la distribution pour chaque valeur de la requete
+        *
+        * Pour chaque valeur de la variable de requete
+        *
+        *   initialiser la variable de requete
+        *
+        *   initialiser une MUL_OBS à 1.0 pour multiplier le resultat de chaque observations de la requete
+        *
+        *   Pour chaque observation
+        *
+        *       recuperer les combinaison de parents de l'observation
+        *
+        *       initialiser un total SUM pour la somme sur les parents de l'observation
+        *
+        *       Pour chaque combinaison de parent
+        *
+        *           initialiser une valeur MUL à 1.0 pour multiplier les parties de la somme
+        *
+        *           initialiser les variables parents de l'observation
+        *
+        *           MUL <- multiplier MUL par la probabilité de l'observation en fonction de la combinaison de valeurs parents courante
+        *
+        *           récuperer la distribution pour les parents de la variable d'observation dans une map
+        *           ayant pour clé la combinaison des variables parents : label + temps de chaque variables concaténées
+        *
+        *           Si cette distribution n'existe pas encore
+        *
+        *               rappel recursif de la fonction backward avec les parents de la variable d'observation
+        *
+        *               recuperation et sauvegarde de la distribution
+        *
+        *           Fin Si
+        *
+        *           recuperer la probabilité pour la combinaison courante de valeurs parents
+        *
+        *           diviser cette probabilité par le total enregistré pour toutes les combinaisons
+        *
+        *           MUL <- multiplier MUL par cette valeur
+        *
+        *           Pour chaque parent de l'observation
+        *
+        *               MUL <- multiplier MUL par la probabilité d'un parent en fonction des siens
+        *
+        *           Fin Pour
+        *
+        *           SUM <- additionner MUL à SUM
+        *
+        *       Fin Pour
+        *
+        *       MUL_OBS <- multiplier MUL_OBS à SUM
+        *
+        *   Fin Pour
+        *
+        *   enregistrer MUL_OBS à la valeur de la requete (clé) dans la distribution
+        *
+        *   TOTAL_REQUEST <- TOTAL_REQUEST + MUL_OBS
+        *
+        * Fin Pour
+        *
+        *
+        * enregistrer TOTAL_REQUEST à la valeur TOTAL dans la distribution
+        *
+        * retourner la distribution
+        *
+        * */
+    }
+
     @Override
     public String toString() {
 
