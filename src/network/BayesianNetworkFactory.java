@@ -201,7 +201,15 @@ public class BayesianNetworkFactory {
 
         //Models
         //Rain time 1
+
+        //Rain 1 rain1Dep
+
+        List<Variable> oneRainDep = new LinkedList<>();
+
+        oneRainDep.add(rain);
+
         ProbabilityCompute tcpRain1 = network.getTCP(
+                oneRainDep,
                 booleanDomain,
                 new Double[][]{{0.7, 1 - 0.7},
                         {0.3, 1 - 0.3}});
@@ -211,6 +219,14 @@ public class BayesianNetworkFactory {
         rainExtensionModel1.addDependencie(rain, 1);
 
         //Rain time 2
+
+        //Rain 1 rain1Dep
+
+        List<Variable> twoRainDep = new LinkedList<>();
+
+        twoRainDep.add(rain);
+
+        twoRainDep.add(rain);
         /*
          * VV : pluie les deux jours precedents
          * VF : pluie il y a deux jour mais pas la veille
@@ -218,6 +234,7 @@ public class BayesianNetworkFactory {
          * FF : pas de pluie les deux derniers jours
          * */
         ProbabilityCompute tcpRain2 = network.getTCP(
+                twoRainDep,
                 booleanDomain,
                 new Double[][]{{0.9, 1 - 0.9},
                         {0.3, 1 - 0.3},
@@ -235,9 +252,10 @@ public class BayesianNetworkFactory {
 
         //Umbrella time 1
 
-        Variable umbrella = new Variable(UMBRELLA.toString());
+        Variable umbrella = new Variable(UMBRELLA.toString(), booleanDomain);
 
         ProbabilityCompute tcpUmbrella = network.getTCP(
+                oneRainDep,
                 booleanDomain,
                 new Double[][]{{0.9, 1 - 0.9},
                         {0.2, 1 - 0.2}});

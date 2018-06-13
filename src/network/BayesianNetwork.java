@@ -162,7 +162,7 @@ public class BayesianNetwork {
 
     /*=================================UTILS=======================================*/
 
-    public static void requestValuesCombinaisons(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar){
+    public static void requestValuesCombinations(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar){
 
         //si aucune variable restantes
         //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
@@ -179,18 +179,18 @@ public class BayesianNetwork {
 
             varsValues.addLast(domainValue);
 
-            requestValuesCombinaisons(requestValuesCombinaisons, varsValues, variables, iVar + 1);
+            requestValuesCombinations(requestValuesCombinaisons, varsValues, variables, iVar + 1);
 
             varsValues.removeLast();
         }
     }
 
-    public static List<List<Domain.DomainValue>> requestValuesCombinaisons(List<Variable> variables){
+    public static List<List<Domain.DomainValue>> requestValuesCombinations(List<Variable> variables){
 
         //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
         List<List<Domain.DomainValue>> requestValuesCombinaisons = new LinkedList<>();
 
-        requestValuesCombinaisons(requestValuesCombinaisons, new LinkedList<>(), variables, 0);
+        requestValuesCombinations(requestValuesCombinaisons, new LinkedList<>(), variables, 0);
 
         return requestValuesCombinaisons;
     }

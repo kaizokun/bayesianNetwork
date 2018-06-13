@@ -190,6 +190,9 @@ public class Variable {
         this.dependencies = dependencies;
     }
 
+    /**
+     * return the probability of the variable from its current value et its dependencies values
+     * */
     public AbstractDouble getProbabilityForCurrentValue() {
 
         return probabilityCompute.getProbability(this);
