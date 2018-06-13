@@ -15,7 +15,11 @@ import static network.BayesianNetwork.requestValuesCombinations;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
+    protected static int maxDepth = Integer.MIN_VALUE;
+
     protected static String TOTAL_VALUE = "total";
+
+    protected static Domain.DomainValue totalDomainValues = new Domain.DomainValue(TOTAL_VALUE);
 
     protected int time = 0;
 
@@ -55,7 +59,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return variables;
     }
 
-    public Variable getVariable(int time, Variable variable){
+    public Variable getVariable(int time, Variable variable) {
 
         return this.timeVariables.get(time).get(variable);
     }
@@ -222,17 +226,70 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-    public  Map<Domain.DomainValue, AbstractDouble> filter(List<Variable> requests) {
+    public AbstractDouble predict(List<Variable> requests, int time){
 
-        return this.filter(requests, 0);
+        //étend le reseau jusqu'au temps voulu
+        while(this.time < time){
+
+            this.extend();
+        }
+
+        List<Variable> requests2 = new LinkedList<>();
+        //pour chacune des variabel de la requete
+        for(Variable req : requests){
+            //récuperer la variable enregitré dans le reseau pour le temps time
+            Variable networkVar = this.getVariable(time, req);
+            //assigner la même valeur que demandé
+            networkVar.setDomainValue(req.getDomainValue());
+
+            requests2.add(networkVar);
+        }
+
+       return this.filter(requests2);
+    }
+
+    public AbstractDouble predict(Variable request, int time){
+
+        //moyen le plus simple de gerer la prediction, il faut juste que le reseau soit etendu
+        //juqu'au temps de prediction
+
+        //étend le reseau jusqu'au temps voulu
+        while(this.time < time){
+
+            this.extend();
+        }
+
+        Variable request2 = this.getVariable(time, request);
+
+        request2.setDomainValue(request.getDomainValue());
+
+        return this.filter(request2);
+    }
+
+    public AbstractDouble filter(List<Variable> requests) {
+
+        List<Domain.DomainValue> domainValues = new LinkedList<>();
+
+        for (Variable request : requests) {
+
+            domainValues.add(request.getDomainValue());
+        }
+
+        Map<Domain.DomainValue, AbstractDouble> distrib = this.filter(requests, 0);
+
+        System.out.println("MAX DEPTH : "+maxDepth);
+
+        return distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(totalDomainValues));
     }
 
     public Map<Domain.DomainValue, AbstractDouble> filter(List<Variable> requests, int depth) {
 
+        maxDepth = Math.max(maxDepth, depth);
+
         //enregistre les distributions pour chaque variable
         List<Map<Domain.DomainValue, AbstractDouble>> distributions = new ArrayList<>(requests.size());
         //appel independant de la methode de filtrage pour chaque variable de la requete
-        for(Variable request : requests){
+        for (Variable request : requests) {
 
             distributions.add(this.filter(request, depth));
         }
@@ -245,13 +302,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         AbstractDouble total = doubleFactory.getNew(0.0);
 
         //pour chaque combinaison de valeurs
-        for(List<Domain.DomainValue> domainValues : requestValuesList){
+        for (List<Domain.DomainValue> domainValues : requestValuesList) {
 
             AbstractDouble totalCombination = doubleFactory.getNew(1.0);
 
             int iVar = 0;
             //pour chaque valeur de variable dans la combinaison
-            for(Domain.DomainValue domainValue : domainValues){
+            for (Domain.DomainValue domainValue : domainValues) {
 
                 //on récupère la probabilité correspondant à la valeur dans la distribution de la variable
                 AbstractDouble varValueProb = distributions.get(iVar).get(domainValue);
@@ -263,7 +320,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 totalCombination = totalCombination.multiply(varValueProbNormalised);
                 */
-                iVar ++;
+                iVar++;
             }
 
             finalDistribution.put(new Domain.DomainValue(domainValues), totalCombination);
@@ -274,15 +331,22 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         finalDistribution.put(new Domain.DomainValue(TOTAL_VALUE), total);
 
         return finalDistribution;
-
     }
 
-    public Map<Domain.DomainValue, AbstractDouble> filter(Variable request) {
+    public AbstractDouble filter(Variable request) {
 
-        return this.filter(request, 0);
+        Domain.DomainValue requestDomainValue = request.getDomainValue();
+
+        Map<Domain.DomainValue, AbstractDouble> distrib = this.filter(request, 0);
+
+        System.out.println("MAX DEPTH : "+maxDepth);
+
+        return distrib.get(requestDomainValue).divide(distrib.get(totalDomainValues));
     }
 
-    private  Map<Domain.DomainValue, AbstractDouble> filter(Variable request, int depth) {
+    private Map<Domain.DomainValue, AbstractDouble> filter(Variable request, int depth) {
+
+        maxDepth = Math.max(maxDepth, depth);
 
         //les variables de requete d'origine doivent avoir le même temps
 
@@ -302,7 +366,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //initialisation du total
             AbstractDouble total = doubleFactory.getNew(0.0);
             //pour chaque valeur du domaine de la requete
-            for(Domain.DomainValue domainValue : request.getDomainValues()){
+            for (Domain.DomainValue domainValue : request.getDomainValues()) {
 
                 request.setDomainValue(domainValue);
 
@@ -332,22 +396,28 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             //initialisation de la multiplication à 1
             AbstractDouble requestValueProbability = this.doubleFactory.getNew(1.0);
+
             //Pour chaque observations : ici on peut avoir une ou plusieurs observation par variable de requete
-            for(Variable observation : requestObservations){
-                //valeur du modele de capteur
-                requestValueProbability = requestValueProbability.multiply( observation.getProbabilityForCurrentValue() );
+            for (Variable observation : requestObservations) {
+
+                //au cas ou la variale d'observation est nul on obtient une prédiction plutot qu'un filtrage
+                if(observation.getDomainValue() != null){
+                    //valeur du modele de capteur
+                    requestValueProbability = requestValueProbability.multiply(observation.getProbabilityForCurrentValue());
+                }
+
                 //pour chaque parent de l'observation on multiplie les sommations
-                for(Variable stateObserved : observation.getDependencies()) {
+                for (Variable stateObserved : observation.getDependencies()) {
                     //total de la somme sur les valeurs cachées initialisé à zero
                     AbstractDouble hiddenVarsSum = doubleFactory.getNew(1.0);
 
                     //sommation sur une seul variable caché
-                    if(stateObserved.getDependencies().size() == 1){
+                    if (stateObserved.getDependencies().size() == 1) {
 
                         hiddenVarsSum = hiddenVarSum(stateObserved, stateObserved.getDependencies().get(0), depth);
 
-                    //sommation sur plusieurs variables cachées
-                    }else if(stateObserved.getDependencies().size() > 1){
+                        //sommation sur plusieurs variables cachées
+                    } else if (stateObserved.getDependencies().size() > 1) {
 
                         hiddenVarsSum = hiddenVarSum(stateObserved, stateObserved.getDependencies(), depth);
                     }
@@ -381,7 +451,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         StringBuilder keybuilder = new StringBuilder();
 
-        for(Variable hiddenVar : hiddenVars){
+        for (Variable hiddenVar : hiddenVars) {
 
             keybuilder.append(hiddenVar.getLabel() + "_" + hiddenVar.getTime());
 
@@ -403,7 +473,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             Map<Domain.DomainValue, AbstractDouble> distrib = this.forwardDistribSaved.get(keybuilder.toString());
 
-            if( distrib == null){
+            if (distrib == null) {
 
                 distrib = filter(hiddenVars, depth + 1);
 
@@ -439,7 +509,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             Map<Domain.DomainValue, AbstractDouble> distrib = this.forwardDistribSaved.get(key);
 
-            if( distrib == null){
+            if (distrib == null) {
 
                 distrib = filter(hiddenVar, depth + 1);
 
@@ -457,291 +527,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return hiddenVarsSum;
     }
 
-    /*
-        private  Map<Domain.DomainValue, AbstractDouble> filter(Variable request, int depth) {
-
-            //les variables de requete d'origine doivent avoir le même temps
-
-            //création d'une distribution vide pour chaque valeur de la requete
-            //qui peuvent être des combinaisons de valeur si la reqete à plusieurs variables
-            Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>();
-
-            Domain.DomainValue originalValue = request.getDomainValue();
-
-            //lors du rappel recursif de la méthode de filtrage une seule variable compose la requete
-            //car même si une variable de la requete à plusieurs parents, dans la sommation sur les valeurs cachés
-            //( çàd les parents de la requete ) ils sont evalués séparemment par rapport à leur observations respectifs
-            //si une variable de requete unique et au temps zero on enregistre sa distribution et le total
-            //pour ne pas avoir à le recalculer
-            if (request.getTime() == 0) {
-
-                //initialisation du total
-                AbstractDouble total = doubleFactory.getNew(0.0);
-                //pour chaque valeur du domaine de la requete
-                for(Domain.DomainValue domainValue : request.getDomainValues()){
-
-                    request.setDomainValue(domainValue);
-
-                    AbstractDouble valueProb = request.getProbabilityForCurrentValue();
-                    //enregistre la probabilité pour cette valeur
-                    distribution.put(domainValue, valueProb);
-
-                    total = total.add(valueProb);
-                }
-                //ajoute une entrée pour le total afin de normaliser
-                distribution.put(new Domain.DomainValue(TOTAL_VALUE), total);
-
-                request.setDomainValue(originalValue);
-
-                return distribution;
-            }
-            //liste des observations à traiter pour l' ensemble de la requete
-            List<Variable> requestObservations = new LinkedList<>(request.getObservations());
-
-            //total pour toutes les valeurs de la requete
-            AbstractDouble totalDistribution = this.doubleFactory.getNew(0.0);
-
-            //pour chaque combinaison
-            for (Domain.DomainValue domainValue : request.getDomainValues()) {
-
-                request.setDomainValue(domainValue);
-
-                //initialisation de la multiplication à 1
-                AbstractDouble requestValueProbability = this.doubleFactory.getNew(1.0);
-                //Pour chaque observations : ici on peut avoir une ou plusieurs observation par variable de requete
-                for(Variable observation : requestObservations){
-                    //valeur du modele de capteur
-                    requestValueProbability = requestValueProbability.multiply( observation.getProbabilityForCurrentValue() );
-                    //pour chaque parent de l'observation on multiplie les sommations
-                    for(Variable obsParentState : observation.getDependencies()) {
-                        //total de la somme sur les valeurs cachées initialisé à zero
-                        AbstractDouble hiddenVarsSum = this.doubleFactory.getNew(0.0);
-                        //une variable de la requete peut avoir plusieurs parents ils faut donc récuperer les combinaisons de valeurs
-                        //pour sommer sur chacune d'entre elle
-                        List<List<Domain.DomainValue>> hiddenVarsCombinations = requestValuesCombinations(obsParentState.getDependencies());
-                        //pour chaque combinaison de valeurs
-                        for (List<Domain.DomainValue> domainValues : hiddenVarsCombinations) {
-
-                            int j = 0;
-                            //initialise chaque variable caché avec une valeur de la combinaison
-                            for (Variable hiddenVar : obsParentState.getDependencies()) {
-
-                                hiddenVar.setDomainValue(domainValues.get(j++));
-                            }
-                            //début de la multiplication avec la valeur fourni par le modele de transition
-                            AbstractDouble mulTransitionForward = obsParentState.getProbabilityForCurrentValue();
-                            //Pour chaque variable caché on a un appel récursif
-                            //chaque variable étant calculable en fonction des observations precedentes
-                            //independemment des autres (du moins je pense...)
-                            for (Variable hiddenVar : obsParentState.getDependencies()) {
-                                //la méthode de filtrage gerant un liste de requete il faut en créer une
-                                List<Variable> newRequests = new LinkedList<>();
-
-                                newRequests.add(hiddenVar);
-                                //résultat du filtrage récursif
-
-                                //création de la clé pour la table de distribution
-                                //qui contient le label de la variable suivit d'un underscore et de la valeur du temps
-                                String varKey = hiddenVar.getLabel() + "_" + hiddenVar.getTime();
-                                //distribution pour une variable en fonction du filtrage
-                                Map<Domain.DomainValue, AbstractDouble> distrib;
-                                //si la distribution pour cette variable à déja été calculée recursivement
-                                if (this.forwardDistribSaved.containsKey(varKey)) {
-
-                                    distrib = this.forwardDistribSaved.get(varKey);
-
-                                } else {
-                                    //si distribution inconnue on rapelle la fonction
-                                    distrib = filter(newRequests, depth + 1);
-
-                                    this.forwardDistribSaved.put(varKey, distrib);
-                                }
-                                //on récupère la frequence pour la variable cachée et sa valeur courante puis
-                                //la probabilité est obtenue en normalisant avec le total préenregistré pour eviter
-                                //de refaire la somme à chaque fois.
-                                AbstractDouble forward = distrib.get(hiddenVar.getDomainValue()).divide(distrib.get(new Domain.DomainValue(TOTAL_VALUE)));
-                                //on multiplie le resultat du filtre pour chaque variable cachée
-                                mulTransitionForward = mulTransitionForward.multiply(forward);
-                            }
-                            //on additionne pour chaque combinaison de valeur pour les variables cachées
-                            hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
-                        }
-                        //qu'on multiplie avec les resultat pour les observations precedentes
-                        requestValueProbability = requestValueProbability.multiply(hiddenVarsSum);
-                    }
-                }
-
-                //enregistrement de la probabilité pour la valeur cournate de la requete
-                distribution.put(request.getDomainValue(), requestValueProbability);
-
-                //addition du resultat pour une combinaison au total
-                totalDistribution = totalDistribution.add(requestValueProbability);
-            }
-            //enregistre le total de la distribution
-            distribution.put(new Domain.DomainValue(TOTAL_VALUE), totalDistribution);
-
-            //valeur de la requete
-            request.setDomainValue(originalValue);
-
-            return distribution;
-        }
-    */
-/*
-    private  Map<Domain.DomainValue, AbstractDouble> filter(List<Variable> requests, int depth) {
-
-        //les variables de requete d'origine doivent avoir le même temps
-
-        //création d'une distribution vide pour chaque valeur de la requete
-        //qui peuvent être des combinaisons de valeur si la reqete à plusieurs variables
-        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>();
-
-        //lors du rappel recursif de la méthode de filtrage une seule variable compose la requete
-        //car même si une variable de la requete à plusieurs parents, dans la sommation sur les valeurs cachés
-        //( çàd les parents de la requete ) ils sont evalués séparemment par rapport à leur observations respectifs
-        //si une variable de requete unique et au temps zero on enregistre sa distribution et le total
-        //pour ne pas avoir à le recalculer
-        if (requests.size() == 1 && requests.get(0).getTime() == 0) {
-
-            Variable request = requests.get(0);
-
-            request.saveOriginValue();
-
-            //initialisation du total
-            AbstractDouble total = doubleFactory.getNew(0.0);
-            //pour chaque valeur du domaine de la requete
-            for(Domain.DomainValue domainValue : request.getDomainValues()){
-
-                request.setDomainValue(domainValue);
-
-                AbstractDouble valueProb = request.getProbabilityForCurrentValue();
-                //enregistre la probabilité pour cette valeur
-                distribution.put(domainValue, valueProb);
-
-                total = total.add(valueProb);
-            }
-            //ajoute une entrée pour le total afin de normaliser
-            distribution.put(new Domain.DomainValue(TOTAL_VALUE), total);
-
-            return distribution;
-        }
-        //liste des observations à traiter pour l' ensemble de la requete
-        List<Variable> requestObservations = new LinkedList<>();
-
-        Map<Variable, Domain.DomainValue> orginalValues = new Hashtable<>();
-
-        for (Variable req : requests) {
-            //on sauvegarde la valeur originale
-            orginalValues.put(req, req.getDomainValue());
-            //plusieurs observations peuvent exister pour la requete
-            requestObservations.addAll(req.getObservations());
-        }
-
-        //total pour toutes les valeurs de la requete
-        AbstractDouble totalDistribution = this.doubleFactory.getNew(0.0);
-
-        //une requete pouvant avoir plusieurs variables il faut récuperer chaque combinaison de valeur
-        List<List<Domain.DomainValue>> requestValuesList = requestValuesCombinations(requests);
-
-        //pour chaque combinaison
-        for (List<Domain.DomainValue> requestValues : requestValuesList) {
-
-            int i = 0;
-            //initialise chaque variable de la requete avec une valeur de la combinaison
-            for (Variable req : requests) {
-
-                req.setDomainValue(requestValues.get(i ++));
-            }
-            //initialisation de la multiplication à 1
-            AbstractDouble requestValueProbability = this.doubleFactory.getNew(1.0);
-            //Pour chaque observations : ici on peut avoir une ou plusieurs observation par variable de requete
-            for(Variable observation : requestObservations){
-                //valeur du modele de capteur
-                requestValueProbability = requestValueProbability.multiply( observation.getProbabilityForCurrentValue() );
-                //pour chaque parent de l'observation on multiplie les sommations
-                for(Variable obsParentState : observation.getDependencies()) {
-                    //total de la somme sur les valeurs cachées initialisé à zero
-                    AbstractDouble hiddenVarsSum = this.doubleFactory.getNew(0.0);
-                    //une variable de la requete peut avoir plusieurs parents ils faut donc récuperer les combinaisons de valeurs
-                    //pour sommer sur chacune d'entre elle
-                    List<List<Domain.DomainValue>> hiddenVarsCombinations = requestValuesCombinations(obsParentState.getDependencies());
-                    //pour chaque combinaison de valeurs
-                    for (List<Domain.DomainValue> domainValues : hiddenVarsCombinations) {
-
-                        int j = 0;
-                        //initialise chaque variable caché avec une valeur de la combinaison
-                        for (Variable hiddenVar : obsParentState.getDependencies()) {
-
-                            hiddenVar.setDomainValue(domainValues.get(j++));
-                        }
-                        //début de la multiplication avec la valeur fourni par le modele de transition
-                        AbstractDouble mulTransitionForward = obsParentState.getProbabilityForCurrentValue();
-                        //Pour chaque variable caché on a un appel récursif
-                        //chaque variable étant calculable en fonction des observations precedentes
-                        //independemment des autres (du moins je pense...)
-                        for (Variable hiddenVar : obsParentState.getDependencies()) {
-                            //la méthode de filtrage gerant un liste de requete il faut en créer une
-                            List<Variable> newRequests = new LinkedList<>();
-
-                            newRequests.add(hiddenVar);
-                            //résultat du filtrage récursif
-
-                            //création de la clé pour la table de distribution
-                            //qui contient le label de la variable suivit d'un underscore et de la valeur du temps
-                            String varKey = hiddenVar.getLabel() + "_" + hiddenVar.getTime();
-                            //distribution pour une variable en fonction du filtrage
-                            Map<Domain.DomainValue, AbstractDouble> distrib;
-                            //si la distribution pour cette variable à déja été calculée recursivement
-                            if (this.forwardDistribSaved.containsKey(varKey)) {
-
-                                distrib = this.forwardDistribSaved.get(varKey);
-
-                            } else {
-                                //si distribution inconnue on rapelle la fonction
-                                distrib = filter(newRequests, depth + 1);
-
-                                this.forwardDistribSaved.put(varKey, distrib);
-                            }
-                            //on récupère la frequence pour la variable cachée et sa valeur courante puis
-                            //la probabilité est obtenue en normalisant avec le total préenregistré pour eviter
-                            //de refaire la somme à chaque fois.
-                            AbstractDouble forward = distrib.get(hiddenVar.getDomainValue()).divide(distrib.get(new Domain.DomainValue(TOTAL_VALUE)));
-                            //on multiplie le resultat du filtre pour chaque variable cachée
-                            mulTransitionForward = mulTransitionForward.multiply(forward);
-                        }
-                        //on additionne pour chaque combinaison de valeur pour les variables cachées
-                        hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
-                    }
-                    //qu'on multiplie avec les resultat pour les observations precedentes
-                    requestValueProbability = requestValueProbability.multiply(hiddenVarsSum);
-                }
-            }
-
-            //pour la distribution finale et gerer le cas ou la requete ne contient qu'une variable
-            //on utilise directement la valeur comme clé
-            if(requests.size() == 1){
-
-                distribution.put(requests.get(0).getDomainValue(), requestValueProbability);
-
-            }//sinon on crée un objet DomainValue composé d'une liste de DomainValue
-            else if(requests.size() > 1){
-
-                distribution.put(new Domain.DomainValue(requestValues), requestValueProbability);
-            }
-            //addition du resultat pour une combinaison au total
-            totalDistribution = totalDistribution.add(requestValueProbability);
-        }
-        //enregistre le total de la distribution
-        distribution.put(new Domain.DomainValue(TOTAL_VALUE), totalDistribution);
-
-        //valeur de la requete
-        for (Variable req : requests) {
-
-            req.setDomainValue(orginalValues.get(req));
-        }
-
-        return distribution;
-    }
-*/
     @Override
     public String toString() {
 
@@ -760,7 +545,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             builder.append(ident);
 
-            builder.append(var+ "\n");
+            builder.append(var + "\n");
 
             loadTree(var.getChildren(), builder, depth + 1);
         }
