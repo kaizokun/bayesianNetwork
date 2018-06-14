@@ -2,6 +2,7 @@ package test.dynamic;
 
 import domain.DomainFactory;
 import domain.data.AbstractDouble;
+import network.BayesianNetwork;
 import network.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -116,7 +117,6 @@ public class DynamicBayesianNetworkTest  {
         System.out.println("request prob : "+rs);
     }
 
-
     @Test
     public void DynamicBayesianNetworkUmbrellaOrder1PredictTest(){
 
@@ -129,7 +129,17 @@ public class DynamicBayesianNetworkTest  {
         this.DynamicBayesianNetworkUmbrellaTestPredict(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2(),10,15);
     }
 
+    @Test
+    public void DynamicBayesianNetworkUmbrellaOrderForwardBackwardTest(){
 
+        DynamicBayesianNetwork network = BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder1();
 
+        this.DynamicBayesianNetworkUmbrellaTest(network, 10);
+
+        Variable rain = new Variable(RAIN.toString());
+
+        network.forwardBackward(rain, 10);
+
+    }
 
 }
