@@ -15,7 +15,6 @@ import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
 
 public class DynamicBayesianNetworkTest  {
 
-
     private void DynamicBayesianNetworkUmbrellaTest( DynamicBayesianNetwork network, int extensions){
 
         for(int e = 0 ; e < extensions ; e ++) {
@@ -40,7 +39,6 @@ public class DynamicBayesianNetworkTest  {
         this.DynamicBayesianNetworkUmbrellaTest(network, extensions);
 
         //initialisation de la requete
-        List<Variable> requests = new LinkedList<>();
 
         Variable rain = new Variable(RAIN.toString());
 
@@ -48,9 +46,7 @@ public class DynamicBayesianNetworkTest  {
 
         rainReq.setValue(1);
 
-        requests.add(rainReq);
-
-        AbstractDouble rs = network.smoothing(requests);
+        AbstractDouble rs = network.smoothing(rainReq);
 
         System.out.println();
 

@@ -15,6 +15,8 @@ import static network.BayesianNetwork.requestValuesCombinations;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
+    protected static boolean backwardLog = false;
+
     protected static int maxDepth = Integer.MIN_VALUE;
 
     protected static String TOTAL_VALUE = "total";
@@ -272,16 +274,18 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             total = total.add(totalCombination);
         }
 
+
+        /*
         if(requests.size() == 1) {
             //cas particulier ou la requete ne contient qu'une variable
             //normalement il faudrait eviter d'appeller cette fonction dans ce cas
             finalDistribution.put(new Domain.DomainValue(TOTAL_VALUE), distributions.get(0).get(totalDomainValues));
 
         }else{
+*/
+        finalDistribution.put(new Domain.DomainValue(TOTAL_VALUE), total);
 
-            finalDistribution.put(new Domain.DomainValue(TOTAL_VALUE), total);
-
-        }
+        //}
 
         return finalDistribution;
     }
@@ -309,6 +313,32 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return finalDistribution;
     }
 
+    private Map<Domain.DomainValue, AbstractDouble> normalizeDistribution(Map<Domain.DomainValue, AbstractDouble> distrib){
+
+        Map<Domain.DomainValue, AbstractDouble> distribNormalized = new Hashtable<>();
+
+        for(Domain.DomainValue key : distrib.keySet()){
+
+            distribNormalized.put(key, distrib.get(key).divide(distrib.get(totalDomainValues)));
+        }
+
+        distribNormalized.remove(totalDomainValues);
+
+        return distribNormalized;
+    }
+
+    private void addTotalToDistribution(Map<Domain.DomainValue,AbstractDouble> distributionFinal) {
+
+        AbstractDouble total = doubleFactory.getNew(0.0);
+
+        for(AbstractDouble value : distributionFinal.values()){
+
+            total = total.add( value );
+        }
+
+        distributionFinal.put(totalDomainValues, total);
+    }
+
     /*------------------- SMOOTHING--------------------*/
 
 
@@ -321,33 +351,37 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             domainValues.add(request.getDomainValue());
         }
 
-        Map<Domain.DomainValue, AbstractDouble> distributionForward = forward(requests, 0);
+        Map<Domain.DomainValue, AbstractDouble> distributionForward = this.normalizeDistribution(forward(requests, 0));
 
         Map<Domain.DomainValue, AbstractDouble> distributionBackward = backWard(requests, 0);
 
+        distributionBackward.remove(totalDomainValues);
+
         Map<Domain.DomainValue, AbstractDouble> distributionFinal = multiplyDistributions(distributionBackward, distributionForward);
 
-        System.out.println();
-
-        System.out.println("forward distrib : "+distributionForward);
-
-        System.out.println("backward distrib : "+distributionBackward);
-
-        System.out.println("backward * forward distrib : "+distributionFinal);
+        this.addTotalToDistribution(distributionFinal);
 
         return distributionFinal.get(new Domain.DomainValue(domainValues)).divide(distributionFinal.get(totalDomainValues));
     }
 
     public AbstractDouble smoothing(Variable request) {
 
-        Map<Domain.DomainValue, AbstractDouble> distributionForward = forward(request, 0);
+        Map<Domain.DomainValue, AbstractDouble> distributionForward = this.normalizeDistribution(forward(request, 0));
 
         Map<Domain.DomainValue, AbstractDouble> distributionBackward = backWard(request, 0);
 
+        //distribution forward normalisé sans le total
+        //retrait du total de la distribution backward
+        distributionBackward.remove(totalDomainValues);
+
         Map<Domain.DomainValue, AbstractDouble> distributionFinal = multiplyDistributions(distributionBackward, distributionForward);
 
-        return distributionFinal.get(request.getDomainValue()).divide(totalDomainValues);
+        this.addTotalToDistribution(distributionFinal);
+
+        return distributionFinal.get(request.getDomainValue()).divide(distributionFinal.get(totalDomainValues));
     }
+
+
 
     /*------------------- BACKWARD --------------------*/
 
@@ -371,7 +405,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             distributions.add(this.backWard(request, depth));
         }
 
-        return this.getCombinatedDistribution(requests, distributions);
+        Map<Domain.DomainValue, AbstractDouble> finalDistrib = this.getCombinatedDistribution(requests, distributions);
+
+        return finalDistrib;
     }
 
 
@@ -460,12 +496,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //atteind une requete située à la derniere phase temporelle
         if (request.getTime() == this.time) {
 
-            for(Domain.DomainValue domainValue : request.getDomainValues()){
+            for (Domain.DomainValue domainValue : request.getDomainValues()) {
 
                 distribution.put(domainValue, doubleFactory.getNew(1.0));
             }
 
-            distribution.put(totalDomainValues, doubleFactory.getNew(1.0) );
+            distribution.put(totalDomainValues, doubleFactory.getNew(1.0));
 
             return distribution;
         }
@@ -486,75 +522,22 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //pour chaque valeru de la requete
         for (Domain.DomainValue requestValue : request.getDomainValues()) {
 
-            System.out.println();
-
             request.setDomainValue(requestValue);
             //multiplier le resultat pour chaque observation
             AbstractDouble multiplyObservations = doubleFactory.getNew(1.0);
 
             for (Variable nextObservation : nextObservations) {
 
-                List<List<Domain.DomainValue>> hiddenVarsValues =
-                        BayesianNetwork.requestValuesCombinations(nextObservation.getDependencies());
+                if (nextObservation.getDependencies().size() == 1) {
 
-                AbstractDouble sum = doubleFactory.getNew(0.0);
+                    multiplyObservations = multiplyObservations.multiply(
+                            backwardSum(nextObservation.getDependencies().get(0), nextObservation, depth));
 
-                StringBuilder keybuilder = new StringBuilder();
+                } else if (nextObservation.getDependencies().size() > 1) {
 
-                for (Variable hiddenVar : nextObservation.getDependencies()) {
-
-                    keybuilder.append(hiddenVar.getLabel() + "_" + hiddenVar.getTime());
-
-                    keybuilder.append(".");
+                    multiplyObservations = multiplyObservations.multiply(
+                            backwardSum(nextObservation.getDependencies(), nextObservation, depth));
                 }
-
-                String key = keybuilder.toString();
-
-                for (List<Domain.DomainValue> domainValues : hiddenVarsValues) {
-
-                    AbstractDouble multiplyUnderSum = doubleFactory.getNew(1.0);
-
-                    int d = 0;
-
-                    for (Domain.DomainValue depValue : domainValues) {
-
-                        nextObservation.getDependencies().get(d).setDomainValue(depValue);
-
-                        d++;
-                    }
-
-                    System.out.print(nextObservation.getProbabilityForCurrentValue());
-
-                    multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
-
-                    Map<Domain.DomainValue, AbstractDouble> hiddenVarsDistribution = this.backwardDistribSaved.get(key);
-
-                    if (hiddenVarsDistribution == null) {
-
-                        hiddenVarsDistribution = this.backWard(nextObservation.getDependencies(), depth + 1);
-
-                        this.backwardDistribSaved.put(key, hiddenVarsDistribution);
-                    }
-
-                    AbstractDouble combinaisonProb = hiddenVarsDistribution.get(new Domain.DomainValue(domainValues));
-
-                    System.out.print(" * "+combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
-
-                    multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
-
-                    for (Variable hiddenVar : nextObservation.getDependencies()) {
-
-                        System.out.print(" * "+hiddenVar.getProbabilityForCurrentValue());
-
-                        multiplyUnderSum = multiplyUnderSum.multiply(hiddenVar.getProbabilityForCurrentValue());
-                    }
-
-                    System.out.print(" + ");
-
-                    sum = sum.add(multiplyUnderSum);
-                }
-
-                multiplyObservations = multiplyObservations.multiply(sum);
             }
 
             distribution.put(requestValue, multiplyObservations);
@@ -569,6 +552,113 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return distribution;
     }
 
+    public AbstractDouble backwardSum(List<Variable> hiddenVars, Variable nextObservation, int depth) {
+
+        AbstractDouble sum = doubleFactory.getNew(0.0);
+
+        List<List<Domain.DomainValue>> hiddenVarsValues =
+                BayesianNetwork.requestValuesCombinations(nextObservation.getDependencies());
+
+        StringBuilder keybuilder = new StringBuilder();
+
+        for (Variable hiddenVar : nextObservation.getDependencies()) {
+
+            keybuilder.append(hiddenVar.getLabel() + "_" + hiddenVar.getTime());
+
+            keybuilder.append(".");
+        }
+
+        String key = keybuilder.toString();
+
+        for (List<Domain.DomainValue> domainValues : hiddenVarsValues) {
+
+            AbstractDouble multiplyUnderSum = doubleFactory.getNew(1.0);
+
+            int d = 0;
+
+            for (Domain.DomainValue depValue : domainValues) {
+
+                nextObservation.getDependencies().get(d).setDomainValue(depValue);
+
+                d++;
+            }
+            
+            if(backwardLog)System.out.print(nextObservation.getProbabilityForCurrentValue());
+
+            multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
+
+            Map<Domain.DomainValue, AbstractDouble> hiddenVarsDistribution = this.backwardDistribSaved.get(key);
+
+            if (hiddenVarsDistribution == null) {
+
+                hiddenVarsDistribution = this.backWard(nextObservation.getDependencies(), depth + 1);
+
+                this.backwardDistribSaved.put(key, hiddenVarsDistribution);
+            }
+
+            AbstractDouble combinaisonProb = hiddenVarsDistribution.get(new Domain.DomainValue(domainValues));
+
+            if(backwardLog)System.out.print(" * " + combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+
+            multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+
+            for (Variable hiddenVar : nextObservation.getDependencies()) {
+
+                if(backwardLog)System.out.print(" * " + hiddenVar.getProbabilityForCurrentValue());
+
+                multiplyUnderSum = multiplyUnderSum.multiply(hiddenVar.getProbabilityForCurrentValue());
+            }
+
+            if(backwardLog)System.out.print(" + ");
+
+            sum = sum.add(multiplyUnderSum);
+        }
+
+        return sum;
+    }
+
+    public AbstractDouble backwardSum(Variable hiddenVar, Variable nextObservation, int depth) {
+
+        AbstractDouble sum = doubleFactory.getNew(0.0);
+
+        String key = hiddenVar.getLabel() + "_" + hiddenVar.getTime();
+
+        for (Domain.DomainValue domainValue : hiddenVar.getDomainValues()) {
+
+            AbstractDouble multiplyUnderSum = doubleFactory.getNew(1.0);
+
+            hiddenVar.setDomainValue(domainValue);
+
+            if(backwardLog)System.out.print(nextObservation.getProbabilityForCurrentValue());
+
+            multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
+
+            Map<Domain.DomainValue, AbstractDouble> hiddenVarsDistribution = this.backwardDistribSaved.get(key);
+
+            if (hiddenVarsDistribution == null) {
+
+                hiddenVarsDistribution = this.backWard(hiddenVar, depth + 1);
+
+                this.backwardDistribSaved.put(key, hiddenVarsDistribution);
+            }
+
+            AbstractDouble hiddenVarProb = hiddenVarsDistribution.get(domainValue);
+
+            if(backwardLog)System.out.print(" * " + hiddenVarProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+
+            multiplyUnderSum = multiplyUnderSum.multiply(hiddenVarProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+
+            if(backwardLog)System.out.print(" * " + hiddenVar.getProbabilityForCurrentValue());
+
+            multiplyUnderSum = multiplyUnderSum.multiply(hiddenVar.getProbabilityForCurrentValue());
+
+            if(backwardLog)System.out.print(" + ");
+
+            sum = sum.add(multiplyUnderSum);
+        }
+
+        return sum;
+    }
 
     /*------------------- PREDICTION--------------------*/
 
@@ -732,12 +822,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                     //sommation sur une seul variable caché
                     if (stateObserved.getDependencies().size() == 1) {
 
-                        hiddenVarsSum = hiddenVarSum(stateObserved, stateObserved.getDependencies().get(0), depth);
+                        hiddenVarsSum = forwardHiddenVarSum(stateObserved, stateObserved.getDependencies().get(0), depth);
 
                         //sommation sur plusieurs variables cachées
                     } else if (stateObserved.getDependencies().size() > 1) {
 
-                        hiddenVarsSum = hiddenVarSum(stateObserved, stateObserved.getDependencies(), depth);
+                        hiddenVarsSum = forwardHiddenVarSum(stateObserved, stateObserved.getDependencies(), depth);
                     }
 
                     //qu'on multiplie avec les resultat pour les observations precedentes
@@ -752,7 +842,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             totalDistribution = totalDistribution.add(requestValueProbability);
         }
         //enregistre le total de la distribution
-        distribution.put(new Domain.DomainValue(TOTAL_VALUE), totalDistribution);
+        distribution.put(totalDomainValues, totalDistribution);
 
         //valeur de la requete
         request.setDomainValue(originalValue);
@@ -760,7 +850,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return distribution;
     }
 
-    private AbstractDouble hiddenVarSum(Variable obsParentState, List<Variable> hiddenVars, int depth) {
+    private AbstractDouble forwardHiddenVarSum(Variable obsParentState, List<Variable> hiddenVars, int depth) {
 
         AbstractDouble hiddenVarsSum = this.doubleFactory.getNew(0.0);
         //une variable de la requete peut avoir plusieurs parents ils faut donc récuperer les combinaisons de valeurs
@@ -798,7 +888,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 this.forwardDistribSaved.put(keybuilder.toString(), distrib);
             }
 
-            AbstractDouble forward = distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(new Domain.DomainValue(TOTAL_VALUE)));
+            AbstractDouble forward = distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(totalDomainValues));
             //on multiplie le resultat du filtre pour chaque variable cachée
             mulTransitionForward = mulTransitionForward.multiply(forward);
 
@@ -809,7 +899,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return hiddenVarsSum;
     }
 
-    private AbstractDouble hiddenVarSum(Variable obsParentState, Variable hiddenVar, int depth) {
+    private AbstractDouble forwardHiddenVarSum(Variable obsParentState, Variable hiddenVar, int depth) {
 
         //méthode identique pour une seule variable cachée
 
@@ -834,7 +924,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 this.forwardDistribSaved.put(key, distrib);
             }
 
-            AbstractDouble forward = distrib.get(domainValue).divide(distrib.get(new Domain.DomainValue(TOTAL_VALUE)));
+            AbstractDouble forward = distrib.get(domainValue).divide(distrib.get(totalDomainValues));
             //on multiplie le resultat du filtre pour la variable cachée
             mulTransitionForward = mulTransitionForward.multiply(forward);
 
