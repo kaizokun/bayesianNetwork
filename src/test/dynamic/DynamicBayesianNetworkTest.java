@@ -1,8 +1,8 @@
 package test.dynamic;
 
+import domain.Domain;
 import domain.DomainFactory;
 import domain.data.AbstractDouble;
-import network.BayesianNetwork;
 import network.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.RAIN;
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
@@ -32,6 +33,27 @@ public class DynamicBayesianNetworkTest  {
             Variable umbrellaO = network.getVariable(time, umbrella);
 
             umbrellaO.setValue(1);
+        }
+    }
+
+    private void DynamicBayesianNetworkUmbrellaTestMax( DynamicBayesianNetwork network){
+
+        for(int e = 0 ; e < 5 ; e ++) {
+
+            network.extend();
+        }
+
+        Object[] obsValues = new Object[]{1, 1, 1, 1, 0};
+
+        //initialisation des observations
+
+        Variable umbrella = new Variable(UMBRELLA.toString());
+
+        for( int time = 1 ; time <= 5; time ++){
+
+            Variable umbrellaO = network.getVariable(time, umbrella);
+
+            umbrellaO.setValue(obsValues[time - 1]);
         }
     }
 
@@ -83,6 +105,43 @@ public class DynamicBayesianNetworkTest  {
         System.out.println("request prob : "+rs);
     }
 
+    private void DynamicBayesianNetworkUmbrellaTestFilterAndMax( DynamicBayesianNetwork network){
+
+        this.DynamicBayesianNetworkUmbrellaTestMax(network);
+
+        //initialisation de la requete
+
+        List<Variable> requests = new LinkedList<>();
+
+        Variable rain = new Variable(RAIN.toString());
+
+        Variable rainReq = network.getVariable(5, rain);
+
+        rainReq.setValue(1);
+
+        requests.add(rainReq);
+
+        network.filtering(requests);
+
+        Map<String, Map<Domain.DomainValue, AbstractDouble>> max = network.getMaxDistribSaved();
+
+        for(String key :  max.keySet()){
+
+            System.out.println("STATE "+key);
+
+            for(Map.Entry<Domain.DomainValue,AbstractDouble> entry : max.get(key).entrySet()){
+
+                System.out.println(entry.getKey()+" "+entry.getValue());
+            }
+        }
+    }
+
+    @Test
+    public void DynamicBayesianNetworkUmbrellaOrder1FilterMax(){
+
+        this.DynamicBayesianNetworkUmbrellaTestFilterAndMax(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder1());
+    }
+
     @Test
     public void DynamicBayesianNetworkUmbrellaOrder1FilterTest(){
 
@@ -97,6 +156,7 @@ public class DynamicBayesianNetworkTest  {
 
 
     private void DynamicBayesianNetworkUmbrellaTestPredict( DynamicBayesianNetwork network, int extensions, int predictTime){
+
 
         this.DynamicBayesianNetworkUmbrellaTest(network, extensions);
 
@@ -134,12 +194,15 @@ public class DynamicBayesianNetworkTest  {
 
         DynamicBayesianNetwork network = BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder1();
 
-        this.DynamicBayesianNetworkUmbrellaTest(network, 10);
+        this.DynamicBayesianNetworkUmbrellaTest(network, 3);
+
+        List<Variable> req = new LinkedList<>();
 
         Variable rain = new Variable(RAIN.toString());
 
-        network.forwardBackward(rain, 10);
+        req.add(rain);
 
+        network.forwardBackward(rain, 0,3);
     }
 
 }
