@@ -24,8 +24,8 @@
       <file leaf-file-name="DynamicBayesianNetworkTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1834">
-              <caret line="40" column="39" lean-forward="true" selection-start-line="40" selection-start-column="39" selection-end-line="40" selection-end-column="39" />
+            <state relative-caret-position="486">
+              <caret line="40" column="39" selection-start-line="40" selection-start-column="39" selection-end-line="40" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -36,12 +36,13 @@
       <file leaf-file-name="DynamicBayesianNetwork.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="423">
-              <caret line="1013" lean-forward="true" selection-start-line="1013" selection-end-line="1013" />
+            <state relative-caret-position="256">
+              <caret line="899" lean-forward="true" selection-start-line="899" selection-end-line="899" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#47152#47153#0" expanded="true" />
-                <element signature="e#47190#47191#0" expanded="true" />
+                <element signature="e#34621#34631#0" expanded="true" />
+                <element signature="e#47618#47619#0" expanded="true" />
+                <element signature="e#47656#47657#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -71,6 +72,7 @@
       <find>requestValues</find>
       <find>timeVariables</find>
       <find>System</find>
+      <find>forward</find>
     </findStrings>
     <replaceStrings>
       <replace>models</replace>
@@ -93,7 +95,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/network/MarkovCoverDistributionComputeStatic.java" />
         <option value="$PROJECT_DIR$/src/network/MarkovCoverDistributionComputeDynamic.java" />
         <option value="$PROJECT_DIR$/src/network/Variable.java" />
         <option value="$PROJECT_DIR$/src/test/inference/approximative/InferenceApproximativeTest.java" />
@@ -142,7 +143,8 @@
         <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
         <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
         <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
-        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" />
+        <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
+        <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
         <option value="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" />
       </list>
     </option>
@@ -172,8 +174,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -272,6 +272,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="AndroidView" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -578,7 +580,8 @@
       <workItem from="1528981916245" duration="6312000" />
       <workItem from="1529000325320" duration="1435000" />
       <workItem from="1529053004708" duration="13004000" />
-      <workItem from="1529134545205" duration="5337000" />
+      <workItem from="1529134545205" duration="5394000" />
+      <workItem from="1529156611716" duration="6618000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1527758342873</created>
@@ -895,7 +898,14 @@
       <option name="project" value="LOCAL" />
       <updated>1529142905051</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="essaie d'implementation de la sauvegarde des chemins">
+      <created>1529144600824</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1529144600824</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -931,7 +941,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="281481000" />
+    <option name="totallyTimeSpent" value="288156000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -948,7 +958,6 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32928178" />
-      <window_info anchor="bottom" id="Messages" order="11" weight="0.15801105" />
       <window_info anchor="right" id="Palette&#9;" order="8" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
@@ -960,9 +969,9 @@
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17963752" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.43535912" visible="true" weight="0.1641791" />
       <window_info anchor="right" id="Database" order="6" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info active="true" id="Structure" order="1" sideWeight="0.5646409" side_tool="true" visible="true" weight="0.1641791" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
@@ -974,6 +983,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32928178" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.15801105" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1014,7 +1024,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="correction Bug MyDouble" />
     <MESSAGE value="initialisation aléatoire de variable en fonction de la distribution des parents et d'un nombre aléatoire" />
     <MESSAGE value="sampleAsk" />
     <MESSAGE value="sampleAsk optimisation qui stop l'echantillonage et pass au suivant si une observation ne correspond pas" />
@@ -1039,7 +1048,8 @@
     <MESSAGE value="debut backward forward &#10;modification des procedures backward et forward pour sauvegarder les distributions" />
     <MESSAGE value="essaie de calcul de la sequence la plus probable en modifiant la procedure de filtrage" />
     <MESSAGE value="correction erreur implementation dans le calcul de la sequence la plus probable" />
-    <option name="LAST_COMMIT_MESSAGE" value="correction erreur implementation dans le calcul de la sequence la plus probable" />
+    <MESSAGE value="essaie d'implementation de la sauvegarde des chemins" />
+    <option name="LAST_COMMIT_MESSAGE" value="essaie d'implementation de la sauvegarde des chemins" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1378,8 +1388,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1834">
-          <caret line="40" column="39" lean-forward="true" selection-start-line="40" selection-start-column="39" selection-end-line="40" selection-end-column="39" />
+        <state relative-caret-position="486">
+          <caret line="40" column="39" selection-start-line="40" selection-start-column="39" selection-end-line="40" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1388,12 +1398,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
-          <caret line="1013" lean-forward="true" selection-start-line="1013" selection-end-line="1013" />
+        <state relative-caret-position="256">
+          <caret line="899" lean-forward="true" selection-start-line="899" selection-end-line="899" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#47152#47153#0" expanded="true" />
-            <element signature="e#47190#47191#0" expanded="true" />
+            <element signature="e#34621#34631#0" expanded="true" />
+            <element signature="e#47618#47619#0" expanded="true" />
+            <element signature="e#47656#47657#0" expanded="true" />
           </folding>
         </state>
       </provider>
