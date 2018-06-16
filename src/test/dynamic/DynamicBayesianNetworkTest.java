@@ -43,7 +43,7 @@ public class DynamicBayesianNetworkTest  {
             network.extend();
         }
 
-        Object[] obsValues = new Object[]{1, 1, 1, 1, 0};
+        Object[] obsValues = new Object[]{1, 1, 0, 1, 1};
 
         //initialisation des observations
 

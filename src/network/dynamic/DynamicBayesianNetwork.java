@@ -1016,7 +1016,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         AbstractDouble totalDistribution = this.doubleFactory.getNew(0.0);
 
         //max pour toutes les valeurs de la requete
-        AbstractDouble maxDomValue = this.doubleFactory.getNew(0.0);
+        AbstractDouble totalMax = this.doubleFactory.getNew(0.0);
 
         //lors du rappel recursif de la méthode de filtrage une seule variable compose la requete
         //car même si une variable de la requete à plusieurs parents, dans la sommation sur les valeurs cachés
@@ -1033,23 +1033,10 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 AbstractDouble valueProb = request.getProbabilityForCurrentValue();
                 //enregistre la probabilité pour cette valeur
                 distribution.put(domainValue, valueProb);
+                //ainsi que dans le maximum
+                maxDistribution.put(domainValue, valueProb);
 
                 totalDistribution = totalDistribution.add(valueProb);
-                //compare la probabilité avec le maximum actuel
-                int cmp = valueProb.compareTo(maxDomValue);
-                //si supérieur au max
-                if(cmp > 0){
-                    //sauvegarde le nouveau max
-                    maxDomValue = valueProb;
-                    //supprimmer le(s) ancienne(s) valeur(s) de domaine liés au max précedents
-                    maxDistribution.clear();
-                    //lié la valeur max à la valeur de domaine
-                    maxDistribution.put(domainValue, valueProb);
-
-                }else if (cmp == 0){
-                    //si égalité avec un max précédent on ajoute la valeur de domaine
-                    maxDistribution.put(domainValue, valueProb);
-                }
             }
             //ajoute une entrée pour le total afin de normaliser
             distribution.put(new Domain.DomainValue(TOTAL_VALUE), totalDistribution);
@@ -1114,36 +1101,25 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                     //qu'on multiplie avec les resultat pour les observations precedentes
                     requestValueProbability = requestValueProbability.multiply(hiddenVarsSum);
-
+                    //idem pour le maximum qauf que l'on mutpliplie le model de capteur par le maximum sur les variables cachées et non la somme
                     requestValueMaxProbability = requestValueMaxProbability.multiply(hiddenVarsMax);
                 }
             }
 
             //enregistrement de la probabilité pour la valeur courante de la requete
             distribution.put(request.getDomainValue(), requestValueProbability);
-
+            //enregistre le maximum çad le resultat du modele de capteur multiplié par le maximum du resultat du modele de transition pour un etat precedent donné
+            //multiplié lui même par la probabilité du chemin le plus vraissemblable menant cet état precedent.
+            maxDistribution.put(domainValue, requestValueMaxProbability);
             //addition du resultat pour une combinaison au total
             totalDistribution = totalDistribution.add(requestValueProbability);
-
-            int cmp = requestValueMaxProbability.compareTo(maxDomValue);
-
-            //si supérieur au max
-            if(cmp > 0){
-                //sauvegarde le nouveau max
-                maxDomValue = requestValueMaxProbability;
-                //supprimmer le(s) ancienne(s) valeur(s) de domaine liés au max précedents
-                maxDistribution.clear();
-                //lié la valeur max à la valeur de domaine
-                maxDistribution.put(domainValue, requestValueMaxProbability);
-
-            }else if (cmp == 0){
-                //si égalité avec un max précédent on ajoute la valeur de domaine
-                maxDistribution.put(domainValue, requestValueMaxProbability);
-            }
-
+            //total des maximums
+            totalMax = totalMax.add(requestValueMaxProbability);
         }
         //enregistre le total de la distribution
         distribution.put(totalDomainValues, totalDistribution);
+
+        maxDistribution.put(totalDomainValues, totalMax);
 
         //valeur de la requete
         request.setDomainValue(originalValue);
@@ -1189,8 +1165,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 distrib = this.forwardDistribSaved.get(key);
             }
-            //si plusieurs valeur de domaine elles ont la même prob on recupere la prob du premier
-            AbstractDouble maxValue = max.values().iterator().next();
+            //probabilité du chemin le plus vraissemblable vers l'état precedent pour une certaine valeur
+            AbstractDouble maxValue = max.get(new Domain.DomainValue(domainValues));
 
             maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
 
@@ -1198,7 +1174,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 hiddenVarMax = maxValue;
             }
-
             AbstractDouble forward = distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(totalDomainValues));
             //on multiplie le resultat du filtre pour chaque variable cachée
             mulTransitionForward = mulTransitionForward.multiply(forward);
@@ -1242,8 +1217,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 max = this.maxDistribSaved.get(key);
             }
 
-            //si plusieurs valeur de domaine elles ont la même prob on recupere la prob du premier
-            AbstractDouble maxValue = max.values().iterator().next();
+            //probabilité du chemin le plus vraissemblable vers l'état precedent pour une certaine valeur
+            AbstractDouble maxValue = max.get(domainValue);
 
             maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
 

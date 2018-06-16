@@ -1,0 +1,83 @@
+RAIN2 = V 
+UMBR2 = V | RAIN2 = V
+{C}  0.9 * SUM [		
+						RAIN2 = V | RAIN1 = V			
+						{T} 0.7 * (
+						            RAIN1 = V
+									UMBR1 = V | RAIN1 = V	
+									{C}  0.9 * SUM [ 		
+															RAIN1 = V | RAIN0 = V
+															{T} 0.7 * (  0.5  )  +
+															RAIN1 = V | RAIN0 = F
+															{T} 0.3 * (  0.5  )  
+													] 
+									RAIN1 = F				
+									UMBR1 = V | RAIN1 = F				
+									{C}  0.2 * SUM [  		
+															RAIN1 = F | RAIN0 = V
+															{T} 0.3 * (  0.5  )  +
+															RAIN1 = F | RAIN0 = F
+															{T} 0.7 * (  0.5  )  
+													] 
+								   )  + 
+						RAIN2 = V | RAIN1 = F	   
+						{T} 0.3 * ( 
+						            RAIN1 = V
+									UMBR1 = V | RAIN1 = V	
+									{C}  0.9 * SUM [ 		
+															RAIN1 = V | RAIN0 = V
+															{T} 0.7 * (  0.5  )  +
+															RAIN1 = V | RAIN0 = F
+															{T} 0.3 * (  0.5  )  
+													] 
+									RAIN1 = F				
+									UMBR1 = V | RAIN1 = F				
+									{C}  0.2 * SUM [  		
+															RAIN1 = F | RAIN0 = V
+															{T} 0.3 * (  0.5  )  +
+															RAIN1 = F | RAIN0 = F
+															{T} 0.7 * (  0.5  )  
+													] 
+								  )  
+				] 
+RAIN2 = F 	
+UMBR2 = V | RAIN2 = F			
+{C}  0.2 * SUM [         
+                        RAIN2 = F | RAIN1 = V
+						{T} 0.3 * (
+						            RAIN1 = V
+									UMBR1 = V | RAIN1 = V	
+									{C}  0.9 * SUM [ 		
+															RAIN1 = V | RAIN0 = V
+															{T} 0.7 * (  0.5  )  +
+															RAIN1 = V | RAIN0 = F
+															{T} 0.3 * (  0.5  )  
+													] 
+									RAIN1 = F				
+									UMBR1 = V | RAIN1 = F				
+									{C}  0.2 * SUM [  		
+															RAIN1 = F | RAIN0 = V
+															{T} 0.3 * (  0.5  )  +
+															RAIN1 = F | RAIN0 = F
+															{T} 0.7 * (  0.5  )  
+													] 
+									) +  
+						{T} 0.7 * ( 
+						            RAIN1 = V
+									UMBR1 = V | RAIN1 = V	
+									{C}  0.9 * SUM [ 		
+															RAIN1 = V | RAIN0 = V
+															{T} 0.7 * (  0.5  )  +
+															RAIN1 = V | RAIN0 = F
+															{T} 0.3 * (  0.5  )  
+													] 
+									RAIN1 = F				
+									UMBR1 = V | RAIN1 = F				
+									{C}  0.2 * SUM [  		
+															RAIN1 = F | RAIN0 = V
+															{T} 0.3 * (  0.5  )  +
+															RAIN1 = F | RAIN0 = F
+															{T} 0.7 * (  0.5  )  
+													] 
+									)
+					]
