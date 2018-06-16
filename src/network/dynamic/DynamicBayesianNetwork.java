@@ -37,6 +37,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     private Map<String, Map<Domain.DomainValue, AbstractDouble>> maxDistribSaved = new Hashtable<>();
 
+    private Map<String, Map<Domain.DomainValue, Map<String, Domain.DomainValue>>> maxWays = new Hashtable<>();
+
     public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory) {
 
         super(doubleFactory);
@@ -1010,6 +1012,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         Map<Domain.DomainValue, AbstractDouble> maxDistribution = new Hashtable<>();
 
+        Map<Domain.DomainValue, Map<String, Domain.DomainValue>> maxWayVar = new Hashtable<>();
+
         Domain.DomainValue originalValue = request.getDomainValue();
 
         //total pour toutes les valeurs de la requete
@@ -1064,7 +1068,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             //Pour chaque observations : ici on peut avoir une ou plusieurs observation par variable de requete
             for (Variable observation : requestObservations) {
-
                 //au cas ou la variale d'observation est nul on obtient une prédiction plutot qu'un filtrage
                 if (observation.getDomainValue() != null) {
                     //valeur du modele de capteur
@@ -1072,15 +1075,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                     requestValueMaxProbability = requestValueMaxProbability.multiply(observation.getProbabilityForCurrentValue());
                 }
-
                 //pour chaque parent de l'observation on multiplie les sommations
                 for (Variable stateObserved : observation.getDependencies()) {
                     //total de la somme sur les valeurs cachées initialisé à zero
 
                     AbstractDouble hiddenVarsSum = doubleFactory.getNew(1.0),
                                    hiddenVarsMax = doubleFactory.getNew(1.0);
-
-                    //sommation sur une seul variable caché
+                    //sommation sur une seul variable cachée
                     if (stateObserved.getDependencies().size() == 1) {
 
                         ForwardSumRs rs = forwardHiddenVarSum( stateObserved, stateObserved.getDependencies().get(0), depth);
@@ -1088,7 +1089,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                         hiddenVarsSum = rs.sum;
 
                         hiddenVarsMax = rs.max;
-
                         //sommation sur plusieurs variables cachées
                     } else if (stateObserved.getDependencies().size() > 1) {
 
@@ -1098,14 +1098,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                         hiddenVarsMax = rs.max;
                     }
-
                     //qu'on multiplie avec les resultat pour les observations precedentes
                     requestValueProbability = requestValueProbability.multiply(hiddenVarsSum);
                     //idem pour le maximum qauf que l'on mutpliplie le model de capteur par le maximum sur les variables cachées et non la somme
                     requestValueMaxProbability = requestValueMaxProbability.multiply(hiddenVarsMax);
                 }
             }
-
             //enregistrement de la probabilité pour la valeur courante de la requete
             distribution.put(request.getDomainValue(), requestValueProbability);
             //enregistre le maximum çad le resultat du modele de capteur multiplié par le maximum du resultat du modele de transition pour un etat precedent donné
@@ -1132,6 +1130,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     private ForwardSumRs forwardHiddenVarSum(Variable obsParentState, List<Variable> hiddenVars, int depth) {
 
         AbstractDouble hiddenVarMax = this.doubleFactory.getNew(0.0);
+
+        Domain.DomainValue maxHiddenValues = null;
 
         AbstractDouble hiddenVarsSum = this.doubleFactory.getNew(0.0);
         //une variable de la requete peut avoir plusieurs parents ils faut donc récuperer les combinaisons de valeurs
@@ -1170,11 +1170,15 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
 
+            Domain.DomainValue domainvaluesCom = new Domain.DomainValue(domainValues);
+
             if(maxValue.compareTo(hiddenVarMax) > 0){
 
                 hiddenVarMax = maxValue;
+
+                maxHiddenValues = domainvaluesCom;
             }
-            AbstractDouble forward = distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(totalDomainValues));
+            AbstractDouble forward = distrib.get(domainvaluesCom).divide(distrib.get(totalDomainValues));
             //on multiplie le resultat du filtre pour chaque variable cachée
             mulTransitionForward = mulTransitionForward.multiply(forward);
 
@@ -1182,7 +1186,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
         }
 
-        return new ForwardSumRs(hiddenVarsSum, hiddenVarMax);
+        return new ForwardSumRs(hiddenVarsSum, hiddenVarMax, maxHiddenValues, key);
     }
 
 
@@ -1191,6 +1195,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //méthode identique pour une seule variable cachée
 
         AbstractDouble hiddenVarMax = this.doubleFactory.getNew(0.0);
+
+        Domain.DomainValue maxHiddenValue = null;
 
         AbstractDouble hiddenVarSum = this.doubleFactory.getNew(0.0);
 
@@ -1225,6 +1231,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             if(maxValue.compareTo(hiddenVarMax) > 0){
 
                 hiddenVarMax = maxValue;
+
+                maxHiddenValue = domainValue;
             }
 
             AbstractDouble forward = distrib.get(domainValue).divide(distrib.get(totalDomainValues));
@@ -1234,21 +1242,28 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             hiddenVarSum = hiddenVarSum.add(mulTransitionForward);
         }
 
-        return new ForwardSumRs(hiddenVarSum, hiddenVarMax);
+        return new ForwardSumRs(hiddenVarSum, hiddenVarMax, maxHiddenValue, key);
     }
 
     private class ForwardSumRs {
 
-        public ForwardSumRs(AbstractDouble sum, AbstractDouble max) {
+        public ForwardSumRs(AbstractDouble sum, AbstractDouble max, Domain.DomainValue maxDomainValue, String key) {
 
             this.sum = sum;
 
             this.max = max;
+
+            this.maxDomainValue = maxDomainValue;
+
+            this.hiddenVarKey = key;
         }
 
         private AbstractDouble sum, max;
-    }
 
+        private Domain.DomainValue maxDomainValue;
+
+        private String hiddenVarKey ;
+    }
 
     @Override
     public String toString() {

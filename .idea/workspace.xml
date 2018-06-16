@@ -4,7 +4,6 @@
     <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -37,8 +36,8 @@
       <file leaf-file-name="DynamicBayesianNetwork.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="594">
-              <caret line="1123" column="30" lean-forward="true" selection-start-line="1123" selection-start-column="30" selection-end-line="1123" selection-end-column="30" />
+            <state relative-caret-position="423">
+              <caret line="1013" lean-forward="true" selection-start-line="1013" selection-end-line="1013" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#47152#47153#0" expanded="true" />
@@ -579,7 +578,7 @@
       <workItem from="1528981916245" duration="6312000" />
       <workItem from="1529000325320" duration="1435000" />
       <workItem from="1529053004708" duration="13004000" />
-      <workItem from="1529134545205" duration="3578000" />
+      <workItem from="1529134545205" duration="5337000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1527758342873</created>
@@ -889,7 +888,14 @@
       <option name="project" value="LOCAL" />
       <updated>1529078524221</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="correction erreur implementation dans le calcul de la sequence la plus probable">
+      <created>1529142905051</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1529142905051</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -925,7 +931,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="279722000" />
+    <option name="totallyTimeSpent" value="281481000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -950,11 +956,11 @@
       <window_info anchor="right" id="Maven Projects" order="7" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.1558011" />
-      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.18412349" />
+      <window_info anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" weight="0.18412349" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17963752" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17963752" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -1008,7 +1014,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="first commit" />
     <MESSAGE value="correction Bug MyDouble" />
     <MESSAGE value="initialisation aléatoire de variable en fonction de la distribution des parents et d'un nombre aléatoire" />
     <MESSAGE value="sampleAsk" />
@@ -1033,7 +1038,8 @@
     <MESSAGE value="modification de la procedure backward pour gerer les cas ou une observation à unou plusieurs parents differemments&#10;correction de l'erreur de calcul du resultat la distribution retourné par le forward devant être normalisé contrairement au resultat du backward" />
     <MESSAGE value="debut backward forward &#10;modification des procedures backward et forward pour sauvegarder les distributions" />
     <MESSAGE value="essaie de calcul de la sequence la plus probable en modifiant la procedure de filtrage" />
-    <option name="LAST_COMMIT_MESSAGE" value="essaie de calcul de la sequence la plus probable en modifiant la procedure de filtrage" />
+    <MESSAGE value="correction erreur implementation dans le calcul de la sequence la plus probable" />
+    <option name="LAST_COMMIT_MESSAGE" value="correction erreur implementation dans le calcul de la sequence la plus probable" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1382,8 +1388,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
-          <caret line="1123" column="30" lean-forward="true" selection-start-line="1123" selection-start-column="30" selection-end-line="1123" selection-end-column="30" />
+        <state relative-caret-position="423">
+          <caret line="1013" lean-forward="true" selection-start-line="1013" selection-end-line="1013" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#47152#47153#0" expanded="true" />
