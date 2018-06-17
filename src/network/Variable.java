@@ -97,11 +97,13 @@ public class Variable {
         }
     }
 
-    public Variable(Variable variable) {
+    public Variable(String label, int time, Domain.DomainValue value) {
 
-        this.value = variable.value;
+        this.label = label;
 
-        this.label = variable.label;
+        this.time = time;
+
+        this.value = value;
     }
 
     private String getvarTimeId(Variable variable, int time){
@@ -293,14 +295,14 @@ public class Variable {
         return this.label+"_"+this.time+" = "+this.value;
     }
 
-    public Variable simpleCopy() {
-
-        return new Variable(this);
-    }
-
     public String getValueKey() {
 
         return this.getValue().toString();
+    }
+
+    public Variable copyLabelTimeValue(){
+
+        return new Variable(this.label, this.time, this.value);
     }
 
     public int getDomainSize() {

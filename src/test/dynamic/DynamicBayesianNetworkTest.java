@@ -123,6 +123,10 @@ public class DynamicBayesianNetworkTest  {
 
         network.filtering(requests);
 
+        System.out.println();
+        System.out.println("MAX");
+        System.out.println();
+
         Map<String, Map<Domain.DomainValue, AbstractDouble>> max = network.getMaxDistribSaved();
 
         for(String key :  max.keySet()){
@@ -134,6 +138,23 @@ public class DynamicBayesianNetworkTest  {
                 System.out.println(entry.getKey()+" "+entry.getValue());
             }
         }
+
+        System.out.println();
+        System.out.println("MOST LIKELY PATH");
+        System.out.println();
+
+        Map<String, Map<Domain.DomainValue, List<Variable>>> mostLikelyPath = network.getMostLikelyPath();
+
+        for(String key :  mostLikelyPath.keySet()){
+
+            System.out.println("STATE "+key);
+
+            for(Map.Entry<Domain.DomainValue,List<Variable>> entry : mostLikelyPath.get(key).entrySet()){
+
+                System.out.println(entry.getKey()+" "+entry.getValue());
+            }
+        }
+
     }
 
     @Test
@@ -145,7 +166,7 @@ public class DynamicBayesianNetworkTest  {
     @Test
     public void DynamicBayesianNetworkUmbrellaOrder1FilterTest(){
 
-        this.DynamicBayesianNetworkUmbrellaTestFilter(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder1(),1);
+        this.DynamicBayesianNetworkUmbrellaTestFilter(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder1(),2);
     }
 
     @Test
@@ -153,7 +174,6 @@ public class DynamicBayesianNetworkTest  {
 
         this.DynamicBayesianNetworkUmbrellaTestFilter(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2(),10);
     }
-
 
     private void DynamicBayesianNetworkUmbrellaTestPredict( DynamicBayesianNetwork network, int extensions, int predictTime){
 

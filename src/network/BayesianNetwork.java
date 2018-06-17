@@ -185,12 +185,12 @@ public class BayesianNetwork {
         }
     }
 
-    public static List<List<Domain.DomainValue>> requestValuesCombinations(List<Variable> variables){
+    public static List<List<Domain.DomainValue>> requestValuesCombinations(Collection<Variable> variables){
 
         //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
         List<List<Domain.DomainValue>> requestValuesCombinaisons = new LinkedList<>();
 
-        requestValuesCombinations(requestValuesCombinaisons, new LinkedList<>(), variables, 0);
+        requestValuesCombinations(requestValuesCombinaisons, new LinkedList<>(), new ArrayList<>(variables), 0);
 
         return requestValuesCombinaisons;
     }
