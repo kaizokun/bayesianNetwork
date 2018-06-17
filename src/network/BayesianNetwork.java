@@ -8,7 +8,8 @@ import java.util.*;
 
 public class BayesianNetwork {
 
-    public BayesianNetwork() { }
+    public BayesianNetwork() {
+    }
 
     public BayesianNetwork(AbstractDoubleFactory doubleFactory) {
 
@@ -27,22 +28,22 @@ public class BayesianNetwork {
         return new ProbabilityComputeFromTCP(booleanDomain, doubles, this.doubleFactory);
     }
 
-    public ProbabilityCompute getTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries){
+    public ProbabilityCompute getTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries) {
 
-        return new ProbabilityComputeFromTCP(dependencies, varDom, entries,  this.doubleFactory);
+        return new ProbabilityComputeFromTCP(dependencies, varDom, entries, this.doubleFactory);
     }
 
-    public void addVariable(Variable variable){
+    public void addVariable(Variable variable) {
 
         this.variables.put(variable.getLabel(), variable);
 
-        if(variable.isRoot()){
+        if (variable.isRoot()) {
 
             this.roots.add(variable);
         }
     }
 
-    public Variable addRootVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute){
+    public Variable addRootVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
 
         Variable newVar = new Variable(label, domain, probabilityCompute);
 
@@ -51,7 +52,7 @@ public class BayesianNetwork {
         return newVar;
     }
 
-    public Variable addVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies){
+    public Variable addVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies) {
 
         Variable newVar = new Variable(label, domain, probabilityCompute, dependencies);
 
@@ -63,7 +64,7 @@ public class BayesianNetwork {
 
     //marque les variables importante pour la requete soit les observations les requetes
     //et leur ancetres
-    public static void markImportantVars(List<Variable> request, List<Variable> observations){
+    public static void markImportantVars(List<Variable> request, List<Variable> observations) {
 
         List<Variable> checkParents = new LinkedList<>();
 
@@ -75,11 +76,11 @@ public class BayesianNetwork {
 
     }
 
-    private static void markImportant(List<Variable> vars){
+    private static void markImportant(List<Variable> vars) {
 
-        for(Variable var : vars){
+        for (Variable var : vars) {
 
-            if(!var.isImportant()){
+            if (!var.isImportant()) {
 
                 var.setImportant(true);
 
@@ -88,16 +89,16 @@ public class BayesianNetwork {
         }
     }
 
-    public LinkedList<Variable> getTopologicalOrder(){
+    public LinkedList<Variable> getTopologicalOrder() {
 
         //list des noeuds racines
         LinkedList<Variable> vars = new LinkedList<>();
         //ajute les noeuds racines à la liste finale
         LinkedList<Variable> orderedVars = new LinkedList<>();
 
-        for(Variable root : this.roots){
+        for (Variable root : this.roots) {
 
-            if(root.isImportant()){
+            if (root.isImportant()) {
 
                 vars.add(root);
 
@@ -108,15 +109,15 @@ public class BayesianNetwork {
         //int d = 0;
 
         //tant qu'il y a des noeuds à traiter
-        while(!vars.isEmpty()){
+        while (!vars.isEmpty()) {
             //créer une liste contenant les noeuds de niveau inférieur
             LinkedList<Variable> children = new LinkedList<>();
             //pour chaque variable du niveau superieur
-            for(Variable var : vars){
+            for (Variable var : vars) {
                 //ajoute chaque variable du niveau inférieur dans la liste
-                for(Variable child : var.getChildren()) {
+                for (Variable child : var.getChildren()) {
                     //marque les noueuds traités
-                    if(!child.isAdded() && child.isImportant()) {
+                    if (!child.isAdded() && child.isImportant()) {
 
                         child.setAdded(true);
 
@@ -138,7 +139,7 @@ public class BayesianNetwork {
             }
 */
 
-           // d++;
+            // d++;
         }
 
         return orderedVars;
@@ -149,7 +150,7 @@ public class BayesianNetwork {
         return variables;
     }
 
-    public Variable getVariable(String label){
+    public Variable getVariable(String label) {
 
         return this.variables.get(label);
     }
@@ -162,11 +163,11 @@ public class BayesianNetwork {
 
     /*=================================UTILS=======================================*/
 
-    public static void requestValuesCombinations(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar){
+    public static void requestValuesCombinations(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar) {
 
         //si aucune variable restantes
         //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
-        if(variables.size() == iVar){
+        if (variables.size() == iVar) {
 
             requestValuesCombinaisons.add(new ArrayList(varsValues));
 
@@ -175,7 +176,7 @@ public class BayesianNetwork {
 
         Variable var = variables.get(iVar);
 
-        for(Domain.DomainValue domainValue : var.getDomainValues()){
+        for (Domain.DomainValue domainValue : var.getDomainValues()) {
 
             varsValues.addLast(domainValue);
 
@@ -183,9 +184,56 @@ public class BayesianNetwork {
 
             varsValues.removeLast();
         }
+
     }
 
-    public static List<List<Domain.DomainValue>> requestValuesCombinations(Collection<Variable> variables){
+    public static List<List<Domain.DomainValue>> requestValuesCombinations(Collection<Variable> variables) {
+
+        //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
+        List<List<Domain.DomainValue>> requestValuesCombinaisons = new LinkedList<>();
+
+        requestValuesCombinations(requestValuesCombinaisons, new LinkedList<>(), new ArrayList<>(variables), 0);
+
+        return requestValuesCombinaisons;
+    }
+
+
+    public static void requestValuesCombinationsCheckInit(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar) {
+
+        //si aucune variable restantes
+        //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
+        if (variables.size() == iVar) {
+
+            requestValuesCombinaisons.add(new ArrayList(varsValues));
+
+            return;
+        }
+
+        Variable var = variables.get(iVar);
+
+        if (var.isInit()) {
+
+            varsValues.addLast(var.getDomainValue());
+
+            requestValuesCombinationsCheckInit(requestValuesCombinaisons, varsValues, variables, iVar + 1);
+
+            varsValues.removeLast();
+
+        } else {
+
+            for (Domain.DomainValue domainValue : var.getDomainValues()) {
+
+                varsValues.addLast(domainValue);
+
+                requestValuesCombinationsCheckInit(requestValuesCombinaisons, varsValues, variables, iVar + 1);
+
+                varsValues.removeLast();
+            }
+
+        }
+    }
+
+    public static List<List<Domain.DomainValue>> requestValuesCombinationsCheckInit(Collection<Variable> variables) {
 
         //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
         List<List<Domain.DomainValue>> requestValuesCombinaisons = new LinkedList<>();

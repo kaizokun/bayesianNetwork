@@ -900,6 +900,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         for (Variable request : requests) {
 
             originalValues.add(request.getDomainValue());
+            //rend la valeur de la variable nule
+            request.clear();
         }
 
         //total pour toutes les valeurs de la requete
@@ -969,7 +971,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //certaines variables parents des observations pourraient ne pas faire parti de la requete
         //et doivent donc être ajoutés sans cela impossible de calculer la valeur de l'observation
         //si un de ses parents n'a pas de valeur
-        Set<Variable> fullRequest = new LinkedHashSet<>();
+        Set<Variable> fullRequest = new LinkedHashSet<>(requests);
 
         for (Variable observation : requestsObservations) {
 
@@ -1122,8 +1124,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         AbstractDouble hiddenVarsSum = this.doubleFactory.getNew(0.0);
         //une variable de la requete peut avoir plusieurs parents ils faut donc récuperer les combinaisons de valeurs
-        //pour sommer sur chacune d'entre elle
-        List<List<Domain.DomainValue>> hiddenVarsCombinations = requestValuesCombinations(obsParentState.getDependencies());
+        //pour sommer sur chacune d'entre elle. les variables deja initialisé gardent la même valeur et on ne somme pas sur les autres
+        List<List<Domain.DomainValue>> hiddenVarsCombinations = requestValuesCombinationsCheckInit(obsParentState.getDependencies());
 
         String key = getDistribSavedKey(obsParentState.getDependencies());
 

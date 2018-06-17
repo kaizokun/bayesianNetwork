@@ -1,0 +1,59 @@
+Exemple d'un cas ou on à deux états et deux observations
+
+deux états  : les maladies
+deux observations : les symptomes
+
+les deux maladies ont les mêmes symptomes
+donc chaque état est lié aux deux observations et chaque observation est liée aux deux états.
+Au niveau du calcul de la sequence la plus probable on travaille sur toutes les variables états, la requete.
+Pour commencer on travaille sur toutes les combinaisons de valeurs pour les états de la requete
+Ensuite on va recuperer toutes les observations des états de la requete, qu'on traite une par une
+On calcule une observation par rapport à ses deux parents
+puis on calcule le max sur chaque parent un par un, s1(t) et s2(t). On prend le premier état parent de l'observation s1(t)
+et on boucle sur les valeurs que peut prendre sa dependence, qui normalement est le même état au temps precedent s1(t-1).
+Au final on obtient un maximum pour une valeur de s1(t-1) suivit d'un maximum pour s2(t-1).
+on fait de même pour chaque combinaison de valeurs pour s1(t) et s2(t) en les associant à chaque fois à la combinaison de valeurs
+offrant la probabilité maximum s1(t-1) et s2(t-1). Au final on à un maximum pour une combinaison de valeur s1(t) et s2(t) qui associé
+à une combinaison sauvegardé s1(t-1) et s2(t-1) donne une partie de la sequence la plus vraissemblable.
+Ici on a un cas simple ou un etat n'a qu'un état parent.
+
+en prenant un cas ou chaque etat à deux parent par exemple une chaine de Markov d'ordre deux
+s1(t) depend de s1(t-1) et s1(t-2)
+s2(t) depend de s2(t-1) et s2(t-2)
+
+cette fois si quand on traite une combi pour s1(t) et s2(t)
+pour s1(t) on à une combinaison de valeur max pour ces parents s1(t-1) et s1(t-2)
+idem pour s2(t)
+
+un problème survient si par exemple s1(t-2) = s1(0) et s1(t-1) = s1(1), dans ce cas dans la partie max ou sommation du filtrage
+on va rapeller le forward avec deux variable situées à des coupes temporelles différentes 0 et 1 
+ici recuperer les observations : s1(0) n'en a pas donc on aura uniquement celle de s1(1)
+ensuite la procedure va recuperer tout les parents des observations au cas ou certains manquent dans la requete
+ici la procedure se base uniquement sur le parent des observations pour recreer une requete complete
+alors qu'il faudrait en fait completer celle recu en parametre de procedure, sinon s1(0) est manquant !
+ensuite recuperer leur combinaison de valeurs pour s1(0) et s1(1)
+on peut maintenant calculer chaque observations en fonction de ses parents dont on est sur qu'ils ont une valeur
+
+Premier problème ici c'est qu'on boucle sur les observations recoltées et que par consequent les états 0 sont ignorées
+alors qu'ils doivent participer au calcul. on calcule chaque observation en fonction de ses parents (ex s1(1)) puis on multiplie le resultat par
+une somme qui se fait sur les parents d'un des parents de l'observation (ex s1(0) qui dans ce cas si à deja une valeur voir 2eme problème)
+soit une somme par parent de l'observation. 
+
+Par consequent on pourrait savoir quelles variables de la requete n'ont pas été traité par
+manque d'observations, en retirant les parents des observation d'une copie de la liste de requete complete, 
+les restantes seront celles en temps 0 qui sont normalement ( même sur ) les seules à ne pas en posseder. 
+celles ci peuvent être calculées directement par rapport à leur valeur car elles ne possede pas de parents 
+non plus situés à des coupes temporelles precedentes.
+
+Une autre solution pourrait être de boucler sur la liste des variables de requete.
+De boucler ensuite sur chaque observation de ses variables (donc on est sur qu'elles sont calculable après avoir complété la requete de base ) 
+verifier si l'observation n'a pas déja été calculé et si non faire le calcul et pour finir ajouter l' observation à le liste de celles déja traités.
+Si une variable n'a pas d'observation et donc normalement pas de parent non plus il s'agit des variables au temps 0, donc on 
+obtiendra directement la valeur à multiplier au reste.
+
+Deuxieme probleme par exemple aux moment ou on calcul les observations liés à s1(1),
+on somme sur les parent de s1(1) hors ici il s1(0) possede deja une valeur. Solution : on pourrait recuperer les combinaisons en en tenant compte
+et on sommerait en fait sur une seul valeur de s1(0), modifier la procedure de recuperation des combinaison de valeur
+pour ignorer les variables deja initialisé et ajouter uniquement leur valeur dans la combi.
+Ce la aurait aussi pu engendrer des problème pour le max car si la combinaison de la requete courante comprend s1(1) = v et s1(0) = f
+calculer une valeur max potentiel (ou une somme ) sur s1(0) = v n'a pas de sens.
