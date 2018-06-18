@@ -1225,16 +1225,18 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         AbstractDouble hiddenVarsSum = this.doubleFactory.getNew(0.0);
         //une variable de la requete peut avoir plusieurs parents il faut donc récuperer les combinaisons de valeurs
         //pour sommer sur chacune d'entre elle.
-        //CAS TRES SPECIFIQUES POUR LES CHAINE DE MARKOV DE NIVEAU SUPERIEUR A 1
+        //CAS TRES SPECIFIQUES POUR LES CHAINES DE MARKOV DE NIVEAU SUPERIEUR A 1
         //les variables deja initialisé gardent la même valeur et on ne somme pas sur les autres
-        //exemple si la requete contient deux variable dont l'une est deja parent de l'autre par exemple pour une chaine de markov d'ordre 2
+        //exemple si la requete dans la procedure forward appelante contient deux variable dont l'une
+        //est parent de l'autre par exemple pour une chaine de markov d'ordre 2
         //une variable s(2) à pour parent s(1) et s(0) par contre s(1) à uniquement pour parent s(0)
         //au moment de calculer dans la boucle de sommation p( s(2)|s(1),s(0) ) on boucle sur les combinaisons de valeur pour s(1),s(0)
-        //et on a egalement un appel recursif pour s(1),s(0) qui devient la requete. on va par consequent cette fois si
-        //calculer une distribution pour cette combinaison de variable et donc assigner leur assigner des valeurs
-        //on calcule une observation de s(1) suivit d'une sommation sur le parent de s(1) ici s(0) qui possede deja une valeur.
+        //et on a egalement un appel recursif à forward pour s(1),s(0) qui devient la requete. on va par consequent cette fois si
+        //calculer une distribution pour cette combinaison de variable et donc assigner leur assigner des valeurs, ici 4 combinaison pour des variabels bolleenes
+        //on calcule ensuite une observation de s(1) par exemple o(1)|s(1) suivit d'une sommation sur le parent de s(1) ici s(0) qui possede deja une valeur.
+        //initialisé precedemment dans la partie forward lorsqu'on boucle sur les combinaisons de la requete
         //la sommation ne doit donc se faire que sur la valeur de s(0) déja assignée, si on avait pusieurs parents pour s(1) on aurait des combinaison
-        //de valeur ou celle de s(0) serait fixe
+        //de valeur ou celle de s(0) serait fixe. Car il me semble que s(0) ne peut être considérée comme variable caché dans ce cas ci.
         List<List<Domain.DomainValue>> hiddenVarsCombinations = requestValuesCombinationsCheckInit(obsParentState.getDependencies());
 
         String key = getDistribSavedKey(obsParentState.getDependencies());

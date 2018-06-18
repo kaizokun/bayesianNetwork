@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="suite revision de la procedure forward qui peut poser certains problèmes dans des cas spécifiques">
+    <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/analyse_procedure_filtrage_et_chemin_plus_vraissemblable" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/analyse_procedure_filtrage_et_chemin_plus_vraissemblable" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/Variable.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,8 +36,8 @@
       <file leaf-file-name="DynamicBayesianNetwork.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="520">
-              <caret line="1316" column="8" selection-start-line="1316" selection-start-column="8" selection-end-line="1316" selection-end-column="8" />
+            <state relative-caret-position="676">
+              <caret line="1237" column="140" lean-forward="true" selection-start-line="1237" selection-start-column="140" selection-end-line="1237" selection-end-column="140" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#31815#31825#0" expanded="true" />
@@ -582,14 +578,7 @@
       <workItem from="1529156611716" duration="6968000" />
       <workItem from="1529170160912" duration="3630000" />
       <workItem from="1529228054149" duration="15796000" />
-      <workItem from="1529304597954" duration="22853000" />
-    </task>
-    <task id="LOCAL-00001" summary="first commit">
-      <created>1527758342873</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1527758342873</updated>
+      <workItem from="1529304597954" duration="25256000" />
     </task>
     <task id="LOCAL-00002" summary="bayesian network basic implementation :&#10;Domain : boolean, TCP, Variable">
       <created>1527777719158</created>
@@ -927,13 +916,17 @@
       <option name="project" value="LOCAL" />
       <updated>1529261264915</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="correction de problème dans la procedure forward surtoute pour gerer des&#10;requetes avec des variables situées à des temps différents">
+      <created>1529336244818</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1529336244818</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2FilterTest - 2018.06.18 at 17h 14m 07s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2FilterTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2FilterTest - 2018.06.18 at 17h 18m 38s.xml">
       <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2FilterTest" configurationId="JUnit" />
     </history-entry>
@@ -961,9 +954,12 @@
     <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2FilterTest - 2018.06.18 at 17h 34m 56s.xml">
       <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2FilterTest" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2FilterTest - 2018.06.18 at 17h 35m 54s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2FilterTest" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="330785000" />
+    <option name="totallyTimeSpent" value="333188000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1046,7 +1042,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="add similarity sampling" />
     <MESSAGE value="frequence cumulée pour une couverture de markov" />
     <MESSAGE value="gibss ask bug correction" />
     <MESSAGE value="Separation des test&#10;gestion dynamique du calcul de distribution markovienne à la demande ou à partir d'une table de frequence cumulées" />
@@ -1071,7 +1066,8 @@
     <MESSAGE value="sequence la plus vraissemblable" />
     <MESSAGE value="revision de la procedure forward qui peut poser certains problèmes dans des cas spécifiques" />
     <MESSAGE value="suite revision de la procedure forward qui peut poser certains problèmes dans des cas spécifiques" />
-    <option name="LAST_COMMIT_MESSAGE" value="suite revision de la procedure forward qui peut poser certains problèmes dans des cas spécifiques" />
+    <MESSAGE value="correction de problème dans la procedure forward surtoute pour gerer des&#10;requetes avec des variables situées à des temps différents" />
+    <option name="LAST_COMMIT_MESSAGE" value="correction de problème dans la procedure forward surtoute pour gerer des&#10;requetes avec des variables situées à des temps différents" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1428,8 +1424,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="520">
-          <caret line="1316" column="8" selection-start-line="1316" selection-start-column="8" selection-end-line="1316" selection-end-column="8" />
+        <state relative-caret-position="676">
+          <caret line="1237" column="140" lean-forward="true" selection-start-line="1237" selection-start-column="140" selection-end-line="1237" selection-end-column="140" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#31815#31825#0" expanded="true" />
