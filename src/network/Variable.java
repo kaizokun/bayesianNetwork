@@ -93,7 +93,7 @@ public class Variable {
             //enregistre l'id du parent dans le tableau
             //ici plusieurs meme variable peuvent avoir des temps differents
             //donc on recupere une clé composée du label suivit du temps de la variable parent
-            this.dependenciesIndex.put(getvarTimeId(parent, parent.time), i ++);
+            this.dependenciesIndex.put(getVarTimeId(parent, parent.time), i ++);
         }
     }
 
@@ -106,14 +106,19 @@ public class Variable {
         this.value = value;
     }
 
-    private String getvarTimeId(Variable variable, int time){
+    public  String getVarTimeId(){
+
+        return this.getVarTimeId(this, this.time);
+    }
+
+    private String getVarTimeId(Variable variable, int time){
 
         return variable.getLabel()+"_"+time;
     }
 
     public Variable getParent(int time){
 
-        String varTimeId = getvarTimeId(this, time);
+        String varTimeId = getVarTimeId(this, time);
 
         int indexId = this.dependenciesIndex.get(varTimeId);
 

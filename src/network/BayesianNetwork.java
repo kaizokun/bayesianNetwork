@@ -238,7 +238,7 @@ public class BayesianNetwork {
         //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
         List<List<Domain.DomainValue>> requestValuesCombinaisons = new LinkedList<>();
 
-        requestValuesCombinations(requestValuesCombinaisons, new LinkedList<>(), new ArrayList<>(variables), 0);
+        requestValuesCombinationsCheckInit(requestValuesCombinaisons, new LinkedList<>(), new ArrayList<>(variables), 0);
 
         return requestValuesCombinaisons;
     }

@@ -172,7 +172,7 @@ public class DynamicBayesianNetworkTest  {
     @Test
     public void DynamicBayesianNetworkUmbrellaOrder2FilterTest(){
 
-        this.DynamicBayesianNetworkUmbrellaTestFilter(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2(),10);
+        this.DynamicBayesianNetworkUmbrellaTestFilter(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2(),2);
     }
 
     private void DynamicBayesianNetworkUmbrellaTestPredict( DynamicBayesianNetwork network, int extensions, int predictTime){

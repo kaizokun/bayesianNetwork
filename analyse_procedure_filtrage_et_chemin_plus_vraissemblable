@@ -7,7 +7,7 @@ les deux maladies ont les mêmes symptomes
 donc chaque état est lié aux deux observations et chaque observation est liée aux deux états.
 Au niveau du calcul de la sequence la plus probable on travaille sur toutes les variables états, la requete.
 Pour commencer on travaille sur toutes les combinaisons de valeurs pour les états de la requete
-Ensuite on va recuperer toutes les observations des états de la requete, qu'on traite une par une
+Ensuite on va recuperer toutes les observations des états de la requete, qu'on traite une par une.
 On calcule une observation par rapport à ses deux parents
 puis on calcule le max sur chaque parent un par un, s1(t) et s2(t). On prend le premier état parent de l'observation s1(t)
 et on boucle sur les valeurs que peut prendre sa dependence, qui normalement est le même état au temps precedent s1(t-1).
@@ -26,10 +26,10 @@ pour s1(t) on à une combinaison de valeur max pour ces parents s1(t-1) et s1(t-
 idem pour s2(t)
 
 un problème survient si par exemple s1(t-2) = s1(0) et s1(t-1) = s1(1), dans ce cas dans la partie max ou sommation du filtrage
-on va rapeller le forward avec deux variable situées à des coupes temporelles différentes 0 et 1 
-ici recuperer les observations : s1(0) n'en a pas donc on aura uniquement celle de s1(1)
-ensuite la procedure va recuperer tout les parents des observations au cas ou certains manquent dans la requete
-ici la procedure se base uniquement sur le parent des observations pour recreer une requete complete
+on va rapeller le forward avec deux variable situées à des coupes temporelles différentes, 0 et 1 
+ici pour recuperer les observations : s1(0) n'en a pas donc on aura uniquement celle de s1(1)
+ensuite la procedure va recuperer tout les parents des observations au cas ou certains manquent dans la requete.
+La procedure tel qu'elle est programmé actuellement se base uniquement sur le parent des observations pour recreer une requete complete
 alors qu'il faudrait en fait completer celle recu en parametre de procedure, sinon s1(0) est manquant !
 ensuite recuperer leur combinaison de valeurs pour s1(0) et s1(1)
 on peut maintenant calculer chaque observations en fonction de ses parents dont on est sur qu'ils ont une valeur
@@ -39,15 +39,15 @@ alors qu'ils doivent participer au calcul. on calcule chaque observation en fonc
 une somme qui se fait sur les parents d'un des parents de l'observation (ex s1(0) qui dans ce cas si à deja une valeur voir 2eme problème)
 soit une somme par parent de l'observation. 
 
-Par consequent on pourrait savoir quelles variables de la requete n'ont pas été traité par
-manque d'observations, en retirant les parents des observation d'une copie de la liste de requete complete, 
+Par consequent on pourrait savoir quelles variables de la requete n'ont pas été traitées du à l'absence 
+d'observations, en retirant les parents des observation d'une copie de la liste de requete complete, 
 les restantes seront celles en temps 0 qui sont normalement ( même sur ) les seules à ne pas en posseder. 
 celles ci peuvent être calculées directement par rapport à leur valeur car elles ne possede pas de parents 
 non plus situés à des coupes temporelles precedentes.
 
 Une autre solution pourrait être de boucler sur la liste des variables de requete.
-De boucler ensuite sur chaque observation de ses variables (donc on est sur qu'elles sont calculable après avoir complété la requete de base ) 
-verifier si l'observation n'a pas déja été calculé et si non faire le calcul et pour finir ajouter l' observation à le liste de celles déja traités.
+De boucler ensuite sur chaque observation de ses variables (dont on est sur qu'elles sont calculables après avoir complété la requete de base ) 
+verifier si l'observation n'a pas déja été calculé et si non faire le calcul. Pour finir ajouter l' observation à la liste de celles déja traitées.
 Si une variable n'a pas d'observation et donc normalement pas de parent non plus il s'agit des variables au temps 0, donc on 
 obtiendra directement la valeur à multiplier au reste.
 
