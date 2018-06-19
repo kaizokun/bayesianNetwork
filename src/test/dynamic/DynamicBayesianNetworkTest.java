@@ -154,7 +154,6 @@ public class DynamicBayesianNetworkTest  {
                 System.out.println(entry.getKey()+" "+entry.getValue());
             }
         }
-
     }
 
     @Test
@@ -172,7 +171,7 @@ public class DynamicBayesianNetworkTest  {
     @Test
     public void DynamicBayesianNetworkUmbrellaOrder2FilterTest(){
 
-        this.DynamicBayesianNetworkUmbrellaTestFilter(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2(),2);
+        this.DynamicBayesianNetworkUmbrellaTestFilter(BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2(),3);
     }
 
     private void DynamicBayesianNetworkUmbrellaTestPredict( DynamicBayesianNetwork network, int extensions, int predictTime){
