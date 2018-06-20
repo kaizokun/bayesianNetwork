@@ -16,7 +16,7 @@ import static network.BayesianNetwork.requestValuesCombinations;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
-    protected static boolean backwardLog = false, forwardLog = true;
+    protected static boolean backwardLog = false, forwardLog = false;
 
     protected static int maxDepth = Integer.MIN_VALUE;
 
@@ -35,6 +35,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     private Map<String, Map<Domain.DomainValue, AbstractDouble>> forwardDistribSaved = new Hashtable<>();
 
     private Map<String, Map<Domain.DomainValue, AbstractDouble>> backwardDistribSaved = new Hashtable<>();
+
+    private Map<String, Map<Domain.DomainValue, AbstractDouble>> backwardFullDistribSaved = new Hashtable<>();
 
     private Map<String, Map<Domain.DomainValue, AbstractDouble>> maxDistribSaved = new Hashtable<>();
 
@@ -344,7 +346,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     }
 
 
-    private String getDistribSavedKey(List<Variable> variables, int time) {
+    private String getDistribSavedKey(Collection<Variable> variables, int time) {
 
         StringBuilder keybuilder = new StringBuilder();
 
@@ -360,7 +362,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return keybuilder.toString();
     }
 
-    private String getDistribSavedKey(List<Variable> variables) {
+    private String getDistribSavedKey(Collection<Variable> variables) {
 
         StringBuilder keybuilder = new StringBuilder();
 
@@ -649,12 +651,10 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
      *
      * */
 
-
     public void backWard(List<Variable> requests, String key, int depth, int timeEnd) {
 
-        //System.out.println(this.getIdent(depth)+" BACKWARD "+request);
-
-        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>();
+        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>(),
+                                                fullDistribution = new Hashtable<>();
 
         //atteind une requete située à la derniere phase temporelle si plusieurs elles doivent être au même temps
         if (requests.get(0).getTime() == timeEnd) {
@@ -663,58 +663,65 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             for (List<Domain.DomainValue> domainValues : domainValuesLists) {
 
-                distribution.put(new Domain.DomainValue(domainValues), doubleFactory.getNew(1.0));
+                Domain.DomainValue domainValue = new Domain.DomainValue(domainValues);
+
+                distribution.put(domainValue, doubleFactory.getNew(1.0));
+
+                fullDistribution.put(domainValue, doubleFactory.getNew(1.0));
             }
+
             distribution.put(totalDomainValues, doubleFactory.getNew(1.0));
 
+            fullDistribution.put(totalDomainValues, doubleFactory.getNew(1.0));
+
             this.backwardDistribSaved.put(key, distribution);
+
+            this.backwardFullDistribSaved.put(key, fullDistribution);
 
             return;
         }
 
         /*
-        *
-        * Chaine de markov d'ordre 2
-        *
-        *               ________________
-        *    __________|_____           |
-        *   |          |     |          |
-        *   |          |     V          V
-        * (s(0))-->(s(1))-->(s(2))-->(s(3))
-        *             |        |        |
-        *             V        V        V
-        *          (o(1))   (o(2))   (o(3))
-        *
-        * le calcul est un peu plus delicat dans ce cas, par exemple :
-        *
-        * on à 4 états s(0) , s(1)|s(0) , s(2)|s(1),s(0) , s(3)|s(2),s(1)
-        * 3 observations o(1)|s(1)  o(2)|s(2) o(3)|s(3)
-        *
-        * la requete est s(1), l'observation suivante o(2), l'état parent de l'observation qui est la variable cachée
-        * et s(2) et qui à deux parents s(1),s(0) par consequent on complete la requete par s(0)
-        * on travaille donc sur des combinaisons de valeurs pour s(1),s(0) en dehors de la somme,
-        * puis dans la 3eme partie de la somme (qui se fait sur les valeurs prises par s(2))
-        * s(2) est calculée par rapport à une assignation de valeur fixes à s(1),s(0).
-        * Maintenant la 2eme partie récursive ou s(2) devient la requete, on recommence le processus
-        * et cette fois ci la requete est complétée par s(1), si on ne tiens pas compte que s(1)
-        * à déja une valeur initialisée precedemment on va calculer une distribution sur s(2) pour toutes les valeurs
-        * de s(1) ce qui n'est pas cohérent. il faut donc soit des combinaisons sur s(1) et s(2) ou la valeur de s(1) ne change pas
-        * ce qui revient à boucler sur les valeurs de s(2). On pourrait aussi ignorer les variables déja initialisées
-        * lorsqu'on complete la requete, en effet ici le but de completer la requete est de pouvoir calculer s(3)|s(2),s(1)
-        * hors s(1) ayant déja une valeur obtenu lors d'un appel recursif précédent on à pas de problème pour obtenir sa valeur.
-        *
-        * Mais cela pose un autre problème (encore) si on calcule est sauvegarde la distribution sur s(2) on en l'aura que
-        * par raport à une seule valeur de s(1) et la partie dynamique echoue !
-        *
-        * il faudrait dans ce cas si calculer une distribution sur s(2) et s(1), soit la requete complétée,
-        * et ensuite recuperer le bon résultat pré calculé, à chaque itération sur une valeur de s(2)
-        * pour une chaine d'ordre x on s'interesse donc à la variable s et à la même variable s sur les temps précédents
-        * sur une profondeur x - 1. POur une chaine de markov 1 ca donnerait uniquement s(2), d'ordre 2, s(2) et s(1)
-        *
-        * apres pour le lissage même si on doit calculer une distribution sur une requete complétée
-        * on peut toujours moyenner sur le(s) parents pour multiplier avec le forward. à voir dans le détail.
-        *
-        * */
+         *
+         * Chaine de markov d'ordre 2
+         *
+         *               ________________
+         *    __________|_____           |
+         *   |          |     |          |
+         *   |          |     V          V
+         * (s(0))-->(s(1))-->(s(2))-->(s(3))
+         *             |        |        |
+         *             V        V        V
+         *          (o(1))   (o(2))   (o(3))
+         *
+         * le calcul est un peu plus delicat dans ce cas, par exemple :
+         *
+         * on à 4 états s(0) , s(1)|s(0) , s(2)|s(1),s(0) , s(3)|s(2),s(1)
+         * 3 observations o(1)|s(1)  o(2)|s(2) o(3)|s(3)
+         *
+         * la requete est s(1), l'observation suivante o(2), l'état parent de l'observation qui est la variable cachée
+         * est s(2) a deux parents s(1),s(0) par consequent on complete la requete par s(0)
+         * on travaille donc sur des combinaisons de valeurs pour s(1),s(0) en dehors de la somme,
+         * puis dans la 3eme partie de la somme (qui se fait sur les valeurs prises par s(2))
+         * s(2) est calculée par rapport à une assignation de valeur fixes à s(1),s(0).
+         * Maintenant la 2eme partie récursive ou s(2) devient la requete, on recommence le processus
+         * et cette fois ci la requete est complétée par s(1), si on ne tiens pas compte que s(1)
+         * à déja une valeur initialisée precedemment on va calculer une distribution sur s(2) pour toutes les valeurs
+         * de s(1) ce qui n'est pas cohérent. il faut donc soit des combinaisons sur s(1) et s(2) ou la valeur de s(1) ne change pas
+         * ce qui revient à boucler sur les valeurs de s(2). On pourrait aussi ignorer les variables déja initialisées
+         * lorsqu'on complete la requete, en effet ici le but de completer la requete est de pouvoir calculer s(3)|s(2),s(1)
+         * hors s(1) ayant déja une valeur obtenu lors d'un appel recursif précédent on à pas de problème pour obtenir sa valeur.
+         *
+         * Mais cela pose un autre problème (encore) si on calcule et sauvegarde la distribution sur s(2) on en l'aura que
+         * par raport à une seule valeur de s(1) et la partie dynamique echoue !
+         *
+         * il faudrait dans ce cas si calculer une distribution sur s(2) et s(1), soit la requete complétée,
+         * et ensuite recuperer le bon résultat pré calculé, à chaque itération sur une valeur de s(2)
+         * pour une chaine d'ordre x on s'interesse donc à la variable s et à la même variable s sur les temps précédents
+         * sur une profondeur x - 1. Pour une chaine de markov 1 ca donnerait uniquement s(2), d'ordre 2, s(2) et s(1)
+         *
+         *
+         * */
 
         //récuperation des observations de la variable au temps suivant
         Map<String, Variable> nextObservations = new Hashtable<>();
@@ -728,15 +735,15 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //faut il recuperer les variables deux temps en avant ?
             Variable nextRequest = this.getVariable(request.getTime() + 1, request);
             //si variable en temps t aucune ne suit
-            if(nextRequest != null) {
+            if (nextRequest != null) {
 
                 for (Variable nextObservation : nextRequest.getObservations()) {
                     //ignore les observation déja enregistrées
-                    if(nextObservations.containsKey(nextObservation.getVarTimeId())) continue;
+                    if (nextObservations.containsKey(nextObservation.getVarTimeId())) continue;
 
                     nextObservations.put(nextObservation.getVarTimeId(), nextObservation);
                     //maintenant chaque observation sera calculé en fonction de ses parents dans partie 1 de la somme
-                    for(Variable observationDep : nextObservation.getDependencies()){
+                    for (Variable observationDep : nextObservation.getDependencies()) {
                         //et le parent de l'observation sera calculé en fonction des siens en partie 3
                         //cependant certain pourrait ne pas faire partie de la requete originale
                         //exemple pour une chaine de markov d'ordre 2
@@ -746,7 +753,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                         //qui doit completer la requete même si dans la distribution finale
                         //on ne prend en compte que s(1) pour ensuite faire la multiplication
                         //avec le forward qui est une distribution sur s(1) également
-                        for(Variable missingRequest : observationDep.getDependencies()){
+                        for (Variable missingRequest : observationDep.getDependencies()) {
 
                             fullRequest.put(missingRequest.getVarTimeId(), missingRequest);
                         }
@@ -755,11 +762,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             }
         }
 
-
-
         List<Domain.DomainValue> originalValues = new LinkedList<>();
 
-        for (Variable request : requests) {
+        for (Variable request : fullRequest.values()) {
 
             originalValues.add(request.getDomainValue());
         }
@@ -768,11 +773,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         AbstractDouble totalRequest = doubleFactory.getNew(0.0);
         //pour combinaison de valeur de la requete
-        for (List<Domain.DomainValue> requestValue : domainValuesLists) {
+        for (List<Domain.DomainValue> fullRequestValue : domainValuesLists) {
 
             Iterator<Variable> requestsIterator = fullRequest.values().iterator();
 
-            for (Domain.DomainValue domainValue : requestValue) {
+            for (Domain.DomainValue domainValue : fullRequestValue) {
 
                 requestsIterator.next().setDomainValue(domainValue);
             }
@@ -782,9 +787,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             for (Variable nextObservation : nextObservations.values()) {
 
-                multiplyObservations = multiplyObservations.multiply(
-                        backwardSum(nextObservation, depth, timeEnd));
-
+                multiplyObservations = multiplyObservations.multiply(backwardSum(nextObservation, depth, timeEnd));
             }
 
             List<Domain.DomainValue> requestDomainValues = new LinkedList<>();
@@ -806,12 +809,16 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 distribution.put(domainValuesCombi, distribution.get(domainValuesCombi).add(multiplyObservations));
             }
 
+            fullDistribution.put(new Domain.DomainValue(fullRequestValue), multiplyObservations);
+
             totalRequest = totalRequest.add(multiplyObservations);
         }
 
         distribution.put(totalDomainValues, totalRequest);
 
-        Iterator<Variable> requestIterator = requests.iterator();
+        fullDistribution.put(totalDomainValues, totalRequest);
+
+        Iterator<Variable> requestIterator = fullRequest.values().iterator();
         //restaure les valeur originales
         for (Domain.DomainValue domainValue : originalValues) {
 
@@ -819,6 +826,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
 
         this.backwardDistribSaved.put(key, distribution);
+
+        this.backwardFullDistribSaved.put(getDistribSavedKey(fullRequest.values()), fullDistribution);
     }
 
     public AbstractDouble backwardSum(Variable nextObservation, int depth, int timeEnd) {
@@ -846,6 +855,16 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             Map<Domain.DomainValue, AbstractDouble> hiddenVarsDistribution = this.backwardDistribSaved.get(key);
 
+            /* ici il faut travailler sur la distribution sur le parent de l'observation complétée
+            * recuperer en fonction de l'ordre les predecesseurs de ce parent
+            * et avec la clé comprenant les labels et temps recuperer la bonne valeur
+            * qui vient d'être calculée
+            * pour cela il faudrait enregistrer l'ordre des dependances dans la variable
+            * mais aussi trier les variables de la requete complete par temps et par label
+            * */
+
+            //Map<Domain.DomainValue, AbstractDouble> hiddenVarsDistribution = this.backwardDistribSaved.get(key);
+
             if (hiddenVarsDistribution == null) {
 
                 this.backWard(nextObservation.getDependencies(), key, depth + 1, timeEnd);
@@ -862,7 +881,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             for (Variable hiddenVar : nextObservation.getDependencies()) {
 
-               // if (backwardLog) System.out.print( hiddenVar +" "+hiddenVar.getDependencies());
+                // if (backwardLog) System.out.print( hiddenVar +" "+hiddenVar.getDependencies());
 
                 if (backwardLog) System.out.print(" * " + hiddenVar.getProbabilityForCurrentValue());
 
@@ -946,7 +965,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         String ident = "";
 
-        if(forwardLog) {
+        if (forwardLog) {
             ident = getIdent(depth);
             System.out.println();
             System.out.println(ident + "************************************");
@@ -964,15 +983,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         Map<Domain.DomainValue, AbstractDouble> maxDistribution = new Hashtable<>();
 
         Map<Domain.DomainValue, List<Variable>> mostLikelyPath = new Hashtable<>();
-
-        List<Domain.DomainValue> originalValues = new LinkedList<>();
-
-        for (Variable request : requests) {
-
-            originalValues.add(request.getDomainValue());
-            //rend la valeur de la variable nule
-            request.clear();
-        }
 
         //total pour toutes les valeurs de la requete
         AbstractDouble totalDistribution = this.doubleFactory.getNew(0.0);
@@ -997,14 +1007,14 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //on ajoute la variable dans la liste complétée
             fullRequest.put(request.getVarTimeId(), request);
             //pour chaque observation des variables de la requete
-            for(Variable observation : request.getObservations()){
+            for (Variable observation : request.getObservations()) {
                 //si l'observation est déja connu on passe
-                if(requestsObservations.containsKey(observation.getVarTimeId())) continue;
+                if (requestsObservations.containsKey(observation.getVarTimeId())) continue;
                 //on ajoute les observations de la requete
                 requestsObservations.put(observation.getVarTimeId(), observation);
                 //et enfin les eventuels etats parent des observations
                 //utile pour les calculer mais qui ne seraient pas present dans la requete
-                for(Variable dep : observation.getDependencies()){
+                for (Variable dep : observation.getDependencies()) {
 
                     fullRequest.put(dep.getVarTimeId(), dep);
                 }
@@ -1017,43 +1027,52 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //les autres seront traités à partir de leur observations
         Set<Variable> requestTime0 = new LinkedHashSet<>();
 
-        for(Variable request : fullRequest.values()){
+        for (Variable request : fullRequest.values()) {
 
-            if(request.getTime() == 0){
+            if (request.getTime() == 0) {
 
                 requestTime0.add(request);
             }
         }
 
-        if(forwardLog) {
+        if (forwardLog) {
             System.out.println(ident + "FULL REQUEST " + fullRequest.values());
         }
 
         List<List<Domain.DomainValue>> requestsValuesCombinations = requestValuesCombinations(fullRequest.values());
 
+        List<Domain.DomainValue> originalValues = new LinkedList<>();
+
+        for (Variable request : fullRequest.values()) {
+
+            originalValues.add(request.getDomainValue());
+            //rend la valeur de la variable nule
+            request.clear();
+        }
+
         /*
-        * Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
-        * --------------------------------------------------------------------------
-        *
-        * on pourrait rechercher la sequence la plus vraissemblable pour un sous ensemble d'états
-        * de 0 à une certaine coupe temporelle
-        *
-        * le premier appel à cette méthode se fait donc avec ce sous ensemble d'états
-        * ici les variables ne doivent pas être initialisés et comme pour le filtrage
-        * on travaille sur des combinaisons de valeurs si plus d'une variable.
-        * D'abord de manière analogue au filtrage il faut eventuellement completer les variables de la requete
-        * par les parents des observations non compris.
-        *
-        * Ensuite pour chaque combinaison de valeur de la requete courante situé à un temps t
-        * on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
-        * états parents situées à un temps t - 1
-        *
-        * Si on prend un cas simple ou on à une variable requete t, une observation unique
-        * et un max pour un état d'une variable parent unique t - 1
-        *
-        * Pour chaque combinaison de valeur de la requete
-        * il faut associer celle des parents ayant donné le maximum
-        * */
+         * Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
+         * --------------------------------------------------------------------------
+         *
+         * on pourrait rechercher la sequence la plus vraissemblable pour un sous ensemble d'états
+         * de 0 à une certaine coupe temporelle
+         *
+         * le premier appel à cette méthode se fait donc avec ce sous ensemble d'états
+         * ici les variables ne doivent pas être initialisés et comme pour le filtrage
+         * on travaille sur des combinaisons de valeurs si plus d'une variable.
+         * D'abord de manière analogue au filtrage il faut eventuellement completer les variables de la requete
+         * par les parents des observations non compris.
+         *
+         * Ensuite pour chaque combinaison de valeur de la requete courante situé à un temps t
+         * on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
+         * états parents situées à un temps t - 1
+         *
+         * Si on prend un cas simple ou on à une variable requete t, une observation unique
+         * et un max pour un état d'une variable parent unique t - 1
+         *
+         * Pour chaque combinaison de valeur de la requete
+         * il faut associer celle des parents ayant donné le maximum
+         * */
 
         AbstractDouble bestMax = doubleFactory.getNew(0.0);
 
@@ -1068,7 +1087,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 requestIterator.next().setDomainValue(domainValue);
             }
-            if(forwardLog) {
+            if (forwardLog) {
                 System.out.println();
                 System.out.println(ident + "FULL REQUEST COMBINATION : " + fullRequest);
             }
@@ -1090,7 +1109,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                     requestValueProbability = requestValueProbability.multiply(observation.getProbabilityForCurrentValue());
                     //idem pour calculer un max pour la sequence la plus vraissemblable
                     requestValueMaxProbability = requestValueMaxProbability.multiply(observation.getProbabilityForCurrentValue());
-                    if(forwardLog) {
+                    if (forwardLog) {
                         System.out.println();
                         System.out.println(ident + "OBS P(" + observation + "|" + observation.getDependencies() + ") = " + observation.getProbabilityForCurrentValue());
                         System.out.println();
@@ -1116,10 +1135,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 }
             }
             //pour les variables situées au temps 0 ont obtient directement leur probabilité
-            for(Variable request0 : requestTime0){
+            for (Variable request0 : requestTime0) {
 
                 requestValueProbability = requestValueProbability.multiply(request0.getProbabilityForCurrentValue());
-                if(forwardLog) {
+
+                if (forwardLog) {
                     System.out.println(ident + "STATE_0 P(" + request0 + ") = " + request0.getProbabilityForCurrentValue());
                 }
             }
@@ -1136,7 +1156,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 requestDomainValues.add(request.getDomainValue());
             }
 
-            if(forwardLog) {
+            if (forwardLog) {
                 System.out.println(ident + "ORIGINAL REQUEST COMBINATION " + requests + " : " + requestDomainValues
                         + " - total = " + requestValueProbability);
             }
@@ -1166,7 +1186,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //etant donné que normaliser ne change pas le rapport de grandeur entre les valeurs
         distribution.put(totalDomainValues, totalDistribution);
 
-        Iterator<Variable> requestIterator = requests.iterator();
+        Iterator<Variable> requestIterator = fullRequest.values().iterator();
         //restaure les valeur originales
         for (Domain.DomainValue domainValue : originalValues) {
 
@@ -1183,7 +1203,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     private ForwardSumRs forwardHiddenVarSum(Variable obsParentState, int depth) {
 
         String ident = "";
-        if(forwardLog) {
+        if (forwardLog) {
             ident = this.getIdent(depth);
 
             System.out.println(ident + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -1198,13 +1218,22 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //si elle fait déja partie de la requete dans la procedure appelante, elle doit rester en l'état
 
         List<Variable> varsToReset = new LinkedList<>();
+/*
+        for (Variable dep : obsParentState.getDependencies()) {
 
-        for(Variable dep : obsParentState.getDependencies()){
-
-            if(!dep.isInit()){
+            if (!dep.isInit()) {
 
                 varsToReset.add(dep);
             }
+        }
+*/
+        List<Domain.DomainValue> originalValues = new LinkedList<>();
+
+        for (Variable request : obsParentState.getDependencies()) {
+
+            originalValues.add(request.getDomainValue());
+            //rend la valeur de la variable nule
+            //request.clear();
         }
 
         AbstractDouble hiddenVarMax = this.doubleFactory.getNew(0.0);
@@ -1256,9 +1285,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //début de la multiplication avec la valeur fourni par le modele de transition
             AbstractDouble mulTransitionForward = obsParentState.getProbabilityForCurrentValue();
             //on a ici potentiellement une filtrage sur plusieurs variable si plusieurs variables cachées
-            if(forwardLog) {
-                System.out.println(ident+"SUM COMBINAISON : "+obsParentState.getDependencies());
-                System.out.println(ident+"TRANSITION P("+obsParentState+"|"+obsParentState.getDependencies()+") = "+obsParentState.getProbabilityForCurrentValue());
+            if (forwardLog) {
+                System.out.println(ident + "SUM COMBINAISON : " + obsParentState.getDependencies());
+                System.out.println(ident + "TRANSITION P(" + obsParentState + "|" + obsParentState.getDependencies() + ") = " + obsParentState.getProbabilityForCurrentValue());
             }
 
             Map<Domain.DomainValue, AbstractDouble> distrib = this.forwardDistribSaved.get(key);
@@ -1273,13 +1302,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 distrib = this.forwardDistribSaved.get(key);
 
-                if(forwardLog) {
+                if (forwardLog) {
                     System.out.println(ident + "FORWARD REC : " + distrib.get(new Domain.DomainValue(domainValues)));
                 }
 
-            }else{
+            } else {
 
-                if(forwardLog) {
+                if (forwardLog) {
                     System.out.println(ident + "FORWARD SAVED : " + distrib.get(new Domain.DomainValue(domainValues)));
                 }
             }
@@ -1296,7 +1325,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 List<Variable> copyDependencies = new LinkedList<>();
 
-                for(Variable dependencie : obsParentState.getDependencies()){
+                for (Variable dependencie : obsParentState.getDependencies()) {
 
                     copyDependencies.add(dependencie.copyLabelTimeValue());
                 }
@@ -1313,10 +1342,18 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //on additionne pour chaque combinaison de valeur pour les variables cachées
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
         }
+        /*
         //remet les valeurs des variables non initialisés à nul
-        for(Variable variable : varsToReset){
+        for (Variable variable : varsToReset) {
 
             variable.clear();
+        }
+*/
+        Iterator<Variable> requestIterator = obsParentState.getDependencies().iterator();
+        //restaure les valeur originales
+        for (Domain.DomainValue domainValue : originalValues) {
+
+            requestIterator.next().setDomainValue(domainValue);
         }
 
         System.out.println();
@@ -1356,7 +1393,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     private void loadTree(List<Variable> vars, StringBuilder builder, int depth) {
 
-        String ident = getIdent(depth);
+        String ident = getTreeIdent(depth);
 
         for (Variable var : vars) {
 
@@ -1402,5 +1439,47 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public Map<String, Map<Domain.DomainValue, List<Variable>>> getMostLikelyPath() {
         return mostLikelyPath;
+    }
+
+
+    public void showForwardDistributions() {
+
+        System.out.println("===========FORWARD============");
+
+        this.showDynamicDistributions(this.forwardDistribSaved);
+    }
+
+    public void showBackwardDistributions() {
+
+        System.out.println("===========BACKWARD============");
+
+        this.showDynamicDistributions(this.backwardDistribSaved);
+    }
+
+    public void showFullBackwardDistributions() {
+
+        System.out.println("===========FULL BACKWARD============");
+
+        this.showDynamicDistributions(this.backwardFullDistribSaved);
+    }
+
+
+    public void showMaxDistributions() {
+
+        this.showDynamicDistributions(this.maxDistribSaved);
+    }
+
+    private void showDynamicDistributions(Map<String, Map<Domain.DomainValue, AbstractDouble>> dynamic) {
+
+        for (String key : dynamic.keySet()) {
+
+            System.out.println("-----" + key + "-----");
+
+            System.out.println("BASIC  : "+dynamic.get(key));
+
+            System.out.println("NORMAL : "+this.normalizeDistribution(dynamic.get(key)));
+
+            System.out.println();
+        }
     }
 }
