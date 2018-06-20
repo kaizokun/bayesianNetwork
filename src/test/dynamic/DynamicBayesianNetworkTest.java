@@ -57,7 +57,7 @@ public class DynamicBayesianNetworkTest {
         }
     }
 
-    private void DynamicBayesianNetworkUmbrellaTestSmoothing(DynamicBayesianNetwork network, int extensions) {
+    private void DynamicBayesianNetworkUmbrellaTestSmoothing(DynamicBayesianNetwork network, int extensions,  int markovOrder) {
 
         this.DynamicBayesianNetworkUmbrellaTest(network, extensions);
 
@@ -69,7 +69,7 @@ public class DynamicBayesianNetworkTest {
 
         rainReq.setValue(1);
 
-        AbstractDouble rs = network.smoothing(rainReq);
+        AbstractDouble rs = network.smoothing(rainReq, markovOrder);
 
         System.out.println();
 
@@ -83,7 +83,7 @@ public class DynamicBayesianNetworkTest {
 
         DynamicBayesianNetwork network = BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder1();
 
-        this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 3);
+        this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 3, 1);
 
         System.out.println(network.toString());
 
@@ -97,7 +97,7 @@ public class DynamicBayesianNetworkTest {
 
         DynamicBayesianNetwork network = BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2();
 
-        this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 3);
+        this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 3, 2);
 
         System.out.println(network.toString());
 
