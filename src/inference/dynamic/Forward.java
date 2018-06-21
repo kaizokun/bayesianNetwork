@@ -28,7 +28,15 @@ public class Forward {
         this.network = network;
     }
 
+
+
     /*------------------- PREDICTION--------------------*/
+
+
+    public AbstractDouble prediction(Variable request, int time) {
+
+        return this.prediction(new LinkedList<Variable>(Arrays.asList(new Variable[]{request})), time);
+    }
 
     public AbstractDouble prediction(List<Variable> requests, int time ) {
 
@@ -52,14 +60,15 @@ public class Forward {
         return this.filtering(requests2);
     }
 
-    public AbstractDouble prediction(Variable request, int time) {
 
-        return this.prediction(new LinkedList<Variable>(Arrays.asList(new Variable[]{request})), time);
-    }
 
 
 
     /*------------------- FILTERING--------------------*/
+
+
+
+
 
     public AbstractDouble filtering(Variable request) {
 
@@ -84,7 +93,15 @@ public class Forward {
         return distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(totalDomainValues));
     }
 
+
+
+
+
     /*------------------- FORWARD--------------------*/
+
+
+
+
 
     public void forward(Variable request, String key, int depth) {
 
@@ -117,9 +134,6 @@ public class Forward {
 
         //total pour toutes les valeurs de la requete
         AbstractDouble totalDistribution = this.network.getDoubleFactory().getNew(0.0);
-
-        //max pour toutes les valeurs de la requete
-        AbstractDouble totalMax = this.network.getDoubleFactory().getNew(0.0);
 
         //liste des observations à traiter pour l'ensemble de la requete
         //un etat peut avoir plusieurs observations par exemple une maladie plusieurs symptomes
@@ -172,14 +186,7 @@ public class Forward {
 
         List<List<Domain.DomainValue>> requestsValuesCombinations = requestValuesCombinations(fullRequest.values());
 
-        List<Domain.DomainValue> originalValues = new LinkedList<>();
-
-        for (Variable request : fullRequest.values()) {
-
-            originalValues.add(request.getDomainValue());
-            //rend la valeur de la variable nule
-            request.clear();
-        }
+        List<Domain.DomainValue> originalValues = Util.getDomainValues(fullRequest.values());
 
         /*
          * Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
@@ -205,10 +212,6 @@ public class Forward {
          * il faut associer celle des parents ayant donné le maximum
          * */
 
-        AbstractDouble bestMax = network.getDoubleFactory().getNew(0.0);
-
-        List<Variable> fullMaxParentsStates = new LinkedList<>();
-
         //pour chaque combinaison de valeur de la requete complétée
         for (List<Domain.DomainValue> domainValues : requestsValuesCombinations) {
 
@@ -218,8 +221,11 @@ public class Forward {
 
                 requestIterator.next().setDomainValue(domainValue);
             }
+
             if (forwardLog) {
+
                 System.out.println();
+
                 System.out.println(ident + "FULL REQUEST COMBINATION : " + fullRequest);
             }
             //initialisation de la multiplication à 1
@@ -248,7 +254,7 @@ public class Forward {
                 }
                 //ici une observation peut avoir plusieurs parents et il faut à mon sens
                 //les traiter separemment soit une somme par variable parent
-                //dont les resultats seront multipliés. marche pour le cas simple
+                //dont les resultats seront multipliés. Fonctionne pour le cas simple
                 //reste à tester sur des exemples plus complexes !
                 for (Variable stateObserved : observation.getDependencies()) {
                     //total de la somme sur les valeurs cachées initialisé à zero
@@ -259,7 +265,7 @@ public class Forward {
                     requestValueMaxProbability = requestValueMaxProbability.multiply(rs.max);
                     //ajoute les variables et leur etats qui ont produit le max
 
-                    //la question est si on à plusieurs observation ainsi que plusieurs états parent observés en t
+                    //la question est : si on à plusieurs observation ainsi que plusieurs états parent observés en t
                     //et qu'au final on obtient des etats situé en t - 1 avec des valeurs differentes
                     //pour differents max obtenus ?
                     maxParentStates.addAll(rs.maxDomainVars);
@@ -308,6 +314,8 @@ public class Forward {
                 maxDistribution.put(domainValuesCombi, maxDistribution.get(domainValuesCombi).add(requestValueMaxProbability));
             }
 
+            //pour chaque combinaison de valeur de la requete enregistre
+            //la liste des variables et leur valeurs pour celle qui offre le max.
             mostLikelyPath.put(domainValuesCombi, maxParentStates);
 
             totalDistribution = totalDistribution.add(requestValueProbability);
@@ -317,12 +325,7 @@ public class Forward {
         //etant donné que normaliser ne change pas le rapport de grandeur entre les valeurs
         distribution.put(totalDomainValues, totalDistribution);
 
-        Iterator<Variable> requestIterator = fullRequest.values().iterator();
-        //restaure les valeur originales
-        for (Domain.DomainValue domainValue : originalValues) {
-
-            requestIterator.next().setDomainValue(domainValue);
-        }
+        Util.resetDomainValues(fullRequest.values(), originalValues);
 
         this.maxDistribSaved.put(key, maxDistribution);
 
@@ -334,9 +337,10 @@ public class Forward {
     protected ForwardSumRs forwardHiddenVarSum(Variable obsParentState, int depth) {
 
         String ident = "";
-        if (forwardLog) {
-            ident = getIdent(depth);
 
+        if (forwardLog) {
+
+            ident = getIdent(depth);
             System.out.println(ident + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println(ident + "SUM ON " + obsParentState + " DEPENDENCIES : " + obsParentState.getDependencies());
             System.out.println(ident + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -348,24 +352,7 @@ public class Forward {
         //par contre si une variabel parent de "obsParentState" est déja initialisé ce qui peut être le cas
         //si elle fait déja partie de la requete dans la procedure appelante, elle doit rester en l'état
 
-        List<Variable> varsToReset = new LinkedList<>();
-/*
-        for (Variable dep : obsParentState.getDependencies()) {
-
-            if (!dep.isInit()) {
-
-                varsToReset.add(dep);
-            }
-        }
-*/
-        List<Domain.DomainValue> originalValues = new LinkedList<>();
-
-        for (Variable request : obsParentState.getDependencies()) {
-
-            originalValues.add(request.getDomainValue());
-            //rend la valeur de la variable nule
-            //request.clear();
-        }
+        List<Domain.DomainValue> originalValues = Util.getDomainValues(obsParentState.getDependencies());
 
         AbstractDouble hiddenVarMax = this.network.getDoubleFactory().getNew(0.0);
 
@@ -443,17 +430,21 @@ public class Forward {
                     System.out.println(ident + "FORWARD SAVED : " + distrib.get(new Domain.DomainValue(domainValues)));
                 }
             }
-            //probabilité du chemin le plus vraissemblable vers l'état precedent pour une certaine valeur
+            //maximum pour une certain valeur de la ou les variables cachées
+            //on ne s'interesse pas au maximum sur toutes les valeurs
+            //mais bien à une probabilité max donnée parmis l'ensemble des valeurs que peut prendre de la variable cachée
             AbstractDouble maxValue = max.get(new Domain.DomainValue(domainValues));
-
+            //ce n'est qu'en multipliant cette probabilité par celle de la requete sachant les variable cachées
+            //pour une combinaison de valeurs donnée que l'on obtient le chemin max.
             maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
 
-            Domain.DomainValue domainvaluesCom = new Domain.DomainValue(domainValues);
+            Domain.DomainValue domainvaluesObj = new Domain.DomainValue(domainValues);
 
             if (maxValue.compareTo(hiddenVarMax) > 0) {
 
                 hiddenVarMax = maxValue;
-
+                //sauvegarde l'état des variables cachées pour le maximum
+                //les valeurs pouvant encore changer dans la procedure
                 List<Variable> copyDependencies = new LinkedList<>();
 
                 for (Variable dependencie : obsParentState.getDependencies()) {
@@ -464,30 +455,15 @@ public class Forward {
                 maxHiddenvars = copyDependencies;
             }
 
-            AbstractDouble forward = distrib.get(domainvaluesCom).divide(distrib.get(totalDomainValues));
-            //on multiplie le resultat du filtre pour chaque variable cachée
+            //recupere le resultat du forward pour la combinaison de valeurs courantes des variables cachées
+            AbstractDouble forward = distrib.get(domainvaluesObj).divide(distrib.get(totalDomainValues));
+            //on multiplie le resultat du forward avec la partie transition
             mulTransitionForward = mulTransitionForward.multiply(forward);
-
-            //System.out.print(obsParentState.getDependencies()+" "+forward);
-
             //on additionne pour chaque combinaison de valeur pour les variables cachées
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
         }
-        /*
-        //remet les valeurs des variables non initialisés à nul
-        for (Variable variable : varsToReset) {
 
-            variable.clear();
-        }
-*/
-        Iterator<Variable> requestIterator = obsParentState.getDependencies().iterator();
-        //restaure les valeur originales
-        for (Domain.DomainValue domainValue : originalValues) {
-
-            requestIterator.next().setDomainValue(domainValue);
-        }
-
-        System.out.println();
+        Util.resetDomainValues(obsParentState.getDependencies(), originalValues);
 
         return new ForwardSumRs(hiddenVarsSum, hiddenVarMax, maxHiddenvars, key);
     }
@@ -513,12 +489,13 @@ public class Forward {
     }
 
 
+    /*------------------------------- VIEW ----------------------------------*/
+
 
     public void showForward() {
 
         showDistributions("FORWARD", this.forwardDistribSaved);
     }
-
 
     public void showForwardDistributions() {
 
@@ -531,6 +508,65 @@ public class Forward {
 
         showDynamicDistributions(this.maxDistribSaved);
     }
+
+    public void computeMostLikelyPath(List<Variable> requests){
+
+        String key = Util.getDistribSavedKey(requests);
+
+        Map<Domain.DomainValue, AbstractDouble> maxProbs = this.maxDistribSaved.get(key);
+
+        Map<Domain.DomainValue, List<Variable>> maxPath = this.mostLikelyPath.get(key);
+
+        Domain.DomainValue maxValue = null;
+
+        AbstractDouble max = network.getDoubleFactory().getNew(0.0);
+
+        for( Domain.DomainValue value : maxProbs.keySet() ){
+
+            if( maxProbs.get(value).compareTo(max) > 0 ){
+
+                max =  maxProbs.get(value);
+
+                maxValue = value;
+            }
+        }
+
+        //initialise la liste de variables avec les valeurs max
+        //si il s'agit d'un object domainValue composite
+        if( maxValue.getValue() instanceof List){
+
+            Util.resetDomainValues(requests, (List<Domain.DomainValue>)maxValue.getValue());
+
+        }else{
+
+            requests.get(0).setDomainValue(maxValue);
+        }
+
+        List<List<Variable>> mostLikelyPath = new LinkedList(requests);
+
+        loadMostLikelyPath(mostLikelyPath, maxPath.get(maxValue));
+    }
+
+    protected void loadMostLikelyPath(List<List<Variable>> mostLikelyPath, List<Variable> maxVarsvalues){
+
+        if(maxVarsvalues.isEmpty()){
+
+            return;
+        }
+
+        String varsKey = Util.getDistribSavedKey(maxVarsvalues);
+
+        Domain.DomainValue valuesKey = new Domain.DomainValue(Util.getDomainValues(maxVarsvalues));
+
+        List<Variable> previousMaxVarsValues = this.mostLikelyPath.get(varsKey).get(valuesKey);
+
+        mostLikelyPath.add(previousMaxVarsValues);
+
+        loadMostLikelyPath(mostLikelyPath, previousMaxVarsValues);
+    }
+
+    /*------------------------------- GETTER SETTER ----------------------------------*/
+
 
     public Map<String, Map<Domain.DomainValue, AbstractDouble>> getForwardDistribSaved() {
         return forwardDistribSaved;

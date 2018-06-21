@@ -28,7 +28,6 @@ public class Smoothing {
 
     protected Map<Domain.DomainValue, AbstractDouble> smootDistribution(Map<Domain.DomainValue, AbstractDouble> forward,
                                                                       Map<Domain.DomainValue, AbstractDouble> backward) {
-
         //normalisation de la distribution forward
         Map<Domain.DomainValue, AbstractDouble> forwardNormal = normalizeDistribution(forward);
         //suppression des valeurs totales
@@ -39,15 +38,29 @@ public class Smoothing {
         return smootDistrib;
     }
 
+    public AbstractDouble smoothing(Variable request) {
+
+        return this.smoothing(request, this.network.getTime(),1);
+    }
+
+    public AbstractDouble smoothing(Variable request, int markovOrder) {
+
+        return this.smoothing(request, this.network.getTime(), markovOrder);
+    }
 
     public AbstractDouble smoothing(List<Variable> requests) {
-        //lissage de la variable
+
         return this.smoothing(requests, network.getTime(), 1);
     }
 
     public AbstractDouble smoothing(List<Variable> requests, int markovOrder) {
-        //lissage de la variable
+
         return this.smoothing(requests, network.getTime(), markovOrder);
+    }
+
+    public AbstractDouble smoothing(Variable request, int timeEnd, int markovOrder) {
+
+        return this.smoothing(new LinkedList(Arrays.asList(new Variable[]{request})), timeEnd, markovOrder);
     }
 
     protected AbstractDouble smoothing(List<Variable> requests, int timeEnd, int markovOrder) {
@@ -63,7 +76,14 @@ public class Smoothing {
 
         this.forward.forward(requests, key, 0);
 
-        this.backward.backward(requests, key, 0, timeEnd, markovOrder);
+        if(markovOrder > 1 ) {
+
+            this.backward.backward(requests, key, 0, timeEnd, markovOrder);
+
+        }else{
+
+            this.backward.backward(requests, key, 0, timeEnd);
+        }
 
         Map<Domain.DomainValue, AbstractDouble> distributionFinal =
                 this.smootDistribution(this.forward.forwardDistribSaved.get(key), this.backward.backwardDistribSaved.get(key));
@@ -71,20 +91,6 @@ public class Smoothing {
         return distributionFinal.get(new Domain.DomainValue(domainValues)).divide(distributionFinal.get(totalDomainValues));
     }
 
-    public AbstractDouble smoothing(Variable request) {
-
-        return this.smoothing(request, this.network.getTime(), 1);
-    }
-
-    public AbstractDouble smoothing(Variable request, int markovOrder) {
-
-        return this.smoothing(request, this.network.getTime(), markovOrder);
-    }
-
-    public AbstractDouble smoothing(Variable request, int timeEnd, int markovOrder) {
-
-        return this.smoothing(new LinkedList<Variable>(Arrays.asList(new Variable[]{request})), timeEnd, markovOrder);
-    }
 
     public void forwardBackward(List<Variable> requests) {
 
@@ -182,7 +188,5 @@ public class Smoothing {
         forwardBackward(new LinkedList<Variable>(Arrays.asList(new Variable[]{request})),
                 smootStart, smootEnd, backWardEnd);
     }
-
-
 
 }

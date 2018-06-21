@@ -27,89 +27,228 @@ public class Backward {
 
     /*------------------- BACKWARD --------------------*/
 
-    /*
-
-     * Backward sur une seule variable
-     *
-     * récuperer toutes les observations de la variable état si tenté qu'il y en a plus d'une ...
-     *
-     * pour le temps suivant
-     *
-     * creer une distribution sur les valeurs de la requete
-     *
-     * sauvegarder la valeur de la requete
-     *
-     * initialiser un total TOTAL_REQUEST : le total de la distribution pour chaque valeur de la requete
-     *
-     * Pour chaque valeur de la variable de requete
-     *
-     *   initialiser la variable de requete
-     *
-     *   initialiser une MUL_OBS à 1.0 pour multiplier le resultat de chaque observations de la requete
-     *
-     *   Pour chaque observation
-     *
-     *       recuperer les combinaison de valeur des parents de l'observation
-     *
-     *       initialiser un total SUM pour la somme sur les parents de l'observation
-     *
-     *       Pour chaque combinaison de parent
-     *
-     *           initialiser une valeur MUL à 1.0 pour multiplier les parties de la somme
-     *
-     *           initialiser les variables parents de l'observation
-     *
-     *           MUL <- multiplier MUL par la probabilité de l'observation en fonction de la combinaison de valeurs parents courante
-     *
-     *           récuperer la distribution pour les parents de la variable d'observation dans une map
-     *           ayant pour clé la combinaison des variables parents : label + temps de chaque variables concaténées
-     *
-     *           Si cette distribution n'existe pas encore
-     *
-     *               rappel recursif de la fonction backward avec les parents de la variable d'observation
-     *
-     *               recuperation et sauvegarde de la distribution
-     *
-     *           Fin Si
-     *
-     *           recuperer la probabilité pour la combinaison courante de valeurs parents
-     *
-     *           diviser cette probabilité par le total enregistré pour toutes les combinaisons
-     *
-     *           MUL <- multiplier MUL par cette valeur
-     *
-     *           Pour chaque parent de l'observation
-     *
-     *               MUL <- multiplier MUL par la probabilité d'un parent en fonction des siens
-     *
-     *           Fin Pour
-     *
-     *           SUM <- additionner MUL à SUM
-     *
-     *       Fin Pour
-     *
-     *       MUL_OBS <- multiplier MUL_OBS à SUM
-     *
-     *   Fin Pour
-     *
-     *   enregistrer MUL_OBS à la valeur de la requete (clé) dans la distribution
-     *
-     *   TOTAL_REQUEST <- TOTAL_REQUEST + MUL_OBS
-     *
-     * Fin Pour
-     *
-     *
-     * enregistrer TOTAL_REQUEST à la valeur TOTAL dans la distribution
-     *
-     * retourner la distribution
-     *
-     * */
-
     public void backward(List<Variable> requests, String key, int depth, int timeEnd) {
 
-        this.backward(requests, key, depth, timeEnd, 1);
+        String ident = getIdent(depth);
+
+        if(backwardLogDetails) {
+
+            System.out.println(ident + "REQUEST " + requests);
+        }
+
+        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>();
+
+        //atteind une requete située à la derniere phase temporelle si plusieurs elles doivent être au même temps
+        if (requests.get(0).getTime() == timeEnd) {
+
+            List<List<Domain.DomainValue>> domainValuesLists = requestValuesCombinations(requests);
+
+            for (List<Domain.DomainValue> domainValues : domainValuesLists) {
+
+                Domain.DomainValue domainValue = new Domain.DomainValue(domainValues);
+
+                distribution.put(domainValue, network.getDoubleFactory().getNew(1.0));
+            }
+
+            distribution.put(totalDomainValues, network.getDoubleFactory().getNew(1.0));
+
+            this.backwardDistribSaved.put(key, distribution);
+
+            return;
+        }
+
+        //récuperation des observations de la variable au temps suivant
+        //et ajout des eventuelles variables manquante à la requete
+        Set<String> containState = new HashSet<>(), containObs = new HashSet<>();
+
+        List<Variable> fullRequest = new LinkedList<>(), nextObservations = new LinkedList<>();
+
+        for (Variable request : requests) {
+
+            //ajout des requetes dans la liste complétée
+            if (!containState.contains(request.getVarTimeId())) {
+
+                containState.add(request.getVarTimeId());
+
+                fullRequest.add(request);
+
+                //récupération de la variable au temps suivant
+                //faut il recuperer les variables deux temps en avant ?
+                Variable nextRequest = this.network.getVariable(request.getTime() + 1, request);
+                //si variable en temps t aucune ne suit
+                if (nextRequest != null) {
+
+                    for (Variable nextObservation : nextRequest.getObservations()) {
+                        //ignore les observations déjas enregistrées
+                        if (!containObs.contains(nextObservation.getVarTimeId())) {
+
+                            containObs.add(nextObservation.getVarTimeId());
+
+                            nextObservations.add(nextObservation);
+                            //maintenant chaque observation sera calculé en fonction de ses parents dans partie 1 de la somme
+                            for (Variable observationDep : nextObservation.getDependencies()) {
+                                //et le parent de l'observation sera calculé en fonction des siens en partie 3
+                                //cependant certain pourrait ne pas faire partie de la requete originale
+                                //et il faut donc les rajouter
+                                for (Variable missingRequest : observationDep.getDependencies()) {
+
+                                    if (!containState.contains(missingRequest.getVarTimeId())) {
+
+                                        containState.add(missingRequest.getVarTimeId());
+
+                                        fullRequest.add(missingRequest);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        //sauvegarde des valeurs originales de la requete
+        List<Domain.DomainValue> originalValues = Util.getDomainValues(fullRequest);
+
+        if(backwardLogDetails)
+            System.out.println(ident+"FULL REQUEST "+fullRequest);
+
+        List<List<Domain.DomainValue>> domainValuesLists = requestValuesCombinations(fullRequest);
+
+        AbstractDouble totalRequest = network.getDoubleFactory().getNew(0.0);
+        //pour combinaison de valeur de la requete
+        for (List<Domain.DomainValue> fullRequestValue : domainValuesLists) {
+
+            Iterator<Variable> requestsIterator = fullRequest.iterator();
+
+            for (Domain.DomainValue domainValue : fullRequestValue) {
+
+                requestsIterator.next().setDomainValue(domainValue);
+            }
+
+            if(backwardLogDetails)
+                System.out.println(ident+"FULL REQUEST INIT COMBINATION : "+fullRequest);
+
+            //multiplier le resultat pour chaque observation
+            AbstractDouble multiplyObservations = network.getDoubleFactory().getNew(1.0);
+
+            for (Variable nextObservation : nextObservations) {
+
+                multiplyObservations = multiplyObservations.multiply(backwardSum(nextObservation, depth + 1, timeEnd));
+            }
+
+            List<Domain.DomainValue> requestDomainValues = Util.getDomainValues(requests);
+
+            Domain.DomainValue requestDomainValuesObj = new Domain.DomainValue(requestDomainValues);
+
+            if (!distribution.containsKey(requestDomainValuesObj)) {
+                //enregistrement de la probabilité pour la valeur courante de la requete
+                distribution.put(requestDomainValuesObj, multiplyObservations);
+
+            } else {
+                //enregistrement de la probabilité pour la valeur courante de la requete additionné à la precedente
+                //pour une même combinaison
+                distribution.put(requestDomainValuesObj, distribution.get(requestDomainValuesObj).add(multiplyObservations));
+            }
+
+            totalRequest = totalRequest.add(multiplyObservations);
+        }
+
+        distribution.put(totalDomainValues, totalRequest);
+
+        Util.resetDomainValues(fullRequest, originalValues);
+
+        if(backwardLogDetails) {
+
+            System.out.println(ident + "KEY " + key);
+
+            System.out.println(ident + "DISTRIB : " + distribution);
+        }
+
+        this.backwardDistribSaved.put(key, distribution);
     }
 
+    protected AbstractDouble backwardSum(Variable nextObservation, int depth, int timeEnd) {
+
+        String ident = getIdent(depth);
+
+        AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
+
+        List<List<Domain.DomainValue>> hiddenVarsValues = requestValuesCombinations(nextObservation.getDependencies());
+
+        String key = getDistribSavedKey(nextObservation.getDependencies());
+
+        if(backwardLogDetails) {
+
+            System.out.println(ident + "SUM ON " + nextObservation.getDependencies());
+
+            System.out.println(ident + "KEY  " + key);
+        }
+
+        for (List<Domain.DomainValue> domainValues : hiddenVarsValues) {
+
+            AbstractDouble multiplyUnderSum = network.getDoubleFactory().getNew(1.0);
+
+            Iterator<Variable> obsDependenciesIterator = nextObservation.getDependencies().iterator();
+
+            for (Domain.DomainValue depValue : domainValues) {
+
+                obsDependenciesIterator.next().setDomainValue(depValue);
+            }
+
+            if(backwardLogDetails)
+                System.out.println(ident+"SUM DEPENDENCY "+nextObservation.getDependencies());
+
+            if (backwardLogCompute) System.out.print(nextObservation.getProbabilityForCurrentValue());
+
+            multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
+
+            Map<Domain.DomainValue, AbstractDouble> hiddenVarsDistribution = this.backwardDistribSaved.get(key);
+
+            if (hiddenVarsDistribution == null) {
+
+                this.backward(nextObservation.getDependencies(), key, depth + 1, timeEnd);
+
+                hiddenVarsDistribution = this.backwardDistribSaved.get(key);
+            }
+
+            List<Domain.DomainValue> hiddenVarValues = Util.getDomainValues(nextObservation.getDependencies());
+
+            if(backwardLogDetails) {
+                System.out.println(ident + "DISTRIB : " + hiddenVarsDistribution);
+                System.out.println(ident + "COMBI : " + new Domain.DomainValue(hiddenVarValues));
+                System.out.println(ident + "RESULT : " + hiddenVarsDistribution.get(new Domain.DomainValue(hiddenVarValues)));
+            }
+
+            AbstractDouble combinaisonProb = hiddenVarsDistribution.get(new Domain.DomainValue(hiddenVarValues));
+
+            if (backwardLogCompute)
+                System.out.print(" * " + combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+
+            multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+
+            for (Variable hiddenVar : nextObservation.getDependencies()) {
+
+                if (backwardLogCompute) System.out.print(" * " + hiddenVar.getProbabilityForCurrentValue());
+
+                multiplyUnderSum = multiplyUnderSum.multiply(hiddenVar.getProbabilityForCurrentValue());
+
+                if(backwardLogDetails)
+                    System.out.println(ident+"HIDDEN VAR PROB  P("+hiddenVar+"|"+hiddenVar.getDependencies()+") = "+ hiddenVar.getProbabilityForCurrentValue());
+            }
+
+            if (backwardLogCompute) System.out.print(" + ");
+
+            sum = sum.add(multiplyUnderSum);
+        }
+
+        return sum;
+    }
+
+
+    /**
+     * Tentative d'implementation du backward pour gerer les chaines de markov d'order superieur à 1
+     * */
     public void backward(List<Variable> requests, String key, int depth, int timeEnd, int markovOrder) {
 
         String ident = getIdent(depth);

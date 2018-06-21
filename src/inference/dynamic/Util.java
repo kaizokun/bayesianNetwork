@@ -242,5 +242,26 @@ public class Util {
         return ident.toString();
     }
 
+    public static List<Domain.DomainValue> getDomainValues(Collection<Variable> variables){
+
+        List<Domain.DomainValue> domainValues = new LinkedList<>();
+
+        for (Variable variable : variables) {
+
+            domainValues.add(variable.getDomainValue());
+        }
+
+        return domainValues;
+    }
+
+    public static void resetDomainValues(Collection<Variable> variables, Collection<Domain.DomainValue> domainValues){
+
+        Iterator<Variable> variableIterator = variables.iterator();
+
+        for (Domain.DomainValue domainValue : domainValues) {
+
+            variableIterator.next().setDomainValue(domainValue);
+        }
+    }
 
 }
