@@ -243,4 +243,6 @@ public class BayesianNetwork {
         return requestValuesCombinaisons;
     }
 
+
+
 }

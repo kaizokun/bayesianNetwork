@@ -3,6 +3,8 @@ package test.dynamic;
 import domain.Domain;
 import domain.DomainFactory;
 import domain.data.AbstractDouble;
+import inference.dynamic.Forward;
+import inference.dynamic.Smoothing;
 import network.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -71,7 +73,9 @@ public class DynamicBayesianNetworkTest {
 
         System.out.println(network.toString());
 
-        AbstractDouble rs = network.smoothing(rainReq, markovOrder);
+        Smoothing smoothing = new Smoothing(network);
+
+        AbstractDouble rs = smoothing.smoothing(rainReq, markovOrder);
 
         System.out.println();
 
@@ -87,9 +91,9 @@ public class DynamicBayesianNetworkTest {
 
         this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 3, 1);
 
-        network.showForwardDistributions();
+        //network.showForwardDistributions();
 
-        network.showBackwardDistributions();
+        //network.showBackwardDistributions();
     }
 
     @Test
@@ -99,11 +103,11 @@ public class DynamicBayesianNetworkTest {
 
         this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 4, 2);
 
-        network.showForwardDistributions();
+       // network.showForwardDistributions();
 
-        network.showBackwardDistributions();
+       // network.showBackwardDistributions();
 
-        network.showFullBackwardDistributions();
+       // network.showFullBackwardDistributions();
     }
 
     private void DynamicBayesianNetworkUmbrellaTestFilter(DynamicBayesianNetwork network, int extensions) {
@@ -122,7 +126,9 @@ public class DynamicBayesianNetworkTest {
 
         requests.add(rainReq);
 
-        AbstractDouble rs = network.filtering(requests);
+        Forward forward = new Forward(network);
+
+        AbstractDouble rs = forward.filtering(requests);
 
         System.out.println();
 
@@ -130,7 +136,7 @@ public class DynamicBayesianNetworkTest {
 
         System.out.println();
 
-        network.showForwardDistributions();
+        forward.showForwardDistributions();
     }
 
     private void DynamicBayesianNetworkUmbrellaTestFilterAndMax(DynamicBayesianNetwork network) {
@@ -149,13 +155,15 @@ public class DynamicBayesianNetworkTest {
 
         requests.add(rainReq);
 
-        network.filtering(requests);
+        Forward forward = new Forward(network);
+
+        forward.filtering(requests);
 
         System.out.println();
         System.out.println("MAX");
         System.out.println();
 
-        Map<String, Map<Domain.DomainValue, AbstractDouble>> max = network.getMaxDistribSaved();
+        Map<String, Map<Domain.DomainValue, AbstractDouble>> max = forward.getMaxDistribSaved();
 
         for (String key : max.keySet()) {
 
@@ -171,7 +179,7 @@ public class DynamicBayesianNetworkTest {
         System.out.println("MOST LIKELY PATH");
         System.out.println();
 
-        Map<String, Map<Domain.DomainValue, List<Variable>>> mostLikelyPath = network.getMostLikelyPath();
+        Map<String, Map<Domain.DomainValue, List<Variable>>> mostLikelyPath = forward.getMostLikelyPath();
 
         for (String key : mostLikelyPath.keySet()) {
 
@@ -205,7 +213,6 @@ public class DynamicBayesianNetworkTest {
 
     private void DynamicBayesianNetworkUmbrellaTestPredict(DynamicBayesianNetwork network, int extensions, int predictTime) {
 
-
         this.DynamicBayesianNetworkUmbrellaTest(network, extensions);
 
         //initialisation de la requete
@@ -218,7 +225,9 @@ public class DynamicBayesianNetworkTest {
 
         requests.add(rainReq);
 
-        AbstractDouble rs = network.prediction(requests, predictTime);
+        Forward forward = new Forward(network);
+
+        AbstractDouble rs = forward.prediction(requests, predictTime);
 
         System.out.println();
 
@@ -244,13 +253,15 @@ public class DynamicBayesianNetworkTest {
 
         this.DynamicBayesianNetworkUmbrellaTest(network, 3);
 
+        Smoothing smoothing = new Smoothing(network);
+
         List<Variable> req = new LinkedList<>();
 
         Variable rain = new Variable(RAIN.toString());
 
         req.add(rain);
 
-        network.forwardBackward(rain, 0, 3);
+        smoothing.forwardBackward(rain, 0, 3);
     }
 
 }
