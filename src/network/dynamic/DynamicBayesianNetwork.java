@@ -4,7 +4,6 @@ import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
-import javafx.scene.chart.ValueAxis;
 import network.BayesianNetwork;
 import network.ProbabilityCompute;
 import network.Variable;
@@ -16,7 +15,7 @@ import static network.BayesianNetwork.requestValuesCombinations;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
-    protected static boolean backwardLog = false, forwardLog = false;
+    protected static boolean backwardLogCompute = false, backwardLogDetails = false, forwardLog = false;
 
     protected static Comparator<Variable> comparatorVarTimeLabel;
 
@@ -690,7 +689,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     private void backWard(List<Variable> requests, String key, int depth, int timeEnd, int markovOrder) {
 
-        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>(), fullDistribution = new Hashtable<>();
+        String ident = getIdent(depth);
+
+        if(backwardLogDetails)
+        System.out.println(ident+"REQUEST "+requests);
+
+        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>(),
+                                                fullDistribution = new Hashtable<>();
 
         //atteind une requete située à la derniere phase temporelle si plusieurs elles doivent être au même temps
         if (requests.get(0).getTime() == timeEnd) {
@@ -814,12 +819,17 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //trie des variables par temps puis par label
         Collections.sort(fullRequest, comparatorVarTimeLabel);
 
+        String fullKey = getDistribSavedKey(fullRequest);
+
         List<Domain.DomainValue> originalValues = new LinkedList<>();
 
         for (Variable request : fullRequest) {
 
             originalValues.add(request.getDomainValue());
         }
+
+        if(backwardLogDetails)
+        System.out.println(ident+"FULL REQUEST "+fullRequest);
 
         List<List<Domain.DomainValue>> domainValuesLists = requestValuesCombinations(fullRequest);
 
@@ -833,12 +843,16 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 requestsIterator.next().setDomainValue(domainValue);
             }
+
+            if(backwardLogDetails)
+            System.out.println(ident+"FULL REQUEST INIT COMBINATION "+fullKey+" : "+fullRequest);
+
             //multiplier le resultat pour chaque observation
             AbstractDouble multiplyObservations = doubleFactory.getNew(1.0);
 
             for (Variable nextObservation : nextObservations) {
 
-                multiplyObservations = multiplyObservations.multiply(backwardSum(nextObservation, depth, timeEnd, markovOrder));
+                multiplyObservations = multiplyObservations.multiply(backwardSum(nextObservation, depth + 1, timeEnd, markovOrder));
             }
 
             List<Domain.DomainValue> requestDomainValues = new LinkedList<>();
@@ -876,12 +890,23 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             requestIterator.next().setDomainValue(domainValue);
         }
 
+        if(backwardLogDetails) {
+            System.out.println(ident + "KEY " + key);
+
+            System.out.println(ident + "FULL KEY " + fullKey);
+
+            System.out.println(ident + "DISTRIB : " + distribution);
+
+            System.out.println(ident + "FULL DISTRIB : " + fullDistribution);
+        }
         this.backwardDistribSaved.put(key, distribution);
 
-        this.backwardFullDistribSaved.put(getDistribSavedKey(fullRequest), fullDistribution);
+        this.backwardFullDistribSaved.put(fullKey, fullDistribution);
     }
 
     public AbstractDouble backwardSum(Variable nextObservation, int depth, int timeEnd, int markovOrder) {
+
+        String ident = getIdent(depth);
 
         AbstractDouble sum = doubleFactory.getNew(0.0);
 
@@ -889,15 +914,19 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         String fullKey = "";
 
+        //récuperer tout les parents de l'observation courante soit
+        //normalement uniquement les variables états situées à la même coupe temporelle
+        //on commence par ajouter celles là
         List<Variable> keyVars = new LinkedList<>();
 
-        if (markovOrder > 1) {
-            //récuperer tout les parents de l'observation courante soit
-            //normalement uniquement les variables états situées à la même coupe temporelle
-            //on commence par ajouter celles là
-            keyVars.addAll(nextObservation.getDependencies());
-            //puis pour chacunes d'entre elles
+        keyVars.addAll(nextObservation.getDependencies());
+        //completer les variables dont la valeur on une importance
+        //pour le calcul. Pour une variable en temps timeEnd dont la distribution vaut 1
+        //c'est inutile
+        if (markovOrder > 1 && keyVars.get(0).getTime() < timeEnd) {
+
             for (Variable nextDep : nextObservation.getDependencies()) {
+               // System.out.println(ident+"NEXT DEP :  "+nextDep);
                 //on recupere les variables de même label situées à des temps precedents
                 //en fonction de la profondeur de la chaine de markov
                 //qui pourrait bien être spécifique à certaines variables
@@ -905,13 +934,10 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 //plutot que comme parametre de la procedure...
                 //On recupere les markovOrder - 1 variables precedentes
                 for (int d = markovOrder; d > 1 && nextDep.getTime() > 0; d--) {
-
+                    //System.out.println(ident+"Previous time state : "+this.getVariable(nextDep.getTime() - 1, nextDep));
                     keyVars.add(this.getVariable(nextDep.getTime() - 1, nextDep));
                 }
             }
-        } else {
-
-            keyVars.addAll(nextObservation.getDependencies());
         }
 
         Collections.sort(keyVars, comparatorVarTimeLabel);
@@ -919,7 +945,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         fullKey = getDistribSavedKey(keyVars);
 
         String simpleKey = getDistribSavedKey(nextObservation.getDependencies());
-
+        if(backwardLogDetails) {
+            System.out.println(ident + "SUM ON " + nextObservation.getDependencies());
+            System.out.println(ident + "SUM ON FULL" + keyVars);
+            System.out.println(ident + "KEY  " + simpleKey);
+            System.out.println(ident + "FULL KEY " + fullKey);
+        }
         for (List<Domain.DomainValue> domainValues : hiddenVarsValues) {
 
             AbstractDouble multiplyUnderSum = doubleFactory.getNew(1.0);
@@ -931,7 +962,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 obsDependenciesIterator.next().setDomainValue(depValue);
             }
 
-            if (backwardLog) System.out.print(nextObservation.getProbabilityForCurrentValue());
+            if(backwardLogDetails)
+            System.out.println(ident+"SUM DEPENDENCY "+nextObservation.getDependencies());
+
+
+            if (backwardLogCompute) System.out.print(nextObservation.getProbabilityForCurrentValue());
 
             multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
 
@@ -947,17 +982,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             if (hiddenVarsFullDistribution == null) {
 
-                this.backWard(nextObservation.getDependencies(), simpleKey, depth + 1, timeEnd);
+                this.backWard(nextObservation.getDependencies(), simpleKey, depth + 1, timeEnd, markovOrder);
 
                 hiddenVarsFullDistribution = this.backwardFullDistribSaved.get(fullKey);
-
-                System.out.println(getIdent(depth)+fullKey);
-
-                System.out.println(getIdent(depth)+"NEW : "+hiddenVarsFullDistribution);
-
-            }else{
-
-                System.out.println(getIdent(depth)+"SAVED : "+hiddenVarsFullDistribution);
             }
 
             List<Domain.DomainValue> fullDistribValues = new LinkedList<>();
@@ -966,26 +993,28 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 fullDistribValues.add(keyVar.getDomainValue());
             }
-
-            System.out.println(getIdent(depth)+"FULL DISTRIB : "+fullDistribValues);
-
+            if(backwardLogDetails) {
+                System.out.println(ident + "DISTRIB : " + hiddenVarsFullDistribution);
+                System.out.println(ident + "COMBI : " + new Domain.DomainValue(fullDistribValues));
+                System.out.println(ident + "RESULT : " + hiddenVarsFullDistribution.get(new Domain.DomainValue(fullDistribValues)));
+            }
             AbstractDouble combinaisonProb = hiddenVarsFullDistribution.get(new Domain.DomainValue(fullDistribValues));
 
-            if (backwardLog)
+            if (backwardLogCompute)
                 System.out.print(" * " + combinaisonProb.divide(hiddenVarsFullDistribution.get(totalDomainValues)));
 
             multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsFullDistribution.get(totalDomainValues)));
 
             for (Variable hiddenVar : nextObservation.getDependencies()) {
 
-                // if (backwardLog) System.out.print( hiddenVar +" "+hiddenVar.getDependencies());
-
-                if (backwardLog) System.out.print(" * " + hiddenVar.getProbabilityForCurrentValue());
+                if (backwardLogCompute) System.out.print(" * " + hiddenVar.getProbabilityForCurrentValue());
 
                 multiplyUnderSum = multiplyUnderSum.multiply(hiddenVar.getProbabilityForCurrentValue());
+                if(backwardLogDetails)
+                System.out.println(ident+"HIDDEN VAR PROB  P("+hiddenVar+"|"+hiddenVar.getDependencies()+") = "+ hiddenVar.getProbabilityForCurrentValue());
             }
 
-            if (backwardLog) System.out.print(" + ");
+            if (backwardLogCompute) System.out.print(" + ");
 
             sum = sum.add(multiplyUnderSum);
         }
@@ -1484,6 +1513,15 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         StringBuilder builder = new StringBuilder();
 
         loadTree(this.roots, builder, 0);
+
+        builder.append("\n\n");
+
+        for(Integer time : timeVariables.keySet()){
+
+            builder.append("---------"+time+"---------\n");
+
+            builder.append(timeVariables.get(time)+"\n");
+        }
 
         return builder.toString();
     }

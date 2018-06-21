@@ -69,6 +69,8 @@ public class DynamicBayesianNetworkTest {
 
         rainReq.setValue(1);
 
+        System.out.println(network.toString());
+
         AbstractDouble rs = network.smoothing(rainReq, markovOrder);
 
         System.out.println();
@@ -85,8 +87,6 @@ public class DynamicBayesianNetworkTest {
 
         this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 3, 1);
 
-        System.out.println(network.toString());
-
         network.showForwardDistributions();
 
         network.showBackwardDistributions();
@@ -97,9 +97,7 @@ public class DynamicBayesianNetworkTest {
 
         DynamicBayesianNetwork network = BayesianNetworkFactory.getUmbrellaDynamicNetworkOrder2();
 
-        this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 3, 2);
-
-        System.out.println(network.toString());
+        this.DynamicBayesianNetworkUmbrellaTestSmoothing(network, 4, 2);
 
         network.showForwardDistributions();
 
