@@ -45,7 +45,7 @@ public class DynamicBayesianNetworkTest {
             network.extend();
         }
 
-        Object[] obsValues = new Object[]{1, 1, 0, 1, 1};
+        Object[] obsValues = new Object[]{1, 0, 1, 0, 1};
 
         //initialisation des observations
 
@@ -176,7 +176,7 @@ public class DynamicBayesianNetworkTest {
         }
 
         System.out.println();
-        System.out.println("MOST LIKELY PATH");
+        System.out.println("ALL PATH");
         System.out.println();
 
         Map<String, Map<Domain.DomainValue, List<Variable>>> mostLikelyPath = forward.getMostLikelyPath();
@@ -190,6 +190,18 @@ public class DynamicBayesianNetworkTest {
                 System.out.println(entry.getKey() + " " + entry.getValue());
             }
         }
+
+        System.out.println();
+        System.out.println("MOST LIKELY PATH");
+        System.out.println();
+
+        List<List<Variable>> mostLikelySequence = forward.computeMostLikelyPath(requests);
+
+        for(List<Variable> states : mostLikelySequence){
+
+            System.out.println(states);
+        }
+
     }
 
     @Test

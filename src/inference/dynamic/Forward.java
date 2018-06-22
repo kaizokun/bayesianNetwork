@@ -38,7 +38,7 @@ public class Forward {
         return this.prediction(new LinkedList<Variable>(Arrays.asList(new Variable[]{request})), time);
     }
 
-    public AbstractDouble prediction(List<Variable> requests, int time ) {
+    public AbstractDouble prediction(List<Variable> requests, int time) {
 
         //étend le reseau jusqu'au temps voulu
         while (this.network.getTime() < time) {
@@ -67,12 +67,9 @@ public class Forward {
     /*------------------- FILTERING--------------------*/
 
 
-
-
-
     public AbstractDouble filtering(Variable request) {
 
-        return this.filtering(new LinkedList<Variable>(Arrays.asList(new Variable[]{request})));
+        return this.filtering(Arrays.asList(new Variable[]{request}));
     }
 
     public AbstractDouble filtering(List<Variable> requests) {
@@ -93,14 +90,7 @@ public class Forward {
         return distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(totalDomainValues));
     }
 
-
-
-
-
     /*------------------- FORWARD--------------------*/
-
-
-
 
 
     public void forward(Variable request, String key, int depth) {
@@ -242,10 +232,12 @@ public class Forward {
             for (Variable observation : requestsObservations.values()) {
                 //au cas ou la variale d'observation est nul on obtient une prédiction plutot qu'un filtrage
                 if (observation.getDomainValue() != null) {
+
+                    AbstractDouble obsProb = observation.getProbabilityForCurrentValue();
                     //valeur du modele de capteur
-                    requestValueProbability = requestValueProbability.multiply(observation.getProbabilityForCurrentValue());
+                    requestValueProbability = requestValueProbability.multiply(obsProb);
                     //idem pour calculer un max pour la sequence la plus vraissemblable
-                    requestValueMaxProbability = requestValueMaxProbability.multiply(observation.getProbabilityForCurrentValue());
+                    requestValueMaxProbability = requestValueMaxProbability.multiply(obsProb);
                     if (forwardLog) {
                         System.out.println();
                         System.out.println(ident + "OBS P(" + observation + "|" + observation.getDependencies() + ") = " + observation.getProbabilityForCurrentValue());
@@ -274,10 +266,14 @@ public class Forward {
             //pour les variables situées au temps 0 ont obtient directement leur probabilité
             for (Variable request0 : requestTime0) {
 
-                requestValueProbability = requestValueProbability.multiply(request0.getProbabilityForCurrentValue());
+                AbstractDouble reqProb = request0.getProbabilityForCurrentValue();
+
+                requestValueProbability = requestValueProbability.multiply(reqProb);
+
+                requestValueMaxProbability = requestValueMaxProbability.multiply(reqProb);
 
                 if (forwardLog) {
-                    System.out.println(ident + "STATE_0 P(" + request0 + ") = " + request0.getProbabilityForCurrentValue());
+                    System.out.println(ident + "STATE_0 P(" + request0 + ") = " + reqProb);
                 }
             }
             //Si la combinaison sur laquelle ont travaille actuellement contient
@@ -509,8 +505,17 @@ public class Forward {
         showDynamicDistributions(this.maxDistribSaved);
     }
 
-    public void computeMostLikelyPath(List<Variable> requests){
+    public List<List<Variable>> computeMostLikelyPath(Variable... request) {
 
+        return computeMostLikelyPath(Arrays.asList(request));
+    }
+
+    public List<List<Variable>> computeMostLikelyPath(List<Variable> requests) {
+
+        //la sequence d'états la plus probable est calculée à partir d'une liste d'états
+        //de 0 à un temps t. la liste des variables et leur ordre doit être le même
+        //que lors du premier appel à la methode forward
+        //on récupere la clé correspondant aux variables
         String key = Util.getDistribSavedKey(requests);
 
         Map<Domain.DomainValue, AbstractDouble> maxProbs = this.maxDistribSaved.get(key);
@@ -520,12 +525,13 @@ public class Forward {
         Domain.DomainValue maxValue = null;
 
         AbstractDouble max = network.getDoubleFactory().getNew(0.0);
+        //on calcul la commbinaison de valeur pour la requete
+        //ayant la plus grande probabilité
+        for (Domain.DomainValue value : maxProbs.keySet()) {
 
-        for( Domain.DomainValue value : maxProbs.keySet() ){
+            if (maxProbs.get(value).compareTo(max) > 0) {
 
-            if( maxProbs.get(value).compareTo(max) > 0 ){
-
-                max =  maxProbs.get(value);
+                max = maxProbs.get(value);
 
                 maxValue = value;
             }
@@ -533,36 +539,39 @@ public class Forward {
 
         //initialise la liste de variables avec les valeurs max
         //si il s'agit d'un object domainValue composite
-        if( maxValue.getValue() instanceof List){
+        if (maxValue.getValue() instanceof List) {
 
-            Util.resetDomainValues(requests, (List<Domain.DomainValue>)maxValue.getValue());
+            Util.resetDomainValues(requests, (List<Domain.DomainValue>) maxValue.getValue());
 
-        }else{
+        } else {
 
             requests.get(0).setDomainValue(maxValue);
         }
+        //ajoute la liste des états initialisés en début de liste
+        List<List<Variable>> mostLikelyPath = new LinkedList();
 
-        List<List<Variable>> mostLikelyPath = new LinkedList(requests);
+        mostLikelyPath.add(requests);
+        //charge les états suivants en commencant par recuperer la liste des variables
+        //parents de la requete avec les valeurs de domaines ayant donné le maximum
+        this.loadMostLikelyPath(mostLikelyPath, maxPath.get(maxValue));
 
-        loadMostLikelyPath(mostLikelyPath, maxPath.get(maxValue));
+        return mostLikelyPath;
     }
 
-    protected void loadMostLikelyPath(List<List<Variable>> mostLikelyPath, List<Variable> maxVarsvalues){
+    protected void loadMostLikelyPath(List<List<Variable>> mostLikelyPath, List<Variable> maxVarsvalues) {
 
-        if(maxVarsvalues.isEmpty()){
-
+        //en time = 0 la liste est vide
+        if (maxVarsvalues.isEmpty()) {
             return;
         }
-
+        //ajoute les variables courantes avec leurs valeurs de domaine
+        mostLikelyPath.add(maxVarsvalues);
+        //récupère la clé correspondant à la liste de variables courantes
         String varsKey = Util.getDistribSavedKey(maxVarsvalues);
-
+        //récupère les valeurs de domaines des variables
         Domain.DomainValue valuesKey = new Domain.DomainValue(Util.getDomainValues(maxVarsvalues));
-
-        List<Variable> previousMaxVarsValues = this.mostLikelyPath.get(varsKey).get(valuesKey);
-
-        mostLikelyPath.add(previousMaxVarsValues);
-
-        loadMostLikelyPath(mostLikelyPath, previousMaxVarsValues);
+        //recupere la suite de la sequence max à partir de la signature des variables et de leurs valeurs
+        this.loadMostLikelyPath(mostLikelyPath, this.mostLikelyPath.get(varsKey).get(valuesKey));
     }
 
     /*------------------------------- GETTER SETTER ----------------------------------*/

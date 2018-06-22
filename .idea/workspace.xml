@@ -6,7 +6,7 @@
       <change beforePath="$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/inference/dynamic/Smoothing.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/dynamic/Smoothing.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/inference/dynamic/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/dynamic/Util.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,31 +24,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Forward.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java">
+      <file leaf-file-name="DynamicBayesianNetworkTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="546" column="66" selection-start-line="546" selection-start-column="66" selection-end-line="546" selection-end-column="66" />
+            <state relative-caret-position="465">
+              <caret line="47" column="43" selection-start-line="47" selection-start-column="43" selection-end-line="47" selection-end-column="43" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#25880#25881#0" expanded="true" />
-                <element signature="e#25922#25923#0" expanded="true" />
-                <element signature="e#26010#26011#0" expanded="true" />
-                <element signature="e#26048#26049#0" expanded="true" />
-                <element signature="e#26135#26136#0" expanded="true" />
-                <element signature="e#26172#26173#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Util.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Util.java">
+      <file leaf-file-name="Forward.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="663">
-              <caret line="190" column="25" selection-start-line="190" selection-start-column="25" selection-end-line="190" selection-end-column="25" />
+            <state relative-caret-position="380">
+              <caret line="271" lean-forward="true" selection-start-line="271" selection-end-line="271" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#2812#2822#0" expanded="true" />
+                <element signature="e#27071#27072#0" expanded="true" />
+                <element signature="e#27113#27114#0" expanded="true" />
+                <element signature="e#27201#27202#0" expanded="true" />
+                <element signature="e#27239#27240#0" expanded="true" />
+                <element signature="e#27326#27327#0" expanded="true" />
+                <element signature="e#27363#27364#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -115,11 +116,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
-        <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
-        <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
-        <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
-        <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
         <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
         <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
         <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
@@ -161,11 +157,16 @@
         <option value="$PROJECT_DIR$/src/inference/dynamic/Forward.java" />
         <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/Util.java" />
+        <option value="$PROJECT_DIR$/src/inference/dynamic/Backward.java" />
+        <option value="$PROJECT_DIR$/src/inference/dynamic/Util.java" />
+        <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
+        <option value="$PROJECT_DIR$/src/inference/dynamic/Smoothing.java" />
+        <option value="$PROJECT_DIR$/src/inference/dynamic/Forward.java" />
         <option value="$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java" />
-        <option value="$PROJECT_DIR$/../probability/src/inference/dynamic/Util.java" />
-        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" />
         <option value="$PROJECT_DIR$/../probability/src/inference/dynamic/Smoothing.java" />
+        <option value="$PROJECT_DIR$/../probability/src/inference/dynamic/Util.java" />
         <option value="$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java" />
+        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java" />
       </list>
     </option>
   </component>
@@ -195,7 +196,6 @@
     </navigator>
     <panes>
       <pane id="AndroidView" />
-      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -248,10 +248,18 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
+              <item name="probability" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="dynamic" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -294,7 +302,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1SmoothingTest">
+  <component name="RunManager" selected="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
     </configuration>
@@ -486,11 +494,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" />
         <item itemvalue="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1SmoothingTest" />
         <item itemvalue="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" />
         <item itemvalue="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2FilterTest" />
         <item itemvalue="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterTest" />
-        <item itemvalue="JUnit.DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" />
       </list>
     </recent_temporary>
   </component>
@@ -569,14 +577,8 @@
       <workItem from="1529489076324" duration="177000" />
       <workItem from="1529504022710" duration="5570000" />
       <workItem from="1529566171443" duration="10070000" />
-      <workItem from="1529588471496" duration="7079000" />
-    </task>
-    <task id="LOCAL-00008" summary="test elimination ask">
-      <created>1528045891722</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1528045891722</updated>
+      <workItem from="1529588471496" duration="7216000" />
+      <workItem from="1529681520200" duration="2941000" />
     </task>
     <task id="LOCAL-00009" summary="elimination ask correction de bugs dans la procedure&#10;sumMulFactors.&#10;- Nouveau facteur initialisé sans ses variables&#10;- valeur de multiplication qui doit retrouve un état precedent avant de multiplier avec une valeur fourni par une nouvelle combinaison&#10;- variable de requete initialisée posait problème car pour créer un facteur à partir de variable dont elle est une dependance&#10; elle ne doit pas être initialisé à la création du facteur mais par la suite lors de l'assignation des valeurs.">
       <created>1528055476445</created>
@@ -914,43 +916,50 @@
       <option name="project" value="LOCAL" />
       <updated>1529575066984</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="most likely path">
+      <created>1529595689676</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1529595689677</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 10h 57m 34s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 13m 01s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 10h 58m 36s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 17m 58s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 11h 10m 14s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 19m 25s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 11h 10m 27s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 20m 03s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 11h 56m 34s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 20m 10s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 16h 13m 43s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 20m 23s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 16h 19m 42s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 20m 32s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1SmoothingTest - 2018.06.21 at 16h 21m 13s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 20m 42s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder2SmoothingTest - 2018.06.21 at 16h 21m 15s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder2SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 20m 52s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1SmoothingTest - 2018.06.21 at 16h 21m 18s.xml">
-      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1SmoothingTest" configurationId="JUnit" />
+    <history-entry file="DynamicBayesianNetworkTest_DynamicBayesianNetworkUmbrellaOrder1FilterMax - 2018.06.22 at 18h 21m 01s.xml">
+      <configuration name="DynamicBayesianNetworkTest.DynamicBayesianNetworkUmbrellaOrder1FilterMax" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="385034000" />
+    <option name="totallyTimeSpent" value="388112000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -963,7 +972,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32928178" />
@@ -975,11 +983,11 @@
       <window_info anchor="right" id="Maven Projects" order="7" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.1558011" />
-      <window_info anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" weight="0.46961325" />
+      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.63425416" visible="true" weight="0.1977612" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.63425416" visible="true" weight="0.19989339" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info id="Structure" order="1" sideWeight="0.36574584" side_tool="true" weight="0.1977612" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -1033,7 +1041,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="Separation des test&#10;gestion dynamique du calcul de distribution markovienne à la demande ou à partir d'une table de frequence cumulées" />
     <MESSAGE value="test implementation dynamic bayesian network" />
     <MESSAGE value="simplification de l'extension du reseau" />
     <MESSAGE value="amélioration du reseau baysien dynamique pour gérer&#10;des ordres differents avec des modeles d'extension du reseau differents en fonction du temps pour le début de l'extension." />
@@ -1058,7 +1065,8 @@
     <MESSAGE value="correction de problème dans la procedure forward surtoute pour gerer des&#10;requetes avec des variables situées à des temps différents" />
     <MESSAGE value="révision du forwward pour chaine d'ordre supérieur à 1" />
     <MESSAGE value="réorganisation des algorithmes pour les rbd" />
-    <option name="LAST_COMMIT_MESSAGE" value="réorganisation des algorithmes pour les rbd" />
+    <MESSAGE value="most likely path" />
+    <option name="LAST_COMMIT_MESSAGE" value="most likely path" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1210,9 +1218,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2808">
           <caret line="160" column="44" selection-start-line="160" selection-start-column="44" selection-end-line="160" selection-end-column="44" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1298,9 +1303,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4860">
           <caret line="275" selection-start-line="275" selection-end-line="275" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1349,16 +1351,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3150">
-          <caret line="189" column="41" selection-start-line="189" selection-start-column="41" selection-end-line="189" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/domain/Domain.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1890">
@@ -1383,31 +1375,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="247" lean-forward="true" selection-start-line="247" selection-end-line="247" />
+        <state relative-caret-position="844">
+          <caret line="135" column="41" selection-start-line="135" selection-start-column="41" selection-end-line="135" selection-end-column="41" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#backwardSum#0;class#Backward#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Smoothing.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="713">
-          <caret line="190" selection-start-line="190" selection-end-line="190" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1386">
-          <caret line="77" column="39" lean-forward="true" selection-start-line="77" selection-start-column="39" selection-end-line="77" selection-end-column="39" />
+        <state relative-caret-position="-1591">
+          <caret line="62" column="92" lean-forward="true" selection-start-line="62" selection-start-column="92" selection-end-line="62" selection-end-column="92" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1416,26 +1397,48 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Util.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="663">
-          <caret line="190" column="25" selection-start-line="190" selection-start-column="25" selection-end-line="190" selection-end-column="25" />
+        <state relative-caret-position="105">
+          <caret line="191" lean-forward="true" selection-start-line="191" selection-end-line="191" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="546" column="66" selection-start-line="546" selection-start-column="66" selection-end-line="546" selection-end-column="66" />
+        <state relative-caret-position="-5587">
+          <caret line="169" lean-forward="true" selection-start-line="169" selection-end-line="169" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#25880#25881#0" expanded="true" />
-            <element signature="e#25922#25923#0" expanded="true" />
-            <element signature="e#26010#26011#0" expanded="true" />
-            <element signature="e#26048#26049#0" expanded="true" />
-            <element signature="e#26135#26136#0" expanded="true" />
-            <element signature="e#26172#26173#0" expanded="true" />
+            <element signature="method#backwardSum#0;class#Backward#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="271" lean-forward="true" selection-start-line="271" selection-end-line="271" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2812#2822#0" expanded="true" />
+            <element signature="e#27071#27072#0" expanded="true" />
+            <element signature="e#27113#27114#0" expanded="true" />
+            <element signature="e#27201#27202#0" expanded="true" />
+            <element signature="e#27239#27240#0" expanded="true" />
+            <element signature="e#27326#27327#0" expanded="true" />
+            <element signature="e#27363#27364#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="47" column="43" selection-start-line="47" selection-start-column="43" selection-end-line="47" selection-end-column="43" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

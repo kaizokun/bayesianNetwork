@@ -245,7 +245,6 @@ public class Backward {
         return sum;
     }
 
-
     /**
      * Tentative d'implementation du backward pour gerer les chaines de markov d'order superieur à 1
      * */

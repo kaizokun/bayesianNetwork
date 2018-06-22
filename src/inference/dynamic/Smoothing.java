@@ -60,7 +60,7 @@ public class Smoothing {
 
     public AbstractDouble smoothing(Variable request, int timeEnd, int markovOrder) {
 
-        return this.smoothing(new LinkedList(Arrays.asList(new Variable[]{request})), timeEnd, markovOrder);
+        return this.smoothing(Arrays.asList(new Variable[]{request}), timeEnd, markovOrder);
     }
 
     protected AbstractDouble smoothing(List<Variable> requests, int timeEnd, int markovOrder) {
