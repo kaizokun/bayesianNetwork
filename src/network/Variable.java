@@ -441,4 +441,26 @@ public class Variable {
 
         this.matrix = matrix;
     }
+
+    public String getMatrixView(){
+
+        if(matrix == null){
+
+            return "EMPTY MATRX";
+        }
+
+        StringBuilder builder = new StringBuilder("\n");
+
+        for(AbstractDouble[] row : this.matrix){
+
+            for(AbstractDouble col : row){
+
+                builder.append(String.format("[%04.3f]", col.getDoubleValue()));
+            }
+
+            builder.append('\n');
+        }
+
+        return builder.toString();
+    }
 }

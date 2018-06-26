@@ -222,15 +222,22 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
 
 
-    public Variable mergeStateVariables(int t) {
+    public Variable mergeStateVariables(int t, List<Variable> variablesToMerge) {
 
         StringBuilder labelBuilder = new StringBuilder();
 
         List<IDomain> subDomains = new LinkedList<>();
 
-        List<Variable> tVars =  new ArrayList<>(this.getTimeVariables(t).values());
+        List<Variable> tVars =  new ArrayList<>();
+
+        for(Variable variable : variablesToMerge){
+
+           tVars.add(this.getVariable(t, variable));
+        }
 
         Collections.sort(tVars, Variable.varLabelComparator);
+
+        System.out.println("TVARS "+tVars);
 
         for(Variable variable : tVars){
 
@@ -268,7 +275,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 //multiplie les probabilités
                 while(tVarsIterator.hasNext()){
 
-                    prob.multiply( tVarsIterator.next().getProbabilityForCurrentValue());
+                   prob =  prob.multiply( tVarsIterator.next().getProbabilityForCurrentValue());
                 }
 
                 matrix[0][col] = prob;
@@ -283,6 +290,10 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             List<Variable> tVarsParents =  new ArrayList<>(this.getTimeVariables(t - 1).values());
 
             Collections.sort(tVarsParents, Variable.varLabelComparator);
+
+            System.out.println(tVarsParents);
+
+            System.out.println(domainValuesList);
 
             int row = 0;
             //pour chaque combinaisons de valeurs pouvant être prises par les variables parents
@@ -299,13 +310,20 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 for(List<Domain.DomainValue> domainValuesChild : domainValuesList) {
 
+                    Iterator<Variable> tVarsIterator = tVars.iterator();
+                    //assigne une combinaison de valeurs aux variables
+                    for(Domain.DomainValue domainValue : domainValuesParents){
+
+                        tVarsIterator.next().setDomainValue(domainValue);
+                    }
+
                     AbstractDouble prob = doubleFactory.getNew(1.0);
 
-                    Iterator<Variable> tVarsIterator = tVars.iterator();
+                    tVarsIterator = tVars.iterator();
                     //multiplie les probabilités
                     while (tVarsIterator.hasNext()) {
 
-                        prob.multiply(tVarsIterator.next().getProbabilityForCurrentValue());
+                        prob = prob.multiply(tVarsIterator.next().getProbabilityForCurrentValue());
                     }
 
                     matrix[row][col] = prob;

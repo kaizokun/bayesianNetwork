@@ -14,8 +14,7 @@ import java.util.Map;
 
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
-import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.RAIN;
-import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
+import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
 public class BayesianNetworkFactory {
 
@@ -128,10 +127,9 @@ public class BayesianNetworkFactory {
 
     }
 
-
     public enum UMBRELLA_NETWORK_VARS {
 
-        UMBRELLA, RAIN
+        UMBRELLA, COAT, RAIN, CLOUD,
     }
 
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder1() {
@@ -187,17 +185,79 @@ public class BayesianNetworkFactory {
         return network;
     }
 
-    public static DynamicBayesianNetwork getUmbrellaMMCDynamicNetworkOrder1() {
+
+    public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder1TwoStates() {
+
+        DynamicBayesianNetwork network = getUmbrellaDynamicNetworkOrder1();
+
+        IDomain booleanDomain = DomainFactory.getBooleanDomain();
+
+        //Rain time 0
+        ProbabilityCompute tcpCloud0 = network.getTCP(
+                booleanDomain,
+                new Double[][]{{0.7, 1 - 0.3}});
+
+        Variable cloud = network.addRootVariable(CLOUD.toString(), booleanDomain, tcpCloud0);
+
+        //Cloud 1 dependencies
+
+        List<Variable> dependencies = new LinkedList<>();
+
+        dependencies.add(cloud);
+
+        ProbabilityCompute tcpCloud = network.getTCP(
+                dependencies,
+                booleanDomain,
+                new Double[][]{{0.8, 1 - 0.8},
+                        {0.2, 1 - 0.8}});
+        //création du model avec la tcp associé
+        Model cloudExtensionModel = new Model(tcpCloud);
+        //ajoute une dependence à la variable avec une profondeur de 1
+        cloudExtensionModel.addDependencie(cloud, 1);
+
+        network.addTransitionModel(cloud, cloudExtensionModel);
+
+        //coat time 1
+
+        Variable coat = new Variable(COAT.toString(), booleanDomain);
+
+        ProbabilityCompute tcpCoat = network.getTCP(
+                dependencies,
+                booleanDomain,
+                new Double[][]{{0.9, 1 - 0.9},
+                        {0.4, 1 - 0.4}});
+
+        Model coatExtensionModel = new Model(tcpCoat);
+
+        coatExtensionModel.addDependencie(cloud);
+
+        network.addCaptorModel(coat, coatExtensionModel);
+
+        return network;
+    }
+
+    public static DynamicBayesianNetwork getUmbrellaMMCDynamicNetwork() {
 
         //récuperer le reseau de base
-        DynamicBayesianNetwork network = getUmbrellaDynamicNetworkOrder1();
+        DynamicBayesianNetwork network = getUmbrellaDynamicNetworkOrder1TwoStates();
         //l'étendre une fois
         network.extend();
 
-        network.mergeStateVariables(0);
+        List<Variable> varsToMerge = new LinkedList<>();
 
+        varsToMerge.add(network.getVariable(RAIN.toString()));
 
+        varsToMerge.add(network.getVariable(CLOUD.toString()));
 
+        Variable megaRootVar = network.mergeStateVariables(0, varsToMerge);
+
+        Variable megaVar = network.mergeStateVariables(1, varsToMerge);
+
+        System.out.println(megaRootVar.getMatrixView());
+
+        System.out.println(megaVar.getMatrixView());
+
+        return network;
     }
 
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2() {
