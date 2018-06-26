@@ -12,10 +12,9 @@ import network.dynamic.Model.Dependency;
 import java.util.*;
 
 import static inference.dynamic.Util.getTreeIdent;
-import static network.BayesianNetwork.requestValuesCombinations;
+import static network.BayesianNetwork.domainValuesCombinations;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
-
 
     protected int time = 0;
 
@@ -35,12 +34,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         Variable root = super.addRootVariable(label, domain, probabilityCompute);
 
-        this.getTimeVariable(this.time).put(root, root);
+        this.getTimeVariables(this.time).put(root, root);
 
         return root;
     }
 
-    private Map<Variable, Variable> getTimeVariable(int time) {
+    public Map<Variable, Variable> getTimeVariables(int time) {
 
         Map<Variable, Variable> variables = this.timeVariables.get(time);
 
@@ -175,7 +174,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //en correspondance avec les entrées TCP
             for (Dependency dependencie : model.getDependencies()) {
 
-                Variable lastDep = this.getTimeVariable(timeParent).get(dependencie.getDependency());
+                Variable lastDep = this.getTimeVariables(timeParent).get(dependencie.getDependency());
 
                 // System.out.println("       DEP : "+dependencie.getDependency()+" "+dependencie.getMarkovOrder());
 
@@ -207,7 +206,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //enregistrement des variables pour access rapide
         for (Variable newVar : newVars) {
 
-            this.getTimeVariable(time).put(newVar, newVar);
+            this.getTimeVariables(time).put(newVar, newVar);
         }
 
         //(1)
@@ -221,6 +220,132 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
+
+
+    public Variable mergeStateVariables(int t) {
+
+        StringBuilder labelBuilder = new StringBuilder();
+
+        List<IDomain> subDomains = new LinkedList<>();
+
+        List<Variable> tVars =  new ArrayList<>(this.getTimeVariables(t).values());
+
+        Collections.sort(tVars, Variable.varLabelComparator);
+
+        for(Variable variable : tVars){
+
+            labelBuilder.append(variable.getLabel()+"-");
+
+            subDomains.add(variable.getDomain());
+        }
+
+        labelBuilder.deleteCharAt(labelBuilder.length() - 1);
+
+        Variable megaVariable = new Variable(labelBuilder.toString(), new Domain(subDomains), tVars);
+
+        List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(tVars);
+
+        AbstractDouble[][] matrix;
+
+        if(t == 0){
+
+            matrix = new AbstractDouble[1][domainValuesList.size()];
+
+            int col = 0;
+            //pour chaque combinaisons de valeurs pouvant être prises par les variables
+            for(List<Domain.DomainValue> domainValues : domainValuesList){
+
+                Iterator<Variable> tVarsIterator = tVars.iterator();
+                //assigne une combinaison de valeurs aux variables
+                for(Domain.DomainValue domainValue : domainValues){
+
+                    tVarsIterator.next().setDomainValue(domainValue);
+                }
+
+                AbstractDouble prob = doubleFactory.getNew(1.0);
+
+                tVarsIterator = tVars.iterator();
+                //multiplie les probabilités
+                while(tVarsIterator.hasNext()){
+
+                    prob.multiply( tVarsIterator.next().getProbabilityForCurrentValue());
+                }
+
+                matrix[0][col] = prob;
+
+                col ++;
+            }
+
+        }else{
+
+            matrix = new AbstractDouble[domainValuesList.size()][domainValuesList.size()];
+            //liste des variables au temps precedents logiquement la même
+            List<Variable> tVarsParents =  new ArrayList<>(this.getTimeVariables(t - 1).values());
+
+            Collections.sort(tVarsParents, Variable.varLabelComparator);
+
+            int row = 0;
+            //pour chaque combinaisons de valeurs pouvant être prises par les variables parents
+            for(List<Domain.DomainValue> domainValuesParents : domainValuesList){
+
+                Iterator<Variable> tVarsParentsIterator = tVarsParents.iterator();
+                //assigne une combinaison de valeurs aux variables
+                for(Domain.DomainValue domainValue : domainValuesParents){
+
+                    tVarsParentsIterator.next().setDomainValue(domainValue);
+                }
+
+                int col = 0;
+
+                for(List<Domain.DomainValue> domainValuesChild : domainValuesList) {
+
+                    AbstractDouble prob = doubleFactory.getNew(1.0);
+
+                    Iterator<Variable> tVarsIterator = tVars.iterator();
+                    //multiplie les probabilités
+                    while (tVarsIterator.hasNext()) {
+
+                        prob.multiply(tVarsIterator.next().getProbabilityForCurrentValue());
+                    }
+
+                    matrix[row][col] = prob;
+
+                    col ++;
+                }
+
+                row ++;
+            }
+        }
+
+        megaVariable.setMatrix(matrix);
+
+        /*
+        * Récuperer la liste des variables au temps t
+        *
+        * Trier les variables par label
+        *
+        * Creer une variable dont le label est une combinaison de tout les labels
+        *
+        * et dont le domaine est un domaine composée de tous les domaines des variables dans leur ordre
+        *
+        * recuperer les combinaison de valeurs pour les variables
+        *
+        * pour le temps 0 la matrice est un vecteur colones de la taille du nombre de combinaisons
+        *
+        * pour le temps > 0 la matrice est une matrice carré de la taille du nombre de combis au carré
+        *
+        * //premiere boucle valeurs parents
+        * Pour chaque combiniaison
+        *
+        *
+        * Fin Pour
+        *
+        *
+        * */
+
+        return megaVariable;
+
+    }
 
     /*---------------------------GETTER SETTER -----------------------*/
 
@@ -264,7 +389,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             loadTree(var.getChildren(), builder, depth + 1);
         }
     }
-
 
 
 }

@@ -11,4 +11,6 @@ public interface AbstractDouble<Type> extends Comparable<Type> {
 
     AbstractDouble divide(Type value);
 
+    Double getDoubleValue();
+
 }

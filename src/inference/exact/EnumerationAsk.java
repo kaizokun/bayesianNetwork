@@ -34,7 +34,7 @@ public class EnumerationAsk {
 
         LinkedList<Variable> vars = network.getTopologicalOrder();
 
-        List<List<Domain.DomainValue>> requestValuesCombinaisons = BayesianNetwork.requestValuesCombinations(request);
+        List<List<Domain.DomainValue>> requestValuesCombinaisons = BayesianNetwork.domainValuesCombinations(request);
 
         //pour chaque combinaison de valeur
         for(List<Domain.DomainValue> requestValues : requestValuesCombinaisons){

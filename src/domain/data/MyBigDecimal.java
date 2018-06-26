@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 
 public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
 
-   private java.math.BigDecimal bigDecimal;
+   private BigDecimal bigDecimal;
 
-    public MyBigDecimal(java.math.BigDecimal bigDecimal) {
+    public MyBigDecimal(BigDecimal bigDecimal) {
 
         this.bigDecimal = bigDecimal;
     }
@@ -49,5 +49,11 @@ public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
     @Override
     public int compareTo(MyBigDecimal o) {
         return this.bigDecimal.compareTo(o.bigDecimal);
+    }
+
+    @Override
+    public Double getDoubleValue() {
+
+        return this.bigDecimal.doubleValue();
     }
 }

@@ -44,4 +44,9 @@ public class MyDouble implements AbstractDouble<MyDouble> {
 
         return this.value.compareTo(o.value);
     }
+
+    @Override
+    public Double getDoubleValue() {
+        return this.value;
+    }
 }

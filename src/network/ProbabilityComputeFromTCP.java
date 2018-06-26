@@ -17,12 +17,16 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
     protected AbstractDoubleFactory doubleFactory;
 
+    protected Double[][] matrice;
+
     public ProbabilityComputeFromTCP(IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
 
         this(new ArrayList<>(), varDom, entries, doubleFactory);
     }
 
     public ProbabilityComputeFromTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
+
+        this.matrice = entries;
 
         this.doubleFactory = doubleFactory;
 
@@ -33,7 +37,6 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         this.cumulativeFrequencies = new Hashtable<>();
 
         this.initCulumativeFrequencies(varDom);
-
     }
 
     /*===================== INITIALISATION ==============================*/

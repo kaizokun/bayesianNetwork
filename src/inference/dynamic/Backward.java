@@ -2,13 +2,14 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
+import network.BayesianNetwork;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 
 import java.util.*;
 
 import static inference.dynamic.Util.*;
-import static network.BayesianNetwork.requestValuesCombinations;
+import static network.BayesianNetwork.domainValuesCombinations;
 
 public class Backward {
 
@@ -41,7 +42,7 @@ public class Backward {
         //atteind une requete située à la derniere phase temporelle si plusieurs elles doivent être au même temps
         if (requests.get(0).getTime() == timeEnd) {
 
-            List<List<Domain.DomainValue>> domainValuesLists = requestValuesCombinations(requests);
+            List<List<Domain.DomainValue>> domainValuesLists = BayesianNetwork.domainValuesCombinations(requests);
 
             for (List<Domain.DomainValue> domainValues : domainValuesLists) {
 
@@ -113,7 +114,7 @@ public class Backward {
         if(backwardLogDetails)
             System.out.println(ident+"FULL REQUEST "+fullRequest);
 
-        List<List<Domain.DomainValue>> domainValuesLists = requestValuesCombinations(fullRequest);
+        List<List<Domain.DomainValue>> domainValuesLists = BayesianNetwork.domainValuesCombinations(fullRequest);
 
         AbstractDouble totalRequest = network.getDoubleFactory().getNew(0.0);
         //pour combinaison de valeur de la requete
@@ -174,7 +175,7 @@ public class Backward {
 
         AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
 
-        List<List<Domain.DomainValue>> hiddenVarsValues = requestValuesCombinations(nextObservation.getDependencies());
+        List<List<Domain.DomainValue>> hiddenVarsValues = BayesianNetwork.domainValuesCombinations(nextObservation.getDependencies());
 
         String key = getDistribSavedKey(nextObservation.getDependencies());
 
@@ -261,7 +262,7 @@ public class Backward {
         //atteind une requete située à la derniere phase temporelle si plusieurs elles doivent être au même temps
         if (requests.get(0).getTime() == timeEnd) {
 
-            List<List<Domain.DomainValue>> domainValuesLists = requestValuesCombinations(requests);
+            List<List<Domain.DomainValue>> domainValuesLists = BayesianNetwork.domainValuesCombinations(requests);
 
             for (List<Domain.DomainValue> domainValues : domainValuesLists) {
 
@@ -392,7 +393,7 @@ public class Backward {
         if(backwardLogDetails)
             System.out.println(ident+"FULL REQUEST "+fullRequest);
 
-        List<List<Domain.DomainValue>> domainValuesLists = requestValuesCombinations(fullRequest);
+        List<List<Domain.DomainValue>> domainValuesLists = BayesianNetwork.domainValuesCombinations(fullRequest);
 
         AbstractDouble totalRequest = network.getDoubleFactory().getNew(0.0);
         //pour combinaison de valeur de la requete
@@ -471,7 +472,7 @@ public class Backward {
 
         AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
 
-        List<List<Domain.DomainValue>> hiddenVarsValues = requestValuesCombinations(nextObservation.getDependencies());
+        List<List<Domain.DomainValue>> hiddenVarsValues = BayesianNetwork.domainValuesCombinations(nextObservation.getDependencies());
 
         String fullKey = "";
 

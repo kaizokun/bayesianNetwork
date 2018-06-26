@@ -7,7 +7,7 @@ import domain.data.AbstractDoubleFactory;
 
 public interface ProbabilityCompute {
 
-    AbstractDouble getProbability(Variable value);
+    AbstractDouble getProbability(Variable var);
 
     Domain.DomainValue getRandomValue(Variable var);
 

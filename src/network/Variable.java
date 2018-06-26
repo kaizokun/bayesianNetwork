@@ -9,6 +9,18 @@ import java.util.*;
 
 public class Variable {
 
+    public static Comparator<Variable> varLabelComparator;
+
+    static{
+
+        varLabelComparator = new Comparator<Variable>() {
+            @Override
+            public int compare(Variable v1, Variable v2) {
+                return v1.getLabel().compareTo(v2.getLabel());
+            }
+        };
+    }
+
     protected IDomain domain;
 
     protected String label;
@@ -29,7 +41,11 @@ public class Variable {
 
     protected List<Variable> observations;
 
+    protected List<Variable> compoVars;
+
     protected int time;
+
+    protected AbstractDouble[][] matrix;
 
     //utilisé dans la recuperation des noeuds dans l'odre topologique
     //pour savoir si ils ont été ajoutés, pas vraiment une propriété mais plus pratique que de créer
@@ -50,6 +66,15 @@ public class Variable {
         this.domain = domain;
 
         this.label = label;
+    }
+
+    public Variable(String label, IDomain domain, Collection<Variable> compoVars){
+
+        this.domain = domain;
+
+        this.label = label;
+
+        this.compoVars = new LinkedList<>(compoVars);
     }
 
     public Variable(String label){
@@ -398,5 +423,22 @@ public class Variable {
     public List<Variable> getObservations() {
 
         return observations;
+    }
+
+    public List<Variable> getCompoVars() {
+        return compoVars;
+    }
+
+    public void setCompoVars(List<Variable> compoVars) {
+        this.compoVars = compoVars;
+    }
+
+    public AbstractDouble[][] getMatrix() {
+        return matrix;
+    }
+
+    public void setMatrix(AbstractDouble[][] matrix) {
+
+        this.matrix = matrix;
     }
 }

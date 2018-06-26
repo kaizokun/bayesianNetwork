@@ -2,14 +2,15 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
+import network.BayesianNetwork;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 
 import java.util.*;
 
 import static inference.dynamic.Util.*;
-import static network.BayesianNetwork.requestValuesCombinations;
-import static network.BayesianNetwork.requestValuesCombinationsCheckInit;
+import static network.BayesianNetwork.domainValuesCombinations;
+import static network.BayesianNetwork.domainValuesCombinationsCheckInit;
 
 public class Forward {
 
@@ -174,7 +175,7 @@ public class Forward {
             System.out.println(ident + "FULL REQUEST " + fullRequest.values());
         }
 
-        List<List<Domain.DomainValue>> requestsValuesCombinations = requestValuesCombinations(fullRequest.values());
+        List<List<Domain.DomainValue>> requestsValuesCombinations = BayesianNetwork.domainValuesCombinations(fullRequest.values());
 
         List<Domain.DomainValue> originalValues = Util.getDomainValues(fullRequest.values());
 
@@ -382,7 +383,7 @@ public class Forward {
         //Ca ne pose pas de problème pour une requete avec des variables
         //situées dans la même coupe temporelles ou tout leur parent sont des variables cachées
 
-        List<List<Domain.DomainValue>> hiddenVarsCombinations = requestValuesCombinationsCheckInit(obsParentState.getDependencies());
+        List<List<Domain.DomainValue>> hiddenVarsCombinations = BayesianNetwork.domainValuesCombinationsCheckInit(obsParentState.getDependencies());
 
         String key = getDistribSavedKey(obsParentState.getDependencies());
 

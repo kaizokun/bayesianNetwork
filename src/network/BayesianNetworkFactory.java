@@ -10,6 +10,7 @@ import network.dynamic.Model;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
@@ -186,6 +187,18 @@ public class BayesianNetworkFactory {
         return network;
     }
 
+    public static DynamicBayesianNetwork getUmbrellaMMCDynamicNetworkOrder1() {
+
+        //récuperer le reseau de base
+        DynamicBayesianNetwork network = getUmbrellaDynamicNetworkOrder1();
+        //l'étendre une fois
+        network.extend();
+
+        network.mergeStateVariables(0);
+
+
+
+    }
 
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2() {
 

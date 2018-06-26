@@ -6,6 +6,8 @@ public class Domain implements IDomain {
 
     protected List<DomainValue> values;
 
+    protected List<IDomain> subDomains;
+
     protected Hashtable<Object, DomainValue> index = new Hashtable<>();
 
     public Domain(Object... values) {
@@ -20,6 +22,11 @@ public class Domain implements IDomain {
 
             this.index.put(values[i], domainValue);
         }
+    }
+
+    public Domain(List<IDomain> subDomains){
+
+        this.subDomains = new LinkedList<>(subDomains);
     }
 
     @Override
@@ -109,5 +116,13 @@ public class Domain implements IDomain {
         public int hashCode() {
             return Objects.hash(value);
         }
+    }
+
+    public List<IDomain> getSubDomains() {
+        return subDomains;
+    }
+
+    public void setSubDomains(List<IDomain> subDomains) {
+        this.subDomains = subDomains;
     }
 }

@@ -4,11 +4,12 @@ import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import domain.data.MyDoubleFactory;
+import network.BayesianNetwork;
 import network.Variable;
 
 import java.util.*;
 
-import static network.BayesianNetwork.requestValuesCombinations;
+import static network.BayesianNetwork.domainValuesCombinations;
 
 public class Util {
 
@@ -73,7 +74,7 @@ public class Util {
                                                                               List<Map<Domain.DomainValue, AbstractDouble>> distributions) {
 
         //Il faut récuperer chaque combinaison de valeur pour chaque variable de la requete
-        List<List<Domain.DomainValue>> requestValuesList = requestValuesCombinations(requests);
+        List<List<Domain.DomainValue>> requestValuesList = BayesianNetwork.domainValuesCombinations(requests);
 
         Map<Domain.DomainValue, AbstractDouble> finalDistribution = new Hashtable<>();
 
