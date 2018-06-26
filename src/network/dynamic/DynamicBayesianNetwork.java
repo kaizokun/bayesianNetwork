@@ -220,8 +220,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-
-
     public Variable mergeStateVariables(int t, List<Variable> variablesToMerge) {
 
         StringBuilder labelBuilder = new StringBuilder();
@@ -236,8 +234,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
 
         Collections.sort(tVars, Variable.varLabelComparator);
-
-        System.out.println("TVARS "+tVars);
 
         for(Variable variable : tVars){
 
@@ -287,13 +283,15 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             matrix = new AbstractDouble[domainValuesList.size()][domainValuesList.size()];
             //liste des variables au temps precedents logiquement la même
-            List<Variable> tVarsParents =  new ArrayList<>(this.getTimeVariables(t - 1).values());
+
+            List<Variable> tVarsParents = new ArrayList<>();
+
+            for(Variable variable : variablesToMerge){
+
+                tVarsParents.add(this.getVariable(t - 1, variable));
+            }
 
             Collections.sort(tVarsParents, Variable.varLabelComparator);
-
-            System.out.println(tVarsParents);
-
-            System.out.println(domainValuesList);
 
             int row = 0;
             //pour chaque combinaisons de valeurs pouvant être prises par les variables parents
@@ -308,11 +306,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 int col = 0;
 
-                for(List<Domain.DomainValue> domainValuesChild : domainValuesList) {
+                for(List<Domain.DomainValue> domainValuesChild : domainValuesList){
 
                     Iterator<Variable> tVarsIterator = tVars.iterator();
                     //assigne une combinaison de valeurs aux variables
-                    for(Domain.DomainValue domainValue : domainValuesParents){
+                    for(Domain.DomainValue domainValue : domainValuesChild){
 
                         tVarsIterator.next().setDomainValue(domainValue);
                     }

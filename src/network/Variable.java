@@ -449,16 +449,41 @@ public class Variable {
             return "EMPTY MATRX";
         }
 
+        List<List<Domain.DomainValue>> domainValuesLists = BayesianNetwork.domainValuesCombinations(this.compoVars);
+
         StringBuilder builder = new StringBuilder("\n");
+
+        builder.append(label+'\n');
+
+        if(matrix.length > 1) {
+
+            builder.append(String.format("%6s", ""));
+        }
+
+        for(List<Domain.DomainValue> domainValues : domainValuesLists){
+
+            builder.append(String.format("%-7s", domainValues));
+        }
+
+        builder.append('\n');
+
+        int r = 0 ;
 
         for(AbstractDouble[] row : this.matrix){
 
+            if(matrix.length > 1) {
+
+                builder.append(String.format("%5s", domainValuesLists.get(r)));
+            }
+
             for(AbstractDouble col : row){
 
-                builder.append(String.format("[%04.3f]", col.getDoubleValue()));
+                builder.append(String.format("[%.3f]", col.getDoubleValue()));
             }
 
             builder.append('\n');
+
+            r ++;
         }
 
         return builder.toString();
