@@ -156,10 +156,9 @@ public class BayesianNetwork {
     }
 
     public AbstractDoubleFactory getDoubleFactory() {
+
         return doubleFactory;
     }
-
-
 
     /*=================================UTILS=======================================*/
 
@@ -197,8 +196,8 @@ public class BayesianNetwork {
         return requestValuesCombinaisons;
     }
 
-
-    public static void domainValuesCombinationsCheckInit(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar) {
+    public static void domainValuesCombinationsCheckInit(List<List<Domain.DomainValue>> requestValuesCombinaisons,
+                                                         LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar) {
 
         //si aucune variable restantes
         //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes

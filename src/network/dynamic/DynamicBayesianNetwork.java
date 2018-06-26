@@ -224,7 +224,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     }
 
 
-    private void loadVarDistrib(AbstractDouble[] row, List<Variable> tVars, List<List<Domain.DomainValue>> domainValuesList){
+    private static void loadVarDistrib(AbstractDouble[] row, List<Variable> tVars, List<List<Domain.DomainValue>> domainValuesList, AbstractDoubleFactory doubleFactory){
 
         int col = 0;
         //pour chaque combinaisons de valeurs pouvant être prises par les variables
@@ -251,7 +251,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             col ++;
         }
     }
-
+/*
     private List<Variable> copyTimeVarsAndSort(int t, List<Variable> vars){
 
         List<Variable> varsListCopy =  new ArrayList<>();
@@ -265,12 +265,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         return varsListCopy;
     }
+*/
+    public static Variable mergeObservationVariables(List<Variable> obs, List<Variable> tStates, AbstractDoubleFactory doubleFactory){
 
-    public Variable mergeObservationVariable(int t, List<Variable> observations, List<Variable> parentStates){
+       // List<Variable> obs = copyTimeVarsAndSort(t, observations);
 
-        List<Variable> tObs = copyTimeVarsAndSort(t, observations);
-
-        List<Variable> tStates =  copyTimeVarsAndSort(t, parentStates);
+        //List<Variable> tStates =  copyTimeVarsAndSort(t, parentStates);
 
         //combinaison de valeurs pour les parents des observations
         List<List<Domain.DomainValue>> statesDomainValuesList = BayesianNetwork.domainValuesCombinations(tStates);
@@ -279,14 +279,14 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //que peuvent prendre le sobservations à un temps t
         //stockées dans la megaVariable et récuperables en fonction de la combinaison de valeurs
         //qui formera la clé pour chaque matrice
-        List<List<Domain.DomainValue>> obsDomainValuesList = BayesianNetwork.domainValuesCombinations(observations);
+        List<List<Domain.DomainValue>> obsDomainValuesList = BayesianNetwork.domainValuesCombinations(obs);
 
         //liste des matrices
         Map<String, AbstractDouble[][]> matrixMap = new Hashtable<>();
         //pour chaque combinaison de valeur prises par toutes les observations
         for(List<Domain.DomainValue> obsDomainValues : obsDomainValuesList){
             //initialisation des observations
-            Iterator<Variable> tObsIterator = tObs.iterator();
+            Iterator<Variable> tObsIterator = obs.iterator();
 
             for(Domain.DomainValue obsDomainValue : obsDomainValues){
 
@@ -294,6 +294,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             }
 
             AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
+
+            for(int r = 0 ; r < statesDomainValuesList.size() ; r ++) {
+                for (int c = 0; c < statesDomainValuesList.size(); c++) {
+                    obsMatrix[r][c] = doubleFactory.getNew(0.0);
+                }
+            }
 
             int col = 0;
 
@@ -310,7 +316,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 AbstractDouble prob = doubleFactory.getNew(1.0);
 
-                tObsIterator = tObs.iterator();
+                tObsIterator = obs.iterator();
 
                 while(tObsIterator.hasNext()){
 
@@ -325,33 +331,37 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             matrixMap.put(obsDomainValues.toString(), obsMatrix);
         }
 
-        return new Variable(tObs, tStates, matrixMap);
+        return new Variable(obs, tStates, matrixMap);
     }
 
-    public Variable mergeStateVariables(int t, List<Variable> statesToMerge) {
+    public static Variable mergeStateVariables(List<Variable> states, AbstractDoubleFactory doubleFactory) {
 
-        List<Variable> tStates =  copyTimeVarsAndSort(t, statesToMerge);
+        //List<Variable> states =  copyTimeVarsAndSort(t, statesToMerge);
 
         List<Variable> tVarsParents = new ArrayList<>();
 
-        List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(tStates);
+        List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(states);
 
         AbstractDouble[][] matrix;
-
-        if(t == 0){
+        //si variables de temps 0
+        if(states.get(0).getDependencies().isEmpty()){
 
             matrix = new AbstractDouble[1][domainValuesList.size()];
 
-            loadVarDistrib(matrix[0], tStates, domainValuesList);
+            loadVarDistrib(matrix[0], states, domainValuesList, doubleFactory);
 
         }else{
 
             matrix = new AbstractDouble[domainValuesList.size()][domainValuesList.size()];
-            //liste des variables au temps precedents logiquement la même
-            for(Variable variable : statesToMerge){
+            //Set des variables parents
+            Set<Variable> parents = new LinkedHashSet<>();
 
-                tVarsParents.add(this.getVariable(t - 1, variable));
+            for(Variable state : states){
+
+                parents.addAll(state.getDependencies());
             }
+
+            tVarsParents.addAll(parents);
 
             Collections.sort(tVarsParents, Variable.varLabelComparator);
 
@@ -368,7 +378,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 int col = 0;
 
-                loadVarDistrib(matrix[row], tStates, domainValuesList);
+                loadVarDistrib(matrix[row], states, domainValuesList, doubleFactory);
 
                 row ++;
             }
@@ -378,33 +388,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         matrixMap.put(Variable.ALL_VALUES, matrix);
 
-        return new Variable(tStates, tVarsParents, matrixMap);
-
-        /*
-        * Récuperer la liste des variables au temps t
-        *
-        * Trier les variables par label
-        *
-        * Creer une variable dont le label est une combinaison de tout les labels
-        *
-        * et dont le domaine est un domaine composée de tous les domaines des variables dans leur ordre
-        *
-        * recuperer les combinaison de valeurs pour les variables
-        *
-        * pour le temps 0 la matrice est un vecteur colones de la taille du nombre de combinaisons
-        *
-        * pour le temps > 0 la matrice est une matrice carré de la taille du nombre de combis au carré
-        *
-        * //premiere boucle valeurs parents
-        * Pour chaque combiniaison
-        *
-        *
-        * Fin Pour
-        *
-        *
-        * */
-
-
+        return new Variable(states, tVarsParents, matrixMap);
     }
 
     /*---------------------------GETTER SETTER -----------------------*/

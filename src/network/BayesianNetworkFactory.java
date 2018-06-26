@@ -2,15 +2,13 @@ package network;
 
 import domain.DomainFactory;
 import domain.IDomain;
+import domain.data.AbstractDoubleFactory;
 import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.Model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
@@ -241,6 +239,56 @@ public class BayesianNetworkFactory {
         DynamicBayesianNetwork network = getUmbrellaDynamicNetworkOrder1TwoStates();
 
         return network;
+    }
+
+    public static DynamicBayesianNetwork getUmbrellaMMCDynamicNetworkOneVars() {
+
+        AbstractDoubleFactory doubleFactory = new MyDoubleFactory();
+
+        IDomain booleanDomain = DomainFactory.getBooleanDomain();
+
+        //Rain time 0
+        ProbabilityCompute tcpRain0 =  new ProbabilityComputeFromTCP(
+                booleanDomain, new Double[][]{{0.5, 1 - 0.5}},
+                doubleFactory);
+
+        Variable rain0 = new Variable(RAIN.toString(), booleanDomain, tcpRain0);
+
+        //Rain time 1
+
+        ProbabilityCompute tcpRain1 = new ProbabilityComputeFromTCP(
+                Arrays.asList(new Variable[]{rain0}),
+                booleanDomain,
+                new Double[][]{{0.7, 1 - 0.7},
+                                {0.3, 1 - 0.3}},
+                doubleFactory);
+
+        Variable rain1 = new Variable(RAIN.toString(), booleanDomain, tcpRain1, Arrays.asList(new Variable[]{rain0}));
+
+        //Umbrella time 1
+
+        ProbabilityCompute tcpUmbrella1 = new ProbabilityComputeFromTCP(
+                Arrays.asList(new Variable[]{rain1}),
+                booleanDomain,
+                new Double[][]{{0.9, 1 - 0.9},
+                        {0.2, 1 - 0.2}},
+                doubleFactory);
+
+        Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, Arrays.asList(new Variable[]{rain1}));
+
+        Variable megaState = DynamicBayesianNetwork.mergeStateVariables(
+                Arrays.asList(new Variable[]{rain1}), doubleFactory);
+
+        Variable megaObservation = DynamicBayesianNetwork.mergeObservationVariables(
+                Arrays.asList(new Variable[]{umbrella1}),
+                Arrays.asList(new Variable[]{rain1}),
+                doubleFactory);
+
+        System.out.println(megaState.getMatrixView());
+
+        System.out.println(megaObservation.getMatrixView());
+
+        return null;
     }
 
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2() {

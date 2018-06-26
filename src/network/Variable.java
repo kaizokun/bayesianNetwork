@@ -470,17 +470,13 @@ public class Variable {
 
         for(Map.Entry<String, AbstractDouble[][]> entry : this.matrixMap.entrySet()){
 
-            builder.append(entry.getKey());
-
-            builder.append("\n");
-
-            builder.append(getMatrixView(entry.getValue()));
+            builder.append(getMatrixView(entry.getValue(), entry.getKey()));
         }
 
         return builder.toString();
     }
 
-    public String getMatrixView(AbstractDouble[][] matrix){
+    public String getMatrixView(AbstractDouble[][] matrix, String key){
 
         if(matrix == null){
 
@@ -493,19 +489,22 @@ public class Variable {
 
         StringBuilder builder = new StringBuilder("\n");
 
-        builder.append(label+'\n');
+        builder.append(label+" : "+key+'\n');
 
-        if(matrix.length > 1) {
+        if(key.equals(ALL_VALUES)) {
 
-            builder.append(String.format("%6s", ""));
+            if(matrix.length > 1) {
+
+                builder.append(String.format("%6s", ""));
+            }
+
+            for (List<Domain.DomainValue> domainValues : compVarValues) {
+
+                builder.append(String.format("%-7s", domainValues));
+            }
+
+            builder.append('\n');
         }
-
-        for(List<Domain.DomainValue> domainValues : compVarValues){
-
-            builder.append(String.format("%-7s", domainValues));
-        }
-
-        builder.append('\n');
 
         int r = 0 ;
 
@@ -518,14 +517,7 @@ public class Variable {
 
             for(AbstractDouble col : row){
 
-                if(col != null) {
-
-                    builder.append(String.format("[%.3f]", col.getDoubleValue()));
-
-                }else{
-
-                    builder.append(String.format("[%.3f]", 0.0));
-                }
+                builder.append(String.format("[%.3f]", col.getDoubleValue()));
             }
 
             builder.append('\n');
