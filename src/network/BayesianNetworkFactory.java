@@ -185,7 +185,6 @@ public class BayesianNetworkFactory {
         return network;
     }
 
-
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder1TwoStates() {
 
         DynamicBayesianNetwork network = getUmbrellaDynamicNetworkOrder1();

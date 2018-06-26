@@ -49,7 +49,7 @@ Calculer la valeur d'une entrée d'un facteur dont les variables ont été initi
 
 iVar <- 0
 
-(Objet) prob = matrix
+(Objet) prob = matrixMap
 
 Pour chaque variable du facteur
 	
@@ -57,7 +57,7 @@ Pour chaque variable du facteur
 	
 	récuper l'indice iV de la valeur dans son domaine
 	
-	prob = matrix[iVar][iV]
+	prob = matrixMap[iVar][iV]
 
 	iVar ++;
 	

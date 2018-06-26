@@ -43,9 +43,13 @@ public class Variable {
 
     protected List<Variable> compoVars;
 
+    protected List<Variable> compoVarsParents;
+
     protected int time;
 
-    protected AbstractDouble[][] matrix;
+    protected Map<String,AbstractDouble[][]> matrixMap;
+
+    public static String ALL_VALUES = "all_values";
 
     //utilisé dans la recuperation des noeuds dans l'odre topologique
     //pour savoir si ils ont été ajoutés, pas vraiment une propriété mais plus pratique que de créer
@@ -68,13 +72,24 @@ public class Variable {
         this.label = label;
     }
 
-    public Variable(String label, IDomain domain, Collection<Variable> compoVars){
+    public Variable( Collection<Variable> compoVars, Collection<Variable> compoVarsParents, Map<String,AbstractDouble[][]> matrixMap){
 
-        this.domain = domain;
+        StringBuilder labelBuilder = new StringBuilder();
 
-        this.label = label;
+        for(Variable variable : compoVars){
+
+            labelBuilder.append(variable.getLabel()+"-");
+        }
+
+        labelBuilder.deleteCharAt(labelBuilder.length() - 1);
+
+        this.label = labelBuilder.toString();
 
         this.compoVars = new LinkedList<>(compoVars);
+
+        this.compoVarsParents =  new LinkedList<>(compoVarsParents);
+
+        this.matrixMap = matrixMap;
     }
 
     public Variable(String label){
@@ -433,23 +448,48 @@ public class Variable {
         this.compoVars = compoVars;
     }
 
-    public AbstractDouble[][] getMatrix() {
-        return matrix;
+    public AbstractDouble[][] getMatrix(String key) {
+
+        return matrixMap.get(key);
     }
 
-    public void setMatrix(AbstractDouble[][] matrix) {
+    public AbstractDouble[][] getMatrixMap() {
 
-        this.matrix = matrix;
+        return matrixMap.get(ALL_VALUES);
     }
+
+    public void setMatrixMap(Map<String,AbstractDouble[][]> matrixMap) {
+
+        this.matrixMap = matrixMap;
+    }
+
 
     public String getMatrixView(){
 
-        if(matrix == null){
+        StringBuilder builder = new StringBuilder();
 
-            return "EMPTY MATRX";
+        for(Map.Entry<String, AbstractDouble[][]> entry : this.matrixMap.entrySet()){
+
+            builder.append(entry.getKey());
+
+            builder.append("\n");
+
+            builder.append(getMatrixView(entry.getValue()));
         }
 
-        List<List<Domain.DomainValue>> domainValuesLists = BayesianNetwork.domainValuesCombinations(this.compoVars);
+        return builder.toString();
+    }
+
+    public String getMatrixView(AbstractDouble[][] matrix){
+
+        if(matrix == null){
+
+            return "EMPTY MATRIX";
+        }
+
+        List<List<Domain.DomainValue>> compVarParentsValues = BayesianNetwork.domainValuesCombinations(this.compoVarsParents);
+
+        List<List<Domain.DomainValue>> compVarValues = BayesianNetwork.domainValuesCombinations(this.compoVars);
 
         StringBuilder builder = new StringBuilder("\n");
 
@@ -460,7 +500,7 @@ public class Variable {
             builder.append(String.format("%6s", ""));
         }
 
-        for(List<Domain.DomainValue> domainValues : domainValuesLists){
+        for(List<Domain.DomainValue> domainValues : compVarValues){
 
             builder.append(String.format("%-7s", domainValues));
         }
@@ -469,16 +509,23 @@ public class Variable {
 
         int r = 0 ;
 
-        for(AbstractDouble[] row : this.matrix){
+        for(AbstractDouble[] row : matrix){
 
             if(matrix.length > 1) {
 
-                builder.append(String.format("%5s", domainValuesLists.get(r)));
+                builder.append(String.format("%5s", compVarParentsValues.get(r)));
             }
 
             for(AbstractDouble col : row){
 
-                builder.append(String.format("[%.3f]", col.getDoubleValue()));
+                if(col != null) {
+
+                    builder.append(String.format("[%.3f]", col.getDoubleValue()));
+
+                }else{
+
+                    builder.append(String.format("[%.3f]", 0.0));
+                }
             }
 
             builder.append('\n');

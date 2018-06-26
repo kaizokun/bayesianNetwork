@@ -11,6 +11,7 @@ import java.util.List;
 
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.CLOUD;
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.RAIN;
+import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
 
 public class MMCtest {
 
@@ -45,17 +46,30 @@ public class MMCtest {
         //l'étendre une fois
         network.extend();
 
-        List<Variable> varsToMerge = new LinkedList<>();
+        //etats
 
-        varsToMerge.add(network.getVariable(RAIN.toString()));
+        List<Variable> varsState = new LinkedList<>();
 
-        Variable megaRootVar = network.mergeStateVariables(0, varsToMerge);
+        varsState.add(network.getVariable(0, new Variable(RAIN.toString())));
 
-        Variable megaVar = network.mergeStateVariables(1, varsToMerge);
+        Variable megaRootStateVar = network.mergeStateVariables(0, varsState);
 
-        System.out.println(megaRootVar.getMatrixView());
+        Variable megaStateVar = network.mergeStateVariables(1, varsState);
 
-        System.out.println(megaVar.getMatrixView());
+        System.out.println(megaRootStateVar.getMatrixView());
+
+        System.out.println(megaStateVar.getMatrixView());
+
+        //observations
+
+        List<Variable> varsObs = new LinkedList<>();
+
+        varsObs.add(network.getVariable(1, new Variable(UMBRELLA.toString())));
+
+        Variable megaObsVar = network.mergeObservationVariable(1, varsObs, varsState);
+
+        System.out.println(megaObsVar.getMatrixView());
+
     }
 
 }

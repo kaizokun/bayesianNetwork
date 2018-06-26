@@ -11,6 +11,7 @@ import network.dynamic.Model.Dependency;
 
 import java.util.*;
 
+import static inference.dynamic.Util.getDistribSavedKey;
 import static inference.dynamic.Util.getTreeIdent;
 import static network.BayesianNetwork.domainValuesCombinations;
 
@@ -54,6 +55,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     }
 
     public Variable getVariable(int time, Variable variable) {
+
+       // System.out.println("GET VAR : "+this.timeVariables.get(time)+"\n var : "+variable);
 
         return this.timeVariables.get(time).get(variable);
     }
@@ -220,33 +223,118 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-    public Variable mergeStateVariables(int t, List<Variable> variablesToMerge) {
 
-        StringBuilder labelBuilder = new StringBuilder();
+    private void loadVarDistrib(AbstractDouble[] row, List<Variable> tVars, List<List<Domain.DomainValue>> domainValuesList){
 
-        List<IDomain> subDomains = new LinkedList<>();
+        int col = 0;
+        //pour chaque combinaisons de valeurs pouvant être prises par les variables
+        for(List<Domain.DomainValue> domainValues : domainValuesList){
 
-        List<Variable> tVars =  new ArrayList<>();
+            Iterator<Variable> tVarsIterator = tVars.iterator();
+            //assigne une combinaison de valeurs aux variables
+            for(Domain.DomainValue domainValue : domainValues){
 
-        for(Variable variable : variablesToMerge){
+                tVarsIterator.next().setDomainValue(domainValue);
+            }
 
-           tVars.add(this.getVariable(t, variable));
+            AbstractDouble prob = doubleFactory.getNew(1.0);
+
+            tVarsIterator = tVars.iterator();
+            //multiplie les probabilités
+            while(tVarsIterator.hasNext()){
+
+                prob =  prob.multiply( tVarsIterator.next().getProbabilityForCurrentValue());
+            }
+
+            row[col] = prob;
+
+            col ++;
+        }
+    }
+
+    private List<Variable> copyTimeVarsAndSort(int t, List<Variable> vars){
+
+        List<Variable> varsListCopy =  new ArrayList<>();
+        //récupération des observations au temps t (1)
+        for(Variable variable : vars){
+
+            varsListCopy.add(this.getVariable(t, variable));
+        }
+        //trie par label
+        Collections.sort(varsListCopy, Variable.varLabelComparator);
+
+        return varsListCopy;
+    }
+
+    public Variable mergeObservationVariable(int t, List<Variable> observations, List<Variable> parentStates){
+
+        List<Variable> tObs = copyTimeVarsAndSort(t, observations);
+
+        List<Variable> tStates =  copyTimeVarsAndSort(t, parentStates);
+
+        //combinaison de valeurs pour les parents des observations
+        List<List<Domain.DomainValue>> statesDomainValuesList = BayesianNetwork.domainValuesCombinations(tStates);
+
+        //récuperer les combinaisons de valeurs on aura une matrice par valeur
+        //que peuvent prendre le sobservations à un temps t
+        //stockées dans la megaVariable et récuperables en fonction de la combinaison de valeurs
+        //qui formera la clé pour chaque matrice
+        List<List<Domain.DomainValue>> obsDomainValuesList = BayesianNetwork.domainValuesCombinations(observations);
+
+        //liste des matrices
+        Map<String, AbstractDouble[][]> matrixMap = new Hashtable<>();
+        //pour chaque combinaison de valeur prises par toutes les observations
+        for(List<Domain.DomainValue> obsDomainValues : obsDomainValuesList){
+            //initialisation des observations
+            Iterator<Variable> tObsIterator = tObs.iterator();
+
+            for(Domain.DomainValue obsDomainValue : obsDomainValues){
+
+                tObsIterator.next().setDomainValue(obsDomainValue);
+            }
+
+            AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
+
+            int col = 0;
+
+            //calculer la probabilité d'un état des observations pour une combinaison de valeurs parents
+            for(List<Domain.DomainValue> statesDomainValues : statesDomainValuesList){
+
+                //initialise les valeurs parents
+                Iterator<Variable> tStatesIterator = tStates.iterator();
+
+                for(Domain.DomainValue stateDomainValue : statesDomainValues){
+
+                    tStatesIterator.next().setDomainValue(stateDomainValue);
+                }
+
+                AbstractDouble prob = doubleFactory.getNew(1.0);
+
+                tObsIterator = tObs.iterator();
+
+                while(tObsIterator.hasNext()){
+
+                    prob = prob.multiply( tObsIterator.next().getProbabilityForCurrentValue() );
+                }
+
+                obsMatrix[col][col] = prob;
+
+                col ++;
+            }
+
+            matrixMap.put(obsDomainValues.toString(), obsMatrix);
         }
 
-        Collections.sort(tVars, Variable.varLabelComparator);
+        return new Variable(tObs, tStates, matrixMap);
+    }
 
-        for(Variable variable : tVars){
+    public Variable mergeStateVariables(int t, List<Variable> statesToMerge) {
 
-            labelBuilder.append(variable.getLabel()+"-");
+        List<Variable> tStates =  copyTimeVarsAndSort(t, statesToMerge);
 
-            subDomains.add(variable.getDomain());
-        }
+        List<Variable> tVarsParents = new ArrayList<>();
 
-        labelBuilder.deleteCharAt(labelBuilder.length() - 1);
-
-        Variable megaVariable = new Variable(labelBuilder.toString(), new Domain(subDomains), tVars);
-
-        List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(tVars);
+        List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(tStates);
 
         AbstractDouble[][] matrix;
 
@@ -254,39 +342,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             matrix = new AbstractDouble[1][domainValuesList.size()];
 
-            int col = 0;
-            //pour chaque combinaisons de valeurs pouvant être prises par les variables
-            for(List<Domain.DomainValue> domainValues : domainValuesList){
-
-                Iterator<Variable> tVarsIterator = tVars.iterator();
-                //assigne une combinaison de valeurs aux variables
-                for(Domain.DomainValue domainValue : domainValues){
-
-                    tVarsIterator.next().setDomainValue(domainValue);
-                }
-
-                AbstractDouble prob = doubleFactory.getNew(1.0);
-
-                tVarsIterator = tVars.iterator();
-                //multiplie les probabilités
-                while(tVarsIterator.hasNext()){
-
-                   prob =  prob.multiply( tVarsIterator.next().getProbabilityForCurrentValue());
-                }
-
-                matrix[0][col] = prob;
-
-                col ++;
-            }
+            loadVarDistrib(matrix[0], tStates, domainValuesList);
 
         }else{
 
             matrix = new AbstractDouble[domainValuesList.size()][domainValuesList.size()];
             //liste des variables au temps precedents logiquement la même
-
-            List<Variable> tVarsParents = new ArrayList<>();
-
-            for(Variable variable : variablesToMerge){
+            for(Variable variable : statesToMerge){
 
                 tVarsParents.add(this.getVariable(t - 1, variable));
             }
@@ -306,34 +368,17 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
                 int col = 0;
 
-                for(List<Domain.DomainValue> domainValuesChild : domainValuesList){
-
-                    Iterator<Variable> tVarsIterator = tVars.iterator();
-                    //assigne une combinaison de valeurs aux variables
-                    for(Domain.DomainValue domainValue : domainValuesChild){
-
-                        tVarsIterator.next().setDomainValue(domainValue);
-                    }
-
-                    AbstractDouble prob = doubleFactory.getNew(1.0);
-
-                    tVarsIterator = tVars.iterator();
-                    //multiplie les probabilités
-                    while (tVarsIterator.hasNext()) {
-
-                        prob = prob.multiply(tVarsIterator.next().getProbabilityForCurrentValue());
-                    }
-
-                    matrix[row][col] = prob;
-
-                    col ++;
-                }
+                loadVarDistrib(matrix[row], tStates, domainValuesList);
 
                 row ++;
             }
         }
 
-        megaVariable.setMatrix(matrix);
+        Map<String, AbstractDouble[][]> matrixMap = new Hashtable<>();
+
+        matrixMap.put(Variable.ALL_VALUES, matrix);
+
+        return new Variable(tStates, tVarsParents, matrixMap);
 
         /*
         * Récuperer la liste des variables au temps t
@@ -359,7 +404,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         *
         * */
 
-        return megaVariable;
 
     }
 
