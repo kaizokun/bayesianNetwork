@@ -25,7 +25,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     protected Map<Variable, List<Model>> captorsModels = new Hashtable<>();
 
-
     public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory) {
 
         super(doubleFactory);
@@ -153,7 +152,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         for (Variable variable : models.keySet()) {
 
             //récupere la liste des modeles d'extension pour une variable
-            //en fonction du temps
+            //en fonction du temps utile pour les modele de markov d'ordre superieur à 1
             List<Model> varModels = models.get(variable);
 
             Model model;
@@ -166,7 +165,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 model = varModels.get(this.time - 1);
 
             } else {
-                //sinon recupere le dernier modele celui le plus complet, le nombre de dependences étant suffisantes
+                //sinon recupere le dernier modele celui le plus complet,
+                //le nombre de dependences étant suffisantes
                 model = varModels.get(varModels.size() - 1);
             }
 
@@ -223,174 +223,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //dependances completes
     }
 
-
-    private static void loadVarDistrib(AbstractDouble[] row, List<Variable> tVars, List<List<Domain.DomainValue>> domainValuesList, AbstractDoubleFactory doubleFactory){
-
-        int col = 0;
-        //pour chaque combinaisons de valeurs pouvant être prises par les variables
-        for(List<Domain.DomainValue> domainValues : domainValuesList){
-
-            Iterator<Variable> tVarsIterator = tVars.iterator();
-            //assigne une combinaison de valeurs aux variables
-            for(Domain.DomainValue domainValue : domainValues){
-
-                tVarsIterator.next().setDomainValue(domainValue);
-            }
-
-            AbstractDouble prob = doubleFactory.getNew(1.0);
-
-            tVarsIterator = tVars.iterator();
-            //multiplie les probabilités
-            while(tVarsIterator.hasNext()){
-
-                prob =  prob.multiply( tVarsIterator.next().getProbabilityForCurrentValue());
-            }
-
-            row[col] = prob;
-
-            col ++;
-        }
-    }
-/*
-    private List<Variable> copyTimeVarsAndSort(int t, List<Variable> vars){
-
-        List<Variable> varsListCopy =  new ArrayList<>();
-        //récupération des observations au temps t (1)
-        for(Variable variable : vars){
-
-            varsListCopy.add(this.getVariable(t, variable));
-        }
-        //trie par label
-        Collections.sort(varsListCopy, Variable.varLabelComparator);
-
-        return varsListCopy;
-    }
-*/
-    public static Variable mergeObservationVariables(List<Variable> obs, List<Variable> tStates, AbstractDoubleFactory doubleFactory){
-
-       // List<Variable> obs = copyTimeVarsAndSort(t, observations);
-
-        //List<Variable> tStates =  copyTimeVarsAndSort(t, parentStates);
-
-        //combinaison de valeurs pour les parents des observations
-        List<List<Domain.DomainValue>> statesDomainValuesList = BayesianNetwork.domainValuesCombinations(tStates);
-
-        //récuperer les combinaisons de valeurs on aura une matrice par valeur
-        //que peuvent prendre le sobservations à un temps t
-        //stockées dans la megaVariable et récuperables en fonction de la combinaison de valeurs
-        //qui formera la clé pour chaque matrice
-        List<List<Domain.DomainValue>> obsDomainValuesList = BayesianNetwork.domainValuesCombinations(obs);
-
-        //liste des matrices
-        Map<String, AbstractDouble[][]> matrixMap = new Hashtable<>();
-        //pour chaque combinaison de valeur prises par toutes les observations
-        for(List<Domain.DomainValue> obsDomainValues : obsDomainValuesList){
-            //initialisation des observations
-            Iterator<Variable> tObsIterator = obs.iterator();
-
-            for(Domain.DomainValue obsDomainValue : obsDomainValues){
-
-                tObsIterator.next().setDomainValue(obsDomainValue);
-            }
-
-            AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
-
-            for(int r = 0 ; r < statesDomainValuesList.size() ; r ++) {
-                for (int c = 0; c < statesDomainValuesList.size(); c++) {
-                    obsMatrix[r][c] = doubleFactory.getNew(0.0);
-                }
-            }
-
-            int col = 0;
-
-            //calculer la probabilité d'un état des observations pour une combinaison de valeurs parents
-            for(List<Domain.DomainValue> statesDomainValues : statesDomainValuesList){
-
-                //initialise les valeurs parents
-                Iterator<Variable> tStatesIterator = tStates.iterator();
-
-                for(Domain.DomainValue stateDomainValue : statesDomainValues){
-
-                    tStatesIterator.next().setDomainValue(stateDomainValue);
-                }
-
-                AbstractDouble prob = doubleFactory.getNew(1.0);
-
-                tObsIterator = obs.iterator();
-
-                while(tObsIterator.hasNext()){
-
-                    prob = prob.multiply( tObsIterator.next().getProbabilityForCurrentValue() );
-                }
-
-                obsMatrix[col][col] = prob;
-
-                col ++;
-            }
-
-            matrixMap.put(obsDomainValues.toString(), obsMatrix);
-        }
-
-        return new Variable(obs, tStates, matrixMap);
-    }
-
-    public static Variable mergeStateVariables(List<Variable> states, AbstractDoubleFactory doubleFactory) {
-
-        //List<Variable> states =  copyTimeVarsAndSort(t, statesToMerge);
-
-        List<Variable> tVarsParents = new ArrayList<>();
-
-        List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(states);
-
-        AbstractDouble[][] matrix;
-        //si variables de temps 0
-        if(states.get(0).getDependencies().isEmpty()){
-
-            matrix = new AbstractDouble[1][domainValuesList.size()];
-
-            loadVarDistrib(matrix[0], states, domainValuesList, doubleFactory);
-
-        }else{
-
-            matrix = new AbstractDouble[domainValuesList.size()][domainValuesList.size()];
-            //Set des variables parents
-            Set<Variable> parents = new LinkedHashSet<>();
-
-            for(Variable state : states){
-
-                parents.addAll(state.getDependencies());
-            }
-
-            tVarsParents.addAll(parents);
-
-            Collections.sort(tVarsParents, Variable.varLabelComparator);
-
-            int row = 0;
-            //pour chaque combinaisons de valeurs pouvant être prises par les variables parents
-            for(List<Domain.DomainValue> domainValuesParents : domainValuesList){
-
-                Iterator<Variable> tVarsParentsIterator = tVarsParents.iterator();
-                //assigne une combinaison de valeurs aux variables
-                for(Domain.DomainValue domainValue : domainValuesParents){
-
-                    tVarsParentsIterator.next().setDomainValue(domainValue);
-                }
-
-                int col = 0;
-
-                loadVarDistrib(matrix[row], states, domainValuesList, doubleFactory);
-
-                row ++;
-            }
-        }
-
-        Map<String, AbstractDouble[][]> matrixMap = new Hashtable<>();
-
-        matrixMap.put(Variable.ALL_VALUES, matrix);
-
-        return new Variable(states, tVarsParents, matrixMap);
-    }
-
     /*---------------------------GETTER SETTER -----------------------*/
 
     public int getTime() {
@@ -399,7 +231,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     }
 
     /*--------------------------- VIEW -----------------------*/
-
 
     @Override
     public String toString() {

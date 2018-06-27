@@ -8,8 +8,7 @@ import java.util.*;
 
 public class BayesianNetwork {
 
-    public BayesianNetwork() {
-    }
+    public BayesianNetwork() { }
 
     public BayesianNetwork(AbstractDoubleFactory doubleFactory) {
 

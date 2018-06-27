@@ -27,9 +27,9 @@ public class Variable {
 
     protected Domain.DomainValue value, originValue;
 
-    protected List<Variable> dependencies;
-
-    protected List<Variable> children;
+    protected List<Variable> dependencies = new ArrayList<>(),
+                             children = new ArrayList<>(),
+                             observations, compoVars;
 
     protected ProbabilityCompute probabilityCompute;
 
@@ -37,19 +37,9 @@ public class Variable {
 
     protected Set<Variable> markovKover;
 
-    protected Hashtable<String, Integer> dependenciesIndex;
-
-    protected List<Variable> observations;
-
-    protected List<Variable> compoVars;
-
-    protected List<Variable> compoVarsParents;
+    protected Hashtable<String, Integer> dependenciesIndex = new Hashtable<>(), childrenIndex = new Hashtable<>();
 
     protected int time;
-
-    protected Map<String,AbstractDouble[][]> matrixMap;
-
-    public static String ALL_VALUES = "all_values";
 
     //utilisé dans la recuperation des noeuds dans l'odre topologique
     //pour savoir si ils ont été ajoutés, pas vraiment une propriété mais plus pratique que de créer
@@ -72,7 +62,7 @@ public class Variable {
         this.label = label;
     }
 
-    public Variable( Collection<Variable> compoVars, Collection<Variable> compoVarsParents, Map<String,AbstractDouble[][]> matrixMap){
+    public Variable( Collection<Variable> compoVars, int time ){
 
         StringBuilder labelBuilder = new StringBuilder();
 
@@ -85,11 +75,14 @@ public class Variable {
 
         this.label = labelBuilder.toString();
 
-        this.compoVars = new LinkedList<>(compoVars);
+        this.time = time;
 
-        this.compoVarsParents =  new LinkedList<>(compoVarsParents);
+        this.compoVars = new ArrayList<>(compoVars.size());
 
-        this.matrixMap = matrixMap;
+        for(Variable compoVar : compoVars){
+
+            this.compoVars.add(new Variable(compoVar.label, this.time, compoVar.value, compoVar.domain));
+        }
     }
 
     public Variable(String label){
@@ -113,13 +106,9 @@ public class Variable {
 
         this.domain = domain;
 
-        this.dependencies = dependencies;
+        this.dependencies.addAll(dependencies);
 
         this.probabilityCompute = probabilityCompute;
-
-        this.children = new ArrayList<>();
-
-        this.dependenciesIndex = new Hashtable<>();
 
         this.observations = new LinkedList<>();
 
@@ -137,13 +126,15 @@ public class Variable {
         }
     }
 
-    public Variable(String label, int time, Domain.DomainValue value) {
+    public Variable(String label, int time, Domain.DomainValue value, IDomain domain) {
 
         this.label = label;
 
         this.time = time;
 
         this.value = value;
+
+        this.domain = domain;
     }
 
     public  String getVarTimeId(){
@@ -165,9 +156,20 @@ public class Variable {
         return this.dependencies.get(indexId);
     }
 
-    private void addChild(Variable child) {
+    public void addDependency(Variable parent){
+
+        this.dependencies.add(parent);
+
+        parent.addChild(this);
+
+        this.dependenciesIndex.put(parent.getVarTimeId(), this.dependencies.size() - 1);
+    }
+
+    public void addChild(Variable child) {
 
         this.children.add(child);
+
+        this.childrenIndex.put(child.getVarTimeId(), this.children.size() - 1);
     }
 
     public Domain.DomainValue getDomainValue() {
@@ -206,6 +208,10 @@ public class Variable {
     public void setValue(Object value) {
 
         this.setDomainValue(this.domain.getDomainValue(value));
+    }
+
+    public Collection<Variable> getCompoVars() {
+        return compoVars;
     }
 
     public boolean originalValueMatch() {
@@ -337,7 +343,7 @@ public class Variable {
     @Override
     public String toString() {
 
-        return this.label+"_"+this.time+" = "+this.value;
+        return this.label+"_"+this.time+" = "+this.value+( (this.compoVars != null && !this.compoVars.isEmpty()) ? " - COMPOSITION : "+this.compoVars : "" );
     }
 
     public String getValueKey() {
@@ -345,9 +351,9 @@ public class Variable {
         return this.getValue().toString();
     }
 
-    public Variable copyLabelTimeValue(){
+    public Variable copyLabelTimeValueDom(){
 
-        return new Variable(this.label, this.time, this.value);
+        return new Variable(this.label, this.time, this.value, this.domain);
     }
 
     public int getDomainSize() {
@@ -440,91 +446,5 @@ public class Variable {
         return observations;
     }
 
-    public List<Variable> getCompoVars() {
-        return compoVars;
-    }
 
-    public void setCompoVars(List<Variable> compoVars) {
-        this.compoVars = compoVars;
-    }
-
-    public AbstractDouble[][] getMatrix(String key) {
-
-        return matrixMap.get(key);
-    }
-
-    public AbstractDouble[][] getMatrixMap() {
-
-        return matrixMap.get(ALL_VALUES);
-    }
-
-    public void setMatrixMap(Map<String,AbstractDouble[][]> matrixMap) {
-
-        this.matrixMap = matrixMap;
-    }
-
-
-    public String getMatrixView(){
-
-        StringBuilder builder = new StringBuilder();
-
-        for(Map.Entry<String, AbstractDouble[][]> entry : this.matrixMap.entrySet()){
-
-            builder.append(getMatrixView(entry.getValue(), entry.getKey()));
-        }
-
-        return builder.toString();
-    }
-
-    public String getMatrixView(AbstractDouble[][] matrix, String key){
-
-        if(matrix == null){
-
-            return "EMPTY MATRIX";
-        }
-
-        List<List<Domain.DomainValue>> compVarParentsValues = BayesianNetwork.domainValuesCombinations(this.compoVarsParents);
-
-        List<List<Domain.DomainValue>> compVarValues = BayesianNetwork.domainValuesCombinations(this.compoVars);
-
-        StringBuilder builder = new StringBuilder("\n");
-
-        builder.append(label+" : "+key+'\n');
-
-        if(key.equals(ALL_VALUES)) {
-
-            if(matrix.length > 1) {
-
-                builder.append(String.format("%6s", ""));
-            }
-
-            for (List<Domain.DomainValue> domainValues : compVarValues) {
-
-                builder.append(String.format("%-7s", domainValues));
-            }
-
-            builder.append('\n');
-        }
-
-        int r = 0 ;
-
-        for(AbstractDouble[] row : matrix){
-
-            if(matrix.length > 1) {
-
-                builder.append(String.format("%5s", compVarParentsValues.get(r)));
-            }
-
-            for(AbstractDouble col : row){
-
-                builder.append(String.format("[%.3f]", col.getDoubleValue()));
-            }
-
-            builder.append('\n');
-
-            r ++;
-        }
-
-        return builder.toString();
-    }
 }

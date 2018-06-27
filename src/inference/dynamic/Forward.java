@@ -446,7 +446,7 @@ public class Forward {
 
                 for (Variable dependencie : obsParentState.getDependencies()) {
 
-                    copyDependencies.add(dependencie.copyLabelTimeValue());
+                    copyDependencies.add(dependencie.copyLabelTimeValueDom());
                 }
 
                 maxHiddenvars = copyDependencies;

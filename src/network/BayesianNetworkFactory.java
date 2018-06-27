@@ -6,6 +6,7 @@ import domain.data.AbstractDoubleFactory;
 import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
 import network.dynamic.DynamicBayesianNetwork;
+import network.dynamic.MMC;
 import network.dynamic.Model;
 
 import java.util.*;
@@ -241,7 +242,7 @@ public class BayesianNetworkFactory {
         return network;
     }
 
-    public static DynamicBayesianNetwork getUmbrellaMMCDynamicNetworkOneVars() {
+    public static MMC getUmbrellaMMCDynamicNetworkOneVars() {
 
         AbstractDoubleFactory doubleFactory = new MyDoubleFactory();
 
@@ -276,19 +277,7 @@ public class BayesianNetworkFactory {
 
         Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, Arrays.asList(new Variable[]{rain1}));
 
-        Variable megaState = DynamicBayesianNetwork.mergeStateVariables(
-                Arrays.asList(new Variable[]{rain1}), doubleFactory);
-
-        Variable megaObservation = DynamicBayesianNetwork.mergeObservationVariables(
-                Arrays.asList(new Variable[]{umbrella1}),
-                Arrays.asList(new Variable[]{rain1}),
-                doubleFactory);
-
-        System.out.println(megaState.getMatrixView());
-
-        System.out.println(megaObservation.getMatrixView());
-
-        return null;
+        return new MMC(Arrays.asList(new Variable[]{rain0}), Arrays.asList(new Variable[]{rain1}),  Arrays.asList(new Variable[]{umbrella1}), doubleFactory);
     }
 
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2() {
