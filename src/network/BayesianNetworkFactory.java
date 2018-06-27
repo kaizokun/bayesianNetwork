@@ -295,7 +295,6 @@ public class BayesianNetworkFactory {
 
         //Models
         //Rain time 1
-
         //Rain 1 rain1Dep
 
         List<Variable> oneRainDep = new LinkedList<>();

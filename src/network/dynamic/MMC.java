@@ -3,6 +3,7 @@ package network.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import math.Matrix;
 import network.BayesianNetwork;
 import network.Variable;
 
@@ -12,9 +13,9 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Variable megaVariableStates0, megaVariableStates1, megaVariableObs1;
 
-    protected Map<String,AbstractDouble[][]> matrixObs;
+    protected Map<String, Matrix> matrixObs;
 
-    protected AbstractDouble[][] matrixState0, matrixStates;
+    protected Matrix matrixState0, matrixStates;
 
     protected List<Variable> states, obs, parentStates, parentObs;
 
@@ -117,7 +118,7 @@ public class MMC extends DynamicBayesianNetwork {
         List<List<Domain.DomainValue>> obsDomainValuesList = BayesianNetwork.domainValuesCombinations(obs);
 
         //liste des matrices
-        Map<String, AbstractDouble[][]> matrixMap = new Hashtable<>();
+        Map<String, Matrix> matrixMap = new Hashtable<>();
         //pour chaque combinaison de valeur prises par toutes les observations
         for(List<Domain.DomainValue> obsDomainValues : obsDomainValuesList){
             //initialisation des observations
@@ -163,7 +164,7 @@ public class MMC extends DynamicBayesianNetwork {
                 col ++;
             }
 
-            matrixMap.put(obsDomainValues.toString(), obsMatrix);
+            matrixMap.put(obsDomainValues.toString(), new Matrix(obsMatrix, doubleFactory));
         }
 
         this.matrixObs = matrixMap;
@@ -187,7 +188,7 @@ public class MMC extends DynamicBayesianNetwork {
 
             this.loadVarDistrib(matrix[0], states, domainValuesList, doubleFactory);
 
-            this.matrixState0 = matrix;
+            this.matrixState0 = new Matrix(matrix, doubleFactory);
 
         }else{
 
@@ -222,24 +223,22 @@ public class MMC extends DynamicBayesianNetwork {
                 row ++;
             }
 
-            this.matrixStates = matrix;
+            this.matrixStates = new Matrix(matrix, doubleFactory);
         }
 
         return new Variable(states, time);
     }
 
-
     public void showMegaVarsMatrix(){
 
         List<List<Domain.DomainValue>> compVarParentsValues = BayesianNetwork.domainValuesCombinations(parentStates);
 
-        System.out.println(getMatrixView(megaVariableStates0, matrixState0, "", compVarParentsValues, compVarParentsValues));
+        System.out.println(getMatrixView(megaVariableStates0, matrixState0.getMatrix(), "", compVarParentsValues, compVarParentsValues));
 
-        System.out.println(getMatrixView(megaVariableStates1, matrixStates, "", compVarParentsValues, compVarParentsValues));
+        System.out.println(getMatrixView(megaVariableStates1, matrixStates.getMatrix(), "", compVarParentsValues, compVarParentsValues));
 
         System.out.println(getObsMatrixView());
     }
-
 
     public String getObsMatrixView(){
 
@@ -249,9 +248,9 @@ public class MMC extends DynamicBayesianNetwork {
 
         List<List<Domain.DomainValue>> compVarValues = BayesianNetwork.domainValuesCombinations(obs);
 
-        for(Map.Entry<String, AbstractDouble[][]> entry : this.matrixObs.entrySet()){
+        for(Map.Entry<String, Matrix> entry : this.matrixObs.entrySet()){
 
-            builder.append(getMatrixView(megaVariableObs1, entry.getValue(), entry.getKey(), compVarValues, compVarParentsValues ));
+            builder.append(getMatrixView(megaVariableObs1, entry.getValue().getMatrix(), entry.getKey(), compVarValues, compVarParentsValues ));
         }
 
         return builder.toString();
@@ -302,4 +301,13 @@ public class MMC extends DynamicBayesianNetwork {
         return builder.toString();
     }
 
+    public Matrix getMatrixState0() {
+
+        return matrixState0;
+    }
+
+    public Matrix getMatrixStates() {
+
+        return matrixStates;
+    }
 }

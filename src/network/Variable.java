@@ -425,6 +425,7 @@ public class Variable {
     }
 
     public void setMarkovCoverDistributionCompute(MarkovCoverDistributionCompute markovCoverDistributionCompute) {
+
         this.markovCoverDistributionCompute = markovCoverDistributionCompute;
     }
 
