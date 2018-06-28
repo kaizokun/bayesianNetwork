@@ -239,17 +239,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         loadTree(this.roots, builder, 0);
 
-        builder.append("\n\n");
-
-        for(Integer time : timeVariables.keySet()){
-
-            builder.append("---------"+time+"---------\n");
-
-            builder.append(timeVariables.get(time)+"\n");
-        }
-
         return builder.toString();
     }
+
 
     private void loadTree(List<Variable> vars, StringBuilder builder, int depth) {
 

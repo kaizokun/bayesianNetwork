@@ -229,6 +229,16 @@ public class MMC extends DynamicBayesianNetwork {
         return new Variable(states, time);
     }
 
+    public Variable getMegaVariable( int time, Variable ... variables) {
+
+        // trie les variables constituant la megavariable par labels
+        Arrays.sort(variables, Variable.varLabelComparator);
+        // crée une variable clé conenant le label composée
+        Variable megaVariable = new Variable(variables);
+        // recupere la variable enregistrée dans le reseau au temps t à l'aide de ce label
+        return this.getVariable(time, megaVariable);
+    }
+
     public void showMegaVarsMatrix(){
 
         for(Matrix matrixObs : matrixObs.values()){
@@ -250,5 +260,10 @@ public class MMC extends DynamicBayesianNetwork {
     public Matrix getMatrixStates() {
 
         return matrixStates;
+    }
+
+    public Matrix getMatrixObs(Variable megaVariable) {
+
+        return matrixObs.get(megaVariable.getMegaVarValuesKey());
     }
 }

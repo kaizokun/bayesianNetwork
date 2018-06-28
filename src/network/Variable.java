@@ -62,18 +62,17 @@ public class Variable {
         this.label = label;
     }
 
-    public Variable( Collection<Variable> compoVars, int time ){
+    /**
+     * Generate a mega variable from a list of variables
+     * must be sorted by label (asc)
+     * and a specific time.
+     *
+     * each variable is copied for a futur value assignation.
+     * (label, time, domainValue, domain)
+     * */
+    public Variable( List<Variable> compoVars, int time ){
 
-        StringBuilder labelBuilder = new StringBuilder();
-
-        for(Variable variable : compoVars){
-
-            labelBuilder.append(variable.getLabel()+"-");
-        }
-
-        labelBuilder.deleteCharAt(labelBuilder.length() - 1);
-
-        this.label = labelBuilder.toString();
+        this.label = getMegaVarLabel(compoVars);
 
         this.time = time;
 
@@ -88,6 +87,11 @@ public class Variable {
     public Variable(String label){
 
         this.label = label;
+    }
+
+    public Variable(Variable ... vars){
+
+        this.label = getMegaVarLabel(Arrays.asList(vars));
     }
 
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute ) {
@@ -137,7 +141,7 @@ public class Variable {
         this.domain = domain;
     }
 
-    public  String getVarTimeId(){
+    public String getVarTimeId(){
 
         return this.getVarTimeId(this, this.time);
     }
@@ -145,6 +149,20 @@ public class Variable {
     private String getVarTimeId(Variable variable, int time){
 
         return variable.getLabel()+"_"+time;
+    }
+
+    public static String getMegaVarLabel(Collection<Variable> variables){
+
+        StringBuilder labelBuilder = new StringBuilder();
+
+        for(Variable variable : variables){
+
+            labelBuilder.append(variable.getLabel()+"-");
+        }
+
+        labelBuilder.deleteCharAt(labelBuilder.length() - 1);
+
+        return labelBuilder.toString();
     }
 
     public Variable getParent(int time){
@@ -205,12 +223,66 @@ public class Variable {
         this.value = value;
     }
 
+    /**
+     * initialize the variables composing a megavariable
+     * from a list of domain values
+     * the order of the values must match with the variables one
+     * sorted by label ASC
+     * */
+    public void setDomainValues(Domain.DomainValue ... domainValues){
+
+        Iterator<Variable> variableIterator = this.compoVars.iterator();
+
+        for(Domain.DomainValue domainValue : domainValues){
+
+            variableIterator.next().setDomainValue(domainValue);
+        }
+    }
+
+    /**
+     * initialize the variables composing a megavariable
+     * from another list of variables already initialized
+     * the order of the variables doesn't matter, there are sorted
+     * inside the method
+     * */
+    public void setDomainValuesFromVariables(Variable ... variables){
+
+        Arrays.sort(variables, varLabelComparator);
+
+        Iterator<Variable> variableIterator = this.compoVars.iterator();
+
+        for(Variable variable : variables){
+
+            variableIterator.next().setDomainValue(variable.getDomainValue());
+        }
+    }
+
+    /**
+     * value list of the variables composing the mega variable
+     * */
+    public List<Domain.DomainValue> getMegaVarValues(){
+
+        List<Domain.DomainValue> domainValues = new LinkedList<>();
+
+        for( Variable variable : this.compoVars){
+
+            domainValues.add(variable.getDomainValue());
+        }
+
+        return domainValues;
+    }
+
+    public String getMegaVarValuesKey(){
+
+        return this.getMegaVarValues().toString();
+    }
+
     public void setValue(Object value) {
 
         this.setDomainValue(this.domain.getDomainValue(value));
     }
 
-    public Collection<Variable> getCompoVars() {
+    public List<Variable> getCompoVars() {
         return compoVars;
     }
 
