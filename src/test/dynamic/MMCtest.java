@@ -20,8 +20,8 @@ public class MMCtest {
     public void megaVariableTestTwoVars() {
 
         MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
-
-        for (int i = 1; i <= 2; i++) {
+        //le MMC possede déja une megavariable etendu au temps 1
+        for (int i = 2; i <= 10; i++) {
 
             network.extend();
         }
@@ -35,7 +35,7 @@ public class MMCtest {
         Variable coat = new Variable(COAT.toString(), booleanDomain);
 
         //0 = umbrella, 1 : coat
-        int obsValues[][] = new int[][]{{1, 1}, {1, 1}};
+        int obsValues[][] = new int[][]{{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}};
 
         int time = 1;
 
@@ -56,23 +56,13 @@ public class MMCtest {
             time++;
         }
 
-        Matrix forward = network.forward(2, megaVarObs);
+        Matrix forward = network.forward(5, megaVarObs);
+
+        Matrix backward = network.backward(5, megaVarObs);
 
         System.out.println(forward);
-    }
 
-    @Test
-    public void multiplyMatrixTest() {
-
-        MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
-
-        Matrix m1 = network.getMatrixState0();
-
-        Matrix m2 = network.getMatrixStates();
-
-        Matrix rs = m2.multiply(new Transpose(m1));
-
-        System.out.println(rs);
+        System.out.println(backward);
     }
 
     @Test
@@ -112,6 +102,20 @@ public class MMCtest {
 
         System.out.println(forward);
 
+    }
+
+    @Test
+    public void multiplyMatrixTest() {
+
+        MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
+
+        Matrix m1 = network.getMatrixState0();
+
+        Matrix m2 = network.getMatrixStates();
+
+        Matrix rs = m2.multiply(new Transpose(m1));
+
+        System.out.println(rs);
     }
 
 }

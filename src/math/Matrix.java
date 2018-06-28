@@ -20,15 +20,20 @@ public class Matrix {
 
     protected boolean isObservation = false;
 
-    public Matrix() {
-    }
+    public Matrix() { }
 
     public Matrix(Matrix matrix) {
 
         this(matrix.matrix, matrix.variables, matrix.dependencies, matrix.doubleFactory, matrix.isObservation);
     }
 
-    public Matrix(AbstractDouble[][] matrix, List<Variable> variables, List<Variable> dependencies, AbstractDoubleFactory doubleFactory, boolean isObservation) {
+    public Matrix(AbstractDouble[][] matrix, AbstractDoubleFactory doubleFactory) {
+
+        this(matrix, null, null, doubleFactory, false);
+    }
+
+    public Matrix(AbstractDouble[][] matrix, List<Variable> variables, List<Variable> dependencies,
+                  AbstractDoubleFactory doubleFactory, boolean isObservation) {
 
         //pour l'affichage des matrices
 
@@ -113,7 +118,7 @@ public class Matrix {
         return rsMatrix;
     }
 
-    public void normalize(){
+    public Matrix normalize(){
 
         AbstractDouble total = doubleFactory.getNew(0.0);
 
@@ -126,6 +131,8 @@ public class Matrix {
 
             setValue(row, 0,getValue(row, 0).divide(total));
         }
+
+        return this;
     }
 
     @Override
