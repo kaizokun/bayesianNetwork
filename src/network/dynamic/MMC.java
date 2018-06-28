@@ -18,31 +18,23 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Matrix matrixState0, matrixStates, matrixStatesT;
 
-    protected List<Variable> states, obs, parentStates, parentObs;
-
-    public MMC(List<Variable> states0, List<Variable> states1, List<Variable> obs1, AbstractDoubleFactory doubleFactory) {
+    public MMC(Variable[] states0, Variable[] states1, Variable[] obs1, AbstractDoubleFactory doubleFactory) {
 
         super(doubleFactory);
 
         this.time ++;
 
-        Collections.sort(states0, Variable.varLabelComparator);
+        Arrays.sort(states0, Variable.varLabelComparator);
 
-        Collections.sort(states1, Variable.varLabelComparator);
+        Arrays.sort(states1, Variable.varLabelComparator);
 
-        Collections.sort(obs1, Variable.varLabelComparator);
+        Arrays.sort(obs1, Variable.varLabelComparator);
 
-        this.states = states0;
+        this.megaVariableStates0 = this.mergeStateVariables(Arrays.asList(states0), 0);
 
-        this.obs = obs1;
+        this.megaVariableStates1 = this.mergeStateVariables(Arrays.asList(states1), 1);
 
-        this.parentObs = states1;
-
-        this.megaVariableStates0 = this.mergeStateVariables(states0, 0);
-
-        this.megaVariableStates1 = this.mergeStateVariables(states1, 1);
-
-        this.megaVariableObs1 = this.mergeObservationVariables(obs1, states1, 1);
+        this.megaVariableObs1 = this.mergeObservationVariables(Arrays.asList(obs1), Arrays.asList(states1), 1);
 
         this.megaVariableStates1.addDependency(this.megaVariableStates0);
 
@@ -206,7 +198,7 @@ public class MMC extends DynamicBayesianNetwork {
 
             Collections.sort(parentStates, Variable.varLabelComparator);
             //enregistre les états parents qui restent identiques pour un MMC
-            this.parentStates = parentStates;
+           //this.parentStates = parentStates;
 
             int row = 0;
             //pour chaque combinaisons de valeurs pouvant être prises par les variables parents

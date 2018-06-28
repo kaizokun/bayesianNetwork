@@ -99,6 +99,11 @@ public class Variable {
         this(label, domain, probabilityCompute, new ArrayList<>(),0);
     }
 
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies ) {
+
+        this(label, domain, probabilityCompute, Arrays.asList(dependencies),0);
+    }
+
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies ) {
 
         this(label, domain, probabilityCompute, dependencies,0);
@@ -242,7 +247,7 @@ public class Variable {
     /**
      * initialize the variables composing a megavariable
      * from another list of variables already initialized
-     * the order of the variables doesn't matter, there are sorted
+     * the order of the variables doesn't matter, they are sorted
      * inside the method
      * */
     public void setDomainValuesFromVariables(Variable ... variables){

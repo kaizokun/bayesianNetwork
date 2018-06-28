@@ -24,6 +24,11 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         this(new ArrayList<>(), varDom, entries, doubleFactory);
     }
 
+    public ProbabilityComputeFromTCP(Variable[] dependencies, IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
+
+        this(Arrays.asList(dependencies),varDom, entries, doubleFactory);
+    }
+
     public ProbabilityComputeFromTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
 
         this.matrice = entries;

@@ -234,12 +234,71 @@ public class BayesianNetworkFactory {
         return network;
     }
 
-    public static DynamicBayesianNetwork getUmbrellaMMCDynamicNetworkTwoVars() {
+    public static MMC getUmbrellaMMCDynamicNetworkTwoVars() {
 
-        //récuperer le reseau de base
-        DynamicBayesianNetwork network = getUmbrellaDynamicNetworkOrder1TwoStates();
+        AbstractDoubleFactory doubleFactory = new MyDoubleFactory();
 
-        return network;
+        IDomain booleanDomain = DomainFactory.getBooleanDomain();
+
+        //Rain time 0
+        ProbabilityCompute tcpRain0 =  new ProbabilityComputeFromTCP(
+                booleanDomain, new Double[][]{{0.5, 1 - 0.5}},
+                doubleFactory);
+
+        Variable rain0 = new Variable(RAIN.toString(), booleanDomain, tcpRain0);
+
+        //Cloud time 0
+        ProbabilityCompute tcpCloud0 =  new ProbabilityComputeFromTCP(
+                booleanDomain, new Double[][]{{0.6, 1 - 0.6}},
+                doubleFactory);
+
+        Variable cloud0 = new Variable(CLOUD.toString(), booleanDomain, tcpCloud0);
+
+        //Rain time 1
+
+        ProbabilityCompute tcpRain1 = new ProbabilityComputeFromTCP(
+                new Variable[]{rain0},
+                booleanDomain,
+                new Double[][]{{0.7, 1 - 0.7},
+                               {0.3, 1 - 0.3}},
+                doubleFactory);
+
+        Variable rain1 = new Variable(RAIN.toString(), booleanDomain, tcpRain1, new Variable[]{rain0});
+
+        //Cloud time 1
+
+        ProbabilityCompute tcpCloud1 = new ProbabilityComputeFromTCP(
+                new Variable[]{cloud0},
+                booleanDomain,
+                new Double[][]{{0.8, 1 - 0.8},
+                               {0.2, 1 - 0.2}},
+                doubleFactory);
+
+        Variable cloud1 = new Variable(CLOUD.toString(), booleanDomain, tcpCloud1, new Variable[]{cloud0});
+
+        //Umbrella time 1
+
+        ProbabilityCompute tcpUmbrella1 = new ProbabilityComputeFromTCP(
+                new Variable[]{rain1},
+                booleanDomain,
+                new Double[][]{{0.9, 1 - 0.9},
+                               {0.2, 1 - 0.2}},
+                doubleFactory);
+
+        Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, new Variable[]{rain1});
+
+        //Coat time 1
+
+        ProbabilityCompute tcpCoat1 = new ProbabilityComputeFromTCP(
+                new Variable[]{cloud1},
+                booleanDomain,
+                new Double[][]{{0.6, 1 - 0.6},
+                               {0.3, 1 - 0.3}},
+                doubleFactory);
+
+        Variable coat1 = new Variable(COAT.toString(), booleanDomain, tcpCoat1, new Variable[]{cloud1});
+
+        return new MMC(new Variable[]{rain0, cloud0}, new Variable[]{rain1, cloud1},  new Variable[]{umbrella1, coat1}, doubleFactory);
     }
 
     public static MMC getUmbrellaMMCDynamicNetworkOneVars() {
@@ -258,26 +317,26 @@ public class BayesianNetworkFactory {
         //Rain time 1
 
         ProbabilityCompute tcpRain1 = new ProbabilityComputeFromTCP(
-                Arrays.asList(new Variable[]{rain0}),
+                new Variable[]{rain0},
                 booleanDomain,
                 new Double[][]{{0.7, 1 - 0.7},
-                                {0.3, 1 - 0.3}},
+                               {0.3, 1 - 0.3}},
                 doubleFactory);
 
-        Variable rain1 = new Variable(RAIN.toString(), booleanDomain, tcpRain1, Arrays.asList(new Variable[]{rain0}));
+        Variable rain1 = new Variable(RAIN.toString(), booleanDomain, tcpRain1, new Variable[]{rain0});
 
         //Umbrella time 1
 
         ProbabilityCompute tcpUmbrella1 = new ProbabilityComputeFromTCP(
-                Arrays.asList(new Variable[]{rain1}),
+                new Variable[]{rain1},
                 booleanDomain,
                 new Double[][]{{0.9, 1 - 0.9},
-                        {0.2, 1 - 0.2}},
+                               {0.2, 1 - 0.2}},
                 doubleFactory);
 
-        Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, Arrays.asList(new Variable[]{rain1}));
+        Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, new Variable[]{rain1});
 
-        return new MMC(Arrays.asList(new Variable[]{rain0}), Arrays.asList(new Variable[]{rain1}),  Arrays.asList(new Variable[]{umbrella1}), doubleFactory);
+        return new MMC(new Variable[]{rain0}, new Variable[]{rain1},  new Variable[]{umbrella1}, doubleFactory);
     }
 
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2() {

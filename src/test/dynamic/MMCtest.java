@@ -1,6 +1,5 @@
 package test.dynamic;
 
-import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
 import math.Matrix;
@@ -10,7 +9,6 @@ import network.Variable;
 import network.dynamic.MMC;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -21,6 +19,46 @@ public class MMCtest {
     @Test
     public void megaVariableTestTwoVars() {
 
+        MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
+
+        for (int i = 1; i <= 2; i++) {
+
+            network.extend();
+        }
+
+        System.out.println(network);
+
+        IDomain booleanDomain = DomainFactory.getBooleanDomain();
+
+        Variable umbrella = new Variable(UMBRELLA.toString(), booleanDomain);
+
+        Variable coat = new Variable(COAT.toString(), booleanDomain);
+
+        //0 = umbrella, 1 : coat
+        int obsValues[][] = new int[][]{{1, 1}, {1, 1}};
+
+        int time = 1;
+
+        Map<Integer, Variable> megaVarObs = new Hashtable<>();
+
+        for (int values[] : obsValues) {
+
+            Variable megaVariableObservation = network.getMegaVariable(time, umbrella, coat);
+
+            umbrella.setValue(values[0]);
+
+            coat.setValue(values[1]);
+
+            megaVariableObservation.setDomainValuesFromVariables(umbrella, coat);
+
+            megaVarObs.put(time, megaVariableObservation);
+
+            time++;
+        }
+
+        Matrix forward = network.forward(2, megaVarObs);
+
+        System.out.println(forward);
     }
 
     @Test
@@ -42,35 +80,32 @@ public class MMCtest {
 
         MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
 
-        for(int i = 1 ; i <=  2 ; i ++) {
+        for (int i = 1; i <= 2; i++) {
 
             network.extend();
         }
 
         System.out.println(network);
 
-        IDomain booleanDomain = DomainFactory.getBooleanDomain();
+        Variable umbrella = new Variable(UMBRELLA.toString(), DomainFactory.getBooleanDomain());
 
-        Variable umbrella = new Variable(UMBRELLA.toString());
-
-        int obsValues[][] = new int[][]{{1},{1}};
+        int obsValues[][] = new int[][]{{1}, {1}};
 
         int time = 1;
 
-        Map<Integer,Variable> megaVarObs = new Hashtable<>();
+        Map<Integer, Variable> megaVarObs = new Hashtable<>();
 
-        for(int values[] : obsValues) {
+        for (int values[] : obsValues) {
 
-            for(int value : values) {
+            Variable megaVariableObservation = network.getMegaVariable(time, umbrella);
 
-                Variable megaVariableObservation = network.getMegaVariable(time, umbrella);
+            umbrella.setValue(values[0]);
 
-                megaVariableObservation.setDomainValues(booleanDomain.getDomainValue(value));
+            megaVariableObservation.setDomainValuesFromVariables(umbrella);
 
-                megaVarObs.put(time, megaVariableObservation);
-            }
+            megaVarObs.put(time, megaVariableObservation);
 
-            time ++;
+            time++;
         }
 
         Matrix forward = network.forward(2, megaVarObs);
