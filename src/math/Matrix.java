@@ -113,6 +113,21 @@ public class Matrix {
         return rsMatrix;
     }
 
+    public void normalize(){
+
+        AbstractDouble total = doubleFactory.getNew(0.0);
+
+        for( int row = 0 ; row < getRowCount() ; row ++){
+
+            total = total.add(getValue(row, 0));
+        }
+
+        for( int row = 0 ; row < getRowCount() ; row ++){
+
+            setValue(row, 0,getValue(row, 0).divide(total));
+        }
+    }
+
     @Override
     public String toString() {
 

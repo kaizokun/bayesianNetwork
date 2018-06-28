@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/Variable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/math/Matrix.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/math/Matrix.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/network/dynamic/MMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/dynamic/MMC.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/test/dynamic/MMCtest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/dynamic/MMCtest.java" afterDir="false" />
@@ -38,11 +38,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MMCtest.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MMCtest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCtest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="785">
-              <caret line="75" column="36" selection-start-line="75" selection-start-column="36" selection-end-line="75" selection-end-column="36" />
+            <state relative-caret-position="731">
+              <caret line="75" column="42" selection-start-line="75" selection-start-column="42" selection-end-line="75" selection-end-column="42" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -50,33 +50,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="IDomain.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/domain/IDomain.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
-              <caret line="9" column="11" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Domain.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/domain/Domain.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="50" column="18" selection-start-line="50" selection-start-column="18" selection-end-line="50" selection-end-column="18" />
-              <folding>
-                <element signature="e#1374#1375#0" expanded="true" />
-                <element signature="e#1416#1417#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MMC.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MMC.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/MMC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="695">
-              <caret line="266" column="65" selection-start-line="266" selection-start-column="65" selection-end-line="266" selection-end-column="65" />
+            <state relative-caret-position="209">
+              <caret line="239" column="55" selection-start-line="239" selection-start-column="55" selection-end-line="239" selection-end-column="55" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -87,8 +65,8 @@
       <file leaf-file-name="DynamicBayesianNetwork.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="443">
-              <caret line="244" selection-start-line="244" selection-end-line="244" />
+            <state relative-caret-position="357">
+              <caret line="245" column="28" selection-start-line="245" selection-start-column="28" selection-end-line="245" selection-end-column="28" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -99,8 +77,8 @@
       <file leaf-file-name="Matrix.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/math/Matrix.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
-              <caret line="120" column="30" selection-start-line="120" selection-start-column="30" selection-end-line="120" selection-end-column="30" />
+            <state relative-caret-position="767">
+              <caret line="127" column="9" selection-start-line="127" selection-start-column="9" selection-end-line="127" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -225,7 +203,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/inference/dynamic/Smoothing.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/Util.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/Forward.java" />
         <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
@@ -272,10 +249,11 @@
         <option value="$PROJECT_DIR$/src/math/Transpose.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/Forward.java" />
         <option value="$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java" />
-        <option value="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" />
         <option value="$PROJECT_DIR$/../probability/src/network/Variable.java" />
-        <option value="$PROJECT_DIR$/../probability/src/network/dynamic/MMC.java" />
+        <option value="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" />
+        <option value="$PROJECT_DIR$/../probability/src/math/Matrix.java" />
         <option value="$PROJECT_DIR$/../probability/src/test/dynamic/MMCtest.java" />
+        <option value="$PROJECT_DIR$/../probability/src/network/dynamic/MMC.java" />
       </list>
     </option>
   </component>
@@ -744,14 +722,7 @@
       <workItem from="1530083923458" duration="8992000" />
       <workItem from="1530110887573" duration="6013000" />
       <workItem from="1530175679343" duration="2906000" />
-      <workItem from="1530193150783" duration="4362000" />
-    </task>
-    <task id="LOCAL-00018" summary="restauration perte de fichier Git suite à une mauvaise manip">
-      <created>1528218233853</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1528218233853</updated>
+      <workItem from="1530193150783" duration="7958000" />
     </task>
     <task id="LOCAL-00019" summary="first commit">
       <created>1528219169278</created>
@@ -1089,43 +1060,50 @@
       <option name="project" value="LOCAL" />
       <updated>1530178571126</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="initialisation des valeurs d'observations d'une mega variable">
+      <created>1530197570200</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1530197570201</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="MMCtest_multiplyMatrixTest - 2018.06.28 at 16h 34m 08s.xml">
-      <configuration name="MMCtest.multiplyMatrixTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 38m 19s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 37m 52s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 38m 45s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 38m 19s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 39m 21s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 38m 46s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 39m 43s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 38m 58s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 44m 40s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 39m 22s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 46m 52s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 41m 28s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 46m 56s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 47m 44s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 50m 29s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 49m 13s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 16h 50m 42s.xml">
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 49m 22s.xml">
+      <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MMCtest_megaVariableTestOneVar - 2018.06.28 at 17h 50m 12s.xml">
       <configuration name="MMCtest.megaVariableTestOneVar" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="435716000" />
+    <option name="totallyTimeSpent" value="439312000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1208,7 +1186,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="test implementation filtrage reseau bayesien dynamique&#10;correction erreur calcul" />
     <MESSAGE value="organisation differente du filtrage pour separer&#10;1 : les cas ou la requete à plusieurs variable.&#10;2 : le cas ou une variable etat à plusieurs dependence avec le cas ou elle n'en a qu'une, dans les variable cachées de la sommation" />
     <MESSAGE value="modification du filtrage pour gerer la prediction" />
     <MESSAGE value="ebauche de pseudo code pour sous procedure backward du lissage" />
@@ -1233,7 +1210,8 @@
     <MESSAGE value="simplification du MMC stockage des matrices et des variables parents des megavariables d'observation et d'états + affichage des matrices directement dans le MMC. Copy des variables de compositions en adaptant le temps" />
     <MESSAGE value="matrice multiplication" />
     <MESSAGE value="matrice affichage" />
-    <option name="LAST_COMMIT_MESSAGE" value="matrice affichage" />
+    <MESSAGE value="initialisation des valeurs d'observations d'une mega variable" />
+    <option name="LAST_COMMIT_MESSAGE" value="initialisation des valeurs d'observations d'une mega variable" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1534,34 +1512,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/mmc/Forward.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/math/Matrix.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="120" column="30" selection-start-line="120" selection-start-column="30" selection-end-line="120" selection-end-column="30" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="192" selection-start-line="192" selection-end-line="192" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/domain/IDomain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="11" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
         </state>
       </provider>
     </entry>
@@ -1580,16 +1534,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="324">
           <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="244" selection-start-line="244" selection-end-line="244" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1618,10 +1562,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/MMC.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/domain/IDomain.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="695">
-          <caret line="266" column="65" selection-start-line="266" selection-start-column="65" selection-end-line="266" selection-end-column="65" />
+        <state relative-caret-position="162">
+          <caret line="9" column="11" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/mmc/Forward.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="245" column="28" selection-start-line="245" selection-start-column="28" selection-end-line="245" selection-end-column="28" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/math/Matrix.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="767">
+          <caret line="127" column="9" selection-start-line="127" selection-start-column="9" selection-end-line="127" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1630,8 +1598,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCtest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="785">
-          <caret line="75" column="36" selection-start-line="75" selection-start-column="36" selection-end-line="75" selection-end-column="36" />
+        <state relative-caret-position="731">
+          <caret line="75" column="42" selection-start-line="75" selection-start-column="42" selection-end-line="75" selection-end-column="42" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/MMC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="239" column="55" selection-start-line="239" selection-start-column="55" selection-end-line="239" selection-end-column="55" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

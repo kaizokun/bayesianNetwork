@@ -4,6 +4,7 @@ import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import math.Matrix;
+import math.Transpose;
 import network.BayesianNetwork;
 import network.Variable;
 
@@ -15,7 +16,7 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Map<String, Matrix> matrixObs;
 
-    protected Matrix matrixState0, matrixStates;
+    protected Matrix matrixState0, matrixStates, matrixStatesT;
 
     protected List<Variable> states, obs, parentStates, parentObs;
 
@@ -106,7 +107,7 @@ public class MMC extends DynamicBayesianNetwork {
         }
     }
 
-    private Variable  mergeObservationVariables(List<Variable> obs, List<Variable> states, int time){
+    private Variable mergeObservationVariables(List<Variable> obs, List<Variable> states, int time){
 
         //combinaison de valeurs pour les parents des observations
         List<List<Domain.DomainValue>> statesDomainValuesList = BayesianNetwork.domainValuesCombinations(states);
@@ -224,10 +225,60 @@ public class MMC extends DynamicBayesianNetwork {
             }
 
             this.matrixStates = new Matrix(matrix, states, parentStates, doubleFactory, false);
+
+            this.matrixStatesT = new Transpose(this.matrixStates);
         }
 
         return new Variable(states, time);
     }
+
+
+    public Matrix forward( int t, Map<Integer, Variable> megaVariableObs ){
+
+        /*
+        * on pourrait faire des megavariables états observations sur des sous ensemble de variables du reseau
+        * et pas forcement sur la totalité et au besoin
+        *
+        * */
+
+        if(t == 0){
+
+            Matrix forward =  new Transpose(this.matrixState0);
+
+            forward.normalize();
+
+            //System.out.println("FORWARD "+t+"\n "+forward);
+
+            return forward;
+        }
+
+        Variable megaObs = megaVariableObs.get(t);
+
+        Matrix obs = this.getMatrixObs(megaObs);
+        //dans la matrice de base les lignes correspondent aux valeurs parents
+        //et les colones aux valeurs enfants, dans la transposée c'est l'inverse.
+        //la multiplication matricielle se fait ligne par ligne pour la transposée de la premiere matrice
+        //soit valeur par valeur de la megavariable états
+        //puis pour chaque ligne la somme se fait colonne par colonne
+        //soit pour chaque valeur prise par la megavariable parents située au temps précédent
+        //la matrice resultante contient une ligne par  valeur de la megavariable (enfant) en temps t
+        //la matrice observation contient une valeur par ligne pour chaque valeur de la la megavariable en temps t
+        //ces valeurs sont sur la diagonale le reste à zero pour faciliter le calcul
+        //en multipliant la matrice somme par la matrice observation on obtient la distribution forward
+        //sur les valeurs de la megavariable en temps t ligne par ligne
+        Matrix sum = this.matrixStatesT.multiply(forward( t - 1, megaVariableObs));
+
+        Matrix forward = obs.multiply(sum);
+
+        forward.normalize();
+
+        //System.out.println("FORWARD "+t+"\n "+forward);
+
+        return forward;
+    }
+
+
+    /*-------------------- GETTER SETTER --------------------*/
 
     public Variable getMegaVariable( int time, Variable ... variables) {
 
@@ -238,19 +289,6 @@ public class MMC extends DynamicBayesianNetwork {
         // recupere la variable enregistrée dans le reseau au temps t à l'aide de ce label
         return this.getVariable(time, megaVariable);
     }
-
-    public void showMegaVarsMatrix(){
-
-        for(Matrix matrixObs : matrixObs.values()){
-
-            System.out.println(matrixObs);
-        }
-
-        System.out.println(matrixState0);
-
-        System.out.println(matrixStates);
-    }
-
 
     public Matrix getMatrixState0() {
 
@@ -266,4 +304,32 @@ public class MMC extends DynamicBayesianNetwork {
 
         return matrixObs.get(megaVariable.getMegaVarValuesKey());
     }
+
+    /*---------------------- VIEW ---------------*/
+
+    @Override
+    public String toString() {
+
+        StringBuilder stringBuilder = new StringBuilder( super.toString());
+
+        stringBuilder.append("--------------------------------------------------------------------\n");
+        stringBuilder.append("--------------------------- MATRIX ---------------------------------\n");
+        stringBuilder.append("--------------------------------------------------------------------\n\n");
+
+        for(Matrix matrixObs : matrixObs.values()){
+
+            stringBuilder.append(matrixObs);
+
+            stringBuilder.append('\n');
+        }
+
+        stringBuilder.append(matrixState0);
+
+        stringBuilder.append('\n');
+
+        stringBuilder.append(matrixStates);
+
+        return stringBuilder.toString();
+    }
+
 }

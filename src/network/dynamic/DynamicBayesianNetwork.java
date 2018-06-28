@@ -237,7 +237,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         StringBuilder builder = new StringBuilder();
 
+        builder.append("------------------------------------------------------------------\n");
+        builder.append("------------------------------NETWORK-----------------------------\n");
+        builder.append("------------------------------------------------------------------\n\n");
+
         loadTree(this.roots, builder, 0);
+
+        builder.append("\n\n");
 
         return builder.toString();
     }

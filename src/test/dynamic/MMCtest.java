@@ -11,6 +11,8 @@ import network.dynamic.MMC;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Map;
 
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
@@ -32,8 +34,6 @@ public class MMCtest {
 
         Matrix rs = m2.multiply(new Transpose(m1));
 
-        network.showMegaVarsMatrix();
-
         System.out.println(rs);
     }
 
@@ -42,7 +42,7 @@ public class MMCtest {
 
         MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
 
-        for(int i = 1 ; i <  3 ; i ++) {
+        for(int i = 1 ; i <=  2 ; i ++) {
 
             network.extend();
         }
@@ -53,9 +53,11 @@ public class MMCtest {
 
         Variable umbrella = new Variable(UMBRELLA.toString());
 
-        int obsValues[][] = new int[][]{{0},{0},{1}};
+        int obsValues[][] = new int[][]{{1},{1}};
 
         int time = 1;
+
+        Map<Integer,Variable> megaVarObs = new Hashtable<>();
 
         for(int values[] : obsValues) {
 
@@ -65,18 +67,16 @@ public class MMCtest {
 
                 megaVariableObservation.setDomainValues(booleanDomain.getDomainValue(value));
 
-                System.out.println(megaVariableObservation);
-
-                System.out.println(network.getMatrixObs(megaVariableObservation));
+                megaVarObs.put(time, megaVariableObservation);
             }
 
             time ++;
         }
 
-        System.out.println(network);
+        Matrix forward = network.forward(2, megaVarObs);
+
+        System.out.println(forward);
 
     }
-
-
 
 }
