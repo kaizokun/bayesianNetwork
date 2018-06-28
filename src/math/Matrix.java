@@ -3,6 +3,8 @@ package math;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import network.BayesianNetwork;
+import network.Variable;
 
 import java.util.List;
 
@@ -11,12 +13,42 @@ public class Matrix {
     protected AbstractDouble[][] matrix;
 
     protected AbstractDoubleFactory doubleFactory;
+    //pour l'affichage des matrices
+    protected List<List<Domain.DomainValue>> values, parentValues;
+
+    protected List<Variable> variables, dependencies;
+
+    protected boolean isObservation = false;
 
     public Matrix() {
     }
 
-    public Matrix(AbstractDouble[][] matrix, AbstractDoubleFactory doubleFactory) {
+    public Matrix(Matrix matrix) {
 
+        this(matrix.matrix, matrix.variables, matrix.dependencies, matrix.doubleFactory, matrix.isObservation);
+    }
+
+    public Matrix(AbstractDouble[][] matrix, List<Variable> variables, List<Variable> dependencies, AbstractDoubleFactory doubleFactory, boolean isObservation) {
+
+        //pour l'affichage des matrices
+
+        this.variables = variables;
+
+        this.dependencies = dependencies;
+
+        if (variables != null) {
+
+            this.values = BayesianNetwork.domainValuesCombinations(variables);
+        }
+
+        if (dependencies != null) {
+
+            this.parentValues = BayesianNetwork.domainValuesCombinations(dependencies);
+        }
+
+        this.isObservation = isObservation;
+
+        //----
         this.matrix = matrix;
 
         this.doubleFactory = doubleFactory;
@@ -61,7 +93,7 @@ public class Matrix {
         }
         //la matrice resultat à autemp de ligne que m1 et autant de colones que m2
 
-        Matrix rsMatrix = new Matrix(new AbstractDouble[this.getRowCount()][m2.getColCount()], doubleFactory);
+        Matrix rsMatrix = new Matrix(new AbstractDouble[this.getRowCount()][m2.getColCount()], null, null, doubleFactory, false);
 
         for (int row = 0; row < this.getRowCount(); row++) {
 
@@ -71,7 +103,7 @@ public class Matrix {
                 //autant de somme de que de colones dans m1 (ou de ligne dans m2)
                 for (int cr = 0; cr < this.getColCount(); cr++) {
 
-                    sum = sum.add(this.getValue(row, cr).multiply(m2.getValue(cr, col )));
+                    sum = sum.add(this.getValue(row, cr).multiply(m2.getValue(cr, col)));
                 }
 
                 rsMatrix.setValue(row, col, sum);
@@ -86,11 +118,36 @@ public class Matrix {
 
         StringBuilder builder = new StringBuilder("\n");
 
-        for(AbstractDouble[] row : matrix){
+        if (variables != null)
+            builder.append("ROWS : " + variables + '\n');
+        if (dependencies != null)
+            builder.append("COLS : " + dependencies + '\n');
 
-            for(AbstractDouble col : row){
+        if (!this.isObservation && this.values != null) {
 
-                builder.append(String.format("[%.3f]", col.getDoubleValue()));
+            builder.append(String.format("%6s", ""));
+
+            for (List<Domain.DomainValue> domainValues : values) {
+
+                builder.append(String.format("%-7s", domainValues));
+            }
+        }
+
+        builder.append('\n');
+
+        for (int r = 0; r < this.getRowCount(); r++) {
+
+            if (parentValues != null) {
+
+                builder.append(String.format("%5s", parentValues.get(r)));
+            } else {
+
+                builder.append(String.format("%5s", ""));
+            }
+
+            for (int c = 0; c < this.getColCount(); c++) {
+
+                builder.append(String.format("[%.3f]", getValue(r, c).getDoubleValue()));
             }
 
             builder.append('\n');
@@ -98,4 +155,5 @@ public class Matrix {
 
         return builder.toString();
     }
+
 }

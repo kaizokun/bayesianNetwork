@@ -16,7 +16,7 @@ public class EliminationAsk {
         BayesianNetwork.markImportantVars(request, observations);
 
         //copie des variables de la requete et de leur valeur d'origine
-        //reset des valeurs de la requetes seul les observation seront ignorées
+        //reset des valeurs de la requetes seul les isObservation seront ignorées
         Map<Variable, Domain.DomainValue> reqValues = new Hashtable<>();
 
         for(Variable varReq : request){

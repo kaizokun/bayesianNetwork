@@ -164,7 +164,7 @@ public class MMC extends DynamicBayesianNetwork {
                 col ++;
             }
 
-            matrixMap.put(obsDomainValues.toString(), new Matrix(obsMatrix, doubleFactory));
+            matrixMap.put(obsDomainValues.toString(), new Matrix(obsMatrix, obs, states,  doubleFactory, true));
         }
 
         this.matrixObs = matrixMap;
@@ -188,7 +188,7 @@ public class MMC extends DynamicBayesianNetwork {
 
             this.loadVarDistrib(matrix[0], states, domainValuesList, doubleFactory);
 
-            this.matrixState0 = new Matrix(matrix, doubleFactory);
+            this.matrixState0 = new Matrix(matrix, states, null, doubleFactory, false);
 
         }else{
 
@@ -223,7 +223,7 @@ public class MMC extends DynamicBayesianNetwork {
                 row ++;
             }
 
-            this.matrixStates = new Matrix(matrix, doubleFactory);
+            this.matrixStates = new Matrix(matrix, states, parentStates, doubleFactory, false);
         }
 
         return new Variable(states, time);
@@ -231,75 +231,16 @@ public class MMC extends DynamicBayesianNetwork {
 
     public void showMegaVarsMatrix(){
 
-        List<List<Domain.DomainValue>> compVarParentsValues = BayesianNetwork.domainValuesCombinations(parentStates);
+        for(Matrix matrixObs : matrixObs.values()){
 
-        System.out.println(getMatrixView(megaVariableStates0, matrixState0.getMatrix(), "", compVarParentsValues, compVarParentsValues));
-
-        System.out.println(getMatrixView(megaVariableStates1, matrixStates.getMatrix(), "", compVarParentsValues, compVarParentsValues));
-
-        System.out.println(getObsMatrixView());
-    }
-
-    public String getObsMatrixView(){
-
-        StringBuilder builder = new StringBuilder();
-
-        List<List<Domain.DomainValue>> compVarParentsValues = BayesianNetwork.domainValuesCombinations(parentObs);
-
-        List<List<Domain.DomainValue>> compVarValues = BayesianNetwork.domainValuesCombinations(obs);
-
-        for(Map.Entry<String, Matrix> entry : this.matrixObs.entrySet()){
-
-            builder.append(getMatrixView(megaVariableObs1, entry.getValue().getMatrix(), entry.getKey(), compVarValues, compVarParentsValues ));
+            System.out.println(matrixObs);
         }
 
-        return builder.toString();
+        System.out.println(matrixState0);
+
+        System.out.println(matrixStates);
     }
 
-    public String getMatrixView(Variable megaVariable, AbstractDouble[][] matrix, String key,
-                                List<List<Domain.DomainValue>> compVarValues,
-                                List<List<Domain.DomainValue>> compVarParentsValues ){
-
-        StringBuilder builder = new StringBuilder("\n");
-
-        builder.append(megaVariable.getLabel()+"-"+megaVariable.getTime()+" : "+key+'\n');
-
-        if(key.isEmpty()) {
-
-            if(matrix.length > 1) {
-
-                builder.append(String.format("%6s", ""));
-            }
-
-            for (List<Domain.DomainValue> domainValues : compVarValues) {
-
-                builder.append(String.format("%-7s", domainValues));
-            }
-
-            builder.append('\n');
-        }
-
-        int r = 0 ;
-
-        for(AbstractDouble[] row : matrix){
-
-            if(matrix.length > 1) {
-
-                builder.append(String.format("%5s", compVarParentsValues.get(r)));
-            }
-
-            for(AbstractDouble col : row){
-
-                builder.append(String.format("[%.3f]", col.getDoubleValue()));
-            }
-
-            builder.append('\n');
-
-            r ++;
-        }
-
-        return builder.toString();
-    }
 
     public Matrix getMatrixState0() {
 

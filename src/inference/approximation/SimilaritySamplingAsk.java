@@ -16,7 +16,7 @@ public class SimilaritySamplingAsk {
         //retrait des observations qui ne seront pas echantillonées
         variables.removeAll(obs);
 
-        //sauvegarde les valeurs originales des variables de requete et d'observation
+        //sauvegarde les valeurs originales des variables de requete et d'isObservation
         for (Variable reqVar : request) {
 
             reqVar.saveOriginValue();

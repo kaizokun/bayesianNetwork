@@ -86,9 +86,9 @@ public class Backward {
                             containObs.add(nextObservation.getVarTimeId());
 
                             nextObservations.add(nextObservation);
-                            //maintenant chaque observation sera calculé en fonction de ses parents dans partie 1 de la somme
+                            //maintenant chaque isObservation sera calculé en fonction de ses parents dans partie 1 de la somme
                             for (Variable observationDep : nextObservation.getDependencies()) {
-                                //et le parent de l'observation sera calculé en fonction des siens en partie 3
+                                //et le parent de l'isObservation sera calculé en fonction des siens en partie 3
                                 //cependant certain pourrait ne pas faire partie de la requete originale
                                 //et il faut donc les rajouter
                                 for (Variable missingRequest : observationDep.getDependencies()) {
@@ -130,7 +130,7 @@ public class Backward {
             if(backwardLogDetails)
                 System.out.println(ident+"FULL REQUEST INIT COMBINATION : "+fullRequest);
 
-            //multiplier le resultat pour chaque observation
+            //multiplier le resultat pour chaque isObservation
             AbstractDouble multiplyObservations = network.getDoubleFactory().getNew(1.0);
 
             for (Variable nextObservation : nextObservations) {
@@ -302,7 +302,7 @@ public class Backward {
          * on à 4 états s(0) , s(1)|s(0) , s(2)|s(1),s(0) , s(3)|s(2),s(1)
          * 3 observations o(1)|s(1)  o(2)|s(2) o(3)|s(3)
          *
-         * la requete APPEL_1 est s(1) , l'observation suivante o(2), l'état parent de l'observation qui est la variable cachée
+         * la requete APPEL_1 est s(1) , l'isObservation suivante o(2), l'état parent de l'isObservation qui est la variable cachée
          * est s(2) a deux parents s(1),s(0) par consequent on complete la requete par s(0)
          * on travaille donc sur des combinaisons de valeurs pour s(1),s(0) en dehors de la somme,
          * puis dans la 3eme partie de la somme (qui se fait sur les valeurs prises par s(2))
@@ -345,18 +345,18 @@ public class Backward {
                 if (nextRequest != null) {
 
                     for (Variable nextObservation : nextRequest.getObservations()) {
-                        //ignore les observation déja enregistrées
+                        //ignore les isObservation déja enregistrées
                         if (!containObs.contains(nextObservation.getVarTimeId())) {
 
                             containObs.add(nextObservation.getVarTimeId());
 
                             nextObservations.add(nextObservation);
-                            //maintenant chaque observation sera calculé en fonction de ses parents dans partie 1 de la somme
+                            //maintenant chaque isObservation sera calculé en fonction de ses parents dans partie 1 de la somme
                             for (Variable observationDep : nextObservation.getDependencies()) {
-                                //et le parent de l'observation sera calculé en fonction des siens en partie 3
+                                //et le parent de l'isObservation sera calculé en fonction des siens en partie 3
                                 //cependant certain pourrait ne pas faire partie de la requete originale
                                 //exemple pour une chaine de markov d'ordre 2
-                                //une requete sur s(1), on prend l'observation suivante o(2)
+                                //une requete sur s(1), on prend l'isObservation suivante o(2)
                                 //o(2) à pour parent s(2) qui depend de s(1) mais aussi de s(0)
                                 //donc la partie 3 à besoin d'assigner une valeur à s(0) et s(1) pour calculer s(2)
                                 //qui doit completer la requete même si dans la distribution finale
@@ -409,7 +409,7 @@ public class Backward {
             if(backwardLogDetails)
                 System.out.println(ident+"FULL REQUEST INIT COMBINATION "+fullKey+" : "+fullRequest);
 
-            //multiplier le resultat pour chaque observation
+            //multiplier le resultat pour chaque isObservation
             AbstractDouble multiplyObservations = network.getDoubleFactory().getNew(1.0);
 
             for (Variable nextObservation : nextObservations) {
@@ -476,7 +476,7 @@ public class Backward {
 
         String fullKey = "";
 
-        //récuperer tout les parents de l'observation courante soit
+        //récuperer tout les parents de l'isObservation courante soit
         //normalement uniquement les variables états situées à la même coupe temporelle
         //on commence par ajouter celles là
         List<Variable> keyVars = new LinkedList<>();
@@ -534,7 +534,7 @@ public class Backward {
 
             Map<Domain.DomainValue, AbstractDouble> hiddenVarsFullDistribution = this.backwardFullDistribSaved.get(fullKey);
 
-            /* ici il faut travailler sur la distribution sur le parent de l'observation complétée
+            /* ici il faut travailler sur la distribution sur le parent de l'isObservation complétée
              * recuperer en fonction de l'ordre les predecesseurs de ce parent
              * et avec la clé comprenant les labels et temps recuperer la bonne valeur
              * qui vient d'être calculée

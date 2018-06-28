@@ -198,7 +198,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                     newDependencies, this.time);
 
             if (captors) {
-                //pour les variables d'observation enregistre dans les variables parents leur indice
+                //pour les variables d'isObservation enregistre dans les variables parents leur indice
                 //dans la liste des enfants
                 newVar.saveObservation();
             }
