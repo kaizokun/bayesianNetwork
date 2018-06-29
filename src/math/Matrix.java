@@ -107,36 +107,24 @@ public class Matrix {
         this.matrix = matrix;
     }
 
-    public MultiplyRs multiply(Matrix forward, Matrix maxForward){
+    public Matrix multiplyMax(Matrix maxForward){
 
-        if (this.getColCount() != forward.getRowCount()) {
+        if (this.getColCount() != maxForward.getRowCount()) {
 
             throw new RuntimeException("le nombre de colones de la matrice ne correspond pas avec" +
                     " le nombre de lignes de celle reçu en parametres");
         }
 
-        //la matrice resultat à autant de ligne que m1 et autant de colones que sum
-        //ici on s'en sert principalement pour calculer une distribution
-        //sur une variable ou une megavariable, le sum ou le backward ( 1 colonne plusieurs lignes )
-        //on passe aussi les colVars et les valeurs qui constitue chaque ligne de la distribution
-        Matrix rsMatrix = new Matrix(
-                new AbstractDouble[this.getRowCount()][forward.getColCount()],
-                forward.getRowVars(),
-                forward.getRowValues(),
-                doubleFactory);
-
         Matrix rsMaxMatrix = new Matrix(
-                new AbstractDouble[this.getRowCount()][forward.getColCount()],
-                forward.getRowVars(),
-                forward.getRowValues(),
+                new AbstractDouble[this.getRowCount()][maxForward.getColCount()],
+                maxForward.getRowVars(),
+                maxForward.getRowValues(),
                 doubleFactory);
 
         //pour chaque ligne on travaille sur une valeur de la variable état enfant
         for (int row = 0; row < this.getRowCount(); row++) {
             //le nombre de colone de sum si il s'agit du sum est unique
-            for (int col = 0; col < forward.getColCount(); col++) {
-
-                AbstractDouble sum = doubleFactory.getNew(0.0);
+            for (int col = 0; col < maxForward.getColCount(); col++) {
 
                 AbstractDouble max = doubleFactory.getNew(0.0);
 
@@ -148,8 +136,6 @@ public class Matrix {
                 //identique pour le max sauf qu'on prend le maximum plutot qu'additionner
                 for (int cr = 0; cr < this.getColCount(); cr++) {
 
-                    AbstractDouble mul = this.getValue(row, cr).multiply(forward.getValue(cr, col));
-
                     AbstractDouble mulMax =  this.getValue(row, cr).multiply(maxForward.getValue(cr, col));
 
                     if (mulMax.compareTo(max) > 0) {
@@ -158,11 +144,7 @@ public class Matrix {
                         //enregistre l'indice de la ligne du maxForward qui à fournit la valeur max.
                         maxPreviousForwardRow = cr;
                     }
-
-                    sum = sum.add(mul);
                 }
-
-                rsMatrix.setValue(row, col, sum);
 
                 rsMaxMatrix.setValue(row, col, max);
                 //pour tel ligne de la matrice max resultat ( ou colone de la transposée de la matrice de transition )
@@ -171,37 +153,8 @@ public class Matrix {
             }
         }
 
-        return new MultiplyRs(rsMatrix, rsMaxMatrix);
+        return rsMaxMatrix;
     }
-
-    public static class MultiplyRs {
-
-        private Matrix sum, max;
-
-        public MultiplyRs(Matrix forward, Matrix max) {
-
-            this.sum = forward;
-
-            this.max = max;
-        }
-
-        public Matrix getSum() {
-            return sum;
-        }
-
-        public void setSum(Matrix sum) {
-            this.sum = sum;
-        }
-
-        public Matrix getMax() {
-            return max;
-        }
-
-        public void setMax(Matrix max) {
-            this.max = max;
-        }
-    }
-
 
     public Matrix multiply(Matrix m2) {
 

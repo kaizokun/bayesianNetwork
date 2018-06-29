@@ -5,6 +5,7 @@ import domain.DomainFactory;
 import domain.IDomain;
 import inference.dynamic.mmc.Backward;
 import inference.dynamic.mmc.Forward;
+import inference.dynamic.mmc.MostLikelySequency;
 import inference.dynamic.mmc.Smoothing;
 import math.Matrix;
 import math.Transpose;
@@ -110,19 +111,19 @@ public class MMCtest {
     @Test
     public void mostLikelyPathTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {0}, {1}, {0}, {0}, {0}, {0}, {1}, {0}, {1}};
+        int[][] obsValues = new int[][]{{1}, {1}, {1}, {0}, {0}, {1}, {0}, {1}, {0}, {1}};
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
-        Forward mmcForward = new Forward(mmc);
+        MostLikelySequency mostLikelySequency = new MostLikelySequency(mmc);
 
-        Matrix forward = mmcForward.forward(10, megaVarObs);
+        Matrix forward = mostLikelySequency.forward(10, megaVarObs);
 
         System.out.println(mmc);
 
         System.out.println(forward);
 
-        List<List<Domain.DomainValue>> mostLilelySequency = mmcForward.mostLikelyPath(obsValues.length);
+        List<List<Domain.DomainValue>> mostLilelySequency = mostLikelySequency.mostLikelyPath(obsValues.length);
 
         System.out.println(mostLilelySequency);
     }

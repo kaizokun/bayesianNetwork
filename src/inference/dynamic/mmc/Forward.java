@@ -1,7 +1,4 @@
 package inference.dynamic.mmc;
-
-import domain.Domain;
-import domain.data.AbstractDouble;
 import math.Matrix;
 import math.Transpose;
 import network.Variable;
@@ -13,8 +10,7 @@ public class Forward {
 
     protected MMC mmc;
 
-    protected Map<Integer, Matrix> forwards = new Hashtable<>(),
-                                   forwardsMax = new Hashtable<>();
+    protected Map<Integer, Matrix> forwards = new Hashtable<>();
 
     public Forward(MMC mmc) {
 
@@ -23,10 +19,10 @@ public class Forward {
 
     public Matrix forward(int t, Map<Integer, Variable> megaVariablesObs) {
 
-        return forward(t, megaVariablesObs, 0).forward;
+        return forward(t, megaVariablesObs, 0);
     }
 
-    private ForwardRs forward(int t, Map<Integer, Variable> megaVariablesObs, int depth) {
+    private Matrix forward(int t, Map<Integer, Variable> megaVariablesObs, int depth) {
 
         /*
          * on pourrait faire des megavariables états observations sur des sous ensemble de colVars du reseau
@@ -37,15 +33,11 @@ public class Forward {
 
             Matrix forward = new Transpose(this.mmc.getMatrixState0());
 
-            Matrix forwardMax = new Transpose(this.mmc.getMatrixState0());
-
             forward.normalize();
 
             this.forwards.put(t, forward);
 
-            this.forwardsMax.put(t, forwardMax);
-
-            return new ForwardRs(forward, forwardMax);
+            return forward;
         }
 
         Variable megaObs = megaVariablesObs.get(t);
@@ -66,83 +58,31 @@ public class Forward {
         //pour recuperer la sequence la plus probable, ici la multiplication se fait depuis la
         //matrice transition pour chaque ligne on calcule une valeur max Xt-1 pour une valeur de Xt
 
-        ForwardRs rs = forward(t - 1, megaVariablesObs, depth + 1);
+        Matrix forward = forward(t - 1, megaVariablesObs, depth + 1);
 
-        Matrix.MultiplyRs multiplyRs = this.mmc.getMatrixStatesT().multiply(rs.forward, rs.max);
+        Matrix sum = this.multiplyTransitionForward(this.mmc.getMatrixStatesT(), forward);
 
         //Matrix sum = this.mmc.getMatrixStatesT().multiply(rs.forward);
         //inutile de faire une multiplication matricielle avec les observations
         //qui plutot que d'etre placé sur une diagonale
         //sont placé ligne par ligne le resultat de la somme étant toujours sur une colonne également
         //on peut multiplier ligne par ligne
-        Matrix forward = obs.multiplyRows(multiplyRs.getSum());
-
-        Matrix forwardMax = obs.multiplyRows(multiplyRs.getMax());
-
-        forwardMax.setMaxPrevious(multiplyRs.getMax().getMaxPrevious());
+        forward = obs.multiplyRows(sum);
 
         forward = forward.normalize();
+        //opération supllémentaire pour le most likely path
+        this.mostLikelyPath(forward, sum);
 
         this.forwards.put(t, forward);
 
-        this.forwardsMax.put(t, forwardMax);
-
-        return new ForwardRs(forward, forwardMax);
+        return forward;
     }
 
-    private class ForwardRs {
+    protected void mostLikelyPath(Matrix forward, Matrix sum) { }
 
-        private Matrix forward, max;
+    protected Matrix multiplyTransitionForward(Matrix matrixStatesT, Matrix forward) {
 
-        public ForwardRs(Matrix forward, Matrix max) {
-
-            this.forward = forward;
-
-            this.max = max;
-        }
-    }
-
-    public List<List<Domain.DomainValue>> mostLikelyPath(int t) {
-
-        LinkedList<List<Domain.DomainValue>> mostLikelySequence = new LinkedList<>();
-
-        //récupère la matrice forward du dernier temps;
-        Matrix tForwardMax = forwardsMax.get(t);
-
-        AbstractDouble max = mmc.getDoubleFactory().getNew(0.0);
-
-        int maxRow = 0;
-
-        for(int row = 0 ; row < tForwardMax.getRowCount() ; row ++){
-
-            if(tForwardMax.getValue(row,0).compareTo(max) > 0){
-
-                max = tForwardMax.getValue(row,0);
-
-                maxRow = row;
-            }
-        }
-
-        mostLikelySequence.add(tForwardMax.getRowValue(maxRow));
-
-        //récupere la ligne correspondant à la meilleur valeur precedente
-        //à partir des valeurs recu en parametre
-        int row = tForwardMax.getPreviousForwardMaxValueRow(maxRow);
-
-        t--;
-
-        while (t > 0) {
-
-            tForwardMax = forwardsMax.get(t);
-
-            mostLikelySequence.addFirst(tForwardMax.getRowValue(row));
-
-            row = tForwardMax.getPreviousForwardMaxValueRow(row);
-
-            t--;
-        }
-
-        return mostLikelySequence;
+        return this.mmc.getMatrixStatesT().multiply(forward);
     }
 
     public Map<Integer, Matrix> getForwards() {
