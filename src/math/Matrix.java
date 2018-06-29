@@ -178,4 +178,15 @@ public class Matrix {
         return builder.toString();
     }
 
+    public Matrix multiplyRows(Matrix m2) {
+
+        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], doubleFactory);
+
+        for( int row = 0 ; row < getRowCount() ; row ++){
+
+            rs.setValue(row, 0, this.getValue(row, 0).multiply(m2.getValue(row,0)));
+        }
+
+        return rs;
+    }
 }

@@ -2,6 +2,9 @@ package test.dynamic;
 
 import domain.DomainFactory;
 import domain.IDomain;
+import inference.dynamic.mmc.Backward;
+import inference.dynamic.mmc.Forward;
+import inference.dynamic.mmc.Smoothing;
 import math.Matrix;
 import math.Transpose;
 import network.BayesianNetworkFactory;
@@ -16,17 +19,16 @@ import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
 public class MMCtest {
 
-    @Test
-    public void megaVariableTestTwoVars() {
+    protected MMC mmc;
 
-        MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
+    protected Map<Integer, Variable> megaVariableTestTwoVars(int extend, int [][] obsValues) {
+
+        mmc = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
         //le MMC possede déja une megavariable etendu au temps 1
-        for (int i = 2; i <= 10; i++) {
+        for (int i = 2; i <= extend; i++) {
 
-            network.extend();
+            mmc.extend();
         }
-
-        System.out.println(network);
 
         IDomain booleanDomain = DomainFactory.getBooleanDomain();
 
@@ -34,16 +36,13 @@ public class MMCtest {
 
         Variable coat = new Variable(COAT.toString(), booleanDomain);
 
-        //0 = umbrella, 1 : coat
-        int obsValues[][] = new int[][]{{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}};
-
         int time = 1;
 
         Map<Integer, Variable> megaVarObs = new Hashtable<>();
 
         for (int values[] : obsValues) {
 
-            Variable megaVariableObservation = network.getMegaVariable(time, umbrella, coat);
+            Variable megaVariableObservation = mmc.getMegaVariable(time, umbrella, coat);
 
             umbrella.setValue(values[0]);
 
@@ -56,30 +55,19 @@ public class MMCtest {
             time++;
         }
 
-        Matrix forward = network.forward(5, megaVarObs);
-
-        Matrix backward = network.backward(5, megaVarObs);
-
-        System.out.println(forward);
-
-        System.out.println(backward);
+        return megaVarObs;
     }
 
-    @Test
-    public void megaVariableTestOneVar() {
+    protected Map<Integer, Variable> megaVariableTestOneVar(int extend, int [][] obsValues) {
 
-        MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
+        mmc = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
 
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 1; i <= extend; i++) {
 
-            network.extend();
+            mmc.extend();
         }
 
-        System.out.println(network);
-
         Variable umbrella = new Variable(UMBRELLA.toString(), DomainFactory.getBooleanDomain());
-
-        int obsValues[][] = new int[][]{{1}, {1}};
 
         int time = 1;
 
@@ -87,7 +75,7 @@ public class MMCtest {
 
         for (int values[] : obsValues) {
 
-            Variable megaVariableObservation = network.getMegaVariable(time, umbrella);
+            Variable megaVariableObservation = mmc.getMegaVariable(time, umbrella);
 
             umbrella.setValue(values[0]);
 
@@ -98,10 +86,93 @@ public class MMCtest {
             time++;
         }
 
-        Matrix forward = network.forward(2, megaVarObs);
+        return megaVarObs;
+    }
+
+    @Test
+    public void forwardTestOneVar(){
+
+        int[][] obsValues = new int[][]{{1},{1}};
+
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+
+        Forward mmcForward = new Forward(mmc);
+
+        Matrix forward = mmcForward.forward(2, megaVarObs);
+
+        System.out.println(mmc);
+
+        System.out.println(forward);
+    }
+
+    @Test
+    public void BackwardTestOneVar(){
+
+        int[][] obsValues = new int[][]{{1},{1}};
+
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+
+        Backward mmcBackward = new Backward(mmc);
+
+        Matrix backward = mmcBackward.backward(1, megaVarObs);
+
+        System.out.println(mmc);
+
+        System.out.println(backward);
+    }
+
+    @Test
+    public void smoothingTestOneVar(){
+
+        int[][] obsValues = new int[][]{{1},{1}};
+
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues );
+
+        System.out.println(mmc);
+
+        Matrix smoothing = new Smoothing(mmc).smoothing(1, megaVarObs);
+
+        System.out.println("Smoothing");
+
+        System.out.println(smoothing);
+    }
+
+    @Test
+    public void smoothingRangeTestOneVar(){
+
+        int[][] obsValues = new int[][]{{1},{1},{1},{1},{1}};
+
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues );
+
+       // System.out.println(mmc);
+
+        Smoothing smoothing = new Smoothing(mmc);
+
+        smoothing.smoothing(2,4, megaVarObs);
+
+        System.out.println("Smoothings");
+
+        System.out.println(smoothing.getSmoothings());
+    }
+
+    @Test
+    public void forwardBackwardTestTwoVar(){
+
+        int[][] obsValues = new int[][]{{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1}};
+
+        Map<Integer, Variable> megaVarObs = megaVariableTestTwoVars(obsValues.length - 1, obsValues);
+
+        Forward mmcForward = new Forward(mmc);
+
+        Backward mmcBackward = new Backward(mmc);
+
+        Matrix forward = mmcForward.forward(2, megaVarObs);
+
+        Matrix backward = mmcBackward.backward(2, megaVarObs);
 
         System.out.println(forward);
 
+        System.out.println(backward);
     }
 
     @Test

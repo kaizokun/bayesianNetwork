@@ -224,95 +224,6 @@ public class MMC extends DynamicBayesianNetwork {
         return new Variable(states, time);
     }
 
-    public Matrix forward(int t, Map<Integer, Variable> megaVariableObs) {
-
-        return forward(t, megaVariableObs, 0);
-    }
-
-    private Matrix forward(int t, Map<Integer, Variable> megaVariableObs, int depth) {
-
-        /*
-         * on pourrait faire des megavariables états observations sur des sous ensemble de variables du reseau
-         * et pas forcement sur la totalité et au besoin
-         *
-         * */
-
-        //System.out.println( Util.getIdent(depth)+" "+t);
-
-        if (t == 0) {
-
-            Matrix forward = new Transpose(this.matrixState0);
-
-            forward.normalize();
-
-            //System.out.println("FORWARD "+t+"\n "+forward);
-
-            return forward;
-        }
-
-        Variable megaObs = megaVariableObs.get(t);
-
-        Matrix obs = this.getMatrixObs(megaObs);
-        //dans la matrice de base les lignes correspondent aux valeurs parents
-        //et les colones aux valeurs enfants, dans la transposée c'est l'inverse.
-        //la multiplication matricielle se fait ligne par ligne pour la transposée de la premiere matrice
-        //soit valeur par valeur de la megavariable états
-        //puis pour chaque ligne la somme se fait colonne par colonne
-        //soit pour chaque valeur prise par la megavariable parents située au temps précédent
-        //la matrice resultante contient une ligne par  valeur de la megavariable (enfant) en temps t
-        //la matrice observation contient une valeur par ligne pour chaque valeur de la la megavariable en temps t
-        //ces valeurs sont sur la diagonale le reste à zero pour faciliter le calcul
-        //en multipliant la matrice somme par la matrice observation on obtient la distribution forward
-        //sur les valeurs de la megavariable en temps t ligne par ligne
-        Matrix sum = this.matrixStatesT.multiply(forward(t - 1, megaVariableObs, depth + 1));
-
-        Matrix forward = obs.multiply(sum);
-
-        return forward.normalize();
-    }
-
-    public Matrix backward(int t, Map<Integer, Variable> megaVariableObs) {
-
-        return backward(t, megaVariableObs, 0);
-    }
-
-    private Matrix backward(int t, Map<Integer, Variable> megaVariableObs, int depth) {
-
-        if(t == this.time){
-
-            int rows = 1;
-            //la matrice limite contient uniquement des valerus à 1
-            //et autant de lignes qu'il y a de combinaisons de valeurs pour les variables états
-            for( Variable state : this.megaVariableStates1.getCompoVars()){
-
-                rows *= state.getDomainSize();
-            }
-
-            //une ligne par valeur
-            AbstractDouble[][] limitMatrix = new AbstractDouble[rows][1];
-
-            for(int row = 0 ; row < rows ; row ++ ){
-
-                limitMatrix[row][0] = doubleFactory.getNew(1.0);
-            }
-
-            Matrix backward = new Matrix(limitMatrix, doubleFactory);
-
-            return backward;
-        }
-
-        Variable megaObs = megaVariableObs.get(t);
-
-        Matrix obs = this.getMatrixObs(megaObs);
-
-        Matrix transition = this.matrixStates;
-
-        Matrix backWard = this.backward(t + 1, megaVariableObs, depth + 1);
-
-        return obs.multiply(transition).multiply(backWard).normalize();
-    }
-
-
     /*-------------------- GETTER SETTER --------------------*/
 
     public Variable getMegaVariable(int time, Variable... variables) {
@@ -338,6 +249,27 @@ public class MMC extends DynamicBayesianNetwork {
     public Matrix getMatrixObs(Variable megaVariable) {
 
         return matrixObs.get(megaVariable.getMegaVarValuesKey());
+    }
+
+    public Matrix getMatrixStatesT() {
+
+        return this.matrixStatesT;
+    }
+
+    public Variable getMegaVariableStates0() {
+        return megaVariableStates0;
+    }
+
+    public Variable getMegaVariableStates1() {
+        return megaVariableStates1;
+    }
+
+    public Variable getMegaVariableObs1() {
+        return megaVariableObs1;
+    }
+
+    public Map<String, Matrix> getMatrixObs() {
+        return matrixObs;
     }
 
     /*---------------------- VIEW ---------------*/
@@ -366,5 +298,7 @@ public class MMC extends DynamicBayesianNetwork {
 
         return stringBuilder.toString();
     }
+
+
 
 }
