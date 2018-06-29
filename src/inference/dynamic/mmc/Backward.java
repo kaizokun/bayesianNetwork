@@ -30,7 +30,7 @@ public class Backward {
 
             int rows = 1;
             //la matrice limite contient uniquement des valerus à 1
-            //et autant de lignes qu'il y a de combinaisons de valeurs pour les variables états
+            //et autant de lignes qu'il y a de combinaisons de valeurs pour les colVars états
             for( Variable state : this.mmc.getMegaVariableStates1().getCompoVars()){
 
                 rows *= state.getDomainSize();

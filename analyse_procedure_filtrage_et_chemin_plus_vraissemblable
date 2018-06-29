@@ -26,7 +26,7 @@ pour s1(t) on à une combinaison de valeur max pour ces parents s1(t-1) et s1(t-
 idem pour s2(t)
 
 un problème survient si par exemple s1(t-2) = s1(0) et s1(t-1) = s1(1), dans ce cas dans la partie max ou sommation du filtrage
-on va rapeller le forward avec deux variable situées à des coupes temporelles différentes, 0 et 1 
+on va rapeller le sum avec deux variable situées à des coupes temporelles différentes, 0 et 1
 ici pour recuperer les observations : s1(0) n'en a pas donc on aura uniquement celle de s1(1)
 ensuite la procedure va recuperer tout les parents des observations au cas ou certains manquent dans la requete.
 La procedure tel qu'elle est programmé actuellement se base uniquement sur le parent des observations pour recreer une requete complete

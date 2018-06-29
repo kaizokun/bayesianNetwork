@@ -116,17 +116,17 @@ public class Smoothing {
          *
          * */
 
-        //on travaille sur les variables de la requete situées au temps smootEnd
+        //on travaille sur les colVars de la requete situées au temps smootEnd
         List<Variable> startForwardVars = new LinkedList<>();
-        //variables situées au temps T
+        //colVars situées au temps T
         for (Variable req : requests) {
 
             startForwardVars.add(this.network.getVariable(smootEnd, req));
         }
-        //on travaille sur les variables de la requete situées au temps smootStart
+        //on travaille sur les colVars de la requete situées au temps smootStart
         List<Variable> startBackwardVars = new LinkedList<>();
 
-        //variables situées au temps 1
+        //colVars situées au temps 1
         for (Variable req : requests) {
 
             startBackwardVars.add(this.network.getVariable(smootStart, req));

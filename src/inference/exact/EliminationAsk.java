@@ -15,7 +15,7 @@ public class EliminationAsk {
 
         BayesianNetwork.markImportantVars(request, observations);
 
-        //copie des variables de la requete et de leur valeur d'origine
+        //copie des colVars de la requete et de leur valeur d'origine
         //reset des valeurs de la requetes seul les isObservation seront ignorées
         Map<Variable, Domain.DomainValue> reqValues = new Hashtable<>();
 
@@ -32,7 +32,7 @@ public class EliminationAsk {
         Set<Variable> requestVars = new LinkedHashSet<>(request);
 
         LinkedList<Variable> vars = bayesianNetwork.getTopologicalOrder();
-        //ordre topologique inversé pour traiter les variables les plus bas niveau en premier
+        //ordre topologique inversé pour traiter les colVars les plus bas niveau en premier
         vars = ListUtil.reverseOrder(vars);
 
         for (Variable var : vars) {

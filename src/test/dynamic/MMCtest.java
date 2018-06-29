@@ -1,5 +1,6 @@
 package test.dynamic;
 
+import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
 import inference.dynamic.mmc.Backward;
@@ -13,6 +14,7 @@ import network.dynamic.MMC;
 import org.junit.Test;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
@@ -21,7 +23,7 @@ public class MMCtest {
 
     protected MMC mmc;
 
-    protected Map<Integer, Variable> megaVariableTestTwoVars(int extend, int [][] obsValues) {
+    protected Map<Integer, Variable> megaVariableTestTwoVars(int extend, int[][] obsValues) {
 
         mmc = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
         //le MMC possede déja une megavariable etendu au temps 1
@@ -58,7 +60,7 @@ public class MMCtest {
         return megaVarObs;
     }
 
-    protected Map<Integer, Variable> megaVariableTestOneVar(int extend, int [][] obsValues) {
+    protected Map<Integer, Variable> megaVariableTestOneVar(int extend, int[][] obsValues) {
 
         mmc = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
 
@@ -90,9 +92,9 @@ public class MMCtest {
     }
 
     @Test
-    public void forwardTestOneVar(){
+    public void forwardTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1},{1}};
+        int[][] obsValues = new int[][]{{1}, {1}};
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
@@ -106,9 +108,29 @@ public class MMCtest {
     }
 
     @Test
-    public void BackwardTestOneVar(){
+    public void mostLikelyPathTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1},{1}};
+        int[][] obsValues = new int[][]{{1}, {0}, {1}, {0}, {0}, {0}, {0}, {1}, {0}, {1}};
+
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+
+        Forward mmcForward = new Forward(mmc);
+
+        Matrix forward = mmcForward.forward(10, megaVarObs);
+
+        System.out.println(mmc);
+
+        System.out.println(forward);
+
+        List<List<Domain.DomainValue>> mostLilelySequency = mmcForward.mostLikelyPath(obsValues.length);
+
+        System.out.println(mostLilelySequency);
+    }
+
+    @Test
+    public void BackwardTestOneVar() {
+
+        int[][] obsValues = new int[][]{{1}, {1}};
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
@@ -122,11 +144,11 @@ public class MMCtest {
     }
 
     @Test
-    public void smoothingTestOneVar(){
+    public void smoothingTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1},{1}};
+        int[][] obsValues = new int[][]{{1}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues );
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
         System.out.println(mmc);
 
@@ -138,17 +160,17 @@ public class MMCtest {
     }
 
     @Test
-    public void smoothingRangeTestOneVar(){
+    public void smoothingRangeTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1},{1},{1},{1},{1}};
+        int[][] obsValues = new int[][]{{1}, {1}, {1}, {1}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues );
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
-       // System.out.println(mmc);
+        // System.out.println(mmc);
 
         Smoothing smoothing = new Smoothing(mmc);
 
-        smoothing.smoothing(2,4, megaVarObs);
+        smoothing.smoothing(2, 4, megaVarObs);
 
         System.out.println("Smoothings");
 
@@ -156,9 +178,9 @@ public class MMCtest {
     }
 
     @Test
-    public void forwardBackwardTestTwoVar(){
+    public void forwardBackwardTestTwoVar() {
 
-        int[][] obsValues = new int[][]{{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1}};
+        int[][] obsValues = new int[][]{{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}};
 
         Map<Integer, Variable> megaVarObs = megaVariableTestTwoVars(obsValues.length - 1, obsValues);
 

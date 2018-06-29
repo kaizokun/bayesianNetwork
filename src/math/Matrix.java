@@ -6,7 +6,10 @@ import domain.data.AbstractDoubleFactory;
 import network.BayesianNetwork;
 import network.Variable;
 
+import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class Matrix {
 
@@ -14,17 +17,20 @@ public class Matrix {
 
     protected AbstractDoubleFactory doubleFactory;
     //pour l'affichage des matrices
-    protected List<List<Domain.DomainValue>> values, parentValues;
+    protected List<List<Domain.DomainValue>> colValues, rowValues;
 
-    protected List<Variable> variables, dependencies;
+    protected List<Variable> colVars, rowVars;
+
+    protected Map<Integer, Integer> maxPrevious = new Hashtable<>();
 
     protected boolean isObservation = false;
 
-    public Matrix() { }
+    public Matrix() {
+    }
 
     public Matrix(Matrix matrix) {
 
-        this(matrix.matrix, matrix.variables, matrix.dependencies, matrix.doubleFactory, matrix.isObservation);
+        this(matrix.matrix, matrix.colVars, matrix.rowVars, matrix.doubleFactory, matrix.isObservation);
     }
 
     public Matrix(AbstractDouble[][] matrix, AbstractDoubleFactory doubleFactory) {
@@ -32,29 +38,41 @@ public class Matrix {
         this(matrix, null, null, doubleFactory, false);
     }
 
-    public Matrix(AbstractDouble[][] matrix, List<Variable> variables, List<Variable> dependencies,
+    public Matrix(AbstractDouble[][] matrix, List<Variable> colVars, List<Variable> rowVars,
                   AbstractDoubleFactory doubleFactory, boolean isObservation) {
 
         //pour l'affichage des matrices
 
-        this.variables = variables;
+        this.colVars = colVars;
 
-        this.dependencies = dependencies;
+        this.rowVars = rowVars;
 
-        if (variables != null) {
+        if (colVars != null) {
 
-            this.values = BayesianNetwork.domainValuesCombinations(variables);
+            this.colValues = BayesianNetwork.domainValuesCombinations(colVars);
         }
 
-        if (dependencies != null) {
+        if (rowVars != null) {
 
-            this.parentValues = BayesianNetwork.domainValuesCombinations(dependencies);
+            this.rowValues = BayesianNetwork.domainValuesCombinations(rowVars);
         }
 
         this.isObservation = isObservation;
 
         //----
         this.matrix = matrix;
+
+        this.doubleFactory = doubleFactory;
+    }
+
+    /** init a new sum or backward matrix*/
+    public Matrix(AbstractDouble[][] matrix, List<Variable> rowVars, List<List<Domain.DomainValue>> rowValues, AbstractDoubleFactory doubleFactory) {
+
+        this.matrix = matrix;
+
+        this.rowVars = rowVars;
+
+        this.rowValues = rowValues;
 
         this.doubleFactory = doubleFactory;
     }
@@ -89,6 +107,102 @@ public class Matrix {
         this.matrix = matrix;
     }
 
+    public MultiplyRs multiply(Matrix forward, Matrix maxForward){
+
+        if (this.getColCount() != forward.getRowCount()) {
+
+            throw new RuntimeException("le nombre de colones de la matrice ne correspond pas avec" +
+                    " le nombre de lignes de celle reçu en parametres");
+        }
+
+        //la matrice resultat à autant de ligne que m1 et autant de colones que sum
+        //ici on s'en sert principalement pour calculer une distribution
+        //sur une variable ou une megavariable, le sum ou le backward ( 1 colonne plusieurs lignes )
+        //on passe aussi les colVars et les valeurs qui constitue chaque ligne de la distribution
+        Matrix rsMatrix = new Matrix(
+                new AbstractDouble[this.getRowCount()][forward.getColCount()],
+                forward.getRowVars(),
+                forward.getRowValues(),
+                doubleFactory);
+
+        Matrix rsMaxMatrix = new Matrix(
+                new AbstractDouble[this.getRowCount()][forward.getColCount()],
+                forward.getRowVars(),
+                forward.getRowValues(),
+                doubleFactory);
+
+        //pour chaque ligne on travaille sur une valeur de la variable état enfant
+        for (int row = 0; row < this.getRowCount(); row++) {
+            //le nombre de colone de sum si il s'agit du sum est unique
+            for (int col = 0; col < forward.getColCount(); col++) {
+
+                AbstractDouble sum = doubleFactory.getNew(0.0);
+
+                AbstractDouble max = doubleFactory.getNew(0.0);
+
+                int maxPreviousForwardRow = 0;
+                //autant de terme dans la somme de que de colones dans m1 (ou de ligne dans sum)
+                //chaque partie de la somme correspond à une multiplication entre
+                //la valeur courante de l'état enfant (une par ligne) conditionné par une valeur de l'état parent
+                //et la valeur sum pour une valeur de l'état parent
+                //identique pour le max sauf qu'on prend le maximum plutot qu'additionner
+                for (int cr = 0; cr < this.getColCount(); cr++) {
+
+                    AbstractDouble mul = this.getValue(row, cr).multiply(forward.getValue(cr, col));
+
+                    AbstractDouble mulMax =  this.getValue(row, cr).multiply(maxForward.getValue(cr, col));
+
+                    if (mulMax.compareTo(max) > 0) {
+
+                        max = mulMax;
+                        //enregistre l'indice de la ligne du maxForward qui à fournit la valeur max.
+                        maxPreviousForwardRow = cr;
+                    }
+
+                    sum = sum.add(mul);
+                }
+
+                rsMatrix.setValue(row, col, sum);
+
+                rsMaxMatrix.setValue(row, col, max);
+                //pour tel ligne de la matrice max resultat ( ou colone de la transposée de la matrice de transition )
+                //indique quelle valeur de l'état precedent offre la probabilité maximum,
+                rsMaxMatrix.setMaxPreviousRow(row, maxPreviousForwardRow);
+            }
+        }
+
+        return new MultiplyRs(rsMatrix, rsMaxMatrix);
+    }
+
+    public static class MultiplyRs {
+
+        private Matrix sum, max;
+
+        public MultiplyRs(Matrix forward, Matrix max) {
+
+            this.sum = forward;
+
+            this.max = max;
+        }
+
+        public Matrix getSum() {
+            return sum;
+        }
+
+        public void setSum(Matrix sum) {
+            this.sum = sum;
+        }
+
+        public Matrix getMax() {
+            return max;
+        }
+
+        public void setMax(Matrix max) {
+            this.max = max;
+        }
+    }
+
+
     public Matrix multiply(Matrix m2) {
 
         if (this.getColCount() != m2.getRowCount()) {
@@ -96,19 +210,33 @@ public class Matrix {
             throw new RuntimeException("le nombre de colones de la matrice ne correspond pas avec" +
                     " le nombre de lignes de celle reçu en parametres");
         }
-        //la matrice resultat à autemp de ligne que m1 et autant de colones que m2
 
-        Matrix rsMatrix = new Matrix(new AbstractDouble[this.getRowCount()][m2.getColCount()], null, null, doubleFactory, false);
+        //la matrice resultat à autant de ligne que m1 et autant de colones que m2
+        //ici on s'en sert principalement pour calculer une distribution
+        //sur une variable ou une megavariable, le sum ou le backward ( 1 colonne plusieurs lignes )
+        //on passe aussi les colVars et les valeurs qui constitue chaque ligne de la distribution
+        Matrix rsMatrix = new Matrix(
+                new AbstractDouble[this.getRowCount()][m2.getColCount()],
+                m2.getRowVars(),
+                m2.getRowValues(),
+                doubleFactory);
 
+        //pour chaque ligne on travaille sur une valeur de la variable état enfant
         for (int row = 0; row < this.getRowCount(); row++) {
-
+            //le nombre de colone de m2 si il s'agit du sum est unique
             for (int col = 0; col < m2.getColCount(); col++) {
 
                 AbstractDouble sum = doubleFactory.getNew(0.0);
-                //autant de somme de que de colones dans m1 (ou de ligne dans m2)
+
+                //autant de terme dans la somme de que de colones dans m1 (ou de ligne dans m2)
+                //chaque partie de la somme correspond à une multiplication entre
+                //la valeur courante de l'état enfant (une par ligne) conditionné par une valeur de l'état parent
+                //et la valeur sum pour une valeur de l'état parent
                 for (int cr = 0; cr < this.getColCount(); cr++) {
 
-                    sum = sum.add(this.getValue(row, cr).multiply(m2.getValue(cr, col)));
+                    AbstractDouble mul = this.getValue(row, cr).multiply(m2.getValue(cr, col));
+
+                    sum = sum.add(mul);
                 }
 
                 rsMatrix.setValue(row, col, sum);
@@ -118,18 +246,23 @@ public class Matrix {
         return rsMatrix;
     }
 
-    public Matrix normalize(){
+    private void setMaxPreviousRow(int forwardRow, int maxPreviousForwardRow) {
+
+        this.maxPrevious.put(forwardRow, maxPreviousForwardRow);
+    }
+
+    public Matrix normalize() {
 
         AbstractDouble total = doubleFactory.getNew(0.0);
 
-        for( int row = 0 ; row < getRowCount() ; row ++){
+        for (int row = 0; row < getRowCount(); row++) {
 
             total = total.add(getValue(row, 0));
         }
 
-        for( int row = 0 ; row < getRowCount() ; row ++){
+        for (int row = 0; row < getRowCount(); row++) {
 
-            setValue(row, 0,getValue(row, 0).divide(total));
+            setValue(row, 0, getValue(row, 0).divide(total));
         }
 
         return this;
@@ -140,16 +273,16 @@ public class Matrix {
 
         StringBuilder builder = new StringBuilder("\n");
 
-        if (variables != null)
-            builder.append("ROWS : " + variables + '\n');
-        if (dependencies != null)
-            builder.append("COLS : " + dependencies + '\n');
+        if (colVars != null)
+            builder.append("ROWS : " + colVars + '\n');
+        if (rowVars != null)
+            builder.append("COLS : " + rowVars + '\n');
 
-        if (!this.isObservation && this.values != null) {
+        if (!this.isObservation && this.colValues != null) {
 
             builder.append(String.format("%6s", ""));
 
-            for (List<Domain.DomainValue> domainValues : values) {
+            for (List<Domain.DomainValue> domainValues : colValues) {
 
                 builder.append(String.format("%-7s", domainValues));
             }
@@ -159,9 +292,9 @@ public class Matrix {
 
         for (int r = 0; r < this.getRowCount(); r++) {
 
-            if (parentValues != null) {
+            if (rowValues != null) {
 
-                builder.append(String.format("%5s", parentValues.get(r)));
+                builder.append(String.format("%5s", rowValues.get(r)));
             } else {
 
                 builder.append(String.format("%5s", ""));
@@ -180,13 +313,57 @@ public class Matrix {
 
     public Matrix multiplyRows(Matrix m2) {
 
-        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], doubleFactory);
+        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], this.rowVars, this.rowValues, doubleFactory);
 
-        for( int row = 0 ; row < getRowCount() ; row ++){
+        for (int row = 0; row < getRowCount(); row++) {
 
-            rs.setValue(row, 0, this.getValue(row, 0).multiply(m2.getValue(row,0)));
+            rs.setValue(row, 0, this.getValue(row, 0).multiply(m2.getValue(row, 0)));
         }
 
         return rs;
+    }
+
+
+    public List<List<Domain.DomainValue>> getColValues() {
+        return colValues;
+    }
+
+    public List<List<Domain.DomainValue>> getRowValues() {
+        return rowValues;
+    }
+
+    public List<Variable> getColVars() {
+        return colVars;
+    }
+
+    public List<Variable> getRowVars() {
+        return rowVars;
+    }
+
+    public int getPreviousForwardMaxValueRow(Domain.DomainValue ... values) {
+
+        //récupere la ligne correspondant à la valeur voulu
+        int row = this.rowValues.indexOf(Arrays.asList(values));
+        //retourne l'indice de la ligne pour la valeur max precedente
+        return maxPrevious.get(row);
+    }
+
+    public int getPreviousForwardMaxValueRow(int row) {
+        //retourne l'indice de la ligne pour la valeur max precedente
+        return maxPrevious.get(row);
+    }
+
+    public List<Domain.DomainValue> getRowValue(int row){
+        //retourne la valeur de ligne
+        return this.rowValues.get(row);
+    }
+
+
+    public Map<Integer, Integer> getMaxPrevious() {
+        return maxPrevious;
+    }
+
+    public void setMaxPrevious(Map<Integer, Integer> maxPrevious) {
+        this.maxPrevious = maxPrevious;
     }
 }

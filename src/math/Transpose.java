@@ -2,10 +2,17 @@ package math;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
+import domain.data.AbstractDoubleFactory;
+import network.Variable;
 
 import java.util.List;
 
 public class Transpose extends Matrix {
+
+    public Transpose(AbstractDouble[][] matrix, List<Variable> colVars, List<Variable> rowVars,
+                     AbstractDoubleFactory doubleFactory, boolean isObservation) {
+        super(matrix, colVars, rowVars, doubleFactory, isObservation);
+    }
 
     public Transpose(Matrix matrix) {
 
@@ -42,16 +49,16 @@ public class Transpose extends Matrix {
 
         StringBuilder builder = new StringBuilder("\n");
 
-        if(dependencies != null)
-            builder.append("ROWS : "+dependencies+'\n');
-        if(variables != null)
-            builder.append("COLS : "+variables+'\n');
+        if (rowVars != null)
+            builder.append("ROWS : " + rowVars + '\n');
+        if (colVars != null)
+            builder.append("COLS : " + colVars + '\n');
 
-        if(!this.isObservation && this.parentValues != null){
+        if (!this.isObservation && this.rowValues != null) {
 
             builder.append(String.format("%6s", ""));
 
-            for( List<Domain.DomainValue> domainValues : parentValues){
+            for (List<Domain.DomainValue> domainValues : rowValues) {
 
                 builder.append(String.format("%-7s", domainValues));
             }
@@ -59,17 +66,17 @@ public class Transpose extends Matrix {
 
         builder.append('\n');
 
-        for(int r = 0 ; r < this.getRowCount(); r ++){
+        for (int r = 0; r < this.getRowCount(); r++) {
 
-            if(values != null){
+            if (colValues != null) {
 
-                builder.append(String.format("%5s", values.get(r)));
-            }else{
+                builder.append(String.format("%5s", colValues.get(r)));
+            } else {
 
                 builder.append(String.format("%5s", ""));
             }
 
-            for(int c = 0 ; c < this.getColCount(); c ++){
+            for (int c = 0; c < this.getColCount(); c++) {
 
                 builder.append(String.format("[%.3f]", getValue(r, c).getDoubleValue()));
             }
@@ -78,5 +85,25 @@ public class Transpose extends Matrix {
         }
 
         return builder.toString();
+    }
+
+    @Override
+    public List<List<Domain.DomainValue>> getColValues() {
+        return super.getRowValues();
+    }
+
+    @Override
+    public List<List<Domain.DomainValue>> getRowValues() {
+        return super.getColValues();
+    }
+
+    @Override
+    public List<Variable> getColVars() {
+        return super.getRowVars();
+    }
+
+    @Override
+    public List<Variable> getRowVars() {
+        return super.getColVars();
     }
 }

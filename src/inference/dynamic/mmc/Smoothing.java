@@ -5,7 +5,6 @@ import network.Variable;
 import network.dynamic.MMC;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 public class Smoothing {

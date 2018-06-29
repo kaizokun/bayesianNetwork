@@ -28,7 +28,7 @@ public class BayesianNetworkFactory {
 
         BayesianNetwork network = new BayesianNetwork(new MyDoubleFactory());
 
-        //domain.Domain abcd commun à toutes les variables
+        //domain.Domain abcd commun à toutes les colVars
 
         IDomain abcdDomain = DomainFactory.getABCDDomain();
 
@@ -56,7 +56,7 @@ public class BayesianNetworkFactory {
 
         BayesianNetwork network = new BayesianNetwork(new MyDoubleFactory());
 
-        //domain.Domain booleen commun à toutes les variables
+        //domain.Domain booleen commun à toutes les colVars
 
         IDomain booleanDomain = DomainFactory.getBooleanDomain();
 
@@ -147,7 +147,7 @@ public class BayesianNetworkFactory {
         //Models
         //Rain time 1
 
-        //Rain 1 dependencies
+        //Rain 1 rowVars
 
         List<Variable> dependencies = new LinkedList<>();
 
@@ -197,7 +197,7 @@ public class BayesianNetworkFactory {
 
         Variable cloud = network.addRootVariable(CLOUD.toString(), booleanDomain, tcpCloud0);
 
-        //Cloud 1 dependencies
+        //Cloud 1 rowVars
 
         List<Variable> dependencies = new LinkedList<>();
 

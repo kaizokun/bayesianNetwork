@@ -74,11 +74,11 @@ public class MMC extends DynamicBayesianNetwork {
     private void loadVarDistrib(AbstractDouble[] row, List<Variable> vars, List<List<Domain.DomainValue>> domainValuesList, AbstractDoubleFactory doubleFactory) {
 
         int col = 0;
-        //pour chaque combinaisons de valeurs pouvant être prises par les variables
+        //pour chaque combinaisons de valeurs pouvant être prises par les colVars
         for (List<Domain.DomainValue> domainValues : domainValuesList) {
 
             Iterator<Variable> tVarsIterator = vars.iterator();
-            //assigne une combinaison de valeurs aux variables
+            //assigne une combinaison de valeurs aux colVars
             for (Domain.DomainValue domainValue : domainValues) {
 
                 tVarsIterator.next().setDomainValue(domainValue);
@@ -122,12 +122,20 @@ public class MMC extends DynamicBayesianNetwork {
                 tObsIterator.next().setDomainValue(obsDomainValue);
             }
 
-            AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
+            //AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
 
+            AbstractDouble[][] obsMatrix = new AbstractDouble[1][statesDomainValuesList.size()];
+/*
             for (int r = 0; r < statesDomainValuesList.size(); r++) {
                 for (int c = 0; c < statesDomainValuesList.size(); c++) {
                     obsMatrix[r][c] = doubleFactory.getNew(0.0);
                 }
+            }
+*/
+
+            for (int c = 0; c < statesDomainValuesList.size(); c++) {
+
+                obsMatrix[0][c] = doubleFactory.getNew(0.0);
             }
 
             int col = 0;
@@ -152,12 +160,12 @@ public class MMC extends DynamicBayesianNetwork {
                     prob = prob.multiply(tObsIterator.next().getProbabilityForCurrentValue());
                 }
 
-                obsMatrix[col][col] = prob;
+                obsMatrix[0][col] = prob;
 
                 col++;
             }
 
-            matrixMap.put(obsDomainValues.toString(), new Matrix(obsMatrix, obs, states, doubleFactory, true));
+            matrixMap.put(obsDomainValues.toString(), new Transpose(obsMatrix, obs, states, doubleFactory, true));
         }
 
         this.matrixObs = matrixMap;
@@ -174,7 +182,7 @@ public class MMC extends DynamicBayesianNetwork {
         List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(states);
 
         AbstractDouble[][] matrix;
-        //si variables de temps 0
+        //si colVars de temps 0
         if (time == 0) {
 
             matrix = new AbstractDouble[1][domainValuesList.size()];
@@ -186,7 +194,7 @@ public class MMC extends DynamicBayesianNetwork {
         } else {
 
             matrix = new AbstractDouble[domainValuesList.size()][domainValuesList.size()];
-            //Set des variables parents
+            //Set des colVars parents
             Set<Variable> parents = new LinkedHashSet<>();
 
             for (Variable state : states) {
@@ -201,11 +209,13 @@ public class MMC extends DynamicBayesianNetwork {
             //this.parentStates = parentStates;
 
             int row = 0;
-            //pour chaque combinaisons de valeurs pouvant être prises par les variables parents
+            //pour chaque combinaisons de valeurs pouvant être prises par les colVars parents
+            //ici on boucle sur les combinaisons obtenus à partir de la liste des états
+            //pour charger les parents, c'est en fait la même liste trié de la même manière...
             for (List<Domain.DomainValue> domainValuesParents : domainValuesList) {
 
                 Iterator<Variable> tVarsParentsIterator = parentStates.iterator();
-                //assigne une combinaison de valeurs aux variables
+                //assigne une combinaison de valeurs aux colVars
                 for (Domain.DomainValue domainValue : domainValuesParents) {
 
                     tVarsParentsIterator.next().setDomainValue(domainValue);
@@ -228,7 +238,7 @@ public class MMC extends DynamicBayesianNetwork {
 
     public Variable getMegaVariable(int time, Variable... variables) {
 
-        // trie les variables constituant la megavariable par labels
+        // trie les colVars constituant la megavariable par labels
         Arrays.sort(variables, Variable.varLabelComparator);
         // crée une variable clé conenant le label composée
         Variable megaVariable = new Variable(variables);
@@ -298,7 +308,6 @@ public class MMC extends DynamicBayesianNetwork {
 
         return stringBuilder.toString();
     }
-
 
 
 }

@@ -48,7 +48,7 @@ public class Forward {
         }
 
         List<Variable> requests2 = new LinkedList<>();
-        //pour chacune des variables de la requete
+        //pour chacune des colVars de la requete
         for (Variable req : requests) {
             //récuperer la variable enregitré dans le reseau pour le temps time
             Variable networkVar = this.network.getVariable(time, req);
@@ -113,10 +113,10 @@ public class Forward {
             System.out.println(ident + "************************************");
             System.out.println();
         }
-        //les variables de requete d'origine doivent avoir le même temps
+        //les colVars de requete d'origine doivent avoir le même temps
 
         //création d'une distribution vide pour chaque valeur de la requete
-        //qui peuvent être des combinaisons de valeur si la reqete à plusieurs variables
+        //qui peuvent être des combinaisons de valeur si la reqete à plusieurs colVars
         Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>();
 
         Map<Domain.DomainValue, AbstractDouble> maxDistribution = new Hashtable<>();
@@ -131,7 +131,7 @@ public class Forward {
         //un symptomes peut avoir plusieurs états parent, un symptome identiques pour plusieurs états différents
         //!differencier les isObservation en fonction du temps la classe variable ne se base que sur le label
 
-        //certaines variables parents des observations pourraient ne pas faire parti de la requete
+        //certaines colVars parents des observations pourraient ne pas faire parti de la requete
         //et doivent donc être ajoutés sans cela impossible de calculer la valeur de l'isObservation
         //si un de ses parents n'a pas de valeur on complete donc la requete si necessaire
 
@@ -142,7 +142,7 @@ public class Forward {
         for (Variable request : requests) {
             //on ajoute la variable dans la liste complétée
             fullRequest.put(request.getVarTimeId(), request);
-            //pour chaque isObservation des variables de la requete
+            //pour chaque isObservation des colVars de la requete
             for (Variable observation : request.getObservations()) {
                 //si l'isObservation est déja connu on passe
                 if (requestsObservations.containsKey(observation.getVarTimeId())) continue;
@@ -157,9 +157,9 @@ public class Forward {
             }
         }
 
-        //ensuite on recherche les variables qui sont au temps 0 elles n'ont ni observations ni parent
+        //ensuite on recherche les colVars qui sont au temps 0 elles n'ont ni observations ni parent
         //et doivent être traité differrement par exemple une requete qui contient 1 ou plus variable de temps 0
-        //ou une chaine de markov d'ordre 2 qui contient des variables à des coupes temporelles différentes
+        //ou une chaine de markov d'ordre 2 qui contient des colVars à des coupes temporelles différentes
         //les autres seront traités à partir de leur observations
         Set<Variable> requestTime0 = new LinkedHashSet<>();
 
@@ -187,13 +187,13 @@ public class Forward {
          * de 0 à une certaine coupe temporelle
          *
          * le premier appel à cette méthode se fait donc avec ce sous ensemble d'états
-         * ici les variables ne doivent pas être initialisés et comme pour le filtrage
+         * ici les colVars ne doivent pas être initialisés et comme pour le filtrage
          * on travaille sur des combinaisons de valeurs si plus d'une variable.
-         * D'abord de manière analogue au filtrage il faut eventuellement completer les variables de la requete
+         * D'abord de manière analogue au filtrage il faut eventuellement completer les colVars de la requete
          * par les parents des observations non compris.
          *
          * Ensuite pour chaque combinaison de valeur de la requete courante situé à un temps t
-         * on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
+         * on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les colVars
          * états parents situées à un temps t - 1
          *
          * Si on prend un cas simple ou on à une variable requete t, une isObservation unique
@@ -207,7 +207,7 @@ public class Forward {
         for (List<Domain.DomainValue> domainValues : requestsValuesCombinations) {
 
             Iterator<Variable> requestIterator = fullRequest.values().iterator();
-            //initialise les variables avec une combinaison
+            //initialise les colVars avec une combinaison
             for (Domain.DomainValue domainValue : domainValues) {
 
                 requestIterator.next().setDomainValue(domainValue);
@@ -228,7 +228,7 @@ public class Forward {
             //on demarre par la partie modele de capteur
             //si on à plusieurs observations chacune est independantes des autres
             //et est calculé separemment suivit de la partie sommation contenant l'appel recursif au forward
-            //les variables au temps zero n'ont pas de dependances dont pas d'appel recursif
+            //les colVars au temps zero n'ont pas de dependances dont pas d'appel recursif
             //
             for (Variable observation : requestsObservations.values()) {
                 //au cas ou la variale d'isObservation est nul on obtient une prédiction plutot qu'un filtrage
@@ -254,9 +254,9 @@ public class Forward {
                     ForwardSumRs rs = forwardHiddenVarSum(stateObserved, depth + 1);
                     //qu'on multiplie avec les resultat pour les observations precedentes
                     requestValueProbability = requestValueProbability.multiply(rs.sum);
-                    //idem pour le maximum qauf que l'on mutpliplie le model de capteur par le maximum sur les variables cachées et non la somme
+                    //idem pour le maximum qauf que l'on mutpliplie le model de capteur par le maximum sur les colVars cachées et non la somme
                     requestValueMaxProbability = requestValueMaxProbability.multiply(rs.max);
-                    //ajoute les variables et leur etats qui ont produit le max
+                    //ajoute les colVars et leur etats qui ont produit le max
 
                     //la question est : si on à plusieurs isObservation ainsi que plusieurs états parent observés en t
                     //et qu'au final on obtient des etats situé en t - 1 avec des valeurs differentes
@@ -264,7 +264,7 @@ public class Forward {
                     maxParentStates.addAll(rs.maxDomainVars);
                 }
             }
-            //pour les variables situées au temps 0 ont obtient directement leur probabilité
+            //pour les colVars situées au temps 0 ont obtient directement leur probabilité
             for (Variable request0 : requestTime0) {
 
                 AbstractDouble reqProb = request0.getProbabilityForCurrentValue();
@@ -278,9 +278,9 @@ public class Forward {
                 }
             }
             //Si la combinaison sur laquelle ont travaille actuellement contient
-            //plus de variables que celles requete originale
+            //plus de colVars que celles requete originale
             //mais cependant necessaires pour le calcul on s'interesse
-            //ici uniquement à la combinaison de valeurs pour les variables de la requete d'origine
+            //ici uniquement à la combinaison de valeurs pour les colVars de la requete d'origine
             //sinon il faudrait retrouver cette combinaison parmis plusieurs autres qui la contiendrait
             //P(X1=v,X2=v) = P(X1=v,X2=v,X3=v) + P(X1=v,X2=v,X3=f)
             List<Domain.DomainValue> requestDomainValues = new LinkedList<>();
@@ -312,7 +312,7 @@ public class Forward {
             }
 
             //pour chaque combinaison de valeur de la requete enregistre
-            //la liste des variables et leur valeurs pour celle qui offre le max.
+            //la liste des colVars et leur valeurs pour celle qui offre le max.
             mostLikelyPath.put(domainValuesCombi, maxParentStates);
 
             totalDistribution = totalDistribution.add(requestValueProbability);
@@ -343,7 +343,7 @@ public class Forward {
             System.out.println(ident + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println();
         }
-        //avant de demarrer la sommation les variables parent de "obsParentState" non initialisées doivent être reseter à la fin
+        //avant de demarrer la sommation les colVars parent de "obsParentState" non initialisées doivent être reseter à la fin
         //car si elles conservent leur valeur la recuperation des combinaison echoue pour celle initialisées
         //lors d'un rappel de la sommation pour une combinaison differente de "obsParentState" dans la procedure appelante
         //par contre si une variabel parent de "obsParentState" est déja initialisé ce qui peut être le cas
@@ -359,14 +359,14 @@ public class Forward {
         //une variable de la requete peut avoir plusieurs parents il faut donc récuperer les combinaisons de valeurs
         //pour sommer sur chacune d'entre elle.
         //CAS TRES SPECIFIQUES POUR LES CHAINES DE MARKOV DE NIVEAU SUPERIEUR A 1
-        //les variables deja initialisé gardent la même valeur et on ne somme pas sur les autres
+        //les colVars deja initialisé gardent la même valeur et on ne somme pas sur les autres
         //exemple si la requete dans la procedure forward appelante contient deux variable dont l'une
         //est parent de l'autre par exemple pour une chaine de markov d'ordre 2
         //une variable s(2) à pour parent s(1) et s(0) par contre s(1) à uniquement pour parent s(0)
         //au moment de calculer dans la boucle de sommation p( s(2)|s(1),s(0) ) on boucle sur les combinaisons de valeur pour s(1),s(0)
         //mais ce n'est pas le problème, l'erreur se situe plutot au niveau du rappel de la methode forward
         //car on a egalement un appel recursif à forward pour s(1),s(0) qui devient la requete. On va par consequent cette fois si
-        //calculer une distribution pour cette combinaison de variable et donc assigner leur assigner des valeurs, ici 4 combinaison pour des variables booleenes
+        //calculer une distribution pour cette combinaison de variable et donc assigner leur assigner des valeurs, ici 4 combinaison pour des colVars booleenes
         //on calcule ensuite une isObservation de s(1) par exemple o(1)|s(1) suivit d'une sommation ( dans cette sous procedure)
         //sur le parent de s(1) ici s(0) qui possede deja une valeur.
         //initialisé precedemment dans la partie forward lorsqu'on boucle sur les combinaisons de la requete s(1),s(0)
@@ -380,8 +380,8 @@ public class Forward {
         //respectives, et on multiplier les resultats pour charger une nouvelle distribution dont les clé etait ces combinaison de valeurs
         //on multiplié donc des valeur pour s(1) moyenné sur s(0) = v et s(0) = f à des valeurs s(0) = v
         //la procedure de la sequence la plus probable permet de se rendre compte de l'incoherence de cette methode.
-        //Ca ne pose pas de problème pour une requete avec des variables
-        //situées dans la même coupe temporelles ou tout leur parent sont des variables cachées
+        //Ca ne pose pas de problème pour une requete avec des colVars
+        //situées dans la même coupe temporelles ou tout leur parent sont des colVars cachées
 
         List<List<Domain.DomainValue>> hiddenVarsCombinations = BayesianNetwork.domainValuesCombinationsCheckInit(obsParentState.getDependencies());
 
@@ -399,7 +399,7 @@ public class Forward {
 
             //début de la multiplication avec la valeur fourni par le modele de transition
             AbstractDouble mulTransitionForward = obsParentState.getProbabilityForCurrentValue();
-            //on a ici potentiellement une filtrage sur plusieurs variable si plusieurs variables cachées
+            //on a ici potentiellement une filtrage sur plusieurs variable si plusieurs colVars cachées
             if (forwardLog) {
                 System.out.println(ident + "SUM COMBINAISON : " + obsParentState.getDependencies());
                 System.out.println(ident + "TRANSITION P(" + obsParentState + "|" + obsParentState.getDependencies() + ") = " + obsParentState.getProbabilityForCurrentValue());
@@ -427,7 +427,7 @@ public class Forward {
                     System.out.println(ident + "FORWARD SAVED : " + distrib.get(new Domain.DomainValue(domainValues)));
                 }
             }
-            //maximum pour une certain valeur de la ou les variables cachées
+            //maximum pour une certain valeur de la ou les colVars cachées
             //on ne s'interesse pas au maximum sur toutes les valeurs
             //mais bien à une probabilité max donnée parmis l'ensemble des valeurs que peut prendre de la variable cachée
             AbstractDouble maxValue = max.get(new Domain.DomainValue(domainValues));
@@ -440,7 +440,7 @@ public class Forward {
             if (maxValue.compareTo(hiddenVarMax) > 0) {
 
                 hiddenVarMax = maxValue;
-                //sauvegarde l'état des variables cachées pour le maximum
+                //sauvegarde l'état des colVars cachées pour le maximum
                 //les valeurs pouvant encore changer dans la procedure
                 List<Variable> copyDependencies = new LinkedList<>();
 
@@ -452,11 +452,11 @@ public class Forward {
                 maxHiddenvars = copyDependencies;
             }
 
-            //recupere le resultat du forward pour la combinaison de valeurs courantes des variables cachées
+            //recupere le resultat du forward pour la combinaison de valeurs courantes des colVars cachées
             AbstractDouble forward = distrib.get(domainvaluesObj).divide(distrib.get(totalDomainValues));
             //on multiplie le resultat du forward avec la partie transition
             mulTransitionForward = mulTransitionForward.multiply(forward);
-            //on additionne pour chaque combinaison de valeur pour les variables cachées
+            //on additionne pour chaque combinaison de valeur pour les colVars cachées
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
         }
 
@@ -514,9 +514,9 @@ public class Forward {
     public List<List<Variable>> computeMostLikelyPath(List<Variable> requests) {
 
         //la sequence d'états la plus probable est calculée à partir d'une liste d'états
-        //de 0 à un temps t. la liste des variables et leur ordre doit être le même
+        //de 0 à un temps t. la liste des colVars et leur ordre doit être le même
         //que lors du premier appel à la methode forward
-        //on récupere la clé correspondant aux variables
+        //on récupere la clé correspondant aux colVars
         String key = Util.getDistribSavedKey(requests);
 
         Map<Domain.DomainValue, AbstractDouble> maxProbs = this.maxDistribSaved.get(key);
@@ -538,7 +538,7 @@ public class Forward {
             }
         }
 
-        //initialise la liste de variables avec les valeurs max
+        //initialise la liste de colVars avec les valeurs max
         //si il s'agit d'un object domainValue composite
         if (maxValue.getValue() instanceof List) {
 
@@ -552,7 +552,7 @@ public class Forward {
         List<List<Variable>> mostLikelyPath = new LinkedList();
 
         mostLikelyPath.add(requests);
-        //charge les états suivants en commencant par recuperer la liste des variables
+        //charge les états suivants en commencant par recuperer la liste des colVars
         //parents de la requete avec les valeurs de domaines ayant donné le maximum
         this.loadMostLikelyPath(mostLikelyPath, maxPath.get(maxValue));
 
@@ -565,13 +565,13 @@ public class Forward {
         if (maxVarsvalues.isEmpty()) {
             return;
         }
-        //ajoute les variables courantes avec leurs valeurs de domaine
+        //ajoute les colVars courantes avec leurs valeurs de domaine
         mostLikelyPath.add(maxVarsvalues);
-        //récupère la clé correspondant à la liste de variables courantes
+        //récupère la clé correspondant à la liste de colVars courantes
         String varsKey = Util.getDistribSavedKey(maxVarsvalues);
-        //récupère les valeurs de domaines des variables
+        //récupère les valeurs de domaines des colVars
         Domain.DomainValue valuesKey = new Domain.DomainValue(Util.getDomainValues(maxVarsvalues));
-        //recupere la suite de la sequence max à partir de la signature des variables et de leurs valeurs
+        //recupere la suite de la sequence max à partir de la signature des colVars et de leurs valeurs
         this.loadMostLikelyPath(mostLikelyPath, this.mostLikelyPath.get(varsKey).get(valuesKey));
     }
 

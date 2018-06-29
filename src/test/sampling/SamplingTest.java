@@ -58,7 +58,7 @@ public class SamplingTest {
 
         Variable tremblementDeTerre = alarmNetwork.getVariable(TREMBLEMENT_DE_TERRE.toString());
 
-        //dependencies
+        //rowVars
 
         cambriolage.setValue(0);
 
