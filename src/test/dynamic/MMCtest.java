@@ -163,7 +163,7 @@ public class MMCtest {
     @Test
     public void smoothingRangeTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}};
+        int[][] obsValues = new int[][]{{1}, {1}, {1}, {1}, {1}, {1}};
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
@@ -171,7 +171,26 @@ public class MMCtest {
 
         SmoothingMMC smoothing = new SmoothingMMC(mmc);
 
-        smoothing.smoothing(0, 2, megaVarObs);
+        smoothing.smoothing(0, 6, megaVarObs);
+
+        System.out.println("Smoothings");
+
+        System.out.println(smoothing.getSmoothings());
+    }
+
+
+    @Test
+    public void smoothingConstantRangeTestOneVar() {
+
+        int[][] obsValues = new int[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+
+        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+
+        // System.out.println(mmc);
+
+        SmoothingMMC smoothing = new SmoothingMMC(mmc);
+
+        smoothing.smoothingConstant(0, 6, megaVarObs);
 
         System.out.println("Smoothings");
 
