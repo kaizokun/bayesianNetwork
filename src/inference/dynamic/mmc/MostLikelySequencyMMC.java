@@ -8,10 +8,10 @@ import network.dynamic.MMC;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MostLikelySequency extends Forward{
+public class MostLikelySequencyMMC extends ForwardMMC {
 
 
-    public MostLikelySequency(MMC mmc) {
+    public MostLikelySequencyMMC(MMC mmc) {
 
         super(mmc);
     }

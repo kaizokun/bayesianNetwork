@@ -6,23 +6,28 @@ import network.dynamic.MMC;
 
 import java.util.*;
 
-public class Forward {
+public class ForwardMMC {
 
     protected MMC mmc;
 
     protected Map<Integer, Matrix> forwards = new Hashtable<>();
 
-    public Forward(MMC mmc) {
+    public ForwardMMC(MMC mmc) {
 
         this.mmc = mmc;
     }
 
     public Matrix forward(int t, Map<Integer, Variable> megaVariablesObs) {
 
-        return forward(t, megaVariablesObs, 0);
+        return forward(t, megaVariablesObs, 0, false);
     }
 
-    private Matrix forward(int t, Map<Integer, Variable> megaVariablesObs, int depth) {
+    public Matrix forward(int t, Map<Integer, Variable> megaVariablesObs, boolean saveForwards) {
+
+        return forward(t, megaVariablesObs, 0, saveForwards);
+    }
+
+    private Matrix forward(int t, Map<Integer, Variable> megaVariablesObs, int depth, boolean saveForwards) {
 
         /*
          * on pourrait faire des megavariables états observations sur des sous ensemble de colVars du reseau
@@ -35,7 +40,10 @@ public class Forward {
 
             forward.normalize();
 
-            this.forwards.put(t, forward);
+            if(saveForwards) {
+
+                this.forwards.put(t, forward);
+            }
 
             return forward;
         }
@@ -58,7 +66,7 @@ public class Forward {
         //pour recuperer la sequence la plus probable, ici la multiplication se fait depuis la
         //matrice transition pour chaque ligne on calcule une valeur max Xt-1 pour une valeur de Xt
 
-        Matrix forward = forward(t - 1, megaVariablesObs, depth + 1);
+        Matrix forward = forward(t - 1, megaVariablesObs, depth + 1, saveForwards);
 
         Matrix sum = this.multiplyTransitionForward(this.mmc.getMatrixStatesT(), forward);
 
@@ -67,13 +75,18 @@ public class Forward {
         //qui plutot que d'etre placé sur une diagonale
         //sont placé ligne par ligne le resultat de la somme étant toujours sur une colonne également
         //on peut multiplier ligne par ligne
-        forward = obs.multiplyRows(sum);
+        //cependant la forme carré reste necesaire pour le backward
+        //il faudrait deux formes de matrices pour les observations si on veut optimiser un peu.
+        forward = obs.multiply(sum);
 
         forward = forward.normalize();
         //opération supllémentaire pour le most likely path
         this.mostLikelyPath(forward, sum);
 
-        this.forwards.put(t, forward);
+        if(saveForwards) {
+
+            this.forwards.put(t, forward);
+        }
 
         return forward;
     }

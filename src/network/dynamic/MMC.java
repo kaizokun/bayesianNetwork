@@ -122,20 +122,12 @@ public class MMC extends DynamicBayesianNetwork {
                 tObsIterator.next().setDomainValue(obsDomainValue);
             }
 
-            //AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
+            AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
 
-            AbstractDouble[][] obsMatrix = new AbstractDouble[1][statesDomainValuesList.size()];
-/*
             for (int r = 0; r < statesDomainValuesList.size(); r++) {
                 for (int c = 0; c < statesDomainValuesList.size(); c++) {
                     obsMatrix[r][c] = doubleFactory.getNew(0.0);
                 }
-            }
-*/
-
-            for (int c = 0; c < statesDomainValuesList.size(); c++) {
-
-                obsMatrix[0][c] = doubleFactory.getNew(0.0);
             }
 
             int col = 0;
@@ -160,7 +152,7 @@ public class MMC extends DynamicBayesianNetwork {
                     prob = prob.multiply(tObsIterator.next().getProbabilityForCurrentValue());
                 }
 
-                obsMatrix[0][col] = prob;
+                obsMatrix[col][col] = prob;
 
                 col++;
             }

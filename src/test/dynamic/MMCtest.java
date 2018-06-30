@@ -3,10 +3,10 @@ package test.dynamic;
 import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
-import inference.dynamic.mmc.Backward;
-import inference.dynamic.mmc.Forward;
-import inference.dynamic.mmc.MostLikelySequency;
-import inference.dynamic.mmc.Smoothing;
+import inference.dynamic.mmc.BackwardMMC;
+import inference.dynamic.mmc.ForwardMMC;
+import inference.dynamic.mmc.MostLikelySequencyMMC;
+import inference.dynamic.mmc.SmoothingMMC;
 import math.Matrix;
 import math.Transpose;
 import network.BayesianNetworkFactory;
@@ -99,7 +99,7 @@ public class MMCtest {
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
-        Forward mmcForward = new Forward(mmc);
+        ForwardMMC mmcForward = new ForwardMMC(mmc);
 
         Matrix forward = mmcForward.forward(2, megaVarObs);
 
@@ -115,7 +115,7 @@ public class MMCtest {
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
-        MostLikelySequency mostLikelySequency = new MostLikelySequency(mmc);
+        MostLikelySequencyMMC mostLikelySequency = new MostLikelySequencyMMC(mmc);
 
         Matrix forward = mostLikelySequency.forward(10, megaVarObs);
 
@@ -135,7 +135,7 @@ public class MMCtest {
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
-        Backward mmcBackward = new Backward(mmc);
+        BackwardMMC mmcBackward = new BackwardMMC(mmc);
 
         Matrix backward = mmcBackward.backward(1, megaVarObs);
 
@@ -153,7 +153,7 @@ public class MMCtest {
 
         System.out.println(mmc);
 
-        Matrix smoothing = new Smoothing(mmc).smoothing(1, megaVarObs);
+        Matrix smoothing = new SmoothingMMC(mmc).smoothing(1, megaVarObs);
 
         System.out.println("Smoothing");
 
@@ -163,15 +163,15 @@ public class MMCtest {
     @Test
     public void smoothingRangeTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}, {1}, {1}, {1}};
+        int[][] obsValues = new int[][]{{1}, {1}};
 
         Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
 
         // System.out.println(mmc);
 
-        Smoothing smoothing = new Smoothing(mmc);
+        SmoothingMMC smoothing = new SmoothingMMC(mmc);
 
-        smoothing.smoothing(2, 4, megaVarObs);
+        smoothing.smoothing(0, 2, megaVarObs);
 
         System.out.println("Smoothings");
 
@@ -185,9 +185,9 @@ public class MMCtest {
 
         Map<Integer, Variable> megaVarObs = megaVariableTestTwoVars(obsValues.length - 1, obsValues);
 
-        Forward mmcForward = new Forward(mmc);
+        ForwardMMC mmcForward = new ForwardMMC(mmc);
 
-        Backward mmcBackward = new Backward(mmc);
+        BackwardMMC mmcBackward = new BackwardMMC(mmc);
 
         Matrix forward = mmcForward.forward(2, megaVarObs);
 

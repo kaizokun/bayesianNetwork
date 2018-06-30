@@ -8,23 +8,28 @@ import network.dynamic.MMC;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class Backward {
+public class BackwardMMC {
 
     protected MMC mmc;
 
     protected Map<Integer, Matrix> backwards = new Hashtable<>();
 
-    public Backward(MMC mmc) {
+    public BackwardMMC(MMC mmc) {
 
         this.mmc = mmc;
     }
 
     public Matrix backward(int t, Map<Integer, Variable> megaVariablesObs) {
 
-        return backward(t, megaVariablesObs, 0);
+        return backward(t, megaVariablesObs, 0, false);
     }
 
-    private Matrix backward(int t, Map<Integer, Variable> megaVariablesObs, int depth) {
+    public Matrix backward(int t, Map<Integer, Variable> megaVariablesObs, boolean saveBackward) {
+
+        return backward(t, megaVariablesObs, 0, saveBackward);
+    }
+
+    private Matrix backward(int t, Map<Integer, Variable> megaVariablesObs, int depth, boolean saveBackward) {
 
         if(t == this.mmc.getTime()){
 
@@ -46,7 +51,10 @@ public class Backward {
 
             Matrix backward = new Matrix(limitMatrix, mmc.getDoubleFactory());
 
-            backwards.put(t, backward);
+            if(saveBackward) {
+
+                backwards.put(t, backward);
+            }
 
             return backward;
         }
@@ -57,11 +65,14 @@ public class Backward {
 
         Matrix transition = this.mmc.getMatrixStates();
 
-        Matrix backward = this.backward(t + 1, megaVariablesObs, depth + 1);
+        Matrix backward = this.backward(t + 1, megaVariablesObs, depth + 1, saveBackward);
 
         backward = transition.multiply(obs).multiply(backward);
 
-        backwards.put(t, backward);
+        if(saveBackward) {
+
+            backwards.put(t, backward);
+        }
 
         return backward;
     }

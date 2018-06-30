@@ -7,35 +7,35 @@ import network.dynamic.MMC;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class Smoothing {
+public class SmoothingMMC {
 
     protected MMC mmc;
 
     protected Map<Integer, Matrix> smoothings = new Hashtable<>();
 
-    public Smoothing(MMC mmc) {
+    public SmoothingMMC(MMC mmc) {
 
         this.mmc = mmc;
     }
 
     public Matrix smoothing(int time, Map<Integer, Variable> megaVariablesObs){
 
-        Matrix forward = new Forward(mmc).forward(time, megaVariablesObs);
+        Matrix forward = new ForwardMMC(mmc).forward(time, megaVariablesObs, false);
 
-        Matrix backward = new Backward(mmc).backward(time, megaVariablesObs);
+        Matrix backward = new BackwardMMC(mmc).backward(time, megaVariablesObs, false);
 
         return forward.multiplyRows(backward).normalize();
     }
 
     public void smoothing(int timeStart, int timeEnd, Map<Integer, Variable> megaVariablesObs){
 
-        Forward forward = new Forward(mmc);
+        ForwardMMC forward = new ForwardMMC(mmc);
 
-        forward.forward(timeEnd, megaVariablesObs);
+        forward.forward(timeEnd, megaVariablesObs, true);
 
-        Backward backward = new Backward(mmc);
+        BackwardMMC backward = new BackwardMMC(mmc);
 
-        backward.backward(timeStart, megaVariablesObs);
+        backward.backward(timeStart, megaVariablesObs, true);
 
         while (timeStart <= timeEnd){
 
