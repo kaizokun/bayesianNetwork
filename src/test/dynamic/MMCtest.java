@@ -212,4 +212,20 @@ public class MMCtest {
         System.out.println(rs);
     }
 
+    @Test
+    public void invertMatrixTest() {
+
+        MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
+
+        Matrix m2 = network.getMatrixStates();
+
+        Matrix m2Invert = Matrix.invert(m2);
+
+        System.out.println(m2);
+
+        System.out.println(m2Invert);
+
+        System.out.println(m2.multiply(m2Invert));
+    }
+
 }

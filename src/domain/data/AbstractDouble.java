@@ -13,4 +13,7 @@ public interface AbstractDouble<Type> extends Comparable<Type> {
 
     Double getDoubleValue();
 
+    AbstractDouble abs();
+
+    AbstractDouble copy();
 }

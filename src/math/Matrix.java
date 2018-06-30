@@ -25,8 +25,7 @@ public class Matrix {
 
     protected boolean isObservation = false;
 
-    public Matrix() {
-    }
+    public Matrix() { }
 
     public Matrix(Matrix matrix) {
 
@@ -65,8 +64,11 @@ public class Matrix {
         this.doubleFactory = doubleFactory;
     }
 
-    /** init a new sum or backward matrix*/
-    public Matrix(AbstractDouble[][] matrix, List<Variable> rowVars, List<List<Domain.DomainValue>> rowValues, AbstractDoubleFactory doubleFactory) {
+    /**
+     * init a new sum or backward matrix
+     */
+    public Matrix(AbstractDouble[][] matrix, List<Variable> rowVars, List<List<Domain.DomainValue>> rowValues,
+                  AbstractDoubleFactory doubleFactory) {
 
         this.matrix = matrix;
 
@@ -75,6 +77,36 @@ public class Matrix {
         this.rowValues = rowValues;
 
         this.doubleFactory = doubleFactory;
+    }
+
+
+    public Matrix copy() {
+
+        Matrix copy = new Matrix();
+
+        copy.matrix = new AbstractDouble[this.getRowCount()][this.getColCount()];
+
+        for(int row = 0 ; row < this.getRowCount() ; row ++){
+
+            for(int col = 0 ; col < this.getColCount() ; col ++){
+
+                copy.matrix[row][col] = matrix[row][col].copy();
+            }
+        }
+
+        copy.doubleFactory = this.doubleFactory;
+
+        copy.colValues = colValues;
+
+        copy.rowValues = rowValues;
+
+        copy.colVars = colVars;
+
+        copy.rowVars = rowVars;
+
+        copy.isObservation = isObservation;
+
+        return copy;
     }
 
     public int getRowCount() {
@@ -107,7 +139,7 @@ public class Matrix {
         this.matrix = matrix;
     }
 
-    public Matrix multiplyMax(Matrix maxForward){
+    public Matrix multiplyMax(Matrix maxForward) {
 
         if (this.getColCount() != maxForward.getRowCount()) {
 
@@ -136,7 +168,7 @@ public class Matrix {
                 //identique pour le max sauf qu'on prend le maximum plutot qu'additionner
                 for (int cr = 0; cr < this.getColCount(); cr++) {
 
-                    AbstractDouble mulMax =  this.getValue(row, cr).multiply(maxForward.getValue(cr, col));
+                    AbstractDouble mulMax = this.getValue(row, cr).multiply(maxForward.getValue(cr, col));
 
                     if (mulMax.compareTo(max) > 0) {
 
@@ -199,6 +231,18 @@ public class Matrix {
         return rsMatrix;
     }
 
+    public Matrix multiplyRows(Matrix m2) {
+
+        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], this.rowVars, this.rowValues, doubleFactory);
+
+        for (int row = 0; row < getRowCount(); row++) {
+
+            rs.setValue(row, 0, this.getValue(row, 0).multiply(m2.getValue(row, 0)));
+        }
+
+        return rs;
+    }
+
     private void setMaxPreviousRow(int forwardRow, int maxPreviousForwardRow) {
 
         this.maxPrevious.put(forwardRow, maxPreviousForwardRow);
@@ -220,6 +264,11 @@ public class Matrix {
 
         return this;
     }
+
+
+    // Method to carry out the partial-pivoting Gaussian
+
+    // elimination.  Here index[] stores pivoting order.
 
     @Override
     public String toString() {
@@ -264,19 +313,6 @@ public class Matrix {
         return builder.toString();
     }
 
-    public Matrix multiplyRows(Matrix m2) {
-
-        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], this.rowVars, this.rowValues, doubleFactory);
-
-        for (int row = 0; row < getRowCount(); row++) {
-
-            rs.setValue(row, 0, this.getValue(row, 0).multiply(m2.getValue(row, 0)));
-        }
-
-        return rs;
-    }
-
-
     public List<List<Domain.DomainValue>> getColValues() {
         return colValues;
     }
@@ -293,7 +329,7 @@ public class Matrix {
         return rowVars;
     }
 
-    public int getPreviousForwardMaxValueRow(Domain.DomainValue ... values) {
+    public int getPreviousForwardMaxValueRow(Domain.DomainValue... values) {
 
         //récupere la ligne correspondant à la valeur voulu
         int row = this.rowValues.indexOf(Arrays.asList(values));
@@ -306,7 +342,7 @@ public class Matrix {
         return maxPrevious.get(row);
     }
 
-    public List<Domain.DomainValue> getRowValue(int row){
+    public List<Domain.DomainValue> getRowValue(int row) {
         //retourne la valeur de ligne
         return this.rowValues.get(row);
     }
@@ -319,4 +355,168 @@ public class Matrix {
     public void setMaxPrevious(Map<Integer, Integer> maxPrevious) {
         this.maxPrevious = maxPrevious;
     }
+
+
+    /*------------------------*/
+
+
+    public static Matrix invert(Matrix matrix) {
+
+        Matrix matrixCopy = matrix.copy();
+
+        AbstractDouble[][] invertMatrix = invert(matrixCopy.matrix, matrixCopy.doubleFactory);
+
+        matrixCopy.setMatrix(invertMatrix);
+
+        return matrixCopy;
+    }
+
+    public static AbstractDouble[][] invert(AbstractDouble a[][], AbstractDoubleFactory doubleFactory) {
+
+        int n = a.length;
+
+        AbstractDouble x[][] = new AbstractDouble[n][n];
+
+        AbstractDouble b[][] = new AbstractDouble[n][n];
+
+        initMatrixZero(x, doubleFactory);
+
+        initMatrixZero(b, doubleFactory);
+
+        int index[] = new int[n];
+
+        for (int i = 0; i < n; ++i) {
+
+            b[i][i] = doubleFactory.getNew(1.0);
+        }
+
+        // Transform the matrix into an upper triangle
+        gaussian(a, index, doubleFactory);
+
+        // Update the matrix b[i][j] with the ratios stored
+
+        for (int i = 0; i < n - 1; ++i) {
+
+            for (int j = i + 1; j < n; ++j) {
+
+                for (int k = 0; k < n; ++k) {
+
+                    b[index[j]][k] = b[index[j]][k].substract(a[index[j]][i].multiply(b[index[i]][k]));
+                }
+            }
+        }
+
+        // Perform backward substitutions
+
+        for (int i = 0; i < n; ++i) {
+
+            x[n - 1][i] = b[index[n - 1]][i].divide(a[index[n - 1]][n - 1]);
+
+            for (int j = n - 2; j >= 0; --j) {
+
+                x[j][i] = b[index[j]][i];
+
+                for (int k = j + 1; k < n; ++k) {
+
+                    x[j][i] = x[j][i].substract(a[index[j]][k].multiply(x[k][i]));
+                }
+
+                x[j][i] = x[j][i].divide(a[index[j]][j]);
+            }
+        }
+
+        return x;
+    }
+
+    private static void initMatrixZero(AbstractDouble[][] x, AbstractDoubleFactory doubleFactory) {
+
+        int rows = x.length, cols = x[0].length;
+
+        for( int row = 0 ;  row < rows ; row ++){
+
+            for( int col = 0 ;  col < cols ; col ++){
+
+                x[row][col] = doubleFactory.getNew(0.0);
+            }
+        }
+    }
+
+    public static void gaussian(AbstractDouble a[][], int index[], AbstractDoubleFactory doubleFactory) {
+
+        int n = index.length;
+
+        AbstractDouble c[] = new AbstractDouble[n];
+
+        // Initialize the index
+        for (int i = 0; i < n; ++i) {
+
+            index[i] = i;
+        }
+
+        // Find the rescaling factors, one from each row
+
+        for (int i = 0; i < n; ++i) {
+
+            AbstractDouble c1 = doubleFactory.getNew(0.0);
+
+            for (int j = 0; j < n; ++j) {
+
+                AbstractDouble c0 = a[i][j].abs();
+
+                if (c0.compareTo(c1) > 0) {
+
+                    c1 = c0;
+                }
+            }
+            c[i] = c1;
+        }
+
+        // Search the pivoting element from each column
+        int k = 0;
+
+        for (int j = 0; j < n - 1; ++j) {
+
+            AbstractDouble pi1 = doubleFactory.getNew(0.0);
+
+            for (int i = j; i < n; ++i) {
+
+                AbstractDouble pi0 = a[index[i]][j].abs();
+
+                pi0 = pi0.divide(c[index[i]]);
+
+                if (pi0.compareTo(pi1) > 0) {
+
+                    pi1 = pi0;
+
+                    k = i;
+                }
+            }
+
+            // Interchange rows according to the pivoting order
+
+            int itmp = index[j];
+
+            index[j] = index[k];
+
+            index[k] = itmp;
+
+            for (int i = j + 1; i < n; ++i) {
+
+                AbstractDouble pj = a[index[i]][j].divide( a[index[j]][j]);
+
+                //Record pivoting ratios below the diagonal
+
+                a[index[i]][j] = pj;
+
+                //Modify other elements accordingly
+
+                for (int l = j + 1; l < n; ++l) {
+
+                    //a[index[i]][l] -= pj * a[index[j]][l];
+                    a[index[i]][l] = a[index[i]][l].substract(pj.multiply(a[index[j]][l]));
+                }
+            }
+        }
+    }
+
 }

@@ -56,4 +56,16 @@ public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
 
         return this.bigDecimal.doubleValue();
     }
+
+    @Override
+    public AbstractDouble abs() {
+
+        return new MyBigDecimal(this.bigDecimal.abs());
+    }
+
+    @Override
+    public AbstractDouble copy() {
+
+        return new MyBigDecimal(new BigDecimal(this.bigDecimal.doubleValue()));
+    }
 }
