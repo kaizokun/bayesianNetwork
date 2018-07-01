@@ -53,7 +53,7 @@ public class Factor {
         this.initFactor(this.matrix, varList, var);
 
         //permet de savoir quel facteur sont lié a quel variable
-        //afin d'enregistrer les facteurs à traiter lorsque suffisamment de colVars
+        //afin d'enregistrer les facteurs à traiter lorsque suffisamment de variables
         //ont été initialisé
     }
 
@@ -74,7 +74,7 @@ public class Factor {
 
     public static AbstractDouble getRequestDistribution(Map<Variable, Domain.DomainValue> reqValues, List<Variable> reqVars, Factor factor) {
 
-        //reattribution des valeurs de la requete aux colVars
+        //reattribution des valeurs de la requete aux variables
         for(Variable reqVar : reqVars){
 
             reqVar.setDomainValue(reqValues.get(reqVar));
@@ -105,7 +105,7 @@ public class Factor {
 
     private void initFactor(Object[] matrix, LinkedList<Variable> varList, Variable var) {
 
-        //on pourrait aussi stocker les colVars dans un arrayList et passer d'un indice à l'autre
+        //on pourrait aussi stocker les variables dans un arrayList et passer d'un indice à l'autre
 
         //récupere la première variable
         Variable variable = varList.removeFirst();
@@ -155,7 +155,7 @@ public class Factor {
         Set<Variable> newFactorVars = new LinkedHashSet<>();
 
         //on enregistre les facteurs à multiplier et sommer
-        //en on enregistre les colVars communes dans le facteur courant
+        //en on enregistre les variables communes dans le facteur courant
         for (Factor factor : factors) {
 
             if (factor.vars.contains(var)) {
@@ -179,20 +179,20 @@ public class Factor {
 
         Factor newFactor = new Factor(newFactorVars, doubleFactory);
 
-        //création d'une liste de colVars à traiter pour la multiplication et sommation
+        //création d'une liste de variables à traiter pour la multiplication et sommation
         List<Variable> vars = new ArrayList<>();
         //ajout de la variable à sommer en début de liste
         //inutile si il s'agit d'une variable de la requete dont il faut calculer le resultat
-        //car elle fait parti des colVars du facteur
+        //car elle fait parti des variables du facteur
         if(!varReq) {
 
             vars.add(var);
         }
 
-        //suivit des colVars du facteur finale
+        //suivit des variables du facteur finale
         vars.addAll(newFactor.vars);
 
-        //les colVars seront assignées dans l'ordre, pour chaque variable on verifie
+        //les variables seront assignées dans l'ordre, pour chaque variable on verifie
         //les facteurs liées qui seront actifs au moment ou elle seront traités
         for (Variable variable : vars) {
 
@@ -203,7 +203,7 @@ public class Factor {
 
         //on retire ces facteurs à multiplier de la liste d'origine
         factors.removeAll(factorsMul);
-        //on retire les facteurs enregistrés dans les colVars
+        //on retire les facteurs enregistrés dans les variables
 
         for (Variable variable : vars) {
 
@@ -216,7 +216,7 @@ public class Factor {
     private static void sumMulFactors(Factor newFactor, List<Variable> vars, AbstractDouble mul, int iVar,
                                       AbstractDoubleFactory doubleFactory) {
 
-        //toutes les colVars sont assignées
+        //toutes les variables sont assignées
         if (iVar == vars.size()) {
             //ont addtionne les valeurs multipliés avec les precedentes
             newFactor.addValue(mul);
@@ -231,7 +231,7 @@ public class Factor {
 
             //initialise la variable
             variable.setDomainValue(value);
-            //sauvegarde la valeur de multiplication pour les valeurs de colVars precedentes
+            //sauvegarde la valeur de multiplication pour les valeurs de variables precedentes
             AbstractDouble mul2 = mul;
             //pour chaque facteur pouvant fournir un valeur arrivé à cette variable,
             //multiplier la valeur de l'entrée de la matrice pour une combinaison de valeur
@@ -257,7 +257,7 @@ public class Factor {
 
         Iterator<Variable> variableIterator = this.vars.iterator();
         //on recupere le tableau de probabilités
-        //correspondant à la combinaison de valeur des colVars du facteur
+        //correspondant à la combinaison de valeur des variables du facteur
         for (int iVar = 0; iVar < vars.size() - 1; iVar++) {
 
             Variable var = variableIterator.next();

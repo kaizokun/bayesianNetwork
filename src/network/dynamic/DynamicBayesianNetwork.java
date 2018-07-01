@@ -55,7 +55,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public Variable getVariable(int time, Variable variable) {
 
-       // System.out.println("GET VAR : "+this.timeVariables.get(time)+"\n var : "+variable);
+        //System.out.println(time+" GET VAR : "+this.timeVariables.get(time)+"\n var : "+variable);
 
         return this.timeVariables.get(time).get(variable);
     }
@@ -173,7 +173,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             ArrayList<Variable> newDependencies = new ArrayList<>();
 
             //l'ordre des dependances et d'abord celui defini par le model
-            //puis pour chacune des colVars celles lié à un temps inférieur sont placés avant
+            //puis pour chacune des variables celles lié à un temps inférieur sont placés avant
             //en correspondance avec les entrées TCP
             for (Dependency dependencie : model.getDependencies()) {
 
@@ -185,7 +185,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                 LinkedList<Variable> timeDependencies = new LinkedList<>();
 
                 timeDependencies.add(lastDep);
-                //récuperer les colVars precedentes parmis les parents de la derniere dependance
+                //récuperer les variables precedentes parmis les parents de la derniere dependance
                 //si l'ordre est de 1 il ne se passe rien si supérieur à 1 on recupere
                 //les mêmes variable de temps inférieur jusqu'à la limite d'ordre
                 //(1)
@@ -198,7 +198,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
                     newDependencies, this.time);
 
             if (captors) {
-                //pour les colVars d'isObservation enregistre dans les colVars parents leur indice
+                //pour les variables d'isObservation enregistre dans les variables parents leur indice
                 //dans la liste des enfants
                 newVar.saveObservation();
             }
@@ -206,7 +206,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             newVars.add(newVar);
         }
 
-        //enregistrement des colVars pour access rapide
+        //enregistrement des variables pour access rapide
         for (Variable newVar : newVars) {
 
             this.getTimeVariables(time).put(newVar, newVar);

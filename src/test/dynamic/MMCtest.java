@@ -18,92 +18,58 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import static domain.DomainFactory.getBooleanDomain;
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
 public class MMCtest {
 
-    protected MMC mmc;
+    protected MMC mmcOne = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
 
-    protected Map<Integer, Variable> megaVariableTestTwoVars(int extend, int[][] obsValues) {
+    protected MMC mmcTwo = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
 
-        mmc = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
-        //le MMC possede déja une megavariable etendu au temps 1
-        for (int i = 2; i <= extend; i++) {
+    private Variable[][] getVariablesInit(Object[] varLabels, IDomain[] varDomains, Object[][] valuesTab) {
+        //crée un tableau à deux dimensions, la premier pour le nombre de megavariables d'oservations
+        //qui devront être initialisées, la deuxieme pour le nombre de variables qui consitue la megavariable observation
 
-            mmc.extend();
+        Variable[][] variablesTab = new Variable[valuesTab.length][valuesTab[0].length];
+
+        int o = 0;
+        //pour chaque liste de valeurs prises par les variables composants la mégavariable d'observation
+        for (Object[] values : valuesTab) {
+
+            int v = 0;
+            //pour chaque valeur
+            for (Object value : values) {
+                //crée une variable avec un label et un domain donné
+                Variable var = new Variable(varLabels[v].toString(), varDomains[v]);
+                //initialise la valeur
+                var.setValue(value);
+                //enregistre la variable
+                variablesTab[o][v] = var;
+
+                v++;
+            }
+
+            o++;
         }
 
-        IDomain booleanDomain = DomainFactory.getBooleanDomain();
-
-        Variable umbrella = new Variable(UMBRELLA.toString(), booleanDomain);
-
-        Variable coat = new Variable(COAT.toString(), booleanDomain);
-
-        int time = 1;
-
-        Map<Integer, Variable> megaVarObs = new Hashtable<>();
-
-        for (int values[] : obsValues) {
-
-            Variable megaVariableObservation = mmc.getMegaVariable(time, umbrella, coat);
-
-            umbrella.setValue(values[0]);
-
-            coat.setValue(values[1]);
-
-            megaVariableObservation.setDomainValuesFromVariables(umbrella, coat);
-
-            megaVarObs.put(time, megaVariableObservation);
-
-            time++;
-        }
-
-        return megaVarObs;
-    }
-
-    protected Map<Integer, Variable> megaVariableTestOneVar(int extend, int[][] obsValues) {
-
-        mmc = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
-
-        for (int i = 1; i <= extend; i++) {
-
-            mmc.extend();
-        }
-
-        Variable umbrella = new Variable(UMBRELLA.toString(), DomainFactory.getBooleanDomain());
-
-        int time = 1;
-
-        Map<Integer, Variable> megaVarObs = new Hashtable<>();
-
-        for (int values[] : obsValues) {
-
-            Variable megaVariableObservation = mmc.getMegaVariable(time, umbrella);
-
-            umbrella.setValue(values[0]);
-
-            megaVariableObservation.setDomainValuesFromVariables(umbrella);
-
-            megaVarObs.put(time, megaVariableObservation);
-
-            time++;
-        }
-
-        return megaVarObs;
+        return variablesTab;
     }
 
     @Test
     public void forwardTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
-        ForwardMMC mmcForward = new ForwardMMC(mmc);
+        mmcOne.extend(variablesObsTab);
 
-        Matrix forward = mmcForward.forward(2, megaVarObs);
+        ForwardMMC mmcForward = new ForwardMMC(mmcOne);
 
-        System.out.println(mmc);
+        Matrix forward = mmcForward.forward(2);
+
+        System.out.println(mmcOne);
 
         System.out.println(forward);
     }
@@ -111,15 +77,19 @@ public class MMCtest {
     @Test
     public void mostLikelyPathTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}, {1}, {0}, {0}, {1}, {0}, {1}, {0}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {0}, {0}, {1}, {0}, {1}, {0}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+        IDomain domain = getBooleanDomain();
 
-        MostLikelySequencyMMC mostLikelySequency = new MostLikelySequencyMMC(mmc);
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{domain}, obsValues);
 
-        Matrix forward = mostLikelySequency.forward(10, megaVarObs);
+        mmcOne.extend(variablesObsTab);
 
-        System.out.println(mmc);
+        MostLikelySequencyMMC mostLikelySequency = new MostLikelySequencyMMC(mmcOne);
+
+        Matrix forward = mostLikelySequency.mostLikelySequency(10);
+
+        System.out.println(mmcOne);
 
         System.out.println(forward);
 
@@ -131,15 +101,17 @@ public class MMCtest {
     @Test
     public void BackwardTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
-        BackwardMMC mmcBackward = new BackwardMMC(mmc);
+        mmcOne.extend(variablesObsTab);
 
-        Matrix backward = mmcBackward.backward(1, megaVarObs);
+        BackwardMMC mmcBackward = new BackwardMMC(mmcOne);
 
-        System.out.println(mmc);
+        Matrix backward = mmcBackward.backward(1);
+
+        System.out.println(mmcOne);
 
         System.out.println(backward);
     }
@@ -147,13 +119,15 @@ public class MMCtest {
     @Test
     public void smoothingTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
-        System.out.println(mmc);
+        mmcOne.extend(variablesObsTab);
 
-        Matrix smoothing = new SmoothingMMC(mmc).smoothing(1, megaVarObs);
+        System.out.println(mmcOne);
+
+        Matrix smoothing = new SmoothingMMC(mmcOne).smoothing(1);
 
         System.out.println("Smoothing");
 
@@ -163,17 +137,21 @@ public class MMCtest {
     @Test
     public void smoothingRangeTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
+
+        mmcOne.extend(variablesObsTab);
 
         // System.out.println(mmc);
 
-        SmoothingMMC smoothing = new SmoothingMMC(mmc);
+        SmoothingMMC smoothing = new SmoothingMMC(mmcOne);
 
-        smoothing.smoothing(0, 6, megaVarObs);
+        smoothing.smoothing(0, 6);
 
-        System.out.println("Smoothings");
+        System.out.println("=====================================================");
+        System.out.println("====================Smoothings=======================");
+        System.out.println("=====================================================");
 
         System.out.println(smoothing.getSmoothings());
     }
@@ -182,35 +160,43 @@ public class MMCtest {
     @Test
     public void smoothingConstantRangeTestOneVar() {
 
-        int[][] obsValues = new int[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestOneVar(obsValues.length - 1, obsValues);
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
+
+        mmcOne.extend(variablesObsTab);
 
         // System.out.println(mmc);
 
-        SmoothingMMC smoothing = new SmoothingMMC(mmc);
+        SmoothingMMC smoothing = new SmoothingMMC(mmcOne);
 
-        smoothing.smoothingConstant(0, 6, megaVarObs);
+        smoothing.smoothingConstant(0, 6);
 
-        System.out.println("Smoothings");
+        System.out.println("=====================================================");
+        System.out.println("====================Smoothings=======================");
+        System.out.println("=====================================================");
 
         System.out.println(smoothing.getSmoothings());
     }
 
     @Test
-    public void forwardBackwardTestTwoVar() {
+    public void forwardAndBackwardTestTwoVar() {
 
-        int[][] obsValues = new int[][]{{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}};
+        Object[][] obsValues = new Object[][]{{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}};
 
-        Map<Integer, Variable> megaVarObs = megaVariableTestTwoVars(obsValues.length - 1, obsValues);
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA, COAT},
+                new IDomain[]{getBooleanDomain(),getBooleanDomain()},
+                obsValues);
 
-        ForwardMMC mmcForward = new ForwardMMC(mmc);
+        mmcTwo.extend(variablesObsTab);
 
-        BackwardMMC mmcBackward = new BackwardMMC(mmc);
+        ForwardMMC mmcForward = new ForwardMMC(mmcTwo);
 
-        Matrix forward = mmcForward.forward(2, megaVarObs);
+        BackwardMMC mmcBackward = new BackwardMMC(mmcTwo);
 
-        Matrix backward = mmcBackward.backward(2, megaVarObs);
+        Matrix forward = mmcForward.forward(2);
+
+        Matrix backward = mmcBackward.backward(2);
 
         System.out.println(forward);
 

@@ -16,7 +16,7 @@ public class SimilaritySamplingAsk {
         //retrait des observations qui ne seront pas echantillonées
         variables.removeAll(obs);
 
-        //sauvegarde les valeurs originales des colVars de requete et d'isObservation
+        //sauvegarde les valeurs originales des variables de requete et d'isObservation
         for (Variable reqVar : request) {
 
             reqVar.saveOriginValue();
@@ -28,7 +28,7 @@ public class SimilaritySamplingAsk {
 
         for (int s = 0; s < maxSample; s++) {
 
-            ///echantillonage les colVars
+            ///echantillonage les variables
             for (Variable var : variables) {
 
                 var.initRdmValue();
@@ -46,7 +46,7 @@ public class SimilaritySamplingAsk {
             //de valeurs pour les variable de la requete
             totalWeight = totalWeight.add(sampleWeight);
 
-            //et on test les colVars de requete
+            //et on test les variables de requete
             //même principe et on passe à l'echantillon suivant si une variable de requete ne correspond pas
             for (Variable req : request) {
 

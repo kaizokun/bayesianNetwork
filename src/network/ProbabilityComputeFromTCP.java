@@ -221,7 +221,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
     /**------------------ PRIVATES ----------------*/
 
     /**
-     * Génere une clé à partir d'une combinaison de valeurs pour les colVars parents
+     * Génere une clé à partir d'une combinaison de valeurs pour les variables parents
      **/
     private String getDependenciesValuesKey(List<String> keyParts) {
 

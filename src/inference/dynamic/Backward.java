@@ -59,7 +59,7 @@ public class Backward {
         }
 
         //récuperation des observations de la variable au temps suivant
-        //et ajout des eventuelles colVars manquante à la requete
+        //et ajout des eventuelles variables manquante à la requete
         Set<String> containState = new HashSet<>(), containObs = new HashSet<>();
 
         List<Variable> fullRequest = new LinkedList<>(), nextObservations = new LinkedList<>();
@@ -74,7 +74,7 @@ public class Backward {
                 fullRequest.add(request);
 
                 //récupération de la variable au temps suivant
-                //faut il recuperer les colVars deux temps en avant ?
+                //faut il recuperer les variables deux temps en avant ?
                 Variable nextRequest = this.network.getVariable(request.getTime() + 1, request);
                 //si variable en temps t aucune ne suit
                 if (nextRequest != null) {
@@ -339,7 +339,7 @@ public class Backward {
                 fullRequest.add(request);
 
                 //récupération de la variable au temps suivant
-                //faut il recuperer les colVars deux temps en avant ?
+                //faut il recuperer les variables deux temps en avant ?
                 Variable nextRequest = this.network.getVariable(request.getTime() + 1, request);
                 //si variable en temps t aucune ne suit
                 if (nextRequest != null) {
@@ -378,7 +378,7 @@ public class Backward {
             }
         }
 
-        //trie des colVars par temps puis par label
+        //trie des variables par temps puis par label
         Collections.sort(fullRequest, comparatorVarTimeLabel);
 
         String fullKey = getDistribSavedKey(fullRequest);
@@ -477,24 +477,24 @@ public class Backward {
         String fullKey = "";
 
         //récuperer tout les parents de l'isObservation courante soit
-        //normalement uniquement les colVars états situées à la même coupe temporelle
+        //normalement uniquement les variables états situées à la même coupe temporelle
         //on commence par ajouter celles là
         List<Variable> keyVars = new LinkedList<>();
 
         keyVars.addAll(nextObservation.getDependencies());
-        //completer les colVars dont la valeur on une importance
+        //completer les variables dont la valeur on une importance
         //pour le calcul. Pour une variable en temps timeEnd dont la distribution vaut 1
         //c'est inutile
         if (markovOrder > 1 && keyVars.get(0).getTime() < timeEnd) {
 
             for (Variable nextDep : nextObservation.getDependencies()) {
                 // System.out.println(ident+"NEXT DEP :  "+nextDep);
-                //on recupere les colVars de même label situées à des temps precedents
+                //on recupere les variables de même label situées à des temps precedents
                 //en fonction de la profondeur de la chaine de markov
-                //qui pourrait bien être spécifique à certaines colVars
+                //qui pourrait bien être spécifique à certaines variables
                 //plutot que général dans ce cas l'information serait à récuperer dans la variable
                 //plutot que comme parametre de la procedure...
-                //On recupere les markovOrder - 1 colVars precedentes
+                //On recupere les markovOrder - 1 variables precedentes
                 for (int d = markovOrder; d > 1 && nextDep.getTime() > 0; d--) {
                     //System.out.println(ident+"Previous time state : "+this.getVariable(nextDep.getTime() - 1, nextDep));
                     keyVars.add(this.network.getVariable(nextDep.getTime() - 1, nextDep));
@@ -539,7 +539,7 @@ public class Backward {
              * et avec la clé comprenant les labels et temps recuperer la bonne valeur
              * qui vient d'être calculée
              * pour cela il faudrait enregistrer l'ordre des dependances dans la variable
-             * mais aussi trier les colVars de la requete complete par temps et par label
+             * mais aussi trier les variables de la requete complete par temps et par label
              * */
 
             if (hiddenVarsFullDistribution == null) {

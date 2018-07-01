@@ -61,7 +61,7 @@ public class BayesianNetwork {
     }
 
 
-    //marque les colVars importante pour la requete soit les observations les requetes
+    //marque les variables importante pour la requete soit les observations les requetes
     //et leur ancetres
     public static void markImportantVars(List<Variable> request, List<Variable> observations) {
 
@@ -126,7 +126,7 @@ public class BayesianNetwork {
                     //child.setDepth(d);
                 }
             }
-            //supprime les colVars du niveau supérieur
+            //supprime les variables du niveau supérieur
             vars.clear();
             //ajoute celles du niveau inférieur
             vars.addAll(children);
@@ -164,7 +164,7 @@ public class BayesianNetwork {
     public static void domainValuesCombinations(List<List<Domain.DomainValue>> requestValuesCombinaisons, LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar) {
 
         //si aucune variable restantes
-        //on ajoute le tableau de valeurs pour chaque colVars dans le même ordre que les colVars de la requetes
+        //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
         if (variables.size() == iVar) {
 
             requestValuesCombinaisons.add(new ArrayList(varsValues));
@@ -187,7 +187,7 @@ public class BayesianNetwork {
 
     public static List<List<Domain.DomainValue>> domainValuesCombinations(Collection<Variable> variables) {
 
-        //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de colVars
+        //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
         List<List<Domain.DomainValue>> requestValuesCombinaisons = new ArrayList<>(variables.size());
 
         domainValuesCombinations(requestValuesCombinaisons, new LinkedList<>(), new ArrayList<>(variables), 0);
@@ -199,7 +199,7 @@ public class BayesianNetwork {
                                                          LinkedList<Domain.DomainValue> varsValues, List<Variable> variables, int iVar) {
 
         //si aucune variable restantes
-        //on ajoute le tableau de valeurs pour chaque colVars dans le même ordre que les colVars de la requetes
+        //on ajoute le tableau de valeurs pour chaque variables dans le même ordre que les variables de la requetes
         if (variables.size() == iVar) {
 
             requestValuesCombinaisons.add(new ArrayList(varsValues));
@@ -233,7 +233,7 @@ public class BayesianNetwork {
 
     public static List<List<Domain.DomainValue>> domainValuesCombinationsCheckInit(Collection<Variable> variables) {
 
-        //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de colVars
+        //premiere dimension le nombre de combinaison, deuxieme dimension le nombre de variables
         List<List<Domain.DomainValue>> requestValuesCombinaisons = new LinkedList<>();
 
         domainValuesCombinationsCheckInit(requestValuesCombinaisons, new LinkedList<>(), new ArrayList<>(variables), 0);

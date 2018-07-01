@@ -30,6 +30,11 @@ public class MostLikelySequencyMMC extends ForwardMMC {
         forward.setMaxPrevious(sum.getMaxPrevious());
     }
 
+    public Matrix mostLikelySequency(int t) {
+
+        return forward(t, true);
+    }
+
     public List<List<Domain.DomainValue>> mostLikelyPath(int t) {
 
         LinkedList<List<Domain.DomainValue>> mostLikelySequence = new LinkedList<>();
@@ -72,5 +77,6 @@ public class MostLikelySequencyMMC extends ForwardMMC {
 
         return mostLikelySequence;
     }
+
 
 }

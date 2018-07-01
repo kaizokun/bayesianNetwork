@@ -12,7 +12,7 @@ import java.util.*;
 
 public class MMC extends DynamicBayesianNetwork {
 
-    protected Variable megaVariableStates0, megaVariableStates1, megaVariableObs1;
+    protected Variable megaVariableStatesRoot, megaVariableStates, megaVariableObs;
 
     protected Map<String, Matrix> matrixObs;
 
@@ -22,31 +22,34 @@ public class MMC extends DynamicBayesianNetwork {
 
         super(doubleFactory);
 
-        this.time++;
-
         Arrays.sort(states0, Variable.varLabelComparator);
 
         Arrays.sort(states1, Variable.varLabelComparator);
 
         Arrays.sort(obs1, Variable.varLabelComparator);
 
-        this.megaVariableStates0 = this.mergeStateVariables(Arrays.asList(states0), 0);
+        this.megaVariableStatesRoot = this.mergeStateVariables(Arrays.asList(states0), 0);
 
-        this.megaVariableStates1 = this.mergeStateVariables(Arrays.asList(states1), 1);
+        this.megaVariableStates = this.mergeStateVariables(Arrays.asList(states1), 1);
 
-        this.megaVariableObs1 = this.mergeObservationVariables(Arrays.asList(obs1), Arrays.asList(states1), 1);
+        this.megaVariableObs = this.mergeObservationVariables(Arrays.asList(obs1), Arrays.asList(states1), 1);
 
-        this.megaVariableStates1.addDependency(this.megaVariableStates0);
+        this.getTimeVariables(0).put(megaVariableStatesRoot, megaVariableStatesRoot);
 
-        this.megaVariableObs1.addDependency(this.megaVariableStates1);
+        this.roots.add(this.megaVariableStatesRoot);
+    }
 
-        this.getTimeVariables(0).put(megaVariableStates0, megaVariableStates0);
+    public void extend(Variable[][] variablesTab){
 
-        this.getTimeVariables(1).put(megaVariableStates1, megaVariableStates1);
-
-        this.getTimeVariables(1).put(megaVariableObs1, megaVariableObs1);
-
-        this.roots.add(this.megaVariableStates0);
+        //pour chaque nouvelles observations
+        for (Variable variables[] : variablesTab) {
+            //on etend le reseau
+            this.extend();
+            //on recupere la nouvelle megavariable observation
+            Variable megaVariableObservation = this.getMegaVariableObs(this.time);
+            //on l'initialise à l'aide d'une liste de variables qui la compose et initialisées
+            megaVariableObservation.setDomainValuesFromVariables(variables);
+        }
     }
 
     @Override
@@ -54,15 +57,11 @@ public class MMC extends DynamicBayesianNetwork {
 
         this.time++;
 
-        Variable lastState = this.getTimeVariables(this.time - 1).get(this.megaVariableStates1);
+        Variable newState = new Variable(this.megaVariableStates.getCompoVars(), this.time);
 
-        Variable lastObs = this.getTimeVariables(this.time - 1).get(this.megaVariableObs1);
-
-        Variable newState = new Variable(lastState.getCompoVars(), this.time);
-
-        newState.addDependency(lastState);
-
-        Variable newObs = new Variable(lastObs.getCompoVars(), this.time);
+        Variable newObs = new Variable(this.megaVariableObs.getCompoVars(), this.time);
+        //si time - 1 vaut zero on recuperera la megavariable root qui a le même label que celles qui la succede...
+        newState.addDependency( this.getTimeVariables(this.time - 1).get(this.megaVariableStates));
 
         newObs.addDependency(newState);
 
@@ -71,14 +70,15 @@ public class MMC extends DynamicBayesianNetwork {
         this.getTimeVariables(this.time).put(newObs, newObs);
     }
 
+
     private void loadVarDistrib(AbstractDouble[] row, List<Variable> vars, List<List<Domain.DomainValue>> domainValuesList, AbstractDoubleFactory doubleFactory) {
 
         int col = 0;
-        //pour chaque combinaisons de valeurs pouvant être prises par les colVars
+        //pour chaque combinaisons de valeurs pouvant être prises par les variables
         for (List<Domain.DomainValue> domainValues : domainValuesList) {
 
             Iterator<Variable> tVarsIterator = vars.iterator();
-            //assigne une combinaison de valeurs aux colVars
+            //assigne une combinaison de valeurs aux variables
             for (Domain.DomainValue domainValue : domainValues) {
 
                 tVarsIterator.next().setDomainValue(domainValue);
@@ -174,7 +174,7 @@ public class MMC extends DynamicBayesianNetwork {
         List<List<Domain.DomainValue>> domainValuesList = BayesianNetwork.domainValuesCombinations(states);
 
         AbstractDouble[][] matrix;
-        //si colVars de temps 0
+        //si variables de temps 0
         if (time == 0) {
 
             matrix = new AbstractDouble[1][domainValuesList.size()];
@@ -186,7 +186,7 @@ public class MMC extends DynamicBayesianNetwork {
         } else {
 
             matrix = new AbstractDouble[domainValuesList.size()][domainValuesList.size()];
-            //Set des colVars parents
+            //Set des variables parents
             Set<Variable> parents = new LinkedHashSet<>();
 
             for (Variable state : states) {
@@ -201,13 +201,13 @@ public class MMC extends DynamicBayesianNetwork {
             //this.parentStates = parentStates;
 
             int row = 0;
-            //pour chaque combinaisons de valeurs pouvant être prises par les colVars parents
+            //pour chaque combinaisons de valeurs pouvant être prises par les variables parents
             //ici on boucle sur les combinaisons obtenus à partir de la liste des états
             //pour charger les parents, c'est en fait la même liste trié de la même manière...
             for (List<Domain.DomainValue> domainValuesParents : domainValuesList) {
 
                 Iterator<Variable> tVarsParentsIterator = parentStates.iterator();
-                //assigne une combinaison de valeurs aux colVars
+                //assigne une combinaison de valeurs aux variables
                 for (Domain.DomainValue domainValue : domainValuesParents) {
 
                     tVarsParentsIterator.next().setDomainValue(domainValue);
@@ -227,15 +227,25 @@ public class MMC extends DynamicBayesianNetwork {
     }
 
     /*-------------------- GETTER SETTER --------------------*/
-
+/*
     public Variable getMegaVariable(int time, Variable... variables) {
 
-        // trie les colVars constituant la megavariable par labels
+        // trie les variables constituant la megavariable par labels
         Arrays.sort(variables, Variable.varLabelComparator);
-        // crée une variable clé conenant le label composée
+        // crée une variable servant de clé contenant le label composée
         Variable megaVariable = new Variable(variables);
         // recupere la variable enregistrée dans le reseau au temps t à l'aide de ce label
         return this.getVariable(time, megaVariable);
+    }
+*/
+    public Variable getMegaVariableObs(int time){
+
+        return this.getVariable(time, this.megaVariableObs);
+    }
+
+    public Variable getMegaVariableState(int time){
+
+        return this.getVariable(time, this.megaVariableStates);
     }
 
     public Matrix getMatrixState0() {
@@ -258,16 +268,16 @@ public class MMC extends DynamicBayesianNetwork {
         return this.matrixStatesT;
     }
 
-    public Variable getMegaVariableStates0() {
-        return megaVariableStates0;
+    public Variable getMegaVariableStatesRoot() {
+        return megaVariableStatesRoot;
     }
 
-    public Variable getMegaVariableStates1() {
-        return megaVariableStates1;
+    public Variable getMegaVariableStates() {
+        return megaVariableStates;
     }
 
-    public Variable getMegaVariableObs1() {
-        return megaVariableObs1;
+    public Variable getMegaVariableObs() {
+        return megaVariableObs;
     }
 
     public Map<String, Matrix> getMatrixObs() {

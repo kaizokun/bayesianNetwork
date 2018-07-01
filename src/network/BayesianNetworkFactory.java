@@ -28,7 +28,7 @@ public class BayesianNetworkFactory {
 
         BayesianNetwork network = new BayesianNetwork(new MyDoubleFactory());
 
-        //domain.Domain abcd commun à toutes les colVars
+        //domain.Domain abcd commun à toutes les variables
 
         IDomain abcdDomain = DomainFactory.getABCDDomain();
 
@@ -56,7 +56,7 @@ public class BayesianNetworkFactory {
 
         BayesianNetwork network = new BayesianNetwork(new MyDoubleFactory());
 
-        //domain.Domain booleen commun à toutes les colVars
+        //domain.Domain booleen commun à toutes les variables
 
         IDomain booleanDomain = DomainFactory.getBooleanDomain();
 

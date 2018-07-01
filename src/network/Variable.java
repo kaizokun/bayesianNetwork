@@ -47,7 +47,7 @@ public class Variable {
     protected boolean added, important, isObs;
 
     //facteur actif une fois arrivé à cette variable dans la sous procédure
-    // de sommation de l'algorithme d'elimination de colVars
+    // de sommation de l'algorithme d'elimination de variables
     //peut etre pas ca place ici car lié à un algorithme specifique
     //un table Map pourrait aussi faire l'affaire mais moins efficace car necessite une recherche
     //ici la relation et immédiate
@@ -63,7 +63,7 @@ public class Variable {
     }
 
     /**
-     * Generate a mega variable from a list of colVars
+     * Generate a mega variable from a list of variables
      * must be sorted by label (asc)
      * and a specific time.
      *
@@ -229,25 +229,25 @@ public class Variable {
     }
 
     /**
-     * initialize the colVars composing a megavariable
+     * initialize the variables composing a megavariable
      * from a list of domain colValues
-     * the order of the colValues must match with the colVars one
+     * the order of the colValues must match with the variables one
      * sorted by label ASC
      * */
-    public void setDomainValues(Domain.DomainValue ... domainValues){
+    public void setDomainValues(Object [] objects){
 
         Iterator<Variable> variableIterator = this.compoVars.iterator();
 
-        for(Domain.DomainValue domainValue : domainValues){
+        for(Object object : objects){
 
-            variableIterator.next().setDomainValue(domainValue);
+            variableIterator.next().setDomainValue(new Domain.DomainValue(object));
         }
     }
 
     /**
-     * initialize the colVars composing a megavariable
-     * from another list of colVars already initialized
-     * the order of the colVars doesn't matter, they are sorted
+     * initialize the variables composing a megavariable
+     * from another list of variables already initialized
+     * the order of the variables doesn't matter, they are sorted
      * inside the method
      * */
     public void setDomainValuesFromVariables(Variable ... variables){
@@ -263,7 +263,7 @@ public class Variable {
     }
 
     /**
-     * value list of the colVars composing the mega variable
+     * value list of the variables composing the mega variable
      * */
     public List<Domain.DomainValue> getMegaVarValues(){
 
@@ -484,7 +484,7 @@ public class Variable {
 
         this.activeFactors.clear();
 
-        //inutile de reinitialiser le compteur de colVars initialisés pour ces facteurs
+        //inutile de reinitialiser le compteur de variables initialisés pour ces facteurs
         //qui passeront au ramasse miettes
     }
 

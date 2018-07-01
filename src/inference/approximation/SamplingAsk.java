@@ -13,7 +13,7 @@ public class SamplingAsk {
         network.markImportantVars(request, obs);
 
         List<Variable> variables = network.getTopologicalOrder();
-        //sauvegarde les valeurs originales des colVars de requete et d'isObservation
+        //sauvegarde les valeurs originales des variables de requete et d'isObservation
         for (Variable reqVar : request) {
 
             reqVar.saveOriginValue();
@@ -30,7 +30,7 @@ public class SamplingAsk {
 
         for (int s = 0; s < maxSample; s++) {
 
-            ///echantillonage des colVars
+            ///echantillonage des variables
             for (Variable var : variables) {
 
                 var.initRdmValue();
@@ -51,7 +51,7 @@ public class SamplingAsk {
             if (nextSample) continue;
 
             //si on passe se cap on compte un echantillon valide
-            //et on test les colVars de requete
+            //et on test les variables de requete
 
             totalMatchSamplesObs++;
             //même principe on passe à l'echantillon suivant si une variable de requete ne correspond pas

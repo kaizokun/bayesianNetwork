@@ -17,17 +17,17 @@ public class ForwardMMC {
         this.mmc = mmc;
     }
 
-    public Matrix forward(int t, Map<Integer, Variable> megaVariablesObs) {
+    public Matrix forward(int t) {
 
-        return forward(t, megaVariablesObs, 0, false);
+        return forward(t, 0, false);
     }
 
-    public Matrix forward(int t, Map<Integer, Variable> megaVariablesObs, boolean saveForwards) {
+    public Matrix forward(int t, boolean saveForwards) {
 
-        return forward(t, megaVariablesObs, 0, saveForwards);
+        return forward(t, 0, saveForwards);
     }
 
-    private Matrix forward(int t, Map<Integer, Variable> megaVariablesObs, int depth, boolean saveForwards) {
+    private Matrix forward(int t, int depth, boolean saveForwards) {
 
         /*
          * on pourrait faire des megavariables états observations sur des sous ensemble de colVars du reseau
@@ -48,7 +48,7 @@ public class ForwardMMC {
             return forward;
         }
 
-        Variable megaObs = megaVariablesObs.get(t);
+        Variable megaObs = this.mmc.getMegaVariableObs(t);
 
         Matrix obs = this.mmc.getMatrixObs(megaObs);
         //dans la matrice de base les lignes correspondent aux valeurs parents
@@ -66,7 +66,7 @@ public class ForwardMMC {
         //pour recuperer la sequence la plus probable, ici la multiplication se fait depuis la
         //matrice transition pour chaque ligne on calcule une valeur max Xt-1 pour une valeur de Xt
 
-        Matrix forward = forward(t - 1, megaVariablesObs, depth + 1, saveForwards);
+        Matrix forward = forward(t - 1, depth + 1, saveForwards);
 
         Matrix sum = this.multiplyTransitionForward(this.mmc.getMatrixStatesT(), forward);
 

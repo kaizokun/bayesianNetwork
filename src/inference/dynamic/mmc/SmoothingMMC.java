@@ -18,31 +18,31 @@ public class SmoothingMMC {
         this.mmc = mmc;
     }
 
-    public Matrix smoothing(int time, Map<Integer, Variable> megaVariablesObs) {
+    public Matrix smoothing(int time) {
 
-        Matrix forward = new ForwardMMC(mmc).forward(time, megaVariablesObs, false);
+        Matrix forward = new ForwardMMC(mmc).forward(time, false);
 
-        Matrix backward = new BackwardMMC(mmc).backward(time, megaVariablesObs, false);
+        Matrix backward = new BackwardMMC(mmc).backward(time, false);
 
         return forward.multiplyRows(backward).normalize();
     }
 
-    public void smoothingConstant(int timeStart, int timeEnd, Map<Integer, Variable> megaVariablesObs) {
+    public void smoothingConstant(int timeStart, int timeEnd) {
 
         ForwardMMC forward = new ForwardMMC(mmc);
 
         BackwardMMC backward = new BackwardMMC(mmc);
 
-        Matrix forwardMatrix = forward.forward(timeEnd, megaVariablesObs, false);
+        Matrix forwardMatrix = forward.forward(timeEnd, false);
 
-        Matrix backwardMatrix = backward.backward(timeEnd, megaVariablesObs, false);
+        Matrix backwardMatrix = backward.backward(timeEnd, false);
 
         this.smoothings.put(timeEnd, forwardMatrix.multiplyRows(backwardMatrix));
 
-        this.smoothing(forwardMatrix, backwardMatrix, timeStart, timeEnd - 1, megaVariablesObs);
+        this.smoothing(forwardMatrix, backwardMatrix, timeStart, timeEnd - 1);
     }
 
-    private void smoothing(Matrix forwardMatrix, Matrix backwardMatrix, int timeStart, int timeEnd, Map<Integer, Variable> megaVariablesObs) {
+    private void smoothing(Matrix forwardMatrix, Matrix backwardMatrix, int timeStart, int timeEnd) {
 
         if (timeStart > timeEnd){
 
@@ -50,7 +50,7 @@ public class SmoothingMMC {
         }
 
         //observation au temps suivant, le backward se calculant par rapport aux observations suivantes
-        Variable megaObs = megaVariablesObs.get(timeEnd + 1);
+        Variable megaObs = this.mmc.getMegaVariableObs(timeEnd + 1);
         //récupère la bonne matrice en fonction des valeurs des observations
         Matrix obs = this.mmc.getMatrixObs(megaObs);
         //récupère la matrice transition
@@ -62,25 +62,26 @@ public class SmoothingMMC {
         Matrix reverseStatesT = Matrix.invert(mmc.getMatrixStatesT());
         //inverse de la matrice observation
         Matrix reverseObs = Matrix.invert(obs);
-
-        forwardMatrix = reverseStatesT.multiply(reverseObs).multiply(forwardMatrix).normalize();
+        //forward decrementé
+        forwardMatrix = reverseStatesT.multiply(reverseObs).multiply(forwardMatrix);//.normalize();
 
         System.out.println("FORWARD TIME[" + timeEnd + "]\n" + forwardMatrix);
+        //pour obtenir les bonnes valeurs du smoothing il faut soit normaliser le backward puis le smoothing
+        //soit aucun des deux ce qui fait des opérations en moins
+        this.smoothings.put(timeEnd, forwardMatrix.multiplyRows(backwardMatrix)/*.normalize()*/);
 
-        this.smoothings.put(timeEnd, forwardMatrix.multiplyRows(backwardMatrix));
-
-        this.smoothing(forwardMatrix, backwardMatrix, timeStart, timeEnd - 1, megaVariablesObs);
+        this.smoothing(forwardMatrix, backwardMatrix, timeStart, timeEnd - 1);
     }
 
-    public void smoothing(int timeStart, int timeEnd, Map<Integer, Variable> megaVariablesObs) {
+    public void smoothing(int timeStart, int timeEnd) {
 
         ForwardMMC forward = new ForwardMMC(mmc);
 
-        forward.forward(timeEnd, megaVariablesObs, true);
+        forward.forward(timeEnd, true);
 
         BackwardMMC backward = new BackwardMMC(mmc);
 
-        backward.backward(timeStart, megaVariablesObs, true);
+        backward.backward(timeStart, true);
 
         while (timeStart <= timeEnd) {
 
