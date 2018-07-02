@@ -83,16 +83,14 @@ public class SmoothingMMC {
 
         System.out.println("RANGE [" + timeStart + " - " + timeEnd + "]");
 
-        if (timeEnd < 1) {
-            //enregistre qu'en temps t le lissage ne s'est pas fait
-            //mmc.getSmootRange().put(mmc.getTime(), 0);
+        if (timeEnd < 0) {
 
             return;
         }
         //si timestart est inferieur à 1 on commence à 1
-        timeStart = timeStart < 1 ? 1 : timeStart;
+        timeStart = timeStart < 0 ? 0 : timeStart;
 
-        // System.out.println("SMOOTHING OK ["+timeStart+" - "+timeEnd+"]");
+        System.out.println("SMOOTHING OK ["+timeStart+" - "+timeEnd+"]");
 
         //au depart on lissera sur une plage de longeur [1,1] qui pourrait augmenter par la suite
         //on crée une nouvelle Map pour enregistrer la nouvelle plage de smoothing
@@ -161,6 +159,8 @@ public class SmoothingMMC {
             System.out.println("FIRST SMOOTHING CONSTANT");
 
             this.smoothingConstant(timeStart, timeEnd, newSmoothings);
+
+            System.out.println(newSmoothings);
 
             //System.out.println(newSmoothings.get(timeEnd));
         }

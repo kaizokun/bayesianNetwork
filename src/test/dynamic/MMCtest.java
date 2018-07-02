@@ -186,7 +186,7 @@ public class MMCtest {
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
-        mmcOne.setSmootStart(4);
+        mmcOne.setSmootStart(5);
 
         mmcOne.setSmootEnd(1);
 
