@@ -11,41 +11,45 @@ public class SmoothingMMC {
 
     protected MMC mmc;
 
+    protected ForwardMMC forwardMMC;
+
+    protected BackwardMMC backwardMMC;
+
     protected Map<Integer, SmoothingMatrices> smoothings = new Hashtable<>();
 
-    public SmoothingMMC(MMC mmc) {
+    public SmoothingMMC(MMC mmc, ForwardMMC forwardMMC, BackwardMMC backwardMMC) {
 
         this.mmc = mmc;
+
+        this.forwardMMC = forwardMMC;
+
+        this.backwardMMC = backwardMMC;
     }
 
     public Matrix smoothing(int time) {
 
-        Matrix forward = new ForwardMMC(mmc).forward(time, false);
+        Matrix forward = this.forwardMMC.forward(time, false);
 
-        Matrix backward = new BackwardMMC(mmc).backward(time, false);
+        Matrix backward = this.backwardMMC.backward(time, false);
 
         return forward.multiplyRows(backward).normalize();
     }
 
     public void smoothing(int timeStart, int timeEnd) {
 
-        ForwardMMC forward = new ForwardMMC(mmc);
+        this.forwardMMC.forward(timeEnd, true);
 
-        forward.forward(timeEnd, true);
-
-        BackwardMMC backward = new BackwardMMC(mmc);
-
-        backward.backward(timeStart, true);
+        this.backwardMMC.backward(timeStart, true);
 
         while (timeStart <= timeEnd) {
 
-            System.out.println("FORWARD TIME[" + timeStart + "]\n" + forward.forwards.get(timeStart));
+            System.out.println("FORWARD TIME[" + timeStart + "]\n" + this.forwardMMC.forwards.get(timeStart));
 
             //System.out.println("BACKWARD TIME[" + timeStart + "]\n" + backward.backwards.get(timeStart));
 
-            Matrix forwardMatrix = forward.forwards.get(timeStart);
+            Matrix forwardMatrix = this.forwardMMC.forwards.get(timeStart);
 
-            Matrix backwardMatrix = backward.backwards.get(timeStart);
+            Matrix backwardMatrix = this.backwardMMC.backwards.get(timeStart);
 
             Matrix smoothingMatrix = forwardMatrix.multiply(backwardMatrix);
 
@@ -57,8 +61,7 @@ public class SmoothingMMC {
         }
     }
 
-    public void smoothingConstant() {
-
+    public void smoothing() {
 
         //si timeStart == timeEnd on lisse sur un seul état
         //en général on fera le lissage sur une certain nombre d'états compris entre [time - n; time - 1]
@@ -78,20 +81,26 @@ public class SmoothingMMC {
         //on applique le filtrage sur une sequence de longeur [time - smootStart ; [time - smootEnd]
         int timeStart = mmc.getTime() - mmc.getSmootStart();
 
+        System.out.println("RANGE ["+timeStart+" - "+timeEnd+"]");
+
         if (timeEnd < 1) {
             //enregistre qu'en temps t le lissage ne s'est pas fait
-            mmc.getSmootRange().put(mmc.getTime(), 0);
+            //mmc.getSmootRange().put(mmc.getTime(), 0);
 
             return;
         }
         //si timestart est inferieur à 1 on commence à 1
         timeStart = timeStart < 1 ? 1 : timeStart;
 
+        System.out.println("SMOOTHING OK ["+timeStart+" - "+timeEnd+"]");
+
         //au depart on lissera sur une plage de longeur [1,1] qui pourrait augmenter par la suite
         //on crée une nouvelle Map pour enregistrer la nouvelle plage de smoothing
         Map<Integer, SmoothingMatrices> newSmoothings = new Hashtable<>();
+        //verifie si le smoothing existe déja pour le temps precedent
+        if (mmc.getSmoothings().containsKey(timeEnd - 1)) {
 
-        if (mmc.getSmootRange().get(mmc.getTime() - 1) > 0) {
+            System.out.println("INCREMENT SMOOTHING");
             //on a effectué un lissage pour la coupe precedente
             //on recupere le dernier état lissé au timeEnd precedent
             SmoothingMatrices smoothingMatrices = mmc.getSmoothings().get(timeEnd - 1);
@@ -137,7 +146,7 @@ public class SmoothingMMC {
 
         } else {
             //cas de base ou aucun lissage n'a été effectué on va l'appliquer pour la premier fois
-
+            System.out.println("FIRST SMOOTHING CONSTANT");
             this.smoothingConstant(timeStart, timeEnd, newSmoothings);
         }
 
@@ -161,7 +170,7 @@ public class SmoothingMMC {
 
         SmoothingMatrices smoothingMatrices = new SmoothingMatrices(forwardMatrix, backwardMatrix, forwardMatrix.multiplyRows(backwardMatrix));
 
-        this.smoothings.put(timeEnd, smoothingMatrices);
+        smoothings.put(timeEnd, smoothingMatrices);
 
         this.smoothingConstant(forwardMatrix, backwardMatrix, timeStart, timeEnd - 1, smoothings);
     }

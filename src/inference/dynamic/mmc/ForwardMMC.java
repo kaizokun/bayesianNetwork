@@ -1,4 +1,5 @@
 package inference.dynamic.mmc;
+
 import math.Matrix;
 import math.Transpose;
 import network.Variable;
@@ -20,11 +21,24 @@ public class ForwardMMC implements IForward {
     @Override
     public Matrix forward() {
 
-        Matrix lastForward = forward(mmc.getTime(), 0, false);
+        //récupère le dernier forward enregistré
+        Map.Entry<Integer, Matrix> lastForward = mmc.getLastForward();
+
+        Matrix forward;
+        //si aucun forward n'est enregistré ou que son temps ne correspond pas au temps precedent
+        if (lastForward == null || lastForward.getKey().equals(mmc.getTime() - 1)) {
+            //calcul un nouveau forward
+            forward = forward(mmc.getTime(), 0, false);
+        }else{
+            //sinon incremente le forward precedent
+            forward = incrementForward(mmc.getTime(), lastForward.getValue());
+        }
+
+        lastForward = new AbstractMap.SimpleEntry(mmc.getTime(), forward);
 
         mmc.setLastForward(lastForward);
 
-        return lastForward;
+        return forward;
     }
 
     @Override
@@ -39,7 +53,7 @@ public class ForwardMMC implements IForward {
         return forward(t, 0, saveForwards);
     }
 
-    protected Matrix incrementForward(int timeEnd, Matrix lastForward){
+    protected Matrix incrementForward(int timeEnd, Matrix lastForward) {
 
         Variable megaObs = this.mmc.getMegaVariableObs(timeEnd);
 
@@ -74,7 +88,7 @@ public class ForwardMMC implements IForward {
 
             forward.normalize();
 
-            if(saveForwards) {
+            if (saveForwards) {
 
                 this.forwards.put(t, forward);
             }
@@ -117,7 +131,7 @@ public class ForwardMMC implements IForward {
         //opération supllémentaire pour le most likely path
         this.mostLikelyPath(forward, sum);
 
-        if(saveForwards) {
+        if (saveForwards) {
 
             this.forwards.put(t, forward);
         }
@@ -125,7 +139,8 @@ public class ForwardMMC implements IForward {
         return forward;
     }
 
-    protected void mostLikelyPath(Matrix forward, Matrix sum) { }
+    protected void mostLikelyPath(Matrix forward, Matrix sum) {
+    }
 
     protected Matrix multiplyTransitionForward(Matrix matrixStatesT, Matrix forward) {
 

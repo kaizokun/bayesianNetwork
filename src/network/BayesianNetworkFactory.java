@@ -5,6 +5,9 @@ import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
 import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
+import inference.dynamic.mmc.BackwardMMC;
+import inference.dynamic.mmc.ForwardMMC;
+import inference.dynamic.mmc.SmoothingMMC;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.MMC;
 import network.dynamic.Model;
@@ -298,7 +301,17 @@ public class BayesianNetworkFactory {
 
         Variable coat1 = new Variable(COAT.toString(), booleanDomain, tcpCoat1, new Variable[]{cloud1});
 
-        return new MMC(new Variable[]{rain0, cloud0}, new Variable[]{rain1, cloud1},  new Variable[]{umbrella1, coat1}, doubleFactory);
+        MMC mmc = new MMC(new Variable[]{rain0, cloud0}, new Variable[]{rain1, cloud1},  new Variable[]{umbrella1, coat1}, doubleFactory);
+
+        ForwardMMC forwardMMC = new ForwardMMC(mmc);
+
+        BackwardMMC backwardMMC = new BackwardMMC(mmc);
+
+        mmc.setForwardMMC(forwardMMC);
+
+        mmc.setSmoothingMMC(new SmoothingMMC(mmc, forwardMMC, backwardMMC));
+
+        return mmc;
     }
 
     public static MMC getUmbrellaMMCDynamicNetworkOneVars() {
@@ -336,7 +349,17 @@ public class BayesianNetworkFactory {
 
         Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, new Variable[]{rain1});
 
-        return new MMC(new Variable[]{rain0}, new Variable[]{rain1},  new Variable[]{umbrella1}, doubleFactory);
+        MMC mmc = new MMC(new Variable[]{rain0}, new Variable[]{rain1},  new Variable[]{umbrella1}, doubleFactory);
+
+        ForwardMMC forwardMMC = new ForwardMMC(mmc);
+
+        BackwardMMC backwardMMC = new BackwardMMC(mmc);
+
+        mmc.setForwardMMC(forwardMMC);
+
+        mmc.setSmoothingMMC(new SmoothingMMC(mmc, forwardMMC, backwardMMC));
+
+        return mmc;
     }
 
     public static DynamicBayesianNetwork getUmbrellaDynamicNetworkOrder2() {

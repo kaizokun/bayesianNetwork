@@ -131,7 +131,7 @@ public class MMCtest {
 
         System.out.println(mmcOne);
 
-        Matrix smoothing = new SmoothingMMC(mmcOne).smoothing(1);
+        Matrix smoothing = mmcOne.getSmoothingMMC().smoothing(1);
 
         System.out.println("Smoothing");
 
@@ -149,15 +149,13 @@ public class MMCtest {
 
         // System.out.println(mmc);
 
-        SmoothingMMC smoothing = new SmoothingMMC(mmcOne);
-
-        smoothing.smoothing(0, 6);
+        mmcOne.getSmoothingMMC().smoothing(0, 6);
 
         System.out.println("=====================================================");
         System.out.println("====================Smoothings=======================");
         System.out.println("=====================================================");
 
-        System.out.println(smoothing.getSmoothings());
+        System.out.println(mmcOne.getSmoothingMMC().getSmoothings());
     }
 
 
@@ -172,16 +170,27 @@ public class MMCtest {
 
         // System.out.println(mmc);
 
-        SmoothingMMC smoothing = new SmoothingMMC(mmcOne);
-
-        smoothing.smoothingConstant(0, 6);
+        mmcOne.getSmoothingMMC().smoothingConstant(0, 6);
 
         System.out.println("=====================================================");
         System.out.println("====================Smoothings=======================");
         System.out.println("=====================================================");
 
-        System.out.println(smoothing.getSmoothings());
+        System.out.println(mmcOne.getSmoothingMMC().getSmoothings());
     }
+
+    @Test
+    public void extendOnlineTestOneVar() {
+
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
+
+        mmcOne.extend(variablesObsTab);
+    }
+
+
+
 
     @Test
     public void forwardAndBackwardTestTwoVar() {
@@ -206,6 +215,7 @@ public class MMCtest {
 
         System.out.println(backward);
     }
+
 
     @Test
     public void multiplyMatrixTest() {
