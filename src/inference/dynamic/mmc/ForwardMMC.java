@@ -61,7 +61,7 @@ public class ForwardMMC implements IForward {
 
         Matrix transT = this.mmc.getMatrixStatesT();
 
-        return obs.multiply(transT.multiply(lastForward));
+        return obs.multiply(transT.multiply(lastForward)).normalize();
     }
 
     public Matrix decrementForward(int timeEnd, Matrix timeEndForward) {

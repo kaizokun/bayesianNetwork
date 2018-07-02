@@ -51,7 +51,7 @@ public class SmoothingMMC {
 
             Matrix backwardMatrix = this.backwardMMC.backwards.get(timeStart);
 
-            Matrix smoothingMatrix = forwardMatrix.multiply(backwardMatrix);
+            Matrix smoothingMatrix = forwardMatrix.multiplyRows(backwardMatrix);
 
             SmoothingMatrices smoothingMatrices = new SmoothingMatrices(forwardMatrix, backwardMatrix, smoothingMatrix);
 
@@ -92,7 +92,7 @@ public class SmoothingMMC {
         //si timestart est inferieur à 1 on commence à 1
         timeStart = timeStart < 1 ? 1 : timeStart;
 
-        System.out.println("SMOOTHING OK ["+timeStart+" - "+timeEnd+"]");
+       // System.out.println("SMOOTHING OK ["+timeStart+" - "+timeEnd+"]");
 
         //au depart on lissera sur une plage de longeur [1,1] qui pourrait augmenter par la suite
         //on crée une nouvelle Map pour enregistrer la nouvelle plage de smoothing
@@ -107,15 +107,25 @@ public class SmoothingMMC {
             //c'est celui ci dont on va incrementer le forward ainsi que le backward
             //pour calculer le lissage de l'état en timeEnd
 
-            ForwardMMC forward = new ForwardMMC(mmc);
+           // System.out.println("TIME END - 1 FORWARD");
 
-            BackwardMMC backward = new BackwardMMC(mmc);
+          //  System.out.println(smoothingMatrices.forward);
 
-            Matrix timeEndForward = forward.incrementForward(timeEnd, smoothingMatrices.forward);
+            Matrix timeEndForward = this.forwardMMC.incrementForward(timeEnd, smoothingMatrices.forward);
 
-            Matrix timeEndBackward = backward.incrementBackward(timeEnd, mmc.getTime(), smoothingMatrices.backward);
+           // System.out.println("TIME END FORWARD");
+           // System.out.println(timeEndForward);
 
-            SmoothingMatrices newSmoothingMatrices = new SmoothingMatrices(timeEndForward, timeEndBackward, timeEndForward.multiply(timeEndBackward));
+           // System.out.println("TIME END - 1 BACKWARD");
+
+          //  System.out.println(smoothingMatrices.backward);
+
+            Matrix timeEndBackward = this.backwardMMC.incrementBackward(timeEnd, mmc.getTime(), smoothingMatrices.backward);
+
+            //System.out.println("TIME END BACKWARD");
+           // System.out.println(timeEndBackward);
+
+            SmoothingMatrices newSmoothingMatrices = new SmoothingMatrices(timeEndForward, timeEndBackward, timeEndForward.multiplyRows(timeEndBackward).normalize());
             //on sauvegarde le dernier
             newSmoothings.put(timeEnd, newSmoothingMatrices);
 
@@ -134,12 +144,12 @@ public class SmoothingMMC {
                 //si il n'existe pas encore
                 if(timeEndForward == null){
 
-                    timeEndForward = forward.decrementForward(timeEnd, timeEndForward);
+                    timeEndForward = this.forwardMMC.decrementForward(timeEnd, timeEndForward);
                 }
 
-                timeEndBackward = backward.decrementBackward(timeEnd, timeEndBackward);
+                timeEndBackward = this.backwardMMC.decrementBackward(timeEnd, timeEndBackward);
 
-                newSmoothingMatrices = new SmoothingMatrices(timeEndForward, timeEndBackward, timeEndForward.multiply(timeEndBackward));
+                newSmoothingMatrices = new SmoothingMatrices(timeEndForward, timeEndBackward, timeEndForward.multiplyRows(timeEndBackward).normalize());
 
                 newSmoothings.put(timeEnd, newSmoothingMatrices);
             }
@@ -147,8 +157,14 @@ public class SmoothingMMC {
         } else {
             //cas de base ou aucun lissage n'a été effectué on va l'appliquer pour la premier fois
             System.out.println("FIRST SMOOTHING CONSTANT");
+
             this.smoothingConstant(timeStart, timeEnd, newSmoothings);
+
+            //System.out.println(newSmoothings.get(timeEnd));
         }
+
+
+        System.out.println(newSmoothings);
 
         this.mmc.setSmoothings(newSmoothings);
     }
@@ -168,7 +184,7 @@ public class SmoothingMMC {
 
         Matrix backwardMatrix = backward.backward(timeEnd, false);
 
-        SmoothingMatrices smoothingMatrices = new SmoothingMatrices(forwardMatrix, backwardMatrix, forwardMatrix.multiplyRows(backwardMatrix));
+        SmoothingMatrices smoothingMatrices = new SmoothingMatrices(forwardMatrix, backwardMatrix, forwardMatrix.multiplyRows(backwardMatrix).normalize());
 
         smoothings.put(timeEnd, smoothingMatrices);
 
@@ -245,6 +261,22 @@ public class SmoothingMMC {
 
         public void setSmoothing(Matrix smoothing) {
             this.smoothing = smoothing;
+        }
+
+
+        @Override
+        public String toString() {
+
+            StringBuilder builder = new StringBuilder();
+
+            builder.append("forward");
+            builder.append(this.forward.toString());
+            builder.append("backward");
+            builder.append(this.backward.toString());
+            builder.append("smoothing");
+            builder.append(this.smoothing.toString());
+
+            return builder.toString();
         }
     }
 }

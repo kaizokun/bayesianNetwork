@@ -21,6 +21,8 @@ public class BackwardMMC {
 
     public Matrix incrementBackward(int timeEnd, int time, Matrix backward) {
 
+       // System.out.println("incrementBackward "+timeEnd+" "+time);
+
         //recupere l'observation au temps situé après le backward à incrementer pour obtenir le nouveau
         //si on veut passer d'un backward en 2 à 3, le 2 avait été calculé par rapport aux observations en 3
         //et c'est celles ci qu'il faut extraire
@@ -32,19 +34,23 @@ public class BackwardMMC {
 
         Matrix currentObs = this.mmc.getMatrixObs(currentMegaObs);
 
-        Matrix transT = mmc.getMatrixStatesT();
-
         Matrix trans = mmc.getMatrixStates();
-        //multiplication par l'inverse de la matrice observation multiplié par l'inverse de matrice transition
-        //au temps du backward precedent, correspond à la partie à diviser ( soit à extraire du backward à incrementer )
-        return timeEndObsInvert.multiply( transT )
-                //multiplié par : le backward
-                .multiply(backward)
-                //multiplié par : la matrice transition multiplié par la matrice observation pour le dernier temps
-                .multiply( trans.multiply(currentObs) );
+        //partie à retirer ou à diviser ( ou multiplier par une matrice inverse )
+        Matrix denom = timeEndObsInvert.multiply(Matrix.invert(trans));
+        //partie à ajouter ou à multiplier
+        Matrix num = trans.multiply(currentObs);
+        //on commence par multiplier
+        Matrix newBackward = num.multiply(denom.multiply(backward));
+
+        //System.out.println("new back : "+newBackward);
+
+        return newBackward;
+
+        // return timeEndObsInvert.multiply()
+
     }
 
-    public Matrix decrementBackward(int timeEnd, Matrix backward){
+    public Matrix decrementBackward(int timeEnd, Matrix backward) {
         //récupère la megavariable observation au temps du backward à decrementé
         //la distribution backward en temps timeEnd étant calculé par rapport aux observation aux temps suivant
         Variable backwardTimeMegaObs = mmc.getMegaVariableObs(timeEnd + 1);
@@ -66,12 +72,12 @@ public class BackwardMMC {
 
     private Matrix backward(int t, int depth, boolean saveBackward) {
 
-        if(t == this.mmc.getTime()){
+        if (t == this.mmc.getTime()) {
 
             int rows = 1;
             //la matrice limite contient uniquement des valerus à 1
             //et autant de lignes qu'il y a de combinaisons de valeurs pour les colVars états
-            for( Variable state : this.mmc.getMegaVariableStates().getCompoVars()){
+            for (Variable state : this.mmc.getMegaVariableStates().getCompoVars()) {
 
                 rows *= state.getDomainSize();
             }
@@ -79,14 +85,14 @@ public class BackwardMMC {
             //une ligne par valeur
             AbstractDouble[][] limitMatrix = new AbstractDouble[rows][1];
 
-            for(int row = 0 ; row < rows ; row ++ ){
+            for (int row = 0; row < rows; row++) {
 
                 limitMatrix[row][0] = mmc.getDoubleFactory().getNew(1.0);
             }
 
             Matrix backward = new Matrix(limitMatrix, mmc.getDoubleFactory());
 
-            if(saveBackward) {
+            if (saveBackward) {
 
                 backwards.put(t, backward);
             }
@@ -104,7 +110,7 @@ public class BackwardMMC {
 
         backward = transition.multiply(obs).multiply(backward);
 
-        if(saveBackward) {
+        if (saveBackward) {
 
             backwards.put(t, backward);
         }

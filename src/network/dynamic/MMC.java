@@ -70,7 +70,9 @@ public class MMC extends DynamicBayesianNetwork {
         //pour chaque nouvelles observations
         for (Variable variables[] : variablesTab) {
 
-            System.out.println("Extend "+time);
+            System.out.println("\n-----------------");
+            System.out.println("Extend "+time+" -> "+(time + 1));
+            System.out.println("-----------------\n");
 
             this.extend(variables);
 

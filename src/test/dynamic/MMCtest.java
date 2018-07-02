@@ -182,14 +182,12 @@ public class MMCtest {
     @Test
     public void extendOnlineTestOneVar() {
 
-        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+        Object[][] obsValues = new Object[][]{{0}, {0}, {0}, {0}, {0}, {0}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
         mmcOne.extend(variablesObsTab);
     }
-
-
 
 
     @Test
