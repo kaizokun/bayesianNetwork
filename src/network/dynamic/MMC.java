@@ -3,6 +3,8 @@ package network.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import inference.dynamic.mmc.SmoothingMMC;
+import inference.dynamic.mmc.SmoothingMMC.SmoothingMatrices;
 import math.Matrix;
 import math.Transpose;
 import network.BayesianNetwork;
@@ -14,42 +16,65 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Variable megaVariableStatesRoot, megaVariableStates, megaVariableObs;
 
+    protected Variable[] obsVariables;
+
     protected Map<String, Matrix> matrixObs;
 
     protected Matrix matrixState0, matrixStates, matrixStatesT;
 
-    public MMC(Variable[] states0, Variable[] states1, Variable[] obs1, AbstractDoubleFactory doubleFactory) {
+    protected Matrix LastForward;
+    //end decalage avant time pour la fin du lissage, start decalage avant time pour le debut du lissage
+    protected int smootStart, smootEnd;
+
+    protected Map<Integer, SmoothingMatrices> smoothings = new Hashtable<>();
+
+    protected Map<Integer,Integer> smootRange = new Hashtable<>();
+
+    public MMC(Variable[] statesRoot, Variable[] states, Variable[] obs, AbstractDoubleFactory doubleFactory) {
 
         super(doubleFactory);
+        //trie les variables par labels
+        Arrays.sort(statesRoot, Variable.varLabelComparator);
 
-        Arrays.sort(states0, Variable.varLabelComparator);
+        Arrays.sort(states, Variable.varLabelComparator);
 
-        Arrays.sort(states1, Variable.varLabelComparator);
+        Arrays.sort(obs, Variable.varLabelComparator);
+        //sauvegarde les variables observations
+        this.obsVariables = obs;
 
-        Arrays.sort(obs1, Variable.varLabelComparator);
+        this.megaVariableStatesRoot = this.mergeStateVariables(Arrays.asList(statesRoot), 0);
 
-        this.megaVariableStatesRoot = this.mergeStateVariables(Arrays.asList(states0), 0);
+        this.megaVariableStates = this.mergeStateVariables(Arrays.asList(states), 1);
 
-        this.megaVariableStates = this.mergeStateVariables(Arrays.asList(states1), 1);
-
-        this.megaVariableObs = this.mergeObservationVariables(Arrays.asList(obs1), Arrays.asList(states1), 1);
+        this.megaVariableObs = this.mergeObservationVariables(Arrays.asList(obs), Arrays.asList(states), 1);
 
         this.getTimeVariables(0).put(megaVariableStatesRoot, megaVariableStatesRoot);
 
         this.roots.add(this.megaVariableStatesRoot);
+
+        this.smootRange.put(0, 0);
     }
 
-    public void extend(Variable[][] variablesTab){
+    public void extend(Variable[][] variablesTab) {
 
         //pour chaque nouvelles observations
         for (Variable variables[] : variablesTab) {
-            //on etend le reseau
-            this.extend();
-            //on recupere la nouvelle megavariable observation
-            Variable megaVariableObservation = this.getMegaVariableObs(this.time);
-            //on l'initialise à l'aide d'une liste de variables qui la compose et initialisées
-            megaVariableObservation.setDomainValuesFromVariables(variables);
+
+            this.extend(variables);
         }
+    }
+
+    public void extend(Variable[] variables) {
+
+        //on etend le reseau
+        this.extend();
+        //on recupere la nouvelle megavariable observation
+        Variable megaVariableObservation = this.getMegaVariableObs(this.time);
+        //on l'initialise à l'aide d'une liste de variables qui la compose et initialisées
+        megaVariableObservation.setDomainValuesFromVariables(variables);
+
+        //appliquer le forward sur le dernier etats
+        //ainsi que le smoothing sur le range souhaité
     }
 
     @Override
@@ -61,7 +86,7 @@ public class MMC extends DynamicBayesianNetwork {
 
         Variable newObs = new Variable(this.megaVariableObs.getCompoVars(), this.time);
         //si time - 1 vaut zero on recuperera la megavariable root qui a le même label que celles qui la succede...
-        newState.addDependency( this.getTimeVariables(this.time - 1).get(this.megaVariableStates));
+        newState.addDependency(this.getTimeVariables(this.time - 1).get(this.megaVariableStates));
 
         newObs.addDependency(newState);
 
@@ -238,12 +263,12 @@ public class MMC extends DynamicBayesianNetwork {
         return this.getVariable(time, megaVariable);
     }
 */
-    public Variable getMegaVariableObs(int time){
+    public Variable getMegaVariableObs(int time) {
 
         return this.getVariable(time, this.megaVariableObs);
     }
 
-    public Variable getMegaVariableState(int time){
+    public Variable getMegaVariableState(int time) {
 
         return this.getVariable(time, this.megaVariableStates);
     }
@@ -282,6 +307,46 @@ public class MMC extends DynamicBayesianNetwork {
 
     public Map<String, Matrix> getMatrixObs() {
         return matrixObs;
+    }
+
+    public Matrix getLastForward() {
+        return LastForward;
+    }
+
+    public void setLastForward(Matrix lastForward) {
+        LastForward = lastForward;
+    }
+
+    public int getSmootStart() {
+        return smootStart;
+    }
+
+    public void setSmootStart(int smootStart) {
+        this.smootStart = smootStart;
+    }
+
+    public int getSmootEnd() {
+        return smootEnd;
+    }
+
+    public void setSmootEnd(int smootEnd) {
+        this.smootEnd = smootEnd;
+    }
+
+    public Map<Integer, SmoothingMatrices> getSmoothings() {
+        return smoothings;
+    }
+
+    public void setSmoothings(Map<Integer, SmoothingMatrices> smoothings) {
+        this.smoothings = smoothings;
+    }
+
+    public Map<Integer, Integer> getSmootRange() {
+        return smootRange;
+    }
+
+    public void setSmootRange(Map<Integer, Integer> smootRange) {
+        this.smootRange = smootRange;
     }
 
     /*---------------------- VIEW ---------------*/

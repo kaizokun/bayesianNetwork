@@ -19,6 +19,29 @@ public class BackwardMMC {
         this.mmc = mmc;
     }
 
+    public Matrix nextBackward(int backwardTime, int time, Matrix backward) {
+
+        //recupere l'observation en temps correspondant au backward precedent à incrementer pour obtenir le nouveau
+        Variable previousMegaObs = mmc.getMegaVariableObs(backwardTime - 1);
+
+        Variable currentMegaObs = mmc.getMegaVariableObs(time);
+
+        Matrix previousObsInvert = Matrix.invert(this.mmc.getMatrixObs(previousMegaObs));
+
+        Matrix currentObs = this.mmc.getMatrixObs(currentMegaObs);
+
+        Matrix transT = mmc.getMatrixStatesT();
+
+        Matrix trans = mmc.getMatrixStates();
+        //multiplication par l'inverse de la matrice observation multiplié par l'inverse de matrice transition
+        //au temps du backward precedent, correspond à la partie à diviser ( soit à extraire du backward à incrementer )
+        return previousObsInvert.multiply( transT )
+                //multiplié par : le backward
+                .multiply(backward)
+                //multiplié par : la matrice transition multiplié par la matrice observation pour le dernier temps
+                .multiply( trans.multiply(currentObs) );
+    }
+
     public Matrix backward(int t) {
 
         return backward(t, 0, false);
@@ -81,4 +104,6 @@ public class BackwardMMC {
 
         return backwards;
     }
+
+
 }

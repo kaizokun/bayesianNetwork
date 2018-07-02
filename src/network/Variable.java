@@ -62,6 +62,15 @@ public class Variable {
         this.label = label;
     }
 
+    public Variable(String label, IDomain domain, Object value){
+
+        this.domain = domain;
+
+        this.label = label;
+
+        this.setValue(value);
+    }
+
     /**
      * Generate a mega variable from a list of variables
      * must be sorted by label (asc)

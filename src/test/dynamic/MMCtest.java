@@ -62,7 +62,11 @@ public class MMCtest {
         Object[][] obsValues = new Object[][]{{1}, {1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
-
+/*
+        Variable[][] variablesObsTab = new Variable[2][1];/
+        variablesObsTab[0][0] = new Variable(UMBRELLA.toString(), getBooleanDomain(), 1);
+        variablesObsTab[1][0] = new Variable(UMBRELLA.toString(), getBooleanDomain(), 1);
+*/
         mmcOne.extend(variablesObsTab);
 
         ForwardMMC mmcForward = new ForwardMMC(mmcOne);

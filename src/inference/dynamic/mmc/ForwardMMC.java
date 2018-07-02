@@ -6,7 +6,7 @@ import network.dynamic.MMC;
 
 import java.util.*;
 
-public class ForwardMMC {
+public class ForwardMMC implements IForward {
 
     protected MMC mmc;
 
@@ -17,14 +17,37 @@ public class ForwardMMC {
         this.mmc = mmc;
     }
 
+    @Override
+    public Matrix forward() {
+
+        Matrix lastForward = forward(mmc.getTime(), 0, false);
+
+        mmc.setLastForward(lastForward);
+
+        return lastForward;
+    }
+
+    @Override
     public Matrix forward(int t) {
 
         return forward(t, 0, false);
     }
 
+    @Override
     public Matrix forward(int t, boolean saveForwards) {
 
         return forward(t, 0, saveForwards);
+    }
+
+    protected Matrix nextForward(int timeEnd, Matrix lastForward){
+
+        Variable megaObs = this.mmc.getMegaVariableObs(timeEnd);
+
+        Matrix obs = this.mmc.getMatrixObs(megaObs);
+
+        Matrix transT = this.mmc.getMatrixStatesT();
+
+        return obs.multiply(transT.multiply(lastForward));
     }
 
     private Matrix forward(int t, int depth, boolean saveForwards) {
