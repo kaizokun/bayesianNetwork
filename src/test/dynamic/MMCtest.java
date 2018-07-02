@@ -141,7 +141,7 @@ public class MMCtest {
     @Test
     public void smoothingRangeTestOneVar() {
 
-        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
@@ -149,7 +149,7 @@ public class MMCtest {
 
         // System.out.println(mmc);
 
-        mmcOne.getSmoothingMMC().smoothing(0, 6);
+        mmcOne.getSmoothingMMC().smoothing(0, obsValues.length);
 
         System.out.println("=====================================================");
         System.out.println("====================Smoothings=======================");
@@ -162,7 +162,7 @@ public class MMCtest {
     @Test
     public void smoothingConstantRangeTestOneVar() {
 
-        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
@@ -170,7 +170,7 @@ public class MMCtest {
 
         // System.out.println(mmc);
 
-        mmcOne.getSmoothingMMC().smoothingConstant(0, 6);
+        mmcOne.getSmoothingMMC().smoothingConstant(0, obsValues.length);
 
         System.out.println("=====================================================");
         System.out.println("====================Smoothings=======================");
@@ -182,11 +182,54 @@ public class MMCtest {
     @Test
     public void extendOnlineTestOneVar() {
 
-        Object[][] obsValues = new Object[][]{{0}, {0}, {0}, {0}, {0}, {0}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}};
+
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
+
+        mmcOne.setSmootStart(4);
+
+        mmcOne.setSmootEnd(1);
+
+        mmcOne.extend(variablesObsTab);
+
+        System.out.println("=====================================================");
+        System.out.println("====================Smoothings=======================");
+        System.out.println("=====================================================");
+
+        for(Map.Entry entry : mmcOne.getSmoothings().entrySet()){
+
+            System.out.println(entry.getKey());
+
+            System.out.println(entry.getValue());
+        }
+
+    }
+
+    @Test
+    public void multiplicationObsTransTest() {
+
+        Object[][] obsValues = new Object[][]{{1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
         mmcOne.extend(variablesObsTab);
+
+        Variable obsVar = mmcOne.getMegaVariableObs(1);
+
+        Matrix matrixObs = mmcOne.getMatrixObs(obsVar);
+
+        Matrix matrixTrans = mmcOne.getMatrixStates();
+
+        System.out.println(matrixObs);
+
+        System.out.println(matrixTrans);
+
+        System.out.println(Matrix.invert(matrixObs).multiply(Matrix.invert(matrixTrans)));
+
+        System.out.println(Matrix.invert(matrixObs.multiply(matrixTrans)));
+
+        System.out.println(Matrix.invert(matrixTrans.multiply(matrixObs)));
+
     }
 
 
@@ -229,6 +272,8 @@ public class MMCtest {
         System.out.println(rs);
     }
 
+
+
     @Test
     public void invertMatrixTest() {
 
@@ -244,5 +289,7 @@ public class MMCtest {
 
         System.out.println(m2.multiply(m2Invert));
     }
+
+
 
 }

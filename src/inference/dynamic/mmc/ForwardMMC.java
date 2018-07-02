@@ -72,7 +72,7 @@ public class ForwardMMC implements IForward {
         Matrix matriceObservation = this.mmc.getMatrixObs(megaObs);
         //divise le forward par la matrice observation au temps suivant ainsi que la transition
         //pour retrouver l'état precedent
-        return Matrix.invert(mmc.getMatrixStatesT()).multiply(Matrix.invert(matriceObservation)).multiply(timeEndForward).normalize();
+        return Matrix.invert(mmc.getMatrixStatesT().multiply(matriceObservation)).multiply(timeEndForward).normalize();
     }
 
     private Matrix forward(int t, int depth, boolean saveForwards) {

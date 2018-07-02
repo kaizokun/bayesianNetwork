@@ -21,7 +21,7 @@ public class BackwardMMC {
 
     public Matrix incrementBackward(int timeEnd, int time, Matrix backward) {
 
-       // System.out.println("incrementBackward "+timeEnd+" "+time);
+        // System.out.println("incrementBackward "+timeEnd+" "+time);
 
         //recupere l'observation au temps situé après le backward à incrementer pour obtenir le nouveau
         //si on veut passer d'un backward en 2 à 3, le 2 avait été calculé par rapport aux observations en 3
@@ -30,18 +30,33 @@ public class BackwardMMC {
 
         Variable currentMegaObs = mmc.getMegaVariableObs(time);
 
-        Matrix timeEndObsInvert = Matrix.invert(this.mmc.getMatrixObs(timeEndMegaObs));
+        Matrix timeEndObs = this.mmc.getMatrixObs(timeEndMegaObs);
 
         Matrix currentObs = this.mmc.getMatrixObs(currentMegaObs);
 
         Matrix trans = mmc.getMatrixStates();
         //partie à retirer ou à diviser ( ou multiplier par une matrice inverse )
-        Matrix denom = timeEndObsInvert.multiply(Matrix.invert(trans));
+        //multiplier les inverses ou inverser la multiplication en changeant l'ordre des matrice donne le meme resultat
+        //on ne fait qu'une inversion dans le deuxieme cas ...
+        //Matrix denom = Matrix.invert(timeEndObs).multiply(Matrix.invert(trans));
+        Matrix denom = Matrix.invert(trans.multiply(timeEndObs));
+
         //partie à ajouter ou à multiplier
         Matrix num = trans.multiply(currentObs);
         //on commence par multiplier
         Matrix newBackward = num.multiply(denom.multiply(backward));
 
+        /*
+        System.out.println("-------INC BACKWARD 1 ------- NUM x ( DEN x BACK )");
+        System.out.println(num.multiply(denom.multiply(backward)));
+
+        System.out.println("-------INC BACKWARD 2 ------- ( NUM x DEN ) x BACK");
+        System.out.println(num.multiply(denom).multiply(backward));
+
+        System.out.println("-------INC BACKWARD 3 ------- DEN x ( NUM x BACK )");
+        System.out.println(denom.multiply(num.multiply(backward)));
+
+*/
         //System.out.println("new back : "+newBackward);
 
         return newBackward;
