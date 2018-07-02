@@ -39,7 +39,7 @@ public class ForwardMMC implements IForward {
         return forward(t, 0, saveForwards);
     }
 
-    protected Matrix nextForward(int timeEnd, Matrix lastForward){
+    protected Matrix incrementForward(int timeEnd, Matrix lastForward){
 
         Variable megaObs = this.mmc.getMegaVariableObs(timeEnd);
 
@@ -48,6 +48,17 @@ public class ForwardMMC implements IForward {
         Matrix transT = this.mmc.getMatrixStatesT();
 
         return obs.multiply(transT.multiply(lastForward));
+    }
+
+    public Matrix decrementForward(int timeEnd, Matrix timeEndForward) {
+
+        //récupère l'observation au temps du forward à decrementer
+        Variable megaObs = this.mmc.getMegaVariableObs(timeEnd + 1);
+
+        Matrix matriceObservation = this.mmc.getMatrixObs(megaObs);
+        //divise le forward par la matrice observation au temps suivant ainsi que la transition
+        //pour retrouver l'état precedent
+        return Matrix.invert(mmc.getMatrixStatesT()).multiply(Matrix.invert(matriceObservation)).multiply(timeEndForward).normalize();
     }
 
     private Matrix forward(int t, int depth, boolean saveForwards) {
@@ -125,4 +136,5 @@ public class ForwardMMC implements IForward {
 
         return forwards;
     }
+
 }

@@ -3,7 +3,6 @@ package network.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
-import inference.dynamic.mmc.SmoothingMMC;
 import inference.dynamic.mmc.SmoothingMMC.SmoothingMatrices;
 import math.Matrix;
 import math.Transpose;
@@ -24,7 +23,7 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Matrix LastForward;
     //end decalage avant time pour la fin du lissage, start decalage avant time pour le debut du lissage
-    protected int smootStart, smootEnd;
+    protected int smootStart = 1, smootEnd = 1;
 
     protected Map<Integer, SmoothingMatrices> smoothings = new Hashtable<>();
 

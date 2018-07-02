@@ -1,6 +1,5 @@
 package inference.dynamic.mmc;
 
-import inference.dynamic.Forward;
 import math.Matrix;
 import network.Variable;
 import network.dynamic.MMC;
@@ -97,18 +96,18 @@ public class SmoothingMMC {
             //on recupere le dernier état lissé au timeEnd precedent
             SmoothingMatrices smoothingMatrices = mmc.getSmoothings().get(timeEnd - 1);
             //c'est celui ci dont on va incrementer le forward ainsi que le backward
-            //pour calculer le lissage de l'état timeEnd
+            //pour calculer le lissage de l'état en timeEnd
 
             ForwardMMC forward = new ForwardMMC(mmc);
 
             BackwardMMC backward = new BackwardMMC(mmc);
 
-            Matrix timeEndForward = forward.nextForward(timeEnd, smoothingMatrices.forward);
+            Matrix timeEndForward = forward.incrementForward(timeEnd, smoothingMatrices.forward);
 
-            Matrix timeEndBackward = backward.nextBackward(timeEnd, mmc.getTime(), smoothingMatrices.backward);
+            Matrix timeEndBackward = backward.incrementBackward(timeEnd, mmc.getTime(), smoothingMatrices.backward);
 
             SmoothingMatrices newSmoothingMatrices = new SmoothingMatrices(timeEndForward, timeEndBackward, timeEndForward.multiply(timeEndBackward));
-            //on seuvegarde le dernier
+            //on sauvegarde le dernier
             newSmoothings.put(timeEnd, newSmoothingMatrices);
 
             //on initialise le forward et le backward courant
@@ -118,14 +117,31 @@ public class SmoothingMMC {
             //si il n'existe pas on decremente le forward courant
             //on enregistre le smoothing pour time
 
+            timeEnd--;
+
+            while (timeEnd >= timeStart){
+                //on tente de recuperer un forward enregistré precedemment pour une même variable à un temps identique
+                timeEndForward = mmc.getSmoothings().get(timeEnd).getForward();
+                //si il n'existe pas encore
+                if(timeEndForward == null){
+
+                    timeEndForward = forward.decrementForward(timeEnd, timeEndForward);
+                }
+
+                timeEndBackward = backward.decrementBackward(timeEnd, timeEndBackward);
+
+                newSmoothingMatrices = new SmoothingMatrices(timeEndForward, timeEndBackward, timeEndForward.multiply(timeEndBackward));
+
+                newSmoothings.put(timeEnd, newSmoothingMatrices);
+            }
+
         } else {
             //cas de base ou aucun lissage n'a été effectué on va l'appliquer pour la premier fois
 
             this.smoothingConstant(timeStart, timeEnd, newSmoothings);
-
-            this.mmc.setSmoothings(newSmoothings);
         }
 
+        this.mmc.setSmoothings(newSmoothings);
     }
 
     public void smoothingConstant(int timeStart, int timeEnd) {
