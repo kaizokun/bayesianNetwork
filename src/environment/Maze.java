@@ -1,5 +1,8 @@
 package environment;
 
+import javafx.geometry.Pos;
+
+import javax.smartcardio.Card;
 import java.util.*;
 
 public class Maze {
@@ -11,6 +14,8 @@ public class Maze {
     protected int limitX, limitY;
 
     protected Map<Position, Integer> totalAdjacent = new Hashtable<>();
+
+    protected Map<Position, Set<Cardinal>> percepts = new Hashtable<>();
 
     protected String[] maze;
 
@@ -111,5 +116,65 @@ public class Maze {
     public boolean isIn(Position pos) {
 
         return pos.y >= 0 && pos.y < limitY && pos.x >= 0 && pos.x < limitX;
+    }
+
+    public Set<Cardinal> getPercept(Position position) {
+
+        if(this.percepts.containsKey(position)){
+
+            return this.percepts.get(position);
+        }
+
+        Set<Cardinal> percepts = new LinkedHashSet<>();
+
+        //pour chaque case adjacente, direction N S E W, contenant un potentiel obstacle
+        for(Cardinal cardinal : Cardinal.values()){
+            //cree une position adjacente
+            Position closePos = position.move(cardinal);
+            //si la position est hors du labyrinthe ou est un mur,
+            //il y a un obstacle dans cette direction
+            if( !isIn(closePos) || walls.contains(closePos)){
+
+                percepts.add(cardinal);
+            }
+        }
+
+        this.percepts.put(position, percepts);
+
+        return percepts;
+    }
+
+    public boolean matchPercept(Position position, List<Cardinal> percept) {
+
+        Set<Cardinal> posPercept = getPercept(position);
+
+        if( percept.size() != posPercept.size()){
+
+            return false;
+        }
+/*
+        //l'odre des cardinalités est identique à celui declaré dans l'enum
+        //pour les deux ensembles à comparer
+        Iterator<Cardinal> limits = posPercept.iterator();
+
+        for(Cardinal direction : percept){
+
+            if(!direction.equals(limits.next())){
+
+                return false;
+            }
+        }
+        */
+
+        //autre manière un peu moins efficace
+        for(Cardinal direction : percept){
+
+            if(!posPercept.contains(direction)){
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -3,13 +3,14 @@ package network;
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
-import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
+import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
 import inference.dynamic.mmc.BackwardMMC;
 import inference.dynamic.mmc.ForwardMMC;
 import inference.dynamic.mmc.SmoothingMMC;
+import math.Combination;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.MMC;
 import network.dynamic.Model;
@@ -455,19 +456,19 @@ public class BayesianNetworkFactory {
 
         AbstractDoubleFactory doubleFactory = new MyDoubleFactory();
 
-        List<Position> positionsReachable = maze.getReachablePositions();
+        // List<Position> positionsReachable = maze.getReachablePositions();
 
-        List<Position> previousPositionsReachable = maze.getReachablePositions();
+        // List<Position> previousPositionsReachable = maze.getReachablePositions();
 
         IDomain positionDomain = DomainFactory.getMazePositionDomain(maze);
 
         //-------------matrice racine
 
-        Double[][] rootTransition = new Double[1][positionsReachable.size()];
+        Double[][] rootTransition = new Double[1][positionDomain.getSize()];
 
-        for (int pos = 0; pos < positionsReachable.size(); pos++) {
+        for (int pos = 0; pos < positionDomain.getSize(); pos++) {
 
-            rootTransition[0][pos] = 1.0 / positionsReachable.size();
+            rootTransition[0][pos] = 1.0 / positionDomain.getSize();
         }
 
         ProbabilityCompute tcpPositions0 = new ProbabilityComputeFromTCP(
@@ -479,27 +480,32 @@ public class BayesianNetworkFactory {
 
         //-------------matrice transition
 
-        Double[][] transition = new Double[positionsReachable.size()][positionsReachable.size()];
+        Double[][] transition = new Double[positionDomain.getSize()][positionDomain.getSize()];
 
         int a = 0;
 
-        for (Position previousPos : previousPositionsReachable) {
+        List<Position> reachablePosParent = maze.getReachablePositions();
+
+        List<Position> reachablePosChild = new LinkedList<>(reachablePosParent);
+
+        for (Position previousPos : reachablePosParent) {
 
             int b = 0;
 
-            for (Position position : positionsReachable) {
+            for (Position position : reachablePosChild) {
 
                 if (position.adjacent(previousPos)) {
 
                     transition[a][b] = 1.0 / maze.totalAdjacent(previousPos);
 
-                }else{
+                } else {
 
                     transition[a][b] = 0.0;
                 }
 
                 b++;
             }
+
             a++;
         }
 
@@ -510,18 +516,58 @@ public class BayesianNetworkFactory {
 
         Variable position = new Variable(POSITION.toString(), positionDomain, tcpPositions0, new Variable[]{position0});
 
+        //------------- capteur
+
+        /*
+         * les lignes sont les positions atteignables
+         * les colones les sous ensembles de positions N S E W soit 2^4
+         * la probabilité d'un percept est total si cela correspond aux contours d'une position
+         * on ajoute un peu de bruit pour ne pas avoir de valer 0 par exemple 0.01
+         * */
+
+        List<List<Cardinal>> percepts = Combination.getSubsets(Cardinal.values());
+
+        Double[][] captor = new Double[positionDomain.getSize()][percepts.size()];
+
+        a = 0;
+
+        for (Position positionParent : reachablePosParent) {
+
+            int b = 0;
+
+            for (List<Cardinal> percept : percepts) {
+
+                if (maze.matchPercept(positionParent, percept)) {
+
+                    captor[a][b] = 0.999;
+
+                } else {
+
+                    captor[a][b] = 0.001;
+                }
+
+                b++;
+            }
+
+            a ++;
+        }
+
+        IDomain domainCaptor = DomainFactory.getMazeWallCaptorDomain(percepts);
+
+        ProbabilityCompute tcpCaptors = new ProbabilityComputeFromTCP(
+                new Variable[]{position}, domainCaptor, captor, doubleFactory);
+
+
+        for (List<Cardinal> percept : percepts) {
+
+            System.out.println(percept);
+        }
+
         System.out.println(tcpPositions0);
 
         System.out.println(tcpPositions);
 
-        //------------- capteur
-
-        /*
-        * les lignes sont les positions atteignables
-        * les colones les sous ensembles de positions N S E W soit 2^4
-        * la probabilité d'un percept est total si cela correspond aux contours d'une position
-        * on ajoute un peu de brui pour ne pas avoir de valer 0 par exemple 0.01
-        * */
+        System.out.println(tcpCaptors);
 
         return null;
     }

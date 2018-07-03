@@ -4,7 +4,7 @@ public enum Cardinal {
 
     NORTH, SOUTH, EAST, WEST;
 
-    private static final int delta[][] = new int[][]{{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
+    private static final int delta[][] = new int[][]{{+1, 0}, {-1, 0}, {0, +1}, {0, -1}};
 
     public int[] getDeltaYX(){
 
@@ -20,5 +20,7 @@ public enum Cardinal {
 
         return delta[this.ordinal()][1];
     }
+
+
 
 }

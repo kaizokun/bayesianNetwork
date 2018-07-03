@@ -3,6 +3,9 @@ package domain;
 import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
+import math.Combination;
+
+import java.util.List;
 
 public class DomainFactory {
 
@@ -32,9 +35,14 @@ public class DomainFactory {
         return new Domain(positions);
     }
 
-    public static IDomain getCardinalsDomain() {
 
-        return new Domain(Cardinal.NORTH, Cardinal.SOUTH, Cardinal.EAST, Cardinal.WEST);
+    public static IDomain getMazeWallCaptorDomain() {
+
+        return getMazeWallCaptorDomain(Combination.getSubsets(Cardinal.values()));
     }
 
+    public static IDomain getMazeWallCaptorDomain(List<List<Cardinal>> percepts) {
+
+        return new Domain(percepts.toArray());
+    }
 }

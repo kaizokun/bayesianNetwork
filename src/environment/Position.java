@@ -1,5 +1,6 @@
 package environment;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Position {
@@ -66,4 +67,5 @@ public class Position {
     public String toString() {
         return "("+y+", "+x+")";
     }
+
 }
