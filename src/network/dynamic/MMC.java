@@ -23,7 +23,7 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Matrix matrixState0, matrixStates, matrixStatesT;
 
-    protected Map.Entry<Integer,Matrix> LastForward;
+    protected Map.Entry<Integer,Matrix> lastForward;
     //end decalage avant time pour la fin du lissage, start decalage avant time pour le debut du lissage
     protected int smootStart = 1, smootEnd = 1;
 
@@ -67,18 +67,13 @@ public class MMC extends DynamicBayesianNetwork {
 
     public void extend(Variable[][] variablesTab, boolean log) {
 
-        //pour chaque nouvelles observations
         for (Variable variables[] : variablesTab) {
-
-            System.out.println("\n-----------------");
-            System.out.println("Extend "+time+" -> "+(time + 1));
-            System.out.println("-----------------\n");
 
             this.extend(variables);
 
             if(log){
 
-
+                System.out.println(this);
             }
         }
     }
@@ -330,11 +325,11 @@ public class MMC extends DynamicBayesianNetwork {
     }
 
     public Map.Entry<Integer, Matrix> getLastForward() {
-        return LastForward;
+        return lastForward;
     }
 
     public void setLastForward(Map.Entry<Integer, Matrix> lastForward) {
-        LastForward = lastForward;
+        this.lastForward = lastForward;
     }
 
     public int getSmootStart() {
@@ -391,7 +386,7 @@ public class MMC extends DynamicBayesianNetwork {
     public String toString() {
 
         StringBuilder stringBuilder = new StringBuilder(super.toString());
-
+/*
         stringBuilder.append("--------------------------------------------------------------------\n");
         stringBuilder.append("--------------------------- MATRIX ---------------------------------\n");
         stringBuilder.append("--------------------------------------------------------------------\n\n");
@@ -408,6 +403,19 @@ public class MMC extends DynamicBayesianNetwork {
         stringBuilder.append('\n');
 
         stringBuilder.append(matrixStates);
+*/
+        stringBuilder.append("\n");
+
+        for (Map.Entry entry : getSmoothings().entrySet()) {
+
+            stringBuilder.append(entry.getValue()+"\n");
+        }
+
+        stringBuilder.append("=====================================================\n");
+        stringBuilder.append("====================Forward ["+lastForward.getKey()+"]=======================\n");
+        stringBuilder.append("=====================================================\n");
+        stringBuilder.append("\n");
+        stringBuilder.append(lastForward.getValue());
 
         return stringBuilder.toString();
     }

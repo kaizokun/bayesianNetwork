@@ -5,6 +5,7 @@ import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
 import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
+import environment.Maze;
 import inference.dynamic.mmc.BackwardMMC;
 import inference.dynamic.mmc.ForwardMMC;
 import inference.dynamic.mmc.SmoothingMMC;
@@ -51,7 +52,6 @@ public class BayesianNetworkFactory {
 
         CAMBRIOLAGE, TREMBLEMENT_DE_TERRE, ALARM, JEAN_CALL, MARIE_CALL
     }
-
 
     public static BayesianNetwork getAlarmNetwork() {
 
@@ -443,5 +443,18 @@ public class BayesianNetworkFactory {
 
         return network;
     }
+
+    public enum MAZE_NETWORK_VARS {
+
+        POSITION, CAPTOR_POSITION
+    }
+
+    public static MMC getMazeMMC(Maze maze){
+
+
+
+        return null;
+    }
+
 
 }

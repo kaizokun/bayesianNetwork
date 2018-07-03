@@ -233,7 +233,7 @@ public class Matrix {
 
     public Matrix multiplyRows(Matrix m2) {
 
-        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], this.rowVars, this.rowValues, doubleFactory);
+        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], this.getRowVars(), this.getRowValues(), doubleFactory);
 
         for (int row = 0; row < getRowCount(); row++) {
 
@@ -309,6 +309,8 @@ public class Matrix {
 
             builder.append('\n');
         }
+
+        builder.append('\n');
 
         return builder.toString();
     }

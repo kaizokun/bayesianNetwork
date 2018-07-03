@@ -12,7 +12,7 @@ public class Domain implements IDomain {
 
     public Domain(Object... values) {
 
-        this.values = new ArrayList(Arrays.asList(new Object[values.length]));
+        this.values = (List)Arrays.asList(new Object[values.length]);
 
         for(int i = 0 ; i < values.length ; i ++){
 
