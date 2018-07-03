@@ -1,6 +1,7 @@
 package domain;
 
-import environment.Cardinals;
+import environment.Cardinal;
+import environment.Maze;
 import environment.Position;
 
 public class DomainFactory {
@@ -15,20 +16,17 @@ public class DomainFactory {
         return new Domain('a', 'b', 'c', 'd');
     }
 
-    public static IDomain getMazePositionDomain(int xLimit, int yLimit) {
+    public static IDomain getMazePositionDomain(Maze maze) {
 
-        Position[] positions = new Position[xLimit * yLimit];
+        Position[] positions = new Position[maze.countReachablePositions()];
 
         int xy = 0;
 
-        for (int x = 0; x < xLimit; x++) {
+        for (Position position : maze.getReachablePositions()) {
 
-            for (int y = 0; y < yLimit; y++) {
+            positions[xy] = new Position(position.getY(), position.getX());
 
-                positions[xy] = new Position(x, y);
-
-                xy++;
-            }
+            xy++;
         }
 
         return new Domain(positions);
@@ -36,7 +34,7 @@ public class DomainFactory {
 
     public static IDomain getCardinalsDomain() {
 
-        return new Domain(Cardinals.NORTH, Cardinals.SOUTH, Cardinals.EAST, Cardinals.WEST);
+        return new Domain(Cardinal.NORTH, Cardinal.SOUTH, Cardinal.EAST, Cardinal.WEST);
     }
 
 }

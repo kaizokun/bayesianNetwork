@@ -13,6 +13,8 @@ public interface ProbabilityCompute {
 
     void showCumulativeMarkovFrequencies();
 
+    void initCulumativeFrequencies();
+
     void initCumulativeMarkovFrequencies(Variable variable);
 
     Domain.DomainValue getRandomValueFromMarkovCover(Variable variable);

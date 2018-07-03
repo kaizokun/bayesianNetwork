@@ -29,7 +29,11 @@ public class BayesianNetwork {
 
     public ProbabilityCompute getTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries) {
 
-        return new ProbabilityComputeFromTCP(dependencies, varDom, entries, this.doubleFactory);
+        ProbabilityComputeFromTCP tcp = new ProbabilityComputeFromTCP(dependencies, varDom, entries, this.doubleFactory);
+
+       // tcp.initCulumativeFrequencies();
+
+        return tcp;
     }
 
     public void addVariable(Variable variable) {

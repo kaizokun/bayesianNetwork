@@ -6,6 +6,7 @@ import domain.data.AbstractDoubleFactory;
 import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
 import environment.Maze;
+import environment.Position;
 import inference.dynamic.mmc.BackwardMMC;
 import inference.dynamic.mmc.ForwardMMC;
 import inference.dynamic.mmc.SmoothingMMC;
@@ -17,6 +18,7 @@ import java.util.*;
 
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
+import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.POSITION;
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
 public class BayesianNetworkFactory {
@@ -244,14 +246,14 @@ public class BayesianNetworkFactory {
         IDomain booleanDomain = DomainFactory.getBooleanDomain();
 
         //Rain time 0
-        ProbabilityCompute tcpRain0 =  new ProbabilityComputeFromTCP(
+        ProbabilityCompute tcpRain0 = new ProbabilityComputeFromTCP(
                 booleanDomain, new Double[][]{{0.5, 1 - 0.5}},
                 doubleFactory);
 
         Variable rain0 = new Variable(RAIN.toString(), booleanDomain, tcpRain0);
 
         //Cloud time 0
-        ProbabilityCompute tcpCloud0 =  new ProbabilityComputeFromTCP(
+        ProbabilityCompute tcpCloud0 = new ProbabilityComputeFromTCP(
                 booleanDomain, new Double[][]{{0.6, 1 - 0.6}},
                 doubleFactory);
 
@@ -263,7 +265,7 @@ public class BayesianNetworkFactory {
                 new Variable[]{rain0},
                 booleanDomain,
                 new Double[][]{{0.7, 1 - 0.7},
-                               {0.3, 1 - 0.3}},
+                        {0.3, 1 - 0.3}},
                 doubleFactory);
 
         Variable rain1 = new Variable(RAIN.toString(), booleanDomain, tcpRain1, new Variable[]{rain0});
@@ -274,7 +276,7 @@ public class BayesianNetworkFactory {
                 new Variable[]{cloud0},
                 booleanDomain,
                 new Double[][]{{0.8, 1 - 0.8},
-                               {0.2, 1 - 0.2}},
+                        {0.2, 1 - 0.2}},
                 doubleFactory);
 
         Variable cloud1 = new Variable(CLOUD.toString(), booleanDomain, tcpCloud1, new Variable[]{cloud0});
@@ -285,7 +287,7 @@ public class BayesianNetworkFactory {
                 new Variable[]{rain1},
                 booleanDomain,
                 new Double[][]{{0.9, 1 - 0.9},
-                               {0.2, 1 - 0.2}},
+                        {0.2, 1 - 0.2}},
                 doubleFactory);
 
         Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, new Variable[]{rain1});
@@ -296,12 +298,12 @@ public class BayesianNetworkFactory {
                 new Variable[]{cloud1},
                 booleanDomain,
                 new Double[][]{{0.6, 1 - 0.6},
-                               {0.3, 1 - 0.3}},
+                        {0.3, 1 - 0.3}},
                 doubleFactory);
 
         Variable coat1 = new Variable(COAT.toString(), booleanDomain, tcpCoat1, new Variable[]{cloud1});
 
-        MMC mmc = new MMC(new Variable[]{rain0, cloud0}, new Variable[]{rain1, cloud1},  new Variable[]{umbrella1, coat1}, doubleFactory);
+        MMC mmc = new MMC(new Variable[]{rain0, cloud0}, new Variable[]{rain1, cloud1}, new Variable[]{umbrella1, coat1}, doubleFactory);
 
         ForwardMMC forwardMMC = new ForwardMMC(mmc);
 
@@ -321,7 +323,7 @@ public class BayesianNetworkFactory {
         IDomain booleanDomain = DomainFactory.getBooleanDomain();
 
         //Rain time 0
-        ProbabilityCompute tcpRain0 =  new ProbabilityComputeFromTCP(
+        ProbabilityCompute tcpRain0 = new ProbabilityComputeFromTCP(
                 booleanDomain, new Double[][]{{0.5, 1 - 0.5}},
                 doubleFactory);
 
@@ -333,7 +335,7 @@ public class BayesianNetworkFactory {
                 new Variable[]{rain0},
                 booleanDomain,
                 new Double[][]{{0.7, 1 - 0.7},
-                               {0.3, 1 - 0.3}},
+                        {0.3, 1 - 0.3}},
                 doubleFactory);
 
         Variable rain1 = new Variable(RAIN.toString(), booleanDomain, tcpRain1, new Variable[]{rain0});
@@ -344,12 +346,12 @@ public class BayesianNetworkFactory {
                 new Variable[]{rain1},
                 booleanDomain,
                 new Double[][]{{0.9, 1 - 0.9},
-                               {0.2, 1 - 0.2}},
+                        {0.2, 1 - 0.2}},
                 doubleFactory);
 
         Variable umbrella1 = new Variable(UMBRELLA.toString(), booleanDomain, tcpUmbrella1, new Variable[]{rain1});
 
-        MMC mmc = new MMC(new Variable[]{rain0}, new Variable[]{rain1},  new Variable[]{umbrella1}, doubleFactory);
+        MMC mmc = new MMC(new Variable[]{rain0}, new Variable[]{rain1}, new Variable[]{umbrella1}, doubleFactory);
 
         ForwardMMC forwardMMC = new ForwardMMC(mmc);
 
@@ -449,9 +451,77 @@ public class BayesianNetworkFactory {
         POSITION, CAPTOR_POSITION
     }
 
-    public static MMC getMazeMMC(Maze maze){
+    public static MMC getMazeMMC(Maze maze) {
 
+        AbstractDoubleFactory doubleFactory = new MyDoubleFactory();
 
+        List<Position> positionsReachable = maze.getReachablePositions();
+
+        List<Position> previousPositionsReachable = maze.getReachablePositions();
+
+        IDomain positionDomain = DomainFactory.getMazePositionDomain(maze);
+
+        //-------------matrice racine
+
+        Double[][] rootTransition = new Double[1][positionsReachable.size()];
+
+        for (int pos = 0; pos < positionsReachable.size(); pos++) {
+
+            rootTransition[0][pos] = 1.0 / positionsReachable.size();
+        }
+
+        ProbabilityCompute tcpPositions0 = new ProbabilityComputeFromTCP(
+                positionDomain, rootTransition, doubleFactory);
+
+        //-------------variable etat racine
+
+        Variable position0 = new Variable(POSITION, positionDomain, tcpPositions0);
+
+        //-------------matrice transition
+
+        Double[][] transition = new Double[positionsReachable.size()][positionsReachable.size()];
+
+        int a = 0;
+
+        for (Position previousPos : previousPositionsReachable) {
+
+            int b = 0;
+
+            for (Position position : positionsReachable) {
+
+                if (position.adjacent(previousPos)) {
+
+                    transition[a][b] = 1.0 / maze.totalAdjacent(previousPos);
+
+                }else{
+
+                    transition[a][b] = 0.0;
+                }
+
+                b++;
+            }
+            a++;
+        }
+
+        ProbabilityCompute tcpPositions = new ProbabilityComputeFromTCP(
+                new Variable[]{position0}, positionDomain, transition, doubleFactory);
+
+        //-------------variable etat
+
+        Variable position = new Variable(POSITION.toString(), positionDomain, tcpPositions0, new Variable[]{position0});
+
+        System.out.println(tcpPositions0);
+
+        System.out.println(tcpPositions);
+
+        //------------- capteur
+
+        /*
+        * les lignes sont les positions atteignables
+        * les colones les sous ensembles de positions N S E W soit 2^4
+        * la probabilité d'un percept est total si cela correspond aux contours d'une position
+        * on ajoute un peu de brui pour ne pas avoir de valer 0 par exemple 0.01
+        * */
 
         return null;
     }

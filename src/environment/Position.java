@@ -6,7 +6,7 @@ public class Position {
 
     protected int x, y;
 
-    public Position(int x, int y) {
+    public Position(int y, int x) {
         this.x = x;
         this.y = y;
     }
@@ -27,6 +27,26 @@ public class Position {
         this.y = y;
     }
 
+    public boolean adjacent(Position p2) {
+
+        for(Cardinal cardinal : Cardinal.values()){
+
+            Position adj = move(cardinal);
+
+            if(p2.equals(adj)){
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Position move(Cardinal cardinal){
+
+        return new Position(this.y + cardinal.getDeltaY(), this.x + cardinal.getDeltaX());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -44,9 +64,6 @@ public class Position {
 
     @Override
     public String toString() {
-        return "Position{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
+        return "("+y+", "+x+")";
     }
 }

@@ -108,6 +108,16 @@ public class Variable {
         this(label, domain, probabilityCompute, new ArrayList<>(),0);
     }
 
+    public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute ) {
+
+        this(label.toString(), domain, probabilityCompute, new ArrayList<>(),0);
+    }
+
+    public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies ) {
+
+        this(label.toString(), domain, probabilityCompute, Arrays.asList(dependencies),0);
+    }
+
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies ) {
 
         this(label, domain, probabilityCompute, Arrays.asList(dependencies),0);
