@@ -45,8 +45,8 @@
       <file leaf-file-name="MMCmazeTest.java" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="468">
-              <caret line="26" column="39" lean-forward="true" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
+            <state relative-caret-position="396">
+              <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -54,11 +54,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MazeRobot.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MazeRobot.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/agent/MazeRobot.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="587">
-              <caret line="82" column="35" lean-forward="true" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
+            <state relative-caret-position="447">
+              <caret line="59" column="46" selection-start-line="59" selection-start-column="46" selection-end-line="59" selection-end-column="46" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -69,7 +69,7 @@
       <file leaf-file-name="BayesianNetworkFactory.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1361">
+            <state relative-caret-position="821">
               <caret line="576" selection-start-line="576" selection-end-line="576" />
               <folding>
                 <element signature="class#ABCD_NETWORK_VARS#0;class#BayesianNetworkFactory#0" />
@@ -85,11 +85,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Maze.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Maze.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/environment/Maze.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="443">
-              <caret line="129" column="39" lean-forward="true" selection-start-line="129" selection-start-column="39" selection-end-line="129" selection-end-column="39" />
+            <state relative-caret-position="357">
+              <caret line="26" column="33" selection-start-line="26" selection-start-column="33" selection-end-line="26" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -179,9 +179,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/test/dynamic/MMCtest.java" />
-        <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/SmoothingMMC.java" />
-        <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/ForwardMMC.java" />
         <option value="$PROJECT_DIR$/src/network/dynamic/MMC.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/SmoothingMMC.java" />
         <option value="$PROJECT_DIR$/src/math/Matrix.java" />
@@ -227,9 +224,12 @@
         <option value="$PROJECT_DIR$/src/environment/Maze.java" />
         <option value="$PROJECT_DIR$/src/agent/MazeRobot.java" />
         <option value="$PROJECT_DIR$/src/agent/MazeRobot.java" />
-        <option value="$PROJECT_DIR$/../probability/src/environment/Maze.java" />
-        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java" />
+        <option value="$PROJECT_DIR$/src/environment/Maze.java" />
+        <option value="$PROJECT_DIR$/src/test/dynamic/MMCmazeTest.java" />
+        <option value="$PROJECT_DIR$/src/agent/MazeRobot.java" />
         <option value="$PROJECT_DIR$/../probability/src/agent/MazeRobot.java" />
+        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java" />
+        <option value="$PROJECT_DIR$/../probability/src/environment/Maze.java" />
       </list>
     </option>
   </component>
@@ -243,8 +243,8 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="67" />
-    <option name="y" value="-28" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
     <option name="width" value="1936" />
     <option name="height" value="1066" />
   </component>
@@ -258,6 +258,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -347,9 +350,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -358,7 +358,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/..////ideaProjects/FRANCEIOI" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/..//////ideaProjects/FRANCEIOI" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
@@ -701,14 +701,9 @@
       <workItem from="1530687405656" duration="13696000" />
       <workItem from="1530703374843" duration="745000" />
       <workItem from="1530712434727" duration="373000" />
-      <workItem from="1530714719590" duration="3269000" />
-    </task>
-    <task id="LOCAL-00039" summary="modification du filtrage pour gerer la prediction">
-      <created>1528898655467</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1528898655467</updated>
+      <workItem from="1530714719590" duration="3353000" />
+      <workItem from="1530718147836" duration="101000" />
+      <workItem from="1530723750440" duration="1362000" />
     </task>
     <task id="LOCAL-00040" summary="ebauche de pseudo code pour sous procedure backward du lissage">
       <created>1528905246714</created>
@@ -1046,43 +1041,50 @@
       <option name="project" value="LOCAL" />
       <updated>1530700459102</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="maze robot test recherche position">
+      <created>1530718057015</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1530718057015</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 00m 47s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 12m 52s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 02m 45s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 13m 09s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 06m 30s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 13m 37s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 07m 09s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 13m 41s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 07m 21s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 13m 54s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 07m 22s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 13m 57s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 07m 24s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 14m 02s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 09m 04s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 15m 52s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 09m 18s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 16m 41s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 17h 10m 23s.xml">
+    <history-entry file="MMCmazeTest_mazeInitTest - 2018.07.04 at 19h 16m 49s.xml">
       <configuration name="MMCmazeTest.mazeInitTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="553914000" />
+    <option name="totallyTimeSpent" value="555461000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1107,11 +1109,11 @@
       <window_info anchor="right" id="Maven Projects" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.1558011" />
-      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
+      <window_info anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" weight="0.46961325" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.63425416" visible="true" weight="0.24360341" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.63425416" visible="true" weight="0.2489339" />
       <window_info anchor="right" id="Database" order="8" weight="0.32995737" />
       <window_info id="Structure" order="1" sideWeight="0.36574584" side_tool="true" weight="0.1977612" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -1517,19 +1519,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/environment/Maze.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="129" column="39" lean-forward="true" selection-start-line="129" selection-start-column="39" selection-end-line="129" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetworkFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1361">
+        <state relative-caret-position="821">
           <caret line="576" selection-start-line="576" selection-end-line="576" />
           <folding>
             <element signature="class#ABCD_NETWORK_VARS#0;class#BayesianNetworkFactory#0" />
@@ -1544,20 +1536,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/agent/MazeRobot.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="26" column="39" lean-forward="true" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
+        <state relative-caret-position="447">
+          <caret line="59" column="46" selection-start-line="59" selection-start-column="46" selection-end-line="59" selection-end-column="46" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/agent/MazeRobot.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="587">
-          <caret line="82" column="35" lean-forward="true" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
+        <state relative-caret-position="396">
+          <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/environment/Maze.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="26" column="33" selection-start-line="26" selection-start-column="33" selection-end-line="26" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

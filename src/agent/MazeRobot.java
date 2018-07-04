@@ -25,6 +25,8 @@ public class MazeRobot {
 
     protected List<Position> positions = new ArrayList<>();
 
+    protected LinkedList<List<Cardinal>> percepts = new LinkedList<>();
+
     protected LinkedList<Cardinal> moves = new LinkedList<>();
 
     protected Random random = new Random();
@@ -40,56 +42,44 @@ public class MazeRobot {
         this.maze.setRobot(this);
     }
 
-    public void nextStep() {
+    public void lookUpPosition() {
 
         //récupere le percept à partir de l'environnement
         List<Cardinal> percept = new ArrayList<>(this.maze.getPercept());
         //crée une variable observation pour etendre le reseau
         Variable observation = new Variable(CAPTOR_POSITION, captorDomain, percept);
 
+        this.percepts.addLast(percept);
+
         this.mazeMMC.extend(observation);
         //récupère le filtrage pour le dernier état
         Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
         //récupère les positions offrant la plus grande probabilité pour affichage
-        List<Position> mostProbablePositions = getMostProbablePositions(positionsDistrib);
+        this.positions = getMostProbablePositions(positionsDistrib);
 
-        this.positions = mostProbablePositions;
+        System.out.println("Positions probable : "+positions);
+    }
 
-        //System.out.println(positionsDistrib);
-
-        System.out.println(positions);
+    public void move() {
 
         //récupère toutes les directions
         Set<Cardinal> reachableDirections = Cardinal.getCardinalSetCopy();
         //retirer celles qui ne sont pas accessible
-        reachableDirections.removeAll(percept);
+        reachableDirections.removeAll(this.percepts.getLast());
         //genere un nombre aléatoire en 0 et le nombre de directions licites
         int rdmId = random.nextInt(reachableDirections.size());
 
         Cardinal randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
 
-        moves.add(randomDirection);
+        this.moves.add(randomDirection);
 
         this.maze.moveRobot(randomDirection);
-
     }
 
     public boolean positionKnown() {
 
-        if (this.positions.size() == 1){
-
-            Position pos = this.positions.get(0);
-
-            this.positions.clear();
-
-            this.positions.add(pos.move(this.moves.getLast()));
-
-            return true;
-        }
-
-        return false;
+        return this.positions.size() == 1;
     }
-
 
     private List<Position> getMostProbablePositions(Matrix positionsDistrib) {
 

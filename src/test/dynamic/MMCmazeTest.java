@@ -13,23 +13,37 @@ public class MMCmazeTest {
     public void mazeInitTest() {
 
         String[] strMaze = new String[]{
-                "    #     #   # ",
-                "##  # ## # # ###",
-                "#   # ##     ## ",
-                "  #   #    #    "};
+                "    #     #   # ## # ##",
+                "##  # ## # # ####   # #",
+                "#   # ##     ###  # # #",
+                "# #   #  # #      # #  ",
+                "    #   ## ## ## ##   #",
+                "### # # ## #  ##    #  "};
 
-        Maze maze = new Maze(16, 4, strMaze, new Position(2, 2));
+        Maze maze = new Maze( strMaze, new Position(2, 2));
 
         MMC mmcMaze = BayesianNetworkFactory.getMazeMMC(maze);
 
         MazeRobot robot = new MazeRobot(mmcMaze, maze);
 
-        while(!robot.positionKnown()) {
+        System.out.println("Robot position : "+maze.getRobotPosition());
 
-            robot.nextStep();
-        }
+        boolean lookUp = true;
 
-        System.out.println(robot.getPositions());
+        do {
+
+            robot.lookUpPosition();
+
+            if(robot.positionKnown()){
+
+                lookUp = false;
+
+            }else{
+
+                robot.move();
+            }
+
+        } while (lookUp);
 
         System.out.println(robot.getMoves());
     }

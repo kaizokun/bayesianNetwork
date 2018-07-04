@@ -20,9 +20,13 @@ public class Maze {
 
     protected String[] maze;
 
-    public Maze(int limitX, int limitY, String[] maze, Position robotPosition) {
+    public Maze(String[] maze, Position robotPosition) {
 
-        for (int rowStr = limitY - 1, row = 0; rowStr >= 0; rowStr--, row++) {
+        this.limitX = maze[0].length();
+
+        this.limitY = maze.length;
+
+        for (int rowStr = this.limitY - 1, row = 0; rowStr >= 0; rowStr--, row++) {
 
             String mazeRow = maze[rowStr];
 
@@ -34,10 +38,6 @@ public class Maze {
                 }
             }
         }
-
-        this.limitX = limitX;
-
-        this.limitY = limitY;
 
         this.robotPosition = robotPosition;
 
@@ -135,6 +135,11 @@ public class Maze {
     public void moveRobot(Cardinal cardinal) {
 
         this.robotPosition = this.robotPosition.move(cardinal);
+    }
+
+    public Position getRobotPosition() {
+
+        return robotPosition;
     }
 
     public Set<Cardinal> getPercept(Position position) {
