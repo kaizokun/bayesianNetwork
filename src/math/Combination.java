@@ -41,41 +41,48 @@ public class Combination {
      *
      * */
 
-    public static <T> List<List<T>> getSubsets(T[] set) {
+    public static class Count{
+
+        public int count = 0 ;
+    }
+
+    public static <T> List<T>[] getSubsets(T[] set) {
+
+        Count c = new Count();
 
         //liste des sous ensembles
-        List<List<T>> subSets = new ArrayList((int) Math.pow(2, set.length));
+        List<T>[] subSets = new List[(int) Math.pow(2, set.length)];
         //ensemble vide
-        subSets.add(new ArrayList<>());
+        subSets[c.count++] = new ArrayList<>();
         //ensemble complet
-        subSets.add(Arrays.asList(set));
+        subSets[c.count++] = Arrays.asList(set);
         //sous ensemble vide à charger
         LinkedList<T> subSet = new LinkedList<>();
         //pour chaqu etaille de sous ensemble de 1 à taille du set - 1
         for (int s = 1; s <= set.length - 1; s++) {
 
-            loadSubSet(s, subSets, subSet, set, 0);
+            loadSubSet(s, subSets, subSet, set, 0, c);
         }
 
         return subSets;
     }
 
-    private static <T> void loadSubSet(int size, List<List<T>> subSets, LinkedList<T> subSet, T[] set, int i) {
+    private static <T> void loadSubSet(int size, List<T>[] subSets, LinkedList<T> subSet, T[] set, int i, Count c) {
 
         //si la taille est arrivé à zero
-        if( size == 0 ){
+        if (size == 0) {
             //on enregistre une copie du sous ensemble créé
-            subSets.add(new ArrayList<>(subSet));
+            subSets[c.count++] =new ArrayList<>(subSet);
 
             return;
         }
         //pour chaque element restant du set de base
-        for( ; i < set.length ; i ++ ){
+        for (; i < set.length; i++) {
             //on ajoute l'element
             subSet.addLast(set[i]);
             //on charge la suite en decrementant la taille du sous ensemble
             //à concatener avec le courant, et on passe à l'indice suivant du set d'origine
-            loadSubSet(size - 1, subSets, subSet, set, i + 1);
+            loadSubSet(size - 1, subSets, subSet, set, i + 1, c);
             //on retire l'element pour créer un autre sous ensemble
             subSet.removeLast();
         }

@@ -1,13 +1,13 @@
 package environment;
 
-import javafx.geometry.Pos;
-
-import javax.smartcardio.Card;
+import agent.MazeRobot;
 import java.util.*;
 
 public class Maze {
 
     protected Set<Position> walls = new HashSet<>();
+
+    protected MazeRobot robot;
 
     protected Position robotPosition;
 
@@ -34,11 +34,11 @@ public class Maze {
             }
         }
 
-        this.robotPosition = robotPosition;
-
         this.limitX = limitX;
 
         this.limitY = limitY;
+
+        this.robotPosition = robotPosition;
 
         this.maze = maze;
     }
@@ -113,9 +113,22 @@ public class Maze {
         this.limitY = limitY;
     }
 
+    public MazeRobot getRobot() {
+        return robot;
+    }
+
+    public void setRobot(MazeRobot robot) {
+        this.robot = robot;
+    }
+
     public boolean isIn(Position pos) {
 
         return pos.y >= 0 && pos.y < limitY && pos.x >= 0 && pos.x < limitX;
+    }
+
+    public Set<Cardinal> getPercept() {
+
+        return getPercept(this.robotPosition);
     }
 
     public Set<Cardinal> getPercept(Position position) {

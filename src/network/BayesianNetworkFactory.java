@@ -19,6 +19,7 @@ import java.util.*;
 
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
+import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.CAPTOR_POSITION;
 import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.POSITION;
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
@@ -514,20 +515,20 @@ public class BayesianNetworkFactory {
 
         //-------------variable etat
 
-        Variable position = new Variable(POSITION.toString(), positionDomain, tcpPositions0, new Variable[]{position0});
+        Variable position = new Variable(POSITION, positionDomain, tcpPositions, new Variable[]{position0});
 
         //------------- capteur
 
         /*
-         * les lignes sont les positions atteignables
-         * les colones les sous ensembles de positions N S E W soit 2^4
+         * les lignes sont les positionsDistrib atteignables
+         * les colones les sous ensembles de positionsDistrib N S E W soit 2^4
          * la probabilité d'un percept est total si cela correspond aux contours d'une position
          * on ajoute un peu de bruit pour ne pas avoir de valer 0 par exemple 0.01
          * */
 
-        List<List<Cardinal>> percepts = Combination.getSubsets(Cardinal.values());
+        List<Cardinal> [] percepts = Combination.getSubsets(Cardinal.values());
 
-        Double[][] captor = new Double[positionDomain.getSize()][percepts.size()];
+        Double[][] captor = new Double[positionDomain.getSize()][percepts.length];
 
         a = 0;
 
@@ -549,27 +550,32 @@ public class BayesianNetworkFactory {
                 b++;
             }
 
-            a ++;
+            a++;
         }
 
-        IDomain domainCaptor = DomainFactory.getMazeWallCaptorDomain(percepts);
+        IDomain captorDomain = DomainFactory.getMazeWallCaptorDomain(percepts);
 
         ProbabilityCompute tcpCaptors = new ProbabilityComputeFromTCP(
-                new Variable[]{position}, domainCaptor, captor, doubleFactory);
+                new Variable[]{position}, captorDomain, captor, doubleFactory);
+
+        //-------------variable capteur position
+
+        Variable positionCaptor = new Variable(CAPTOR_POSITION, captorDomain, tcpCaptors, new Variable[]{position});
+
+        //-----------------------------------------
 
 
-        for (List<Cardinal> percept : percepts) {
+        MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{position}, new Variable[]{positionCaptor}, doubleFactory);
 
-            System.out.println(percept);
-        }
+        ForwardMMC forwardMMC = new ForwardMMC(mmc);
 
-        System.out.println(tcpPositions0);
+        BackwardMMC backwardMMC = new BackwardMMC(mmc);
 
-        System.out.println(tcpPositions);
+        mmc.setForwardMMC(forwardMMC);
 
-        System.out.println(tcpCaptors);
+        mmc.setSmoothingMMC(new SmoothingMMC(mmc, forwardMMC, backwardMMC));
 
-        return null;
+        return mmc;
     }
 
 

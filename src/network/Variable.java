@@ -11,7 +11,7 @@ public class Variable {
 
     public static Comparator<Variable> varLabelComparator;
 
-    static{
+    static {
 
         varLabelComparator = new Comparator<Variable>() {
             @Override
@@ -28,8 +28,8 @@ public class Variable {
     protected Domain.DomainValue value, originValue;
 
     protected List<Variable> dependencies = new ArrayList<>(),
-                             children = new ArrayList<>(),
-                             observations, compoVars;
+            children = new ArrayList<>(),
+            observations, compoVars;
 
     protected ProbabilityCompute probabilityCompute;
 
@@ -55,14 +55,19 @@ public class Variable {
     //facteurs lié à cette variable
     protected List<Factor> factors = new LinkedList<>();
 
-    public Variable(String label, IDomain domain){
+    public Variable(String label, IDomain domain) {
 
         this.domain = domain;
 
         this.label = label;
     }
 
-    public Variable(String label, IDomain domain, Object value){
+    public Variable(Object label, IDomain domain, Object value) {
+
+        this(label.toString(), domain, value);
+    }
+
+    public Variable(String label, IDomain domain, Object value) {
 
         this.domain = domain;
 
@@ -75,11 +80,11 @@ public class Variable {
      * Generate a mega variable from a list of variables
      * must be sorted by label (asc)
      * and a specific time.
-     *
+     * <p>
      * each variable is copied for a futur value assignation.
      * (label, time, domainValue, domain)
-     * */
-    public Variable( List<Variable> compoVars, int time ){
+     */
+    public Variable(List<Variable> compoVars, int time) {
 
         this.label = getMegaVarLabel(compoVars);
 
@@ -87,48 +92,48 @@ public class Variable {
 
         this.compoVars = new ArrayList<>(compoVars.size());
 
-        for(Variable compoVar : compoVars){
+        for (Variable compoVar : compoVars) {
 
             this.compoVars.add(new Variable(compoVar.label, this.time, compoVar.value, compoVar.domain));
         }
     }
 
-    public Variable(String label){
+    public Variable(String label) {
 
         this.label = label;
     }
 
-    public Variable(Variable ... vars){
+    public Variable(Variable... vars) {
 
         this.label = getMegaVarLabel(Arrays.asList(vars));
     }
 
-    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute ) {
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
 
-        this(label, domain, probabilityCompute, new ArrayList<>(),0);
+        this(label, domain, probabilityCompute, new ArrayList<>(), 0);
     }
 
-    public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute ) {
+    public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute) {
 
-        this(label.toString(), domain, probabilityCompute, new ArrayList<>(),0);
+        this(label.toString(), domain, probabilityCompute, new ArrayList<>(), 0);
     }
 
-    public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies ) {
+    public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies) {
 
-        this(label.toString(), domain, probabilityCompute, Arrays.asList(dependencies),0);
+        this(label.toString(), domain, probabilityCompute, Arrays.asList(dependencies), 0);
     }
 
-    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies ) {
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies) {
 
-        this(label, domain, probabilityCompute, Arrays.asList(dependencies),0);
+        this(label, domain, probabilityCompute, Arrays.asList(dependencies), 0);
     }
 
-    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies ) {
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies) {
 
-        this(label, domain, probabilityCompute, dependencies,0);
+        this(label, domain, probabilityCompute, dependencies, 0);
     }
 
-    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies, int time ) {
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies, int time) {
 
         this.label = label;
 
@@ -150,7 +155,7 @@ public class Variable {
             //enregistre l'id du parent dans le tableau
             //ici plusieurs meme variable peuvent avoir des temps differents
             //donc on recupere une clé composée du label suivit du temps de la variable parent
-            this.dependenciesIndex.put(getVarTimeId(parent, parent.time), i ++);
+            this.dependenciesIndex.put(getVarTimeId(parent, parent.time), i++);
         }
     }
 
@@ -165,23 +170,23 @@ public class Variable {
         this.domain = domain;
     }
 
-    public String getVarTimeId(){
+    public String getVarTimeId() {
 
         return this.getVarTimeId(this, this.time);
     }
 
-    private String getVarTimeId(Variable variable, int time){
+    private String getVarTimeId(Variable variable, int time) {
 
-        return variable.getLabel()+"_"+time;
+        return variable.getLabel() + "_" + time;
     }
 
-    public static String getMegaVarLabel(Collection<Variable> variables){
+    public static String getMegaVarLabel(Collection<Variable> variables) {
 
         StringBuilder labelBuilder = new StringBuilder();
 
-        for(Variable variable : variables){
+        for (Variable variable : variables) {
 
-            labelBuilder.append(variable.getLabel()+"-");
+            labelBuilder.append(variable.getLabel() + "-");
         }
 
         labelBuilder.deleteCharAt(labelBuilder.length() - 1);
@@ -189,7 +194,7 @@ public class Variable {
         return labelBuilder.toString();
     }
 
-    public Variable getParent(int time){
+    public Variable getParent(int time) {
 
         String varTimeId = getVarTimeId(this, time);
 
@@ -198,7 +203,7 @@ public class Variable {
         return this.dependencies.get(indexId);
     }
 
-    public void addDependency(Variable parent){
+    public void addDependency(Variable parent) {
 
         this.dependencies.add(parent);
 
@@ -252,12 +257,12 @@ public class Variable {
      * from a list of domain colValues
      * the order of the colValues must match with the variables one
      * sorted by label ASC
-     * */
-    public void setDomainValues(Object [] objects){
+     */
+    public void setDomainValues(Object[] objects) {
 
         Iterator<Variable> variableIterator = this.compoVars.iterator();
 
-        for(Object object : objects){
+        for (Object object : objects) {
 
             variableIterator.next().setDomainValue(new Domain.DomainValue(object));
         }
@@ -268,14 +273,14 @@ public class Variable {
      * from another list of variables already initialized
      * the order of the variables doesn't matter, they are sorted
      * inside the method
-     * */
-    public void setDomainValuesFromVariables(Variable ... variables){
+     */
+    public void setDomainValuesFromVariables(Variable... variables) {
 
         Arrays.sort(variables, varLabelComparator);
 
         Iterator<Variable> variableIterator = this.compoVars.iterator();
 
-        for(Variable variable : variables){
+        for (Variable variable : variables) {
 
             variableIterator.next().setDomainValue(variable.getDomainValue());
         }
@@ -283,12 +288,12 @@ public class Variable {
 
     /**
      * value list of the variables composing the mega variable
-     * */
-    public List<Domain.DomainValue> getMegaVarValues(){
+     */
+    public List<Domain.DomainValue> getMegaVarValues() {
 
         List<Domain.DomainValue> domainValues = new LinkedList<>();
 
-        for( Variable variable : this.compoVars){
+        for (Variable variable : this.compoVars) {
 
             domainValues.add(variable.getDomainValue());
         }
@@ -296,7 +301,7 @@ public class Variable {
         return domainValues;
     }
 
-    public String getMegaVarValuesKey(){
+    public String getMegaVarValuesKey() {
 
         return this.getMegaVarValues().toString();
     }
@@ -341,19 +346,19 @@ public class Variable {
 
     /**
      * return the probability of the variable from its current value et its rowVars colValues
-     * */
+     */
     public AbstractDouble getProbabilityForCurrentValue() {
 
         return probabilityCompute.getProbability(this);
     }
 
-    public void loadMarkovCover(){
+    public void loadMarkovCover() {
 
         this.markovKover = new LinkedHashSet<>();
 
         this.markovKover.addAll(this.dependencies);
 
-        for(Variable child : this.children){
+        for (Variable child : this.children) {
 
             this.markovKover.addAll(child.dependencies);
         }
@@ -363,7 +368,7 @@ public class Variable {
         this.markovKover.remove(this);
     }
 
-    public void loadMarkovCover(List<Variable> obs){
+    public void loadMarkovCover(List<Variable> obs) {
 
         this.loadMarkovCover();
 
@@ -377,7 +382,7 @@ public class Variable {
 
     public void initRandomValueFromMarkovCover() {
 
-       this.setDomainValue(this.markovCoverDistributionCompute.getRandomValueFromMarkovCover(this));
+        this.setDomainValue(this.markovCoverDistributionCompute.getRandomValueFromMarkovCover(this));
     }
 
     public void initRdmValue() {
@@ -439,7 +444,7 @@ public class Variable {
     @Override
     public String toString() {
 
-        return this.label+"_"+this.time+" = "+this.value+( (this.compoVars != null && !this.compoVars.isEmpty()) ? " - COMPOSITION : "+this.compoVars : "" );
+        return this.label + "_" + this.time + " = " + this.value + ((this.compoVars != null && !this.compoVars.isEmpty()) ? " - COMPOSITION : " + this.compoVars : "");
     }
 
     public String getValueKey() {
@@ -447,7 +452,7 @@ public class Variable {
         return this.getValue().toString();
     }
 
-    public Variable copyLabelTimeValueDom(){
+    public Variable copyLabelTimeValueDom() {
 
         return new Variable(this.label, this.time, this.value, this.domain);
     }
@@ -515,9 +520,9 @@ public class Variable {
         isObs = obs;
     }
 
-    public AbstractDoubleFactory doubleFactory(){
+    public AbstractDoubleFactory doubleFactory() {
 
-       return this.probabilityCompute.getDoubleFactory();
+        return this.probabilityCompute.getDoubleFactory();
     }
 
     public void setMarkovCoverDistributionCompute(MarkovCoverDistributionCompute markovCoverDistributionCompute) {
@@ -532,7 +537,7 @@ public class Variable {
 
     public void saveObservation() {
 
-        for(Variable dep : dependencies){
+        for (Variable dep : dependencies) {
 
             dep.observations.add(this);
         }

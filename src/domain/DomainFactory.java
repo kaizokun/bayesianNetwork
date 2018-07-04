@@ -41,8 +41,8 @@ public class DomainFactory {
         return getMazeWallCaptorDomain(Combination.getSubsets(Cardinal.values()));
     }
 
-    public static IDomain getMazeWallCaptorDomain(List<List<Cardinal>> percepts) {
+    public static IDomain getMazeWallCaptorDomain(List<Cardinal>[] percepts) {
 
-        return new Domain(percepts.toArray());
+        return new Domain(percepts);
     }
 }

@@ -1,5 +1,6 @@
 package inference.dynamic.mmc;
 
+import inference.dynamic.Util;
 import math.Matrix;
 import math.Transpose;
 import network.Variable;
@@ -99,6 +100,7 @@ public class ForwardMMC implements IForward {
         Variable megaObs = this.mmc.getMegaVariableObs(t);
 
         Matrix obs = this.mmc.getMatrixObs(megaObs);
+
         //dans la matrice de base les lignes correspondent aux valeurs parents
         //et les colones aux valeurs enfants, dans la transposée c'est l'inverse.
         //la multiplication matricielle se fait ligne par ligne pour la transposée de la premiere matrice

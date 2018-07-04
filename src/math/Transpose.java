@@ -43,50 +43,6 @@ public class Transpose extends Matrix {
         return super.getRowCount();
     }
 
-
-    @Override
-    public String toString() {
-
-        StringBuilder builder = new StringBuilder("\n");
-
-        if (rowVars != null)
-            builder.append("ROWS : " + rowVars + '\n');
-        if (colVars != null)
-            builder.append("COLS : " + colVars + '\n');
-
-        if (!this.isObservation && this.rowValues != null) {
-
-            builder.append(String.format("%6s", ""));
-
-            for (List<Domain.DomainValue> domainValues : rowValues) {
-
-                builder.append(String.format("%-7s", domainValues));
-            }
-        }
-
-        builder.append('\n');
-
-        for (int r = 0; r < this.getRowCount(); r++) {
-
-            if (colValues != null) {
-
-                builder.append(String.format("%5s", colValues.get(r)));
-            } else {
-
-                builder.append(String.format("%5s", ""));
-            }
-
-            for (int c = 0; c < this.getColCount(); c++) {
-
-                builder.append(String.format("[%.3f]", getValue(r, c).getDoubleValue()));
-            }
-
-            builder.append('\n');
-        }
-
-        return builder.toString();
-    }
-
     @Override
     public List<List<Domain.DomainValue>> getColValues() {
         return super.getRowValues();

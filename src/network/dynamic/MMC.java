@@ -78,7 +78,7 @@ public class MMC extends DynamicBayesianNetwork {
         }
     }
 
-    public void extend(Variable[] variables) {
+    public void extend(Variable ... variables) {
 
         //on etend le reseau
         this.extend();
@@ -109,7 +109,6 @@ public class MMC extends DynamicBayesianNetwork {
 
         this.getTimeVariables(this.time).put(newObs, newObs);
     }
-
 
     private void loadVarDistrib(AbstractDouble[] row, List<Variable> vars, List<List<Domain.DomainValue>> domainValuesList, AbstractDoubleFactory doubleFactory) {
 
@@ -165,7 +164,9 @@ public class MMC extends DynamicBayesianNetwork {
             AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
 
             for (int r = 0; r < statesDomainValuesList.size(); r++) {
+
                 for (int c = 0; c < statesDomainValuesList.size(); c++) {
+
                     obsMatrix[r][c] = doubleFactory.getNew(0.0);
                 }
             }
@@ -197,7 +198,7 @@ public class MMC extends DynamicBayesianNetwork {
                 col++;
             }
 
-            matrixMap.put(obsDomainValues.toString(), new Transpose(obsMatrix, obs, states, doubleFactory, true));
+            matrixMap.put(obsDomainValues.toString(), new Matrix(obsMatrix, null, states, doubleFactory, true));
         }
 
         this.matrixObs = matrixMap;
@@ -321,6 +322,7 @@ public class MMC extends DynamicBayesianNetwork {
     }
 
     public Map<String, Matrix> getMatrixObs() {
+
         return matrixObs;
     }
 
@@ -386,24 +388,34 @@ public class MMC extends DynamicBayesianNetwork {
     public String toString() {
 
         StringBuilder stringBuilder = new StringBuilder(super.toString());
-/*
+
         stringBuilder.append("--------------------------------------------------------------------\n");
-        stringBuilder.append("--------------------------- MATRIX ---------------------------------\n");
+        stringBuilder.append("--------------------------- MATRIX OBSERVATION----------------------\n");
         stringBuilder.append("--------------------------------------------------------------------\n\n");
 
-        for (Matrix matrixObs : matrixObs.values()) {
+        for (Map.Entry<String,Matrix> entry : matrixObs.entrySet()) {
 
-            stringBuilder.append(matrixObs);
+            stringBuilder.append(entry.getKey()+"\n");
+
+            stringBuilder.append(entry.getValue());
 
             stringBuilder.append('\n');
         }
+
+        stringBuilder.append("--------------------------------------------------------------------\n");
+        stringBuilder.append("--------------------------- MATRIX TRANSITION ROOT------------------\n");
+        stringBuilder.append("--------------------------------------------------------------------\n\n");
 
         stringBuilder.append(matrixState0);
 
         stringBuilder.append('\n');
 
+        stringBuilder.append("--------------------------------------------------------------------\n");
+        stringBuilder.append("--------------------------- MATRIX TRANSITION ----------------------\n");
+        stringBuilder.append("--------------------------------------------------------------------\n\n");
+
         stringBuilder.append(matrixStates);
-*/
+
         stringBuilder.append("\n");
 
         for (Map.Entry entry : getSmoothings().entrySet()) {
@@ -411,11 +423,14 @@ public class MMC extends DynamicBayesianNetwork {
             stringBuilder.append(entry.getValue()+"\n");
         }
 
-        stringBuilder.append("=====================================================\n");
-        stringBuilder.append("====================Forward ["+lastForward.getKey()+"]=======================\n");
-        stringBuilder.append("=====================================================\n");
-        stringBuilder.append("\n");
-        stringBuilder.append(lastForward.getValue());
+        if(lastForward != null) {
+
+            stringBuilder.append("=====================================================\n");
+            stringBuilder.append("====================Forward [" + lastForward.getKey() + "]=======================\n");
+            stringBuilder.append("=====================================================\n");
+            stringBuilder.append("\n");
+            stringBuilder.append(lastForward.getValue());
+        }
 
         return stringBuilder.toString();
     }

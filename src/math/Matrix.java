@@ -270,15 +270,16 @@ public class Matrix {
 
     // elimination.  Here index[] stores pivoting order.
 
+    /*
     @Override
     public String toString() {
 
         StringBuilder builder = new StringBuilder("\n");
 
         if (colVars != null)
-            builder.append("ROWS : " + colVars + '\n');
+            builder.append("COLS : " + colVars + '\n');
         if (rowVars != null)
-            builder.append("COLS : " + rowVars + '\n');
+            builder.append("ROWS : " + rowVars + '\n');
 
         if (!this.isObservation && this.colValues != null) {
 
@@ -314,6 +315,56 @@ public class Matrix {
 
         return builder.toString();
     }
+
+    */
+
+
+
+    @Override
+    public String toString() {
+
+        StringBuilder builder = new StringBuilder("\n");
+
+        if (this.getRowVars() != null)
+            builder.append("ROWS : " + this.getRowVars() + '\n');
+        if (this.getColVars() != null)
+            builder.append("COLS : " + this.getColVars() + '\n');
+
+        if (!this.isObservation && this.getColValues() != null) {
+
+            builder.append(String.format("%6s", ""));
+
+            for (List<Domain.DomainValue> domainValues : this.getColValues()) {
+
+                builder.append(String.format("%-7s", domainValues));
+            }
+        }
+
+        builder.append('\n');
+
+        for (int r = 0; r < this.getRowCount(); r++) {
+
+            if (this.getRowValues() != null) {
+
+                builder.append(String.format("%5s", this.getRowValues().get(r)));
+
+            } else {
+
+                builder.append(String.format("%5s", ""));
+            }
+
+            for (int c = 0; c < this.getColCount(); c++) {
+
+                builder.append(String.format("[%.3f]", getValue(r, c).getDoubleValue()));
+            }
+
+            builder.append('\n');
+        }
+
+        return builder.toString();
+    }
+
+
 
     public List<List<Domain.DomainValue>> getColValues() {
         return colValues;

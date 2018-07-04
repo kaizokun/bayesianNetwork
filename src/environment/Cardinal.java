@@ -1,14 +1,36 @@
 package environment;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 public enum Cardinal {
 
     NORTH, SOUTH, EAST, WEST;
 
     private static final int delta[][] = new int[][]{{+1, 0}, {-1, 0}, {0, +1}, {0, -1}};
 
-    public int[] getDeltaYX(){
+    private static final Set<Cardinal> cardinalSet = new LinkedHashSet<>();
 
-        return delta[this.ordinal()];
+    static{
+
+        cardinalSet.add(NORTH);
+
+        cardinalSet.add(SOUTH);
+
+        cardinalSet.add(EAST);
+
+        cardinalSet.add(WEST);
+    }
+
+    public static Set<Cardinal> getCardinalSet() {
+
+        return cardinalSet;
+    }
+
+    public static Set<Cardinal> getCardinalSetCopy() {
+
+        return new LinkedHashSet<>(cardinalSet);
     }
 
     public int getDeltaY(){

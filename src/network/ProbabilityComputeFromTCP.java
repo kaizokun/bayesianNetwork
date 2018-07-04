@@ -295,8 +295,6 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         Domain.DomainValue value = var.getDomainValue();
 
-       // System.out.println("["+depKey+"] - "+value+" - "+this.TCP+" - "+this.TCP.get(depKey));
-
         return this.TCP.get(depKey).get(value);
     }
 
