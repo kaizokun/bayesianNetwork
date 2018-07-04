@@ -1,6 +1,7 @@
 package environment;
 
 import agent.MazeRobot;
+
 import java.util.*;
 
 public class Maze {
@@ -43,9 +44,9 @@ public class Maze {
         this.maze = maze;
     }
 
-    public int countReachablePositions(){
+    public int countReachablePositions() {
 
-        return ( this.limitY * this.limitX ) - this.walls.size();
+        return (this.limitY * this.limitX) - this.walls.size();
     }
 
     //get percepts
@@ -131,9 +132,14 @@ public class Maze {
         return getPercept(this.robotPosition);
     }
 
+    public void moveRobot(Cardinal cardinal) {
+
+        this.robotPosition = this.robotPosition.move(cardinal);
+    }
+
     public Set<Cardinal> getPercept(Position position) {
 
-        if(this.percepts.containsKey(position)){
+        if (this.percepts.containsKey(position)) {
 
             return this.percepts.get(position);
         }
@@ -141,12 +147,12 @@ public class Maze {
         Set<Cardinal> percepts = new LinkedHashSet<>();
 
         //pour chaque case adjacente, direction N S E W, contenant un potentiel obstacle
-        for(Cardinal cardinal : Cardinal.values()){
+        for (Cardinal cardinal : Cardinal.values()) {
             //cree une position adjacente
             Position closePos = position.move(cardinal);
             //si la position est hors du labyrinthe ou est un mur,
             //il y a un obstacle dans cette direction
-            if( !isIn(closePos) || walls.contains(closePos)){
+            if (!isIn(closePos) || walls.contains(closePos)) {
 
                 percepts.add(cardinal);
             }
@@ -161,7 +167,7 @@ public class Maze {
 
         Set<Cardinal> posPercept = getPercept(position);
 
-        if( percept.size() != posPercept.size()){
+        if (percept.size() != posPercept.size()) {
 
             return false;
         }
@@ -180,9 +186,9 @@ public class Maze {
         */
 
         //autre manière un peu moins efficace
-        for(Cardinal direction : percept){
+        for (Cardinal direction : percept) {
 
-            if(!posPercept.contains(direction)){
+            if (!posPercept.contains(direction)) {
 
                 return false;
             }

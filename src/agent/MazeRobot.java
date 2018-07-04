@@ -4,7 +4,6 @@ import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.AbstractDouble;
-import domain.data.AbstractDoubleFactory;
 import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
@@ -24,7 +23,13 @@ public class MazeRobot {
 
     protected IDomain captorDomain = DomainFactory.getMazeWallCaptorDomain();
 
-    protected Matrix positionsDistrib;
+    protected List<Position> positions = new ArrayList<>();
+
+    protected LinkedList<Cardinal> moves = new LinkedList<>();
+
+    protected Random random = new Random();
+
+    protected double minProb = 0.1;
 
     public MazeRobot(MMC mazeMMC, Maze maze) {
 
@@ -43,54 +48,85 @@ public class MazeRobot {
         Variable observation = new Variable(CAPTOR_POSITION, captorDomain, percept);
 
         this.mazeMMC.extend(observation);
-
-        //ystem.out.println(this.mazeMMC);
         //récupère le filtrage pour le dernier état
-        this.positionsDistrib = this.mazeMMC.getLastForward().getValue();
+        Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
+        //récupère les positions offrant la plus grande probabilité pour affichage
+        List<Position> mostProbablePositions = getMostProbablePositions(positionsDistrib);
 
-        System.out.println(this.positionsDistrib);
+        this.positions = mostProbablePositions;
+
+        //System.out.println(positionsDistrib);
+
+        System.out.println(positions);
 
         //récupère toutes les directions
         Set<Cardinal> reachableDirections = Cardinal.getCardinalSetCopy();
         //retirer celles qui ne sont pas accessible
         reachableDirections.removeAll(percept);
+        //genere un nombre aléatoire en 0 et le nombre de directions licites
+        int rdmId = random.nextInt(reachableDirections.size());
 
-        System.out.println(getMostProbablePostions(mazeMMC.getDoubleFactory()));
+        Cardinal randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
+
+        moves.add(randomDirection);
+
+        this.maze.moveRobot(randomDirection);
+
     }
 
-    private List<Map.Entry<Position, AbstractDouble>> getMostProbablePostions(AbstractDoubleFactory doubleFactory) {
+    public boolean positionKnown() {
 
-        List<Map.Entry<Position, AbstractDouble>> maxPositions = new LinkedList<>();
+        if (this.positions.size() == 1){
 
-        AbstractDouble maxProb = doubleFactory.getNew(0.0);
+            Position pos = this.positions.get(0);
+
+            this.positions.clear();
+
+            this.positions.add(pos.move(this.moves.getLast()));
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private List<Position> getMostProbablePositions(Matrix positionsDistrib) {
+
+        List<Position> mostProbablePositions = new ArrayList<>();
+
+        AbstractDouble minProb = mazeMMC.getDoubleFactory().getNew(this.minProb);
         //pour chaque ligne de la matrice ici la megavariable ne contient qu'une sous variable
         int iRow = 0;
 
-        for (List<Domain.DomainValue> row : this.positionsDistrib.getRowValues()) {
+        for (List<Domain.DomainValue> row : positionsDistrib.getRowValues()) {
 
             Position position = (Position) row.get(0).getValue();
 
-            AbstractDouble prob = this.positionsDistrib.getValue(iRow, 0);
+            AbstractDouble prob = positionsDistrib.getValue(iRow, 0);
 
-            int cmp = prob.compareTo(maxProb);
+            int cmp = prob.compareTo(minProb);
 
             if (cmp > 0) {
 
-                maxProb = prob;
-
-                maxPositions = new LinkedList<>();
-
-                maxPositions.add(new AbstractMap.SimpleEntry<>(position, prob));
-
-            } else if (cmp == 0) {
-
-                maxPositions.add(new AbstractMap.SimpleEntry<>(position, prob));
+                mostProbablePositions.add(position);
             }
 
             iRow++;
         }
 
-        return maxPositions;
+        return mostProbablePositions;
+    }
+
+
+    public List<Position> getPositions() {
+
+        return positions;
+    }
+
+    public List<Cardinal> getMoves() {
+
+        return moves;
     }
 
 }
