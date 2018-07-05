@@ -3,7 +3,6 @@ package inference.dynamic.mmc;
 import inference.dynamic.Util;
 import math.Matrix;
 import math.Transpose;
-import network.Variable;
 import network.dynamic.MMC;
 
 import java.util.*;
@@ -60,7 +59,7 @@ public class ForwardMMC implements IForward {
 
         Matrix transT = this.mmc.getMatrixStatesT();
 
-        return obs.multiply(transT.multiply(lastForward)).normalize();
+        return obs.multiplyRows(Matrix.multiply(transT, lastForward)).normalize();
     }
 
     public Matrix decrementForward(int timeEnd, Matrix timeEndForward) {
@@ -69,10 +68,16 @@ public class ForwardMMC implements IForward {
         Matrix matriceObservation = this.mmc.getMatrixObs(timeEnd + 1);
         //divise le forward par la matrice observation au temps suivant ainsi que la transition
         //pour retrouver l'état precedent
-        return Matrix.invert(mmc.getMatrixStatesT().multiply(matriceObservation)).multiply(timeEndForward).normalize();
+        //inverse de la transition x ( inverse observation x forward )
+        return Matrix.multiply(Matrix.invert(mmc.getMatrixStatesT()), Matrix.invert(matriceObservation).multiplyRows(timeEndForward)).normalize();
     }
 
     private Matrix forward(int t, int depth, boolean saveForwards) {
+
+
+      //  String ident = Util.getIdent(depth);
+
+       // System.out.println(ident+" "+t);
 
         /*
          * on pourrait faire des megavariables états observations sur des sous ensemble de colVars du reseau
@@ -81,6 +86,7 @@ public class ForwardMMC implements IForward {
 
         if (t == 0) {
 
+            //encapsule le vecteur de base qui est horyzontal dans une transposée pour obtenir un vecteur vertical
             Matrix forward = new Transpose(this.mmc.getMatrixState0());
 
             forward.normalize();
@@ -89,6 +95,8 @@ public class ForwardMMC implements IForward {
 
                 this.forwards.put(t, forward);
             }
+
+           // System.out.println(forward.toString(ident));
 
             return forward;
         }
@@ -121,7 +129,7 @@ public class ForwardMMC implements IForward {
         //on peut multiplier ligne par ligne
         //cependant la forme carré reste necesaire pour le backward
         //il faudrait deux formes de matrices pour les observations si on veut optimiser un peu.
-        forward = obs.multiply(sum);
+        forward = obs.multiplyRows(sum);
 
         forward = forward.normalize();
         //opération supllémentaire pour le most likely path
@@ -132,15 +140,18 @@ public class ForwardMMC implements IForward {
             this.forwards.put(t, forward);
         }
 
+       // System.out.println("RETURN FORWARD "+forward.toString(ident));
+
         return forward;
     }
 
     protected void mostLikelyPath(Matrix forward, Matrix sum) {
+
     }
 
     protected Matrix multiplyTransitionForward(Matrix matrixStatesT, Matrix forward) {
 
-        return this.mmc.getMatrixStatesT().multiply(forward);
+        return Matrix.multiply(this.mmc.getMatrixStatesT(), forward);
     }
 
     public Map<Integer, Matrix> getForwards() {

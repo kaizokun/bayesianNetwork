@@ -138,10 +138,10 @@ public class MMCtest {
         System.out.println(smoothing);
     }
 
+    Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
+
     @Test
     public void smoothingRangeTestOneVar() {
-
-        Object[][] obsValues = new Object[][]{{1}, {1}, {0}, {1}, {0}, {1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
@@ -163,8 +163,6 @@ public class MMCtest {
     @Test
     public void smoothingConstantRangeTestOneVar() {
 
-        Object[][] obsValues = new Object[][]{{1}, {1}, {0}, {1}, {0}, {1}};
-
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
         mmcOne.extend(variablesObsTab);
@@ -184,8 +182,6 @@ public class MMCtest {
 
     @Test
     public void extendOnlineTestOneVar() {
-
-        Object[][] obsValues = new Object[][]{{1}, {1}, {0}, {1}, {0}, {1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
@@ -213,11 +209,11 @@ public class MMCtest {
 
         System.out.println(matrixTrans);
 
-        System.out.println(Matrix.invert(matrixObs).multiply(Matrix.invert(matrixTrans)));
+        System.out.println(Matrix.multiply(Matrix.invert(matrixObs), Matrix.invert(matrixTrans)));
 
-        System.out.println(Matrix.invert(matrixObs.multiply(matrixTrans)));
+        System.out.println(Matrix.invert(Matrix.multiply(matrixObs, matrixTrans)));
 
-        System.out.println(Matrix.invert(matrixTrans.multiply(matrixObs)));
+        System.out.println(Matrix.invert(Matrix.multiply(matrixTrans, matrixObs)));
     }
 
     @Test
@@ -247,7 +243,7 @@ public class MMCtest {
     @Test
     public void testForwardMultiplicationOrder() {
 
-        Object[][] obsValues = new Object[][]{{1},{1},{1},{1},{1},{1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA},
                 new IDomain[]{getBooleanDomain()},
@@ -267,25 +263,24 @@ public class MMCtest {
 
         System.out.println(forward);
 
-        for(int t = 1 ; t < obsValues.length ; t ++ ) {
+        for (int t = 1; t < obsValues.length; t++) {
 
             Matrix observation = mmcOne.getMatrixObs(t);
 
             //forward = observation.multiply(new Transpose(transition)).multiply(forward).normalize();
 
-            forward = observation.multiply(transitionT.multiply(forward)).normalize();
+            forward = Matrix.multiply(observation, Matrix.multiply(transitionT, forward)).normalize();
 
-            System.out.println("FORWARD "+t);
+            System.out.println("FORWARD " + t);
 
             System.out.println(forward);
         }
     }
 
-
     @Test
     public void testBackwardMultiplicationOrder() {
 
-        Object[][] obsValues = new Object[][]{{1},{1},{1},{1},{1},{1}};
+        Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA},
                 new IDomain[]{getBooleanDomain()},
@@ -301,19 +296,19 @@ public class MMCtest {
 
         System.out.println(transition);
 
-        System.out.println("Backward "+(obsValues.length + 1));
+        System.out.println("Backward " + (obsValues.length + 1));
 
         System.out.println(backward);
 
-        for(int t = obsValues.length ; t >= 1 ; t -- ) {
+        for (int t = obsValues.length; t >= 1; t--) {
 
             Matrix observation = mmcOne.getMatrixObs(t);
 
-            backward = transition.multiply(mmcOne.getMatrixObs(t).multiply(backward));
+            backward = Matrix.multiply(transition, Matrix.multiply(mmcOne.getMatrixObs(t), backward));
 
             //backward = transition.multiply(mmcOne.getMatrixObs(t)).multiply(backward);
 
-            System.out.println("BACKWARD "+t);
+            System.out.println("BACKWARD " + t);
 
             System.out.println(backward);
         }
@@ -332,7 +327,7 @@ public class MMCtest {
 
         System.out.println(m2Invert);
 
-        System.out.println(m2.multiply(m2Invert));
+        System.out.println(Matrix.multiply(m2, m2Invert));
     }
 
 

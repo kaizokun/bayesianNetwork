@@ -20,7 +20,7 @@ public class MostLikelySequencyMMC extends ForwardMMC {
     protected Matrix multiplyTransitionForward(Matrix matrixStatesT, Matrix forward) {
         //multiplication qui differe de la multiplication habituelle
         //ou plutot que de sommer sur chaque valeur état parent on sauvegarde le maximum
-        return matrixStatesT.multiplyMax(forward);
+        return Matrix.multiplyMax(matrixStatesT, forward);
     }
 
     @Override

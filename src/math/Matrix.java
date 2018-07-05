@@ -25,72 +25,70 @@ public class Matrix {
 
     protected boolean isObservation = false;
 
-    public Matrix() { }
+    public Matrix() {
+    }
 
     public Matrix(Matrix matrix) {
 
-        this(matrix.matrix, matrix.colVars, matrix.rowVars, matrix.doubleFactory, matrix.isObservation);
+        this(matrix.matrix, matrix.rowVars, matrix.rowValues, matrix.colVars, matrix.colValues, matrix.doubleFactory);
     }
 
     public Matrix(AbstractDouble[][] matrix, AbstractDoubleFactory doubleFactory) {
 
-        this(matrix, null, null, doubleFactory, false);
+        this(matrix, null, null, null, null, doubleFactory);
     }
 
-    public Matrix(AbstractDouble[][] matrix, List<Variable> colVars, List<Variable> rowVars,
-                  AbstractDoubleFactory doubleFactory, boolean isObservation) {
 
-        //pour l'affichage des matrices
-
-        this.colVars = colVars;
-
-        this.rowVars = rowVars;
-
-        if (colVars != null) {
-
-            this.colValues = BayesianNetwork.domainValuesCombinations(colVars);
-        }
-
-        if (rowVars != null) {
-
-            this.rowValues = BayesianNetwork.domainValuesCombinations(rowVars);
-        }
-
-        this.isObservation = isObservation;
-
-        //----
-        this.matrix = matrix;
-
-        this.doubleFactory = doubleFactory;
-    }
-
-    /**
-     * init a new sum or backward matrix
-     */
-    public Matrix(AbstractDouble[][] matrix, List<Variable> rowVars, List<List<Domain.DomainValue>> rowValues,
+    public Matrix(AbstractDouble[][] matrix,
+                  List<Variable> rowVars,
+                  List<List<Domain.DomainValue>> rowValues,
+                  List<Variable> colVars,
+                  List<List<Domain.DomainValue>> colValues,
                   AbstractDoubleFactory doubleFactory) {
 
-        this.matrix = matrix;
+        this(matrix, rowVars, rowValues, colVars, colValues, doubleFactory, false);
 
-        this.rowVars = rowVars;
-
-        this.rowValues = rowValues;
-
-        this.doubleFactory = doubleFactory;
     }
 
+    public Matrix(AbstractDouble[][] matrix,
+                  List<Variable> rowVars,
+                  List<List<Domain.DomainValue>> rowValues,
+                  List<Variable> colVars,
+                  List<List<Domain.DomainValue>> colValues,
+                  AbstractDoubleFactory doubleFactory,
+                  boolean isObservation) {
+
+        this.matrix = matrix;
+
+        this.setRowVars(rowVars);
+
+        this.setRowValues(rowValues);
+
+        this.setColVars(colVars);
+
+        this.setColValues(colValues);
+
+        this.doubleFactory = doubleFactory;
+
+        this.isObservation = isObservation;
+    }
 
     public Matrix copy() {
 
-        Matrix copy = new Matrix();
+        //important une matrice inverse doit rester du même type
+        //par exemple la matrice observation une fois inversé doit rester une matrice diagonale
+        //necessaire pour la multiplication ligne par ligne on on joue sur le polymorphisme
+        //pour traiter une matrice diagonale comme une matrice colonne
+        //elle doit cependant avoir une forme carré pour etre inversée
+        Matrix copy = this.getNew();
 
         copy.matrix = new AbstractDouble[this.getRowCount()][this.getColCount()];
 
-        for(int row = 0 ; row < this.getRowCount() ; row ++){
+        for (int row = 0; row < this.getRowCount(); row++) {
 
-            for(int col = 0 ; col < this.getColCount() ; col ++){
+            for (int col = 0; col < this.getColCount(); col++) {
 
-                copy.matrix[row][col] = matrix[row][col].copy();
+                copy.setValue(row, col, getValue(row, col).copy());
             }
         }
 
@@ -109,6 +107,11 @@ public class Matrix {
         return copy;
     }
 
+    public Matrix getNew() {
+
+        return new Matrix();
+    }
+
     public int getRowCount() {
 
         return this.matrix.length;
@@ -122,6 +125,11 @@ public class Matrix {
     public AbstractDouble getValue(int row, int col) {
 
         return matrix[row][col];
+    }
+
+    public AbstractDouble getValue(int row) {
+
+        return matrix[row][0];
     }
 
     public void setValue(int row, int col, AbstractDouble value) {
@@ -139,26 +147,38 @@ public class Matrix {
         this.matrix = matrix;
     }
 
-    public Matrix multiplyMax(Matrix maxForward) {
+    public static Matrix multiplyMax(Matrix m1, Matrix m2) {
 
-        if (this.getColCount() != maxForward.getRowCount()) {
+        if (m1.getColCount() != m2.getRowCount()) {
 
             throw new RuntimeException("le nombre de colones de la matrice ne correspond pas avec" +
                     " le nombre de lignes de celle reçu en parametres");
         }
 
-        Matrix rsMaxMatrix = new Matrix(
-                new AbstractDouble[this.getRowCount()][maxForward.getColCount()],
-                maxForward.getRowVars(),
-                maxForward.getRowValues(),
-                doubleFactory);
+        Matrix rsMaxMatrix;
+
+        if (m2.getColCount() == 1) {
+
+            rsMaxMatrix = new Transpose(
+                    new AbstractDouble[1][m2.getRowCount()],
+                    null, null,
+                    m2.getRowVars(), m2.getRowValues(),
+                    m1.getDoubleFactory());
+
+        } else {
+
+            rsMaxMatrix = new Matrix(
+                    new AbstractDouble[m1.getRowCount()][m2.getColCount()],
+                    null, null, null, null,
+                    m1.getDoubleFactory());
+        }
 
         //pour chaque ligne on travaille sur une valeur de la variable état enfant
-        for (int row = 0; row < this.getRowCount(); row++) {
+        for (int row = 0; row < m1.getRowCount(); row++) {
             //le nombre de colone de sum si il s'agit du sum est unique
-            for (int col = 0; col < maxForward.getColCount(); col++) {
+            for (int col = 0; col < m2.getColCount(); col++) {
 
-                AbstractDouble max = doubleFactory.getNew(0.0);
+                AbstractDouble max = m1.doubleFactory.getNew(0.0);
 
                 int maxPreviousForwardRow = 0;
                 //autant de terme dans la somme de que de colones dans m1 (ou de ligne dans sum)
@@ -166,9 +186,9 @@ public class Matrix {
                 //la valeur courante de l'état enfant (une par ligne) conditionné par une valeur de l'état parent
                 //et la valeur sum pour une valeur de l'état parent
                 //identique pour le max sauf qu'on prend le maximum plutot qu'additionner
-                for (int cr = 0; cr < this.getColCount(); cr++) {
+                for (int cr = 0; cr < m1.getColCount(); cr++) {
 
-                    AbstractDouble mulMax = this.getValue(row, cr).multiply(maxForward.getValue(cr, col));
+                    AbstractDouble mulMax = m1.getValue(row, cr).multiply(m2.getValue(cr, col));
 
                     if (mulMax.compareTo(max) > 0) {
 
@@ -188,38 +208,46 @@ public class Matrix {
         return rsMaxMatrix;
     }
 
-    public Matrix multiply(Matrix m2) {
+    public static Matrix multiply(Matrix m1, Matrix m2) {
 
-        if (this.getColCount() != m2.getRowCount()) {
+        if (m1.getColCount() != m2.getRowCount()) {
 
             throw new RuntimeException("le nombre de colones de la matrice ne correspond pas avec" +
                     " le nombre de lignes de celle reçu en parametres");
         }
 
-        //la matrice resultat à autant de ligne que m1 et autant de colones que m2
-        //ici on s'en sert principalement pour calculer une distribution
-        //sur une variable ou une megavariable, le sum ou le backward ( 1 colonne plusieurs lignes )
-        //on passe aussi les colVars et les valeurs qui constitue chaque ligne de la distribution
-        Matrix rsMatrix = new Matrix(
-                new AbstractDouble[this.getRowCount()][m2.getColCount()],
-                m2.getRowVars(),
-                m2.getRowValues(),
-                doubleFactory);
+        Matrix rsMatrix;
+
+        if (m2.getColCount() == 1) {
+
+            rsMatrix = new Transpose(
+                    new AbstractDouble[1][m2.getRowCount()],
+                    null, null,
+                    m2.getRowVars(), m2.getRowValues(),
+                    m1.getDoubleFactory());
+
+        } else {
+
+            rsMatrix = new Matrix(
+                    new AbstractDouble[m1.getRowCount()][m2.getColCount()],
+                    null, null, null, null,
+                    m1.getDoubleFactory());
+        }
 
         //pour chaque ligne on travaille sur une valeur de la variable état enfant
-        for (int row = 0; row < this.getRowCount(); row++) {
+        for (int row = 0; row < m1.getRowCount(); row++) {
             //le nombre de colone de m2 si il s'agit du sum est unique
             for (int col = 0; col < m2.getColCount(); col++) {
 
-                AbstractDouble sum = doubleFactory.getNew(0.0);
+                AbstractDouble sum = m1.getDoubleFactory().getNew(0.0);
 
                 //autant de terme dans la somme de que de colones dans m1 (ou de ligne dans m2)
                 //chaque partie de la somme correspond à une multiplication entre
                 //la valeur courante de l'état enfant (une par ligne) conditionné par une valeur de l'état parent
                 //et la valeur sum pour une valeur de l'état parent
-                for (int cr = 0; cr < this.getColCount(); cr++) {
+                for (int cr = 0; cr < m1.getColCount(); cr++) {
 
-                    AbstractDouble mul = this.getValue(row, cr).multiply(m2.getValue(cr, col));
+                    AbstractDouble mul = m1.getValue(row, cr).multiply(m2.getValue(cr, col));
 
                     sum = sum.add(mul);
                 }
@@ -233,11 +261,11 @@ public class Matrix {
 
     public Matrix multiplyRows(Matrix m2) {
 
-        Matrix rs = new Matrix(new AbstractDouble[this.getRowCount()][this.getColCount()], this.getRowVars(), this.getRowValues(), doubleFactory);
+        Matrix rs = new Transpose(new AbstractDouble[1][this.getRowCount()], m2.getRowVars(), m2.getRowValues(), doubleFactory);
 
         for (int row = 0; row < getRowCount(); row++) {
 
-            rs.setValue(row, 0, this.getValue(row, 0).multiply(m2.getValue(row, 0)));
+            rs.setValue(row, 0, this.getValue(row).multiply(m2.getValue(row)));
         }
 
         return rs;
@@ -266,77 +294,44 @@ public class Matrix {
     }
 
 
-    // Method to carry out the partial-pivoting Gaussian
-
-    // elimination.  Here index[] stores pivoting order.
-
-    /*
     @Override
     public String toString() {
 
         StringBuilder builder = new StringBuilder("\n");
 
-        if (colVars != null)
-            builder.append("COLS : " + colVars + '\n');
-        if (rowVars != null)
-            builder.append("ROWS : " + rowVars + '\n');
-
-        if (!this.isObservation && this.colValues != null) {
-
-            builder.append(String.format("%6s", ""));
-
-            for (List<Domain.DomainValue> domainValues : colValues) {
-
-                builder.append(String.format("%-7s", domainValues));
-            }
-        }
-
-        builder.append('\n');
-
-        for (int r = 0; r < this.getRowCount(); r++) {
-
-            if (rowValues != null) {
-
-                builder.append(String.format("%5s", rowValues.get(r)));
-            } else {
-
-                builder.append(String.format("%5s", ""));
-            }
-
-            for (int c = 0; c < this.getColCount(); c++) {
-
-                builder.append(String.format("[%.3f]", getValue(r, c).getDoubleValue()));
-            }
-
-            builder.append('\n');
-        }
-
-        builder.append('\n');
+        toString(builder, "");
 
         return builder.toString();
     }
 
-    */
-
-
-
-    @Override
-    public String toString() {
+    public String toString(String ident) {
 
         StringBuilder builder = new StringBuilder("\n");
 
-        if (this.getRowVars() != null)
-            builder.append("ROWS : " + this.getRowVars() + '\n');
-        if (this.getColVars() != null)
-            builder.append("COLS : " + this.getColVars() + '\n');
+        toString(builder, ident);
+
+        return builder.toString();
+    }
+
+    private void toString(StringBuilder builder, String ident) {
+
+        if (this.getRowVars() != null) {
+
+            builder.append(ident + "ROWS : " + this.getRowVars() + '\n');
+        }
+
+        if (this.getColVars() != null) {
+
+            builder.append(ident + "COLS : " + this.getColVars() + '\n');
+        }
 
         if (!this.isObservation && this.getColValues() != null) {
 
-            builder.append(String.format("%6s", ""));
+            builder.append(ident + String.format("%6s", ""));
 
             for (List<Domain.DomainValue> domainValues : this.getColValues()) {
 
-                builder.append(String.format("%-7s", domainValues));
+                builder.append(ident + String.format("%-7s", domainValues));
             }
         }
 
@@ -346,11 +341,11 @@ public class Matrix {
 
             if (this.getRowValues() != null) {
 
-                builder.append(String.format("%5s", this.getRowValues().get(r)));
+                builder.append(ident + String.format("%5s", this.getRowValues().get(r)));
 
             } else {
 
-                builder.append(String.format("%5s", ""));
+                builder.append(ident + String.format("%5s", ""));
             }
 
             for (int c = 0; c < this.getColCount(); c++) {
@@ -361,9 +356,7 @@ public class Matrix {
             builder.append('\n');
         }
 
-        return builder.toString();
     }
-
 
 
     public List<List<Domain.DomainValue>> getColValues() {
@@ -380,6 +373,30 @@ public class Matrix {
 
     public List<Variable> getRowVars() {
         return rowVars;
+    }
+
+    public void setColValues(List<List<Domain.DomainValue>> colValues) {
+        this.colValues = colValues;
+    }
+
+    public void setRowValues(List<List<Domain.DomainValue>> rowValues) {
+        this.rowValues = rowValues;
+    }
+
+    public void setColVars(List<Variable> colVars) {
+        this.colVars = colVars;
+    }
+
+    public void setRowVars(List<Variable> rowVars) {
+        this.rowVars = rowVars;
+    }
+
+    public AbstractDoubleFactory getDoubleFactory() {
+        return doubleFactory;
+    }
+
+    public void setDoubleFactory(AbstractDoubleFactory doubleFactory) {
+        this.doubleFactory = doubleFactory;
     }
 
     public int getPreviousForwardMaxValueRow(Domain.DomainValue... values) {
@@ -400,7 +417,6 @@ public class Matrix {
         return this.rowValues.get(row);
     }
 
-
     public Map<Integer, Integer> getMaxPrevious() {
         return maxPrevious;
     }
@@ -409,24 +425,22 @@ public class Matrix {
         this.maxPrevious = maxPrevious;
     }
 
-
     /*------------------------*/
-
 
     public static Matrix invert(Matrix matrix) {
 
         Matrix matrixCopy = matrix.copy();
 
-        AbstractDouble[][] invertMatrix = invert(matrixCopy.matrix, matrixCopy.doubleFactory);
+        AbstractDouble[][] invertMatrix = invert(matrixCopy, matrixCopy.doubleFactory);
 
         matrixCopy.setMatrix(invertMatrix);
 
         return matrixCopy;
     }
 
-    public static AbstractDouble[][] invert(AbstractDouble a[][], AbstractDoubleFactory doubleFactory) {
+    public static AbstractDouble[][] invert(Matrix matrix, AbstractDoubleFactory doubleFactory) {
 
-        int n = a.length;
+        int n = matrix.getRowCount();
 
         AbstractDouble x[][] = new AbstractDouble[n][n];
 
@@ -444,7 +458,7 @@ public class Matrix {
         }
 
         // Transform the matrix into an upper triangle
-        gaussian(a, index, doubleFactory);
+        gaussian(matrix, index, doubleFactory);
 
         // Update the matrix b[i][j] with the ratios stored
 
@@ -454,7 +468,7 @@ public class Matrix {
 
                 for (int k = 0; k < n; ++k) {
 
-                    b[index[j]][k] = b[index[j]][k].substract(a[index[j]][i].multiply(b[index[i]][k]));
+                    b[index[j]][k] = b[index[j]][k].substract(matrix.getValue(index[j], i).multiply(b[index[i]][k]));
                 }
             }
         }
@@ -463,7 +477,7 @@ public class Matrix {
 
         for (int i = 0; i < n; ++i) {
 
-            x[n - 1][i] = b[index[n - 1]][i].divide(a[index[n - 1]][n - 1]);
+            x[n - 1][i] = b[index[n - 1]][i].divide(matrix.getValue(index[n - 1], n - 1));
 
             for (int j = n - 2; j >= 0; --j) {
 
@@ -471,30 +485,31 @@ public class Matrix {
 
                 for (int k = j + 1; k < n; ++k) {
 
-                    x[j][i] = x[j][i].substract(a[index[j]][k].multiply(x[k][i]));
+                    x[j][i] = x[j][i].substract(matrix.getValue(index[j], k).multiply(x[k][i]));
+
                 }
 
-                x[j][i] = x[j][i].divide(a[index[j]][j]);
+                x[j][i] = x[j][i].divide(matrix.getValue(index[j], j));
             }
         }
 
         return x;
     }
 
-    private static void initMatrixZero(AbstractDouble[][] x, AbstractDoubleFactory doubleFactory) {
+    public static void initMatrixZero(AbstractDouble[][] x, AbstractDoubleFactory doubleFactory) {
 
         int rows = x.length, cols = x[0].length;
 
-        for( int row = 0 ;  row < rows ; row ++){
+        for (int row = 0; row < rows; row++) {
 
-            for( int col = 0 ;  col < cols ; col ++){
+            for (int col = 0; col < cols; col++) {
 
                 x[row][col] = doubleFactory.getNew(0.0);
             }
         }
     }
 
-    public static void gaussian(AbstractDouble a[][], int index[], AbstractDoubleFactory doubleFactory) {
+    public static void gaussian(Matrix matrix, int index[], AbstractDoubleFactory doubleFactory) {
 
         int n = index.length;
 
@@ -514,7 +529,7 @@ public class Matrix {
 
             for (int j = 0; j < n; ++j) {
 
-                AbstractDouble c0 = a[i][j].abs();
+                AbstractDouble c0 = matrix.getValue(i, j).abs();
 
                 if (c0.compareTo(c1) > 0) {
 
@@ -533,7 +548,7 @@ public class Matrix {
 
             for (int i = j; i < n; ++i) {
 
-                AbstractDouble pi0 = a[index[i]][j].abs();
+                AbstractDouble pi0 = matrix.getValue(index[i], j).abs();
 
                 pi0 = pi0.divide(c[index[i]]);
 
@@ -555,18 +570,19 @@ public class Matrix {
 
             for (int i = j + 1; i < n; ++i) {
 
-                AbstractDouble pj = a[index[i]][j].divide( a[index[j]][j]);
+                AbstractDouble pj = matrix.getValue(index[i], j).divide(matrix.getValue(index[j], j));
+                //AbstractDouble pj = a[index[i]][j].divide(a[index[j]][j]);
 
                 //Record pivoting ratios below the diagonal
 
-                a[index[i]][j] = pj;
+                matrix.setValue(index[i], j, pj);
 
                 //Modify other elements accordingly
 
                 for (int l = j + 1; l < n; ++l) {
 
                     //a[index[i]][l] -= pj * a[index[j]][l];
-                    a[index[i]][l] = a[index[i]][l].substract(pj.multiply(a[index[j]][l]));
+                    matrix.setValue(index[i], l, matrix.getValue(index[i], l).substract(pj.multiply(matrix.getValue(index[j], l))));
                 }
             }
         }

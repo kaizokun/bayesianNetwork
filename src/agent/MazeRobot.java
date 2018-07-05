@@ -54,6 +54,8 @@ public class MazeRobot {
         this.mazeMMC.extend(observation);
         //récupère le filtrage pour le dernier état
         Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
+
+        System.out.println(positionsDistrib);
         //récupère les positions offrant la plus grande probabilité pour affichage
         this.positions = getMostProbablePositions(positionsDistrib);
 

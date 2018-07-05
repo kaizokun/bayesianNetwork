@@ -178,14 +178,14 @@ public class SmoothingMMC {
         //récupère la matrice transition
         Matrix transition = this.mmc.getMatrixStates();
         //calcul le backward pour timeEnd courant
-        backwardMatrix = transition.multiply(obs).multiply(backwardMatrix);
+        backwardMatrix = Matrix.multiply(Matrix.multiply(transition, obs), backwardMatrix);
         //calcul le forward courant à partir du forward en timeEnd + 1
         //inverse de la transposée de la matrice transition
         Matrix reverseStatesT = Matrix.invert(mmc.getMatrixStatesT());
         //inverse de la matrice observation
         Matrix reverseObs = Matrix.invert(obs);
         //forward decrementé
-        forwardMatrix = reverseStatesT.multiply(reverseObs).multiply(forwardMatrix).normalize();
+        forwardMatrix = Matrix.multiply(Matrix.multiply(reverseStatesT, reverseObs), forwardMatrix).normalize();
         //pour obtenir les bonnes valeurs du smoothing il faut soit normaliser le backward puis le smoothing
         //soit aucun des deux ce qui fait des opérations en moins
         SmoothingMatrices smoothingMatrices = new SmoothingMatrices(forwardMatrix, backwardMatrix, forwardMatrix.multiplyRows(backwardMatrix).normalize(), timeEnd);

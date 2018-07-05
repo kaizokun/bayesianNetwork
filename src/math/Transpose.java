@@ -9,10 +9,25 @@ import java.util.List;
 
 public class Transpose extends Matrix {
 
-    public Transpose(AbstractDouble[][] matrix, List<Variable> colVars, List<Variable> rowVars,
-                     AbstractDoubleFactory doubleFactory, boolean isObservation) {
-        super(matrix, colVars, rowVars, doubleFactory, isObservation);
+    public Transpose(AbstractDouble[][] matrix,
+                     List<Variable> rowVars,
+                     List<List<Domain.DomainValue>> rowValues,
+                     List<Variable> colVars,
+                     List<List<Domain.DomainValue>> colValues,
+                     AbstractDoubleFactory doubleFactory) {
+
+        super(matrix, rowVars, rowValues, colVars, colValues, doubleFactory);
     }
+
+    public Transpose(AbstractDouble[][] matrix,
+                     List<Variable> colVars,
+                     List<List<Domain.DomainValue>> colValues,
+                     AbstractDoubleFactory doubleFactory) {
+
+        super(matrix, null, null, colVars, colValues, doubleFactory);
+    }
+
+    public Transpose() { }
 
     public Transpose(Matrix matrix) {
 
@@ -23,6 +38,11 @@ public class Transpose extends Matrix {
     public AbstractDouble getValue(int row, int col) {
 
         return super.getValue(col, row);
+    }
+
+    public AbstractDouble getValue(int row) {
+
+        return matrix[0][row];
     }
 
     @Override
@@ -44,6 +64,12 @@ public class Transpose extends Matrix {
     }
 
     @Override
+    public Matrix getNew() {
+
+        return new Transpose();
+    }
+
+    @Override
     public List<List<Domain.DomainValue>> getColValues() {
         return super.getRowValues();
     }
@@ -62,4 +88,6 @@ public class Transpose extends Matrix {
     public List<Variable> getRowVars() {
         return super.getColVars();
     }
+
+
 }
