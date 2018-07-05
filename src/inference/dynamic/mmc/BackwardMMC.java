@@ -35,13 +35,16 @@ public class BackwardMMC {
         //multiplier les inverses ou inverser la multiplication en changeant l'ordre des matrice donne le meme resultat
         //on ne fait qu'une inversion dans le deuxieme cas ...
 
-        Matrix denom = Matrix.multiply(Matrix.invert(timeEndObs), Matrix.invert(trans));
+       // Matrix denom = Matrix.multiply(Matrix.invert(timeEndObs), Matrix.invert(trans));
 
-       // Matrix denom = Matrix.invert(Matrix.multiply(trans, timeEndObs));
+        Matrix denom = Matrix.invert(Matrix.multiply(trans, timeEndObs));
         //partie à ajouter ou à multiplier
-        Matrix num = Matrix.multiply(trans, currentObs);
+       // Matrix num = Matrix.multiply(trans, currentObs);
         //on commence par multiplier
-        Matrix newBackward = Matrix.multiply(num, Matrix.multiply(denom, backward));
+
+        //Matrix newBackward = Matrix.multiply(num, Matrix.multiply(denom, backward));
+        Matrix newBackward = Matrix.multiply(trans, currentObs.multiplyRows(Matrix.multiply(denom, backward)));
+
 
 /*
         Matrix newBackward = Matrix.invert(timeEndObs).multiplyRows( // 1 colonne

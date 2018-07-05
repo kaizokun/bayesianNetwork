@@ -26,7 +26,7 @@ public class ForwardMMC implements IForward {
 
         Matrix forward;
         //si aucun forward n'est enregistré ou que son temps ne correspond pas au temps precedent
-        if (lastForward == null || lastForward.getKey().equals(mmc.getTime() - 1)) {
+        if (lastForward == null || !lastForward.getKey().equals(mmc.getTime() - 1)) {
             //calcul un nouveau forward
             forward = forward(mmc.getTime(), 0, false);
         }else{
@@ -74,31 +74,23 @@ public class ForwardMMC implements IForward {
 
     private Matrix forward(int t, int depth, boolean saveForwards) {
 
-
-      //  String ident = Util.getIdent(depth);
-
-       // System.out.println(ident+" "+t);
-
         /*
          * on pourrait faire des megavariables états observations sur des sous ensemble de colVars du reseau
          * et pas forcement sur la totalité et au besoin
          * */
 
         if (t == 0) {
-
             //encapsule le vecteur de base qui est horyzontal dans une transposée pour obtenir un vecteur vertical
-            Matrix forward = new Transpose(this.mmc.getMatrixState0());
+           // Matrix forward = new Transpose(this.mmc.getMatrixState0());
 
-            forward.normalize();
+            //forward.normalize();
 
             if (saveForwards) {
 
-                this.forwards.put(t, forward);
+                this.forwards.put(t, this.mmc.getMatrixState0());
             }
 
-           // System.out.println(forward.toString(ident));
-
-            return forward;
+            return this.mmc.getMatrixState0();
         }
 
         Matrix obs = this.mmc.getMatrixObs(t);
@@ -139,8 +131,6 @@ public class ForwardMMC implements IForward {
 
             this.forwards.put(t, forward);
         }
-
-       // System.out.println("RETURN FORWARD "+forward.toString(ident));
 
         return forward;
     }

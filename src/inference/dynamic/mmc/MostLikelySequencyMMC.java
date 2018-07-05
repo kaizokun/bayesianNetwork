@@ -45,7 +45,7 @@ public class MostLikelySequencyMMC extends ForwardMMC {
         AbstractDouble max = mmc.getDoubleFactory().getNew(0.0);
 
         int maxRow = 0;
-
+        //max probabilité
         for(int row = 0 ; row < tForwardMax.getRowCount() ; row ++){
 
             if(tForwardMax.getValue(row,0).compareTo(max) > 0){
@@ -55,6 +55,8 @@ public class MostLikelySequencyMMC extends ForwardMMC {
                 maxRow = row;
             }
         }
+
+
 
         mostLikelySequence.add(tForwardMax.getRowValue(maxRow));
 

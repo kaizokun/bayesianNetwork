@@ -242,9 +242,10 @@ public class MMC extends DynamicBayesianNetwork {
 
             this.loadVarDistrib(matrix[0], states, domainValuesList, doubleFactory);
 
-            this.matrixState0 = new Matrix(matrix, states, domainValuesCombinations(states),
+            this.matrixState0 = new Transpose(new Matrix(matrix,
                     null, null,
-                    doubleFactory, false);
+                    states, domainValuesCombinations(states),
+                    doubleFactory, false));
 
         } else {
 

@@ -67,6 +67,7 @@ public class MMCtest {
         variablesObsTab[0][0] = new Variable(UMBRELLA.toString(), getBooleanDomain(), 1);
         variablesObsTab[1][0] = new Variable(UMBRELLA.toString(), getBooleanDomain(), 1);
 */
+
         mmcOne.extend(variablesObsTab);
 
         ForwardMMC mmcForward = new ForwardMMC(mmcOne);
@@ -86,16 +87,17 @@ public class MMCtest {
         IDomain domain = getBooleanDomain();
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{domain}, obsValues);
-
+        System.out.println("EXTEND");
         mmcOne.extend(variablesObsTab);
+        System.out.println("EXTEND END");
 
         MostLikelySequencyMMC mostLikelySequency = new MostLikelySequencyMMC(mmcOne);
 
         Matrix forward = mostLikelySequency.mostLikelySequency(10);
 
-        System.out.println(mmcOne);
+        //System.out.println(mmcOne);
 
-        System.out.println(forward);
+        //System.out.println(forward);
 
         List<List<Domain.DomainValue>> mostLilelySequency = mostLikelySequency.mostLikelyPath(obsValues.length);
 

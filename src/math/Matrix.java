@@ -331,7 +331,7 @@ public class Matrix {
 
             for (List<Domain.DomainValue> domainValues : this.getColValues()) {
 
-                builder.append(ident + String.format("%-7s", domainValues));
+                builder.append(String.format("%-7s", domainValues));
             }
         }
 
@@ -402,7 +402,7 @@ public class Matrix {
     public int getPreviousForwardMaxValueRow(Domain.DomainValue... values) {
 
         //récupere la ligne correspondant à la valeur voulu
-        int row = this.rowValues.indexOf(Arrays.asList(values));
+        int row = this.getRowValues().indexOf(Arrays.asList(values));
         //retourne l'indice de la ligne pour la valeur max precedente
         return maxPrevious.get(row);
     }
@@ -414,7 +414,7 @@ public class Matrix {
 
     public List<Domain.DomainValue> getRowValue(int row) {
         //retourne la valeur de ligne
-        return this.rowValues.get(row);
+        return this.getRowValues().get(row);
     }
 
     public Map<Integer, Integer> getMaxPrevious() {
