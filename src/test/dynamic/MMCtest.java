@@ -205,9 +205,7 @@ public class MMCtest {
 
         mmcOne.extend(variablesObsTab);
 
-        Variable obsVar = mmcOne.getMegaVariableObs(1);
-
-        Matrix matrixObs = mmcOne.getMatrixObs(obsVar);
+        Matrix matrixObs = mmcOne.getMatrixObs(1);
 
         Matrix matrixTrans = mmcOne.getMatrixStates();
 
@@ -246,19 +244,79 @@ public class MMCtest {
         System.out.println(backward);
     }
 
+    @Test
+    public void testForwardMultiplicationOrder() {
+
+        Object[][] obsValues = new Object[][]{{1},{1},{1},{1},{1},{1}};
+
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA},
+                new IDomain[]{getBooleanDomain()},
+                obsValues);
+
+        mmcOne.extend(variablesObsTab);
+
+        Matrix forward = new Transpose(mmcOne.getMatrixState0());
+
+        Matrix transitionT = mmcOne.getMatrixStatesT();
+
+        System.out.println("TRANSITION T");
+
+        System.out.println(transitionT);
+
+        System.out.println("FOWARD 0");
+
+        System.out.println(forward);
+
+        for(int t = 1 ; t < obsValues.length ; t ++ ) {
+
+            Matrix observation = mmcOne.getMatrixObs(t);
+
+            //forward = observation.multiply(new Transpose(transition)).multiply(forward).normalize();
+
+            forward = observation.multiply(transitionT.multiply(forward)).normalize();
+
+            System.out.println("FORWARD "+t);
+
+            System.out.println(forward);
+        }
+    }
+
 
     @Test
-    public void multiplyMatrixTest() {
+    public void testBackwardMultiplicationOrder() {
 
-        MMC network = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
+        Object[][] obsValues = new Object[][]{{1},{1},{1},{1},{1},{1}};
 
-        Matrix m1 = network.getMatrixState0();
+        Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA},
+                new IDomain[]{getBooleanDomain()},
+                obsValues);
 
-        Matrix m2 = network.getMatrixStates();
+        mmcOne.extend(variablesObsTab);
 
-        Matrix rs = m2.multiply(new Transpose(m1));
+        Matrix backward = mmcOne.getBackwardInit();
 
-        System.out.println(rs);
+        Matrix transition = mmcOne.getMatrixStates();
+
+        System.out.println("TRANSITION");
+
+        System.out.println(transition);
+
+        System.out.println("Backward "+(obsValues.length + 1));
+
+        System.out.println(backward);
+
+        for(int t = obsValues.length ; t >= 1 ; t -- ) {
+
+            Matrix observation = mmcOne.getMatrixObs(t);
+
+            backward = transition.multiply(mmcOne.getMatrixObs(t).multiply(backward));
+
+            //backward = transition.multiply(mmcOne.getMatrixObs(t)).multiply(backward);
+
+            System.out.println("BACKWARD "+t);
+
+            System.out.println(backward);
+        }
     }
 
     @Test

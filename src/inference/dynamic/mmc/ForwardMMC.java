@@ -56,9 +56,7 @@ public class ForwardMMC implements IForward {
 
     protected Matrix incrementForward(int timeEnd, Matrix lastForward) {
 
-        Variable megaObs = this.mmc.getMegaVariableObs(timeEnd);
-
-        Matrix obs = this.mmc.getMatrixObs(megaObs);
+        Matrix obs = this.mmc.getMatrixObs(timeEnd);
 
         Matrix transT = this.mmc.getMatrixStatesT();
 
@@ -68,9 +66,7 @@ public class ForwardMMC implements IForward {
     public Matrix decrementForward(int timeEnd, Matrix timeEndForward) {
 
         //récupère l'observation au temps du forward à decrementer
-        Variable megaObs = this.mmc.getMegaVariableObs(timeEnd + 1);
-
-        Matrix matriceObservation = this.mmc.getMatrixObs(megaObs);
+        Matrix matriceObservation = this.mmc.getMatrixObs(timeEnd + 1);
         //divise le forward par la matrice observation au temps suivant ainsi que la transition
         //pour retrouver l'état precedent
         return Matrix.invert(mmc.getMatrixStatesT().multiply(matriceObservation)).multiply(timeEndForward).normalize();
@@ -97,9 +93,7 @@ public class ForwardMMC implements IForward {
             return forward;
         }
 
-        Variable megaObs = this.mmc.getMegaVariableObs(t);
-
-        Matrix obs = this.mmc.getMatrixObs(megaObs);
+        Matrix obs = this.mmc.getMatrixObs(t);
 
         //dans la matrice de base les lignes correspondent aux valeurs parents
         //et les colones aux valeurs enfants, dans la transposée c'est l'inverse.

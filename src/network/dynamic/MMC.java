@@ -21,15 +21,13 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Map<String, Matrix> matrixObs;
 
-    protected Matrix matrixState0, matrixStates, matrixStatesT;
+    protected Matrix matrixState0, backwardInit, matrixStates, matrixStatesT;
 
     protected Map.Entry<Integer,Matrix> lastForward;
     //end decalage avant time pour la fin du lissage, start decalage avant time pour le debut du lissage
     protected int smootStart = 1, smootEnd = 1;
 
     protected Map<Integer, SmoothingMatrices> smoothings = new Hashtable<>();
-
-   // protected Map<Integer, Integer> smootRange = new Hashtable<>();
 
     protected ForwardMMC forwardMMC;
 
@@ -57,7 +55,27 @@ public class MMC extends DynamicBayesianNetwork {
 
         this.roots.add(this.megaVariableStatesRoot);
 
-       // this.smootRange.put(0, 0);
+        this.initBackward();
+    }
+
+    private void initBackward() {
+
+        int rows = 1;
+        //la matrice limite contient uniquement des valerus à 1
+        //et autant de lignes qu'il y a de combinaisons de valeurs pour les colVars états
+        for (Variable state : getMegaVariableStates().getCompoVars()) {
+
+            rows *= state.getDomainSize();
+        }
+        //une ligne par valeur
+        AbstractDouble[][] limitMatrix = new AbstractDouble[rows][1];
+
+        for (int row = 0; row < rows; row++) {
+
+            limitMatrix[row][0] = doubleFactory.getNew(1.0);
+        }
+
+        this.backwardInit = new Matrix(limitMatrix, doubleFactory);
     }
 
     public void extend(Variable[][] variablesTab) {
@@ -299,9 +317,9 @@ public class MMC extends DynamicBayesianNetwork {
         return matrixStates;
     }
 
-    public Matrix getMatrixObs(Variable megaVariable) {
+    public Matrix getMatrixObs(int time) {
 
-        return matrixObs.get(megaVariable.getMegaVarValuesKey());
+        return matrixObs.get(this.getMegaVariableObs(time).getMegaVarValuesKey());
     }
 
     public Matrix getMatrixStatesT() {
@@ -324,6 +342,10 @@ public class MMC extends DynamicBayesianNetwork {
     public Map<String, Matrix> getMatrixObs() {
 
         return matrixObs;
+    }
+
+    public Matrix getBackwardInit() {
+        return backwardInit;
     }
 
     public Map.Entry<Integer, Matrix> getLastForward() {

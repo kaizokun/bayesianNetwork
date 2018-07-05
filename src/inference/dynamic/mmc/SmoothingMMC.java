@@ -173,9 +173,8 @@ public class SmoothingMMC {
             return;
         }
         //observation au temps suivant, le backward se calculant par rapport aux observations suivantes
-        Variable megaObs = this.mmc.getMegaVariableObs(timeEnd + 1);
         //récupère la bonne matrice en fonction des valeurs des observations
-        Matrix obs = this.mmc.getMatrixObs(megaObs);
+        Matrix obs = this.mmc.getMatrixObs(timeEnd + 1);
         //récupère la matrice transition
         Matrix transition = this.mmc.getMatrixStates();
         //calcul le backward pour timeEnd courant
