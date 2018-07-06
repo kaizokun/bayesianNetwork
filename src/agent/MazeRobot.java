@@ -23,7 +23,7 @@ public class MazeRobot {
 
     protected IDomain captorDomain = DomainFactory.getMazeWallCaptorDomain();
 
-    protected List<Position> positions = new ArrayList<>();
+    protected Map<Integer, List<Position>> positions = new Hashtable<>();
 
     protected LinkedList<List<Cardinal>> percepts = new LinkedList<>();
 
@@ -51,14 +51,12 @@ public class MazeRobot {
 
         this.percepts.addLast(percept);
 
-        this.mazeMMC.extend(observation);
+        this.mazeMMC.extend( observation);
         //récupère le filtrage pour le dernier état
         Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
 
         //récupère les positions offrant la plus grande probabilité pour affichage
-        this.positions = getMostProbablePositions(positionsDistrib);
-
-        System.out.println("Positions probable : "+positions);
+        this.positions.put(mazeMMC.getTime(), getMostProbablePositions(positionsDistrib));
     }
 
     public void move() {
@@ -79,7 +77,7 @@ public class MazeRobot {
 
     public boolean positionKnown() {
 
-        return this.positions.size() == 1;
+        return this.positions.get(this.mazeMMC.getTime()).size() == 1;
     }
 
     private List<Position> getMostProbablePositions(Matrix positionsDistrib) {
@@ -109,9 +107,7 @@ public class MazeRobot {
         return mostProbablePositions;
     }
 
-
-    public List<Position> getPositions() {
-
+    public Map<Integer, List<Position>> getPositions() {
         return positions;
     }
 

@@ -3,10 +3,7 @@ package test.dynamic;
 import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
-import inference.dynamic.mmc.BackwardMMC;
-import inference.dynamic.mmc.ForwardMMC;
-import inference.dynamic.mmc.MostLikelySequencyMMC;
-import inference.dynamic.mmc.SmoothingMMC;
+import inference.dynamic.mmc.*;
 import math.Matrix;
 import math.Transpose;
 import network.BayesianNetworkFactory;
@@ -143,53 +140,37 @@ public class MMCtest {
     Object[][] obsValues = new Object[][]{{1}, {1}, {1}, {1}, {1}, {1}};
 
     @Test
-    public void smoothingRangeTestOneVar() {
+    public void smoothingForwardBackwardTestOneVar() {
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
-        mmcOne.extend(variablesObsTab);
+        mmcOne.setSmoothingMMC(new SmoothingForwardBackwardMMC(mmcOne, mmcOne.getForwardMMC(), mmcOne.getBackwardMMC()));
 
-        mmcOne.getSmoothingMMC().smoothing(0, obsValues.length);
+        mmcOne.setSmootRange(6, 1);
 
-        System.out.println("=====================================================");
-        System.out.println("====================Smoothings=======================");
-        System.out.println("=====================================================");
-        System.out.println();
-
-        for (Map.Entry entry : mmcOne.getSmoothingMMC().getSmoothings().entrySet()) {
-
-            System.out.println(entry.getValue());
-        }
+        mmcOne.extend(variablesObsTab, true);
     }
 
     @Test
-    public void smoothingConstantRangeTestOneVar() {
+    public void smoothingForwardIncrementalTestOneVar() {
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
-        mmcOne.extend(variablesObsTab);
+        mmcOne.setSmoothingMMC(new SmoothingForwardDecMMC(mmcOne, mmcOne.getForwardMMC(), mmcOne.getBackwardMMC()));
 
-        mmcOne.getSmoothingMMC().smoothingConstant(0, obsValues.length);
+        mmcOne.setSmootRange(6, 1);
 
-        System.out.println("=====================================================");
-        System.out.println("====================Smoothings=======================");
-        System.out.println("=====================================================");
-        System.out.println();
-
-        for (Map.Entry entry : mmcOne.getSmoothingMMC().getSmoothings().entrySet()) {
-
-            System.out.println(entry.getValue());
-        }
+        mmcOne.extend(variablesObsTab, true);
     }
 
     @Test
-    public void extendOnlineTestOneVar() {
+    public void smoothingForwardDecrementalBackwardIncrementalTestOneVar() {
 
         Variable[][] variablesObsTab = getVariablesInit(new Object[]{UMBRELLA}, new IDomain[]{getBooleanDomain()}, obsValues);
 
-        mmcOne.setSmootStart(6);
+        mmcOne.setSmoothingMMC(new SmoothingForwardDecBackwardIncMMC(mmcOne, mmcOne.getForwardMMC(), mmcOne.getBackwardMMC()));
 
-        mmcOne.setSmootEnd(1);
+        mmcOne.setSmootRange(6, 1);
 
         mmcOne.extend(variablesObsTab, true);
     }

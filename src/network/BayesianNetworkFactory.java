@@ -3,13 +3,12 @@ package network;
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
+import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
 import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
-import inference.dynamic.mmc.BackwardMMC;
-import inference.dynamic.mmc.ForwardMMC;
-import inference.dynamic.mmc.SmoothingMMC;
+import inference.dynamic.mmc.*;
 import math.Combination;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.MMC;
@@ -307,13 +306,9 @@ public class BayesianNetworkFactory {
 
         MMC mmc = new MMC(new Variable[]{rain0, cloud0}, new Variable[]{rain1, cloud1}, new Variable[]{umbrella1, coat1}, doubleFactory);
 
-        ForwardMMC forwardMMC = new ForwardMMC(mmc);
+        mmc.setForwardMMC( new ForwardMMC(mmc));
 
-        BackwardMMC backwardMMC = new BackwardMMC(mmc);
-
-        mmc.setForwardMMC(forwardMMC);
-
-        mmc.setSmoothingMMC(new SmoothingMMC(mmc, forwardMMC, backwardMMC));
+        mmc.setBackwardMMC(new BackwardMMC(mmc));
 
         return mmc;
     }
@@ -355,13 +350,9 @@ public class BayesianNetworkFactory {
 
         MMC mmc = new MMC(new Variable[]{rain0}, new Variable[]{rain1}, new Variable[]{umbrella1}, doubleFactory);
 
-        ForwardMMC forwardMMC = new ForwardMMC(mmc);
+        mmc.setForwardMMC( new ForwardMMC(mmc));
 
-        BackwardMMC backwardMMC = new BackwardMMC(mmc);
-
-        mmc.setForwardMMC(forwardMMC);
-
-        mmc.setSmoothingMMC(new SmoothingMMC(mmc, forwardMMC, backwardMMC));
+        mmc.setBackwardMMC(new BackwardMMC(mmc));
 
         return mmc;
     }
@@ -455,7 +446,7 @@ public class BayesianNetworkFactory {
 
     public static MMC getMazeMMC(Maze maze) {
 
-        AbstractDoubleFactory doubleFactory = new MyDoubleFactory();
+        AbstractDoubleFactory doubleFactory = new MyBigDecimalFactory();
 
         // List<Position> positionsReachable = maze.getReachablePositions();
 
@@ -501,7 +492,7 @@ public class BayesianNetworkFactory {
 
                 } else {
 
-                    transition[a][b] = 0.0;
+                    transition[a][b] = 0.1;
                 }
 
                 b++;
@@ -544,7 +535,7 @@ public class BayesianNetworkFactory {
 
                 } else {
 
-                    captor[a][b] = 0.001;
+                    captor[a][b] = 0.0;
                 }
 
                 b++;
@@ -567,13 +558,9 @@ public class BayesianNetworkFactory {
 
         MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{position}, new Variable[]{positionCaptor}, doubleFactory);
 
-        ForwardMMC forwardMMC = new ForwardMMC(mmc);
+        mmc.setForwardMMC( new ForwardMMC(mmc));
 
-        BackwardMMC backwardMMC = new BackwardMMC(mmc);
-
-        mmc.setForwardMMC(forwardMMC);
-
-        mmc.setSmoothingMMC(new SmoothingMMC(mmc, forwardMMC, backwardMMC));
+        mmc.setBackwardMMC(new BackwardMMC(mmc));
 
         return mmc;
     }

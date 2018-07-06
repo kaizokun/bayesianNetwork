@@ -35,17 +35,41 @@ public class BackwardMMC {
         //multiplier les inverses ou inverser la multiplication en changeant l'ordre des matrice donne le meme resultat
         //on ne fait qu'une inversion dans le deuxieme cas ...
 
-       // Matrix denom = Matrix.multiply(Matrix.invert(timeEndObs), Matrix.invert(trans));
+        Matrix denom = Matrix.multiply(Matrix.invert(timeEndObs), Matrix.invert(trans));
 
-        Matrix denom = Matrix.invert(Matrix.multiply(trans, timeEndObs));
+       // Matrix denom = Matrix.invert(Matrix.multiply(trans, timeEndObs));
         //partie à ajouter ou à multiplier
        // Matrix num = Matrix.multiply(trans, currentObs);
         //on commence par multiplier
 
         //Matrix newBackward = Matrix.multiply(num, Matrix.multiply(denom, backward));
         Matrix newBackward = Matrix.multiply(trans, currentObs.multiplyRows(Matrix.multiply(denom, backward)));
+/*
+        System.out.println("OBS INVERT");
+        System.out.println(Matrix.invert(timeEndObs));
 
+        System.out.println("OBS INVERT x OBS");
+        System.out.println(Matrix.multiply(Matrix.invert(timeEndObs), timeEndObs));
+*/
+        System.out.println("TRANS ");
+        System.out.println(trans);
 
+        System.out.println("TRANS INVERT");
+        System.out.println(Matrix.invert(trans));
+
+        System.out.println("TRANS * OBS");
+        System.out.println(Matrix.multiply(trans, timeEndObs));
+
+/*
+        System.out.println("DENOM");
+        System.out.println(denom);
+        System.out.println("BACKWARD");
+        System.out.println(backward);
+        System.out.println("DENOM * BACKWARD");*/
+       // System.out.println(Matrix.multiply(denom, backward));
+
+   // if(time == 3)
+       // System.exit(0);
 /*
         Matrix newBackward = Matrix.invert(timeEndObs).multiplyRows( // 1 colonne
                 Matrix.multiply(Matrix.invert(trans), backward). // 1 colonne

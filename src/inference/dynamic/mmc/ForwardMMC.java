@@ -81,9 +81,6 @@ public class ForwardMMC implements IForward {
 
         if (t == 0) {
             //encapsule le vecteur de base qui est horyzontal dans une transposée pour obtenir un vecteur vertical
-           // Matrix forward = new Transpose(this.mmc.getMatrixState0());
-
-            //forward.normalize();
 
             if (saveForwards) {
 

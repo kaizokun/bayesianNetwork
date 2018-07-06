@@ -3,18 +3,18 @@ package network.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import inference.dynamic.Backward;
+import inference.dynamic.mmc.BackwardMMC;
 import inference.dynamic.mmc.ForwardMMC;
 import inference.dynamic.mmc.SmoothingMMC;
 import inference.dynamic.mmc.SmoothingMMC.SmoothingMatrices;
 import math.Matrix;
 import math.MatrixDiagonal;
 import math.Transpose;
-import network.BayesianNetwork;
 import network.Variable;
 
 import java.util.*;
 
-import static network.BayesianNetwork.domainValuesCombinations;
 
 public class MMC extends DynamicBayesianNetwork {
 
@@ -33,6 +33,8 @@ public class MMC extends DynamicBayesianNetwork {
     protected Map<Integer, SmoothingMatrices> smoothings = new Hashtable<>();
 
     protected ForwardMMC forwardMMC;
+
+    protected BackwardMMC backwardMMC;
 
     protected SmoothingMMC smoothingMMC;
 
@@ -83,6 +85,7 @@ public class MMC extends DynamicBayesianNetwork {
         this.backwardInit = new Transpose(limitMatrix, varList, domainValuesCombinations(varList), doubleFactory);
     }
 
+
     public void extend(Variable[][] variablesTab) {
 
         this.extend(variablesTab, false);
@@ -92,16 +95,16 @@ public class MMC extends DynamicBayesianNetwork {
 
         for (Variable variables[] : variablesTab) {
 
-            this.extend(variables);
-
-            if (log) {
-
-                System.out.println(this);
-            }
+            this.extend(log, variables);
         }
     }
 
     public void extend(Variable... variables) {
+
+        extend(false, variables);
+    }
+
+    public void extend(boolean log, Variable... variables) {
 
         //on etend le reseau
         this.extend();
@@ -113,6 +116,15 @@ public class MMC extends DynamicBayesianNetwork {
         this.forwardMMC.forward();
         //ainsi que le smoothing sur le range souhaité
         this.smoothingMMC.smoothing();
+
+        if (log) {
+
+            System.out.println(this);
+
+            System.out.println(basicMatricesToString());
+
+            System.out.println(smothingsAndLastForwardToString());
+        }
     }
 
     @Override
@@ -187,12 +199,12 @@ public class MMC extends DynamicBayesianNetwork {
             AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
 
             Matrix.initMatrixZero(obsMatrix, doubleFactory);
-
+/*
             for (int c = 0; c < statesDomainValuesList.size(); c++) {
 
                 obsMatrix[0][c] = doubleFactory.getNew(0.0);
             }
-
+*/
             int col = 0;
 
             //calculer la probabilité d'un état des observations pour une combinaison de valeurs parents
@@ -379,6 +391,13 @@ public class MMC extends DynamicBayesianNetwork {
         this.smootEnd = smootEnd;
     }
 
+    public void setSmootRange(int s, int e) {
+
+        this.setSmootStart(s);
+
+        this.setSmootEnd(e);
+    }
+
     public Map<Integer, SmoothingMatrices> getSmoothings() {
         return smoothings;
     }
@@ -404,6 +423,14 @@ public class MMC extends DynamicBayesianNetwork {
         this.forwardMMC = forwardMMC;
     }
 
+    public BackwardMMC getBackwardMMC() {
+        return backwardMMC;
+    }
+
+    public void setBackwardMMC(BackwardMMC backwardMMC) {
+        this.backwardMMC = backwardMMC;
+    }
+
     public SmoothingMMC getSmoothingMMC() {
         return smoothingMMC;
     }
@@ -414,10 +441,34 @@ public class MMC extends DynamicBayesianNetwork {
 
     /*---------------------- VIEW ---------------*/
 
-    @Override
-    public String toString() {
 
-        StringBuilder stringBuilder = new StringBuilder(super.toString());
+    public String smothingsAndLastForwardToString() {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("\n");
+
+        for (Map.Entry entry : getSmoothings().entrySet()) {
+
+            stringBuilder.append(entry.getValue() + "\n");
+        }
+
+        if (lastForward != null) {
+
+            stringBuilder.append("=====================================================\n");
+            stringBuilder.append("====================Forward [" + lastForward.getKey() + "]=======================\n");
+            stringBuilder.append("=====================================================\n");
+            stringBuilder.append("\n");
+            stringBuilder.append(lastForward.getValue());
+        }
+
+        return stringBuilder.toString();
+    }
+
+
+    public String basicMatricesToString() {
+
+        StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("--------------------------------------------------------------------\n");
         stringBuilder.append("--------------------------- MATRIX OBSERVATION----------------------\n");
@@ -445,22 +496,6 @@ public class MMC extends DynamicBayesianNetwork {
         stringBuilder.append("--------------------------------------------------------------------\n\n");
 
         stringBuilder.append(matrixStates);
-
-        stringBuilder.append("\n");
-
-        for (Map.Entry entry : getSmoothings().entrySet()) {
-
-            stringBuilder.append(entry.getValue() + "\n");
-        }
-
-        if (lastForward != null) {
-
-            stringBuilder.append("=====================================================\n");
-            stringBuilder.append("====================Forward [" + lastForward.getKey() + "]=======================\n");
-            stringBuilder.append("=====================================================\n");
-            stringBuilder.append("\n");
-            stringBuilder.append(lastForward.getValue());
-        }
 
         return stringBuilder.toString();
     }

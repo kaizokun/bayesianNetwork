@@ -18,6 +18,8 @@ public class Maze {
 
     protected Map<Position, Set<Cardinal>> percepts = new Hashtable<>();
 
+    protected List<Position> reachablePositions = new LinkedList<>();
+
     protected String[] maze;
 
     public Maze(String[] maze, Position robotPosition) {
@@ -46,28 +48,31 @@ public class Maze {
 
     public int countReachablePositions() {
 
-        return (this.limitY * this.limitX) - this.walls.size();
+        // return (this.limitY * this.limitX) - this.walls.size();
+        return this.getReachablePositions().size();
     }
 
     //get percepts
 
     public List<Position> getReachablePositions() {
 
-        List<Position> positions = new LinkedList<>();
+        if (reachablePositions.isEmpty()) {
 
-        for (int y = 0; y < limitY; y++) {
+            for (int y = 0; y < limitY; y++) {
 
-            for (int x = 0; x < limitX; x++) {
+                for (int x = 0; x < limitX; x++) {
 
-                if (!walls.contains(new Position(y, x))) {
+                    if (!walls.contains(new Position(y, x))) {
 
-                    positions.add(new Position(y, x));
+                        reachablePositions.add(new Position(y, x));
+                    }
                 }
             }
         }
 
-        return positions;
+        return reachablePositions;
     }
+
 
     public boolean isWall(Position position) {
 
