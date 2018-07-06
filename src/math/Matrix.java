@@ -73,6 +73,22 @@ public class Matrix {
         this.isObservation = isObservation;
     }
 
+    public Map<Object, AbstractDouble> getDistributionMap() {
+
+        Map<Object, AbstractDouble> distributionMap = new Hashtable<>();
+
+        int row = 0;
+
+        for (Object value : this.getRowValues()) {
+
+            distributionMap.put(value, this.getValue(row));
+
+            row++;
+        }
+
+        return distributionMap;
+    }
+
     public Matrix copy() {
 
         //important une matrice inverse doit rester du même type

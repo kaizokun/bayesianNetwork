@@ -7,6 +7,7 @@ import domain.data.AbstractDouble;
 import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
+import javafx.geometry.Pos;
 import math.Matrix;
 import network.Variable;
 import network.dynamic.MMC;
@@ -23,7 +24,7 @@ public class MazeRobot {
 
     protected IDomain captorDomain = DomainFactory.getMazeWallCaptorDomain();
 
-    protected Map<Integer, List<Position>> positions = new Hashtable<>();
+    protected Map<Integer, List<PositionProb>> positions = new Hashtable<>();
 
     protected LinkedList<List<Cardinal>> percepts = new LinkedList<>();
 
@@ -42,6 +43,7 @@ public class MazeRobot {
         this.maze.setRobot(this);
     }
 
+
     public void lookUpPosition() {
 
         //récupere le percept à partir de l'environnement
@@ -51,9 +53,11 @@ public class MazeRobot {
 
         this.percepts.addLast(percept);
 
-        this.mazeMMC.extend( observation);
+        this.mazeMMC.extend(observation);
         //récupère le filtrage pour le dernier état
         Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
+
+      //  Map<Object, AbstractDouble> distributionMap = positionsDistrib.getDistributionMap();
 
         //récupère les positions offrant la plus grande probabilité pour affichage
         this.positions.put(mazeMMC.getTime(), getMostProbablePositions(positionsDistrib));
@@ -80,9 +84,9 @@ public class MazeRobot {
         return this.positions.get(this.mazeMMC.getTime()).size() == 1;
     }
 
-    private List<Position> getMostProbablePositions(Matrix positionsDistrib) {
+    private List<PositionProb> getMostProbablePositions(Matrix positionsDistrib) {
 
-        List<Position> mostProbablePositions = new ArrayList<>();
+        List<PositionProb> mostProbablePositions = new ArrayList<>();
 
         AbstractDouble minProb = mazeMMC.getDoubleFactory().getNew(this.minProb);
         //pour chaque ligne de la matrice ici la megavariable ne contient qu'une sous variable
@@ -98,7 +102,7 @@ public class MazeRobot {
 
             if (cmp > 0) {
 
-                mostProbablePositions.add(position);
+                mostProbablePositions.add(new PositionProb(position, prob));
             }
 
             iRow++;
@@ -107,7 +111,40 @@ public class MazeRobot {
         return mostProbablePositions;
     }
 
-    public Map<Integer, List<Position>> getPositions() {
+    public static class PositionProb{
+
+        protected Position position;
+
+        protected AbstractDouble prob;
+
+        public PositionProb(Position position, AbstractDouble prob) {
+            this.position = position;
+            this.prob = prob;
+        }
+
+        public Position getPosition() {
+            return position;
+        }
+
+        public void setPosition(Position position) {
+            this.position = position;
+        }
+
+        public AbstractDouble getProb() {
+            return prob;
+        }
+
+        public void setProb(AbstractDouble prob) {
+            this.prob = prob;
+        }
+
+        @Override
+        public String toString() {
+            return  position +" : "+ prob;
+        }
+    }
+
+    public Map<Integer, List<PositionProb>> getPositions() {
         return positions;
     }
 
@@ -116,4 +153,8 @@ public class MazeRobot {
         return moves;
     }
 
+    public List<PositionProb> getLastKnowPositions() {
+
+        return this.positions.get(mazeMMC.getTime());
+    }
 }

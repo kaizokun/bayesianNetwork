@@ -3,7 +3,6 @@ package network.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
-import inference.dynamic.Backward;
 import inference.dynamic.mmc.BackwardMMC;
 import inference.dynamic.mmc.ForwardMMC;
 import inference.dynamic.mmc.SmoothingMMC;
@@ -40,6 +39,11 @@ public class MMC extends DynamicBayesianNetwork {
 
     public MMC(Variable[] statesRoot, Variable[] states, Variable[] obs, AbstractDoubleFactory doubleFactory) {
 
+        this(statesRoot, states, obs, doubleFactory, 0);
+    }
+
+    public MMC(Variable[] statesRoot, Variable[] states, Variable[] obs, AbstractDoubleFactory doubleFactory, int time) {
+
         super(doubleFactory);
         //trie les variables par labels
         Arrays.sort(statesRoot, Variable.varLabelComparator);
@@ -50,13 +54,13 @@ public class MMC extends DynamicBayesianNetwork {
         //sauvegarde les variables observations
         this.obsVariables = obs;
 
-        this.megaVariableStatesRoot = this.mergeStateVariables(Arrays.asList(statesRoot), 0);
+        this.megaVariableStatesRoot = this.mergeStateVariables(Arrays.asList(statesRoot), time, true);
 
-        this.megaVariableStates = this.mergeStateVariables(Arrays.asList(states), 1);
+        this.megaVariableStates = this.mergeStateVariables(Arrays.asList(states), time + 1, false);
 
-        this.megaVariableObs = this.mergeObservationVariables(Arrays.asList(obs), Arrays.asList(states), 1);
+        this.megaVariableObs = this.mergeObservationVariables(Arrays.asList(obs), Arrays.asList(states), time + 1);
 
-        this.getTimeVariables(0).put(megaVariableStatesRoot, megaVariableStatesRoot);
+        this.getTimeVariables(time).put(megaVariableStatesRoot, megaVariableStatesRoot);
 
         this.roots.add(this.megaVariableStatesRoot);
 
@@ -199,12 +203,7 @@ public class MMC extends DynamicBayesianNetwork {
             AbstractDouble[][] obsMatrix = new AbstractDouble[statesDomainValuesList.size()][statesDomainValuesList.size()];
 
             Matrix.initMatrixZero(obsMatrix, doubleFactory);
-/*
-            for (int c = 0; c < statesDomainValuesList.size(); c++) {
 
-                obsMatrix[0][c] = doubleFactory.getNew(0.0);
-            }
-*/
             int col = 0;
 
             //calculer la probabilité d'un état des observations pour une combinaison de valeurs parents
@@ -238,7 +237,7 @@ public class MMC extends DynamicBayesianNetwork {
         return new Variable(obs, time);
     }
 
-    private Variable mergeStateVariables(List<Variable> states, int time) {
+    private Variable mergeStateVariables(List<Variable> states, int time, boolean first) {
 
         //List<Variable> states =  copyTimeVarsAndSort(t, statesToMerge);
 
@@ -248,7 +247,7 @@ public class MMC extends DynamicBayesianNetwork {
 
         AbstractDouble[][] matrix;
         //si variables de temps 0
-        if (time == 0) {
+        if (first) {
 
             matrix = new AbstractDouble[1][domainValuesList.size()];
 

@@ -1,5 +1,6 @@
 package domain;
 
+import agent.MazeRobot;
 import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
@@ -25,9 +26,9 @@ public class DomainFactory {
 
         int xy = 0;
 
-        for (Position position : maze.getReachablePositions()) {
+        for (MazeRobot.PositionProb position : maze.getReachablePositions()) {
 
-            positions[xy] = new Position(position.getY(), position.getX());
+            positions[xy] = new Position(position.getPosition().getY(), position.getPosition().getX());
 
             xy++;
         }

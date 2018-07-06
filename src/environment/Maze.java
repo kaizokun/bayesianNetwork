@@ -1,6 +1,9 @@
 package environment;
 
 import agent.MazeRobot;
+import agent.MazeRobot.PositionProb;
+import domain.data.AbstractDouble;
+import domain.data.AbstractDoubleFactory;
 
 import java.util.*;
 
@@ -18,11 +21,13 @@ public class Maze {
 
     protected Map<Position, Set<Cardinal>> percepts = new Hashtable<>();
 
-    protected List<Position> reachablePositions = new LinkedList<>();
+    protected List<PositionProb> reachablePositions = new LinkedList<>();
 
     protected String[] maze;
 
-    public Maze(String[] maze, Position robotPosition) {
+    protected AbstractDoubleFactory doubleFactory;
+
+    public Maze(String[] maze, Position robotPosition, AbstractDoubleFactory doubleFactory) {
 
         this.limitX = maze[0].length();
 
@@ -44,6 +49,8 @@ public class Maze {
         this.robotPosition = robotPosition;
 
         this.maze = maze;
+
+        this.doubleFactory = doubleFactory;
     }
 
     public int countReachablePositions() {
@@ -54,7 +61,7 @@ public class Maze {
 
     //get percepts
 
-    public List<Position> getReachablePositions() {
+    public List<PositionProb> getReachablePositions() {
 
         if (reachablePositions.isEmpty()) {
 
@@ -64,19 +71,43 @@ public class Maze {
 
                     if (!walls.contains(new Position(y, x))) {
 
-                        reachablePositions.add(new Position(y, x));
+                        reachablePositions.add(new PositionProb(new Position(y, x), null));
                     }
                 }
+            }
+
+            double initProb = 1.0 / reachablePositions.size();
+
+            for(PositionProb positionProb : reachablePositions){
+
+                positionProb.setProb(doubleFactory.getNew(initProb));
             }
         }
 
         return reachablePositions;
     }
 
+    public List<PositionProb> getNewReachablePosition(List<PositionProb> positionsProb) {
 
-    public boolean isWall(Position position) {
+        Set<PositionProb> allPositions = new LinkedHashSet<>();
 
-        return this.walls.contains(position);
+        allPositions.addAll(positionsProb);
+
+        //pour chaque positions
+        for (PositionProb position : positionsProb) {
+            //chaque position alentours
+            for (Cardinal direction : Cardinal.values()) {
+
+                Position positionB = position.getPosition().move(direction);
+                //si la position est atteignable
+                if (isIn(positionB) && !isWall(positionB)) {
+
+                    allPositions.add(new PositionProb(positionB, doubleFactory.getNew(0.0)));
+                }
+            }
+        }
+
+        return new ArrayList(allPositions);
     }
 
     public int totalAdjacent(Position position) {
@@ -103,29 +134,11 @@ public class Maze {
         return total;
     }
 
-    public int getLimitX() {
-        return limitX;
+    public boolean isWall(Position position) {
+
+        return this.walls.contains(position);
     }
 
-    public void setLimitX(int limitX) {
-        this.limitX = limitX;
-    }
-
-    public int getLimitY() {
-        return limitY;
-    }
-
-    public void setLimitY(int limitY) {
-        this.limitY = limitY;
-    }
-
-    public MazeRobot getRobot() {
-        return robot;
-    }
-
-    public void setRobot(MazeRobot robot) {
-        this.robot = robot;
-    }
 
     public boolean isIn(Position pos) {
 
@@ -205,5 +218,35 @@ public class Maze {
         }
 
         return true;
+    }
+
+
+    public int getLimitX() {
+        return limitX;
+    }
+
+    public void setLimitX(int limitX) {
+        this.limitX = limitX;
+    }
+
+    public int getLimitY() {
+        return limitY;
+    }
+
+    public void setLimitY(int limitY) {
+        this.limitY = limitY;
+    }
+
+    public MazeRobot getRobot() {
+        return robot;
+    }
+
+    public void setRobot(MazeRobot robot) {
+        this.robot = robot;
+    }
+
+    public void setReachablePositions(List<PositionProb> reachablePositions) {
+
+        this.reachablePositions = reachablePositions;
     }
 }

@@ -1,5 +1,7 @@
 package network;
 
+import agent.MazeRobot;
+import agent.MazeRobot.PositionProb;
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
@@ -306,7 +308,7 @@ public class BayesianNetworkFactory {
 
         MMC mmc = new MMC(new Variable[]{rain0, cloud0}, new Variable[]{rain1, cloud1}, new Variable[]{umbrella1, coat1}, doubleFactory);
 
-        mmc.setForwardMMC( new ForwardMMC(mmc));
+        mmc.setForwardMMC(new ForwardMMC(mmc));
 
         mmc.setBackwardMMC(new BackwardMMC(mmc));
 
@@ -350,7 +352,7 @@ public class BayesianNetworkFactory {
 
         MMC mmc = new MMC(new Variable[]{rain0}, new Variable[]{rain1}, new Variable[]{umbrella1}, doubleFactory);
 
-        mmc.setForwardMMC( new ForwardMMC(mmc));
+        mmc.setForwardMMC(new ForwardMMC(mmc));
 
         mmc.setBackwardMMC(new BackwardMMC(mmc));
 
@@ -448,6 +450,10 @@ public class BayesianNetworkFactory {
 
         AbstractDoubleFactory doubleFactory = new MyBigDecimalFactory();
 
+        List<PositionProb> reachablePosParent = maze.getReachablePositions();
+
+        List<PositionProb> reachablePosChild = new LinkedList<>(reachablePosParent);
+
         // List<Position> positionsReachable = maze.getReachablePositions();
 
         // List<Position> previousPositionsReachable = maze.getReachablePositions();
@@ -458,11 +464,20 @@ public class BayesianNetworkFactory {
 
         Double[][] rootTransition = new Double[1][positionDomain.getSize()];
 
+        int pos = 0;
+        //verifier si l'ordre correspond
+        for (PositionProb positionProb : reachablePosParent) {
+
+            rootTransition[0][pos] = positionProb.getProb().getDoubleValue();
+
+            pos ++;
+        }
+/*
         for (int pos = 0; pos < positionDomain.getSize(); pos++) {
 
             rootTransition[0][pos] = 1.0 / positionDomain.getSize();
         }
-
+*/
         ProbabilityCompute tcpPositions0 = new ProbabilityComputeFromTCP(
                 positionDomain, rootTransition, doubleFactory);
 
@@ -476,19 +491,15 @@ public class BayesianNetworkFactory {
 
         int a = 0;
 
-        List<Position> reachablePosParent = maze.getReachablePositions();
-
-        List<Position> reachablePosChild = new LinkedList<>(reachablePosParent);
-
-        for (Position previousPos : reachablePosParent) {
+        for (PositionProb previousPos : reachablePosParent) {
 
             int b = 0;
 
-            for (Position position : reachablePosChild) {
+            for (PositionProb position : reachablePosChild) {
 
-                if (position.adjacent(previousPos)) {
+                if (position.getPosition().adjacent(previousPos.getPosition())) {
 
-                    transition[a][b] = 1.0 / maze.totalAdjacent(previousPos);
+                    transition[a][b] = 1.0 / maze.totalAdjacent(previousPos.getPosition());
 
                 } else {
 
@@ -517,19 +528,19 @@ public class BayesianNetworkFactory {
          * on ajoute un peu de bruit pour ne pas avoir de valer 0 par exemple 0.01
          * */
 
-        List<Cardinal> [] percepts = Combination.getSubsets(Cardinal.values());
+        List<Cardinal>[] percepts = Combination.getSubsets(Cardinal.values());
 
         Double[][] captor = new Double[positionDomain.getSize()][percepts.length];
 
         a = 0;
 
-        for (Position positionParent : reachablePosParent) {
+        for (PositionProb positionParent : reachablePosParent) {
 
             int b = 0;
 
             for (List<Cardinal> percept : percepts) {
 
-                if (maze.matchPercept(positionParent, percept)) {
+                if (maze.matchPercept(positionParent.getPosition(), percept)) {
 
                     captor[a][b] = 0.999;
 
@@ -555,10 +566,9 @@ public class BayesianNetworkFactory {
 
         //-----------------------------------------
 
-
         MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{position}, new Variable[]{positionCaptor}, doubleFactory);
 
-        mmc.setForwardMMC( new ForwardMMC(mmc));
+        mmc.setForwardMMC(new ForwardMMC(mmc));
 
         mmc.setBackwardMMC(new BackwardMMC(mmc));
 
