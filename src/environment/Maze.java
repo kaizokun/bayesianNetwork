@@ -27,6 +27,8 @@ public class Maze {
 
     private String[][] strMaze;
 
+    private List<Position> resetPositions = new LinkedList<>();
+
     protected AbstractDoubleFactory doubleFactory;
 
     public Maze(String[] maze, Position robotPosition, AbstractDoubleFactory doubleFactory) {
@@ -142,7 +144,6 @@ public class Maze {
 
         return this.walls.contains(position);
     }
-
 
     public boolean isIn(Position pos) {
 
@@ -288,21 +289,37 @@ public class Maze {
         }
     }
 
-    private String[][] loadStringMaze() {
+    private void loadStringMaze() {
 
-        String[][] strMazeCopy = new String[strMaze.length][strMaze[0].length];
+        //reset du labyrinthe
+        for (Position reset : resetPositions) {
 
-        for (int row = 0; row < strMazeCopy.length; row++) {
-
-            for (int col = 0; col < strMazeCopy[0].length; col++) {
-
-                strMazeCopy[row][col] = new String(strMaze[row][col]);
-            }
+            this.strMaze[reset.getY()][reset.getX()] = "[  ]";
         }
 
-        strMazeCopy[this.strMaze.length - 2 - this.robotPosition.y][this.robotPosition.x + 1] = "[++]";
+        this.resetPositions.clear();
 
-        return strMazeCopy;
+        //position robot
+        int y = this.strMaze.length - 2 - this.robotPosition.y;
+
+        int x = this.robotPosition.x + 1;
+
+        this.strMaze[y][x] = "[++]";
+
+        this.resetPositions.add(new Position(y, x));
+
+        //positions probables
+        for(PositionProb positionProb : robot.getLastKnowPositions()){
+
+             y = this.strMaze.length - 2 - positionProb.getPosition().y;
+
+             x = positionProb.getPosition().x + 1;
+
+            this.strMaze[y][x] = "[??]";
+
+            this.resetPositions.add(new Position(y, x));
+        }
+
     }
 
     @Override
@@ -310,7 +327,7 @@ public class Maze {
 
         StringBuilder builder = new StringBuilder();
 
-        String[][] strMaze = loadStringMaze();
+        loadStringMaze();
 
         for (int row = 0; row < strMaze.length; row++) {
 

@@ -41,6 +41,10 @@ public class MMCmazeTest {
 
             robot.lookUpPosition();
 
+            System.out.println(maze.getPercept());
+
+            System.out.println(maze);
+
             //System.out.println("BEST POSITIONS : "+robot.getLastKnowPositions());
 
             // System.out.println("ROBOT POSITIONS DISTRIB: " + robot.getPositionsDistribs().get(mmcMaze.getTime()));
@@ -62,7 +66,6 @@ public class MMCmazeTest {
                 robot.reload();
             }
 
-            System.out.println(maze);
 
         } while (lookUp);
 
