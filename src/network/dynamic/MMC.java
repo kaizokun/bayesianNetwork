@@ -37,6 +37,8 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected SmoothingMMC smoothingMMC;
 
+    private int initTime;
+
     public MMC(Variable[] statesRoot, Variable[] states, Variable[] obs, AbstractDoubleFactory doubleFactory) {
 
         this(statesRoot, states, obs, doubleFactory, 0);
@@ -45,6 +47,10 @@ public class MMC extends DynamicBayesianNetwork {
     public MMC(Variable[] statesRoot, Variable[] states, Variable[] obs, AbstractDoubleFactory doubleFactory, int time) {
 
         super(doubleFactory);
+
+        this.initTime = time;
+
+        this.time = time;
         //trie les variables par labels
         Arrays.sort(statesRoot, Variable.varLabelComparator);
 
@@ -231,7 +237,10 @@ public class MMC extends DynamicBayesianNetwork {
                 col++;
             }
 
-            this.matrixObs.put(obsDomainValues.toString(), new MatrixDiagonal(obsMatrix, states, domainValuesCombinations(states), doubleFactory, true));
+            this.matrixObs.put(obsDomainValues.toString(), new MatrixDiagonal(obsMatrix,
+                    states, domainValuesCombinations(states),
+                    obs, null,
+                    doubleFactory, true));
         }
 
         return new Variable(obs, time);
@@ -500,4 +509,8 @@ public class MMC extends DynamicBayesianNetwork {
     }
 
 
+    public int getInitTime() {
+
+        return this.initTime;
+    }
 }

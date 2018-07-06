@@ -28,7 +28,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
     public ProbabilityComputeFromTCP(Variable[] dependencies, IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
 
-        this(Arrays.asList(dependencies),varDom, entries, doubleFactory);
+        this(Arrays.asList(dependencies), varDom, entries, doubleFactory);
     }
 
     public ProbabilityComputeFromTCP(List<Variable> dependencies, IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
@@ -88,6 +88,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
                 AbstractDouble prob = doubleFactory.getNew(entries[iRow][j]);
 
                 row.put(domainValue, prob);
+
             }
 
             //ajout de la ligne dans la TCP
@@ -157,20 +158,20 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         //couverture de markov sans la variable (et les observations)
         List<Variable> markovCoverTab = new ArrayList<>(variable.markovKover);
 
-        this.initCumulativeMarkovFrequencies(markovCoverTab,variable, 0);
+        this.initCumulativeMarkovFrequencies(markovCoverTab, variable, 0);
     }
 
     private void initCumulativeMarkovFrequencies(List<Variable> markovCovertab, Variable variable, int iVar) {
 
         //derniere variable de la couverture initialisée
-        if( iVar == markovCovertab.size() ){
+        if (iVar == markovCovertab.size()) {
 
             //disribution de la variable pour chacune de ses valeur en fonction d'un etat de la couverture
-            List<Map.Entry<Domain.DomainValue,AbstractDouble>> valuesProbs = new LinkedList<>();
+            List<Map.Entry<Domain.DomainValue, AbstractDouble>> valuesProbs = new LinkedList<>();
 
             AbstractDouble totalProb = doubleFactory.getNew(0.0);
             //pour chaque valeur du domaine
-            for(Domain.DomainValue domainValue : variable.getDomainValues()) {
+            for (Domain.DomainValue domainValue : variable.getDomainValues()) {
 
                 variable.setDomainValue(domainValue);
                 //prob initialisé à 1
@@ -179,7 +180,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
                 markovProb = markovProb.multiply(variable.getProbabilityForCurrentValue());
 
                 //multiplie la probabilité de chaque enfants en fonction des parents
-                for(Variable child : variable.children){
+                for (Variable child : variable.children) {
 
                     markovProb = markovProb.multiply(child.getProbabilityForCurrentValue());
                 }
@@ -198,13 +199,13 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
             //le minimum du range demarre à zéro
             AbstractDouble min = doubleFactory.getNew(0.0);
 
-            for(Map.Entry<Domain.DomainValue, AbstractDouble> valueProb : valuesProbs){
+            for (Map.Entry<Domain.DomainValue, AbstractDouble> valueProb : valuesProbs) {
 
                 FrequencyRange range = new FrequencyRange();
 
                 range.setMin(min);
                 //probabilité pour une valeur en rapport avec le total de toute les valeur pour attaindre les 100%
-                AbstractDouble max = min.add( valueProb.getValue().divide(totalProb) );
+                AbstractDouble max = min.add(valueProb.getValue().divide(totalProb));
 
                 range.setMax(max);
                 //le min devient le max du prochain range
@@ -219,7 +220,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         //récupere une variable
         Variable markovVar = markovCovertab.get(iVar);
         //pour chaque valeur du domaine initialiser la variable
-        for(Domain.DomainValue domainValue : markovVar.getDomainValues()){
+        for (Domain.DomainValue domainValue : markovVar.getDomainValues()) {
 
             markovVar.setDomainValue(domainValue);
 
@@ -286,7 +287,9 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         }
     }
 
-    /**------------------ GETTER PROBABILITIES AND VALUES ----------------*/
+    /**
+     * ------------------ GETTER PROBABILITIES AND VALUES ----------------
+     */
 
     @Override
     public AbstractDouble getProbability(Variable var) {
@@ -324,7 +327,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         //AbstractDouble total = doubleFactory.getNew(0.0);
 
-        return this.dichotomicSearch(rangevalues,  doubleFactory.getNew(new Random().nextDouble()), 0, rangevalues.size());
+        return this.dichotomicSearch(rangevalues, doubleFactory.getNew(new Random().nextDouble()), 0, rangevalues.size());
     }
 
     @Override
@@ -332,12 +335,19 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         AbstractDouble rdm = doubleFactory.getNew(new Random().nextDouble());
 
-        List<Map.Entry<Domain.DomainValue,FrequencyRange>> cumulFreq = this.cumulativeMarkovFrequencies.get(this.getDependenciesKey(variable.markovKover));
+        List<Map.Entry<Domain.DomainValue, FrequencyRange>> cumulFreq = this.cumulativeMarkovFrequencies.get(this.getDependenciesKey(variable.markovKover));
 
         return dichotomicSearch(cumulFreq, rdm, 0, cumulFreq.size());
     }
 
-    /**-------------------------AFFICHAGES--------------------------*/
+    @Override
+    public int size() {
+        return this.TCP.size();
+    }
+
+    /**
+     * -------------------------AFFICHAGES--------------------------
+     */
 
     @Override
     public String toString() {
@@ -370,22 +380,24 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
     }
 
     @Override
-    public void showCumulativeMarkovFrequencies(){
+    public void showCumulativeMarkovFrequencies() {
 
-        for(Map.Entry<String, List<Map.Entry<Domain.DomainValue, FrequencyRange>>> entry : this.cumulativeMarkovFrequencies.entrySet()){
+        for (Map.Entry<String, List<Map.Entry<Domain.DomainValue, FrequencyRange>>> entry : this.cumulativeMarkovFrequencies.entrySet()) {
 
             System.out.println();
-            System.out.println("=====KEY==== "+entry.getKey());
+            System.out.println("=====KEY==== " + entry.getKey());
 
-            for(Map.Entry<Domain.DomainValue, FrequencyRange> entry2 : entry.getValue()){
+            for (Map.Entry<Domain.DomainValue, FrequencyRange> entry2 : entry.getValue()) {
 
-                System.out.println(entry2.getKey()+" : "+entry2.getValue());
+                System.out.println(entry2.getKey() + " : " + entry2.getValue());
             }
         }
     }
 
 
-    /**-------------------------SUB CLASSES--------------------------*/
+    /**
+     * -------------------------SUB CLASSES--------------------------
+     */
 
 
     static class FrequencyRange {
@@ -443,12 +455,14 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         @Override
         public String toString() {
 
-            return "["+this.min+" - "+this.max+"]";
+            return "[" + this.min + " - " + this.max + "]";
         }
     }
 
 
-    /**------------------------- ACCESSORS-------------------------*/
+    /**
+     * ------------------------- ACCESSORS-------------------------
+     */
 
     @Override
     public AbstractDoubleFactory getDoubleFactory() {

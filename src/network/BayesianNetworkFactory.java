@@ -12,12 +12,14 @@ import environment.Maze;
 import environment.Position;
 import inference.dynamic.mmc.*;
 import math.Combination;
+import math.Matrix;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.MMC;
 import network.dynamic.Model;
 
 import java.util.*;
 
+import static environment.Cardinal.SOUTH;
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.CAPTOR_POSITION;
@@ -448,15 +450,18 @@ public class BayesianNetworkFactory {
 
     public static MMC getMazeMMC(Maze maze) {
 
+        return getMazeMMC(maze, 0);
+    }
+
+    public static MMC getMazeMMC(Maze maze, int time) {
+
+        System.out.println("INIT MMC "+time);
+
         AbstractDoubleFactory doubleFactory = new MyBigDecimalFactory();
 
-        List<PositionProb> reachablePosParent = maze.getReachablePositions();
+        List<PositionProb> reachablePositions = maze.getReachablePositions();
 
-        List<PositionProb> reachablePosChild = new LinkedList<>(reachablePosParent);
-
-        // List<Position> positionsReachable = maze.getReachablePositions();
-
-        // List<Position> previousPositionsReachable = maze.getReachablePositions();
+        List<PositionProb> reachablePosChild = new LinkedList<>(reachablePositions);
 
         IDomain positionDomain = DomainFactory.getMazePositionDomain(maze);
 
@@ -466,18 +471,13 @@ public class BayesianNetworkFactory {
 
         int pos = 0;
         //verifier si l'ordre correspond
-        for (PositionProb positionProb : reachablePosParent) {
+        for (PositionProb positionProb : reachablePositions) {
 
             rootTransition[0][pos] = positionProb.getProb().getDoubleValue();
 
-            pos ++;
+            pos++;
         }
-/*
-        for (int pos = 0; pos < positionDomain.getSize(); pos++) {
 
-            rootTransition[0][pos] = 1.0 / positionDomain.getSize();
-        }
-*/
         ProbabilityCompute tcpPositions0 = new ProbabilityComputeFromTCP(
                 positionDomain, rootTransition, doubleFactory);
 
@@ -491,7 +491,7 @@ public class BayesianNetworkFactory {
 
         int a = 0;
 
-        for (PositionProb previousPos : reachablePosParent) {
+        for (PositionProb previousPos : reachablePositions) {
 
             int b = 0;
 
@@ -505,10 +505,8 @@ public class BayesianNetworkFactory {
 
                     transition[a][b] = 0.1;
                 }
-
                 b++;
             }
-
             a++;
         }
 
@@ -534,7 +532,7 @@ public class BayesianNetworkFactory {
 
         a = 0;
 
-        for (PositionProb positionParent : reachablePosParent) {
+        for (PositionProb positionParent : reachablePositions) {
 
             int b = 0;
 
@@ -566,7 +564,7 @@ public class BayesianNetworkFactory {
 
         //-----------------------------------------
 
-        MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{position}, new Variable[]{positionCaptor}, doubleFactory);
+        MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{position}, new Variable[]{positionCaptor}, doubleFactory, time);
 
         mmc.setForwardMMC(new ForwardMMC(mmc));
 

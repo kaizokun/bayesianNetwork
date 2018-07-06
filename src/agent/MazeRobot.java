@@ -7,8 +7,9 @@ import domain.data.AbstractDouble;
 import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
-import javafx.geometry.Pos;
+import inference.dynamic.mmc.SmoothingMMC;
 import math.Matrix;
+import network.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.MMC;
 
@@ -26,13 +27,20 @@ public class MazeRobot {
 
     protected Map<Integer, List<PositionProb>> positions = new Hashtable<>();
 
+    protected Map<Integer, Matrix> positionsDistribs = new Hashtable<>();
+
     protected LinkedList<List<Cardinal>> percepts = new LinkedList<>();
 
     protected LinkedList<Cardinal> moves = new LinkedList<>();
 
+    //protected LinkedList<Cardinal> movesTest = new LinkedList<>(Arrays.asList(new Cardinal[]{Cardinal.WEST, Cardinal.EAST, Cardinal.WEST}));
+
     protected Random random = new Random();
 
-    protected double minProb = 0.1;
+    //minimum à 0.1 ou un peu moins, si on utilise le même MMC avec toutes les positions accessibles tout le long du processus
+    //permet de trouver la position au bout d'un cour laps de temps entre 200ms et 1 seconde
+    //minimum à 0 suffit si on recrée le MMC à partir de la liste des positions possibles non nul
+    protected double minProb = 0.1 ;
 
     public MazeRobot(MMC mazeMMC, Maze maze) {
 
@@ -42,7 +50,6 @@ public class MazeRobot {
 
         this.maze.setRobot(this);
     }
-
 
     public void lookUpPosition() {
 
@@ -57,7 +64,7 @@ public class MazeRobot {
         //récupère le filtrage pour le dernier état
         Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
 
-      //  Map<Object, AbstractDouble> distributionMap = positionsDistrib.getDistributionMap();
+        this.positionsDistribs.put(mazeMMC.getTime(), positionsDistrib);
 
         //récupère les positions offrant la plus grande probabilité pour affichage
         this.positions.put(mazeMMC.getTime(), getMostProbablePositions(positionsDistrib));
@@ -73,6 +80,8 @@ public class MazeRobot {
         int rdmId = random.nextInt(reachableDirections.size());
 
         Cardinal randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
+
+        //randomDirection = movesTest.removeFirst();
 
         this.moves.add(randomDirection);
 
@@ -111,6 +120,23 @@ public class MazeRobot {
         return mostProbablePositions;
     }
 
+    public void reload() {
+
+        //récupération les dernieres positions possibles du robot
+        List<PositionProb> lastKnownPositions = getLastKnowPositions();
+        //recuperer toutes les positions alentours
+        List<PositionProb> newInitPositions = maze.getNewReachablePosition(lastKnownPositions);
+        //enregistre ces positions dans le labyrinthe
+        //afin de reinitialiser un mmc avec ces positions
+        maze.setReachablePositions(newInitPositions);
+
+        SmoothingMMC smoothingMMC = mazeMMC.getSmoothingMMC();
+
+        mazeMMC = BayesianNetworkFactory.getMazeMMC(maze, mazeMMC.getTime());
+
+        mazeMMC.setSmoothingMMC(smoothingMMC);
+    }
+
     public static class PositionProb{
 
         protected Position position;
@@ -142,13 +168,31 @@ public class MazeRobot {
         public String toString() {
             return  position +" : "+ prob;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PositionProb that = (PositionProb) o;
+            return Objects.equals(position, that.position);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return Objects.hash(position);
+        }
     }
 
     public Map<Integer, List<PositionProb>> getPositions() {
         return positions;
     }
 
-    public List<Cardinal> getMoves() {
+    public Map<Integer, Matrix> getPositionsDistribs() {
+        return positionsDistribs;
+    }
+
+    public LinkedList<Cardinal> getMoves() {
 
         return moves;
     }
@@ -156,5 +200,15 @@ public class MazeRobot {
     public List<PositionProb> getLastKnowPositions() {
 
         return this.positions.get(mazeMMC.getTime());
+    }
+
+    public void setMazeMMC(MMC mazeMMC) {
+
+        this.mazeMMC = mazeMMC;
+    }
+
+    public void setMinProb(double minProb) {
+
+        this.minProb = minProb;
     }
 }

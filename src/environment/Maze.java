@@ -25,6 +25,8 @@ public class Maze {
 
     protected String[] maze;
 
+    private String[][] strMaze;
+
     protected AbstractDoubleFactory doubleFactory;
 
     public Maze(String[] maze, Position robotPosition, AbstractDoubleFactory doubleFactory) {
@@ -51,6 +53,8 @@ public class Maze {
         this.maze = maze;
 
         this.doubleFactory = doubleFactory;
+
+        this.initStrMaze();
     }
 
     public int countReachablePositions() {
@@ -78,7 +82,7 @@ public class Maze {
 
             double initProb = 1.0 / reachablePositions.size();
 
-            for(PositionProb positionProb : reachablePositions){
+            for (PositionProb positionProb : reachablePositions) {
 
                 positionProb.setProb(doubleFactory.getNew(initProb));
             }
@@ -102,7 +106,7 @@ public class Maze {
                 //si la position est atteignable
                 if (isIn(positionB) && !isWall(positionB)) {
 
-                    allPositions.add(new PositionProb(positionB, doubleFactory.getNew(0.0)));
+                    allPositions.add(new PositionProb(positionB, doubleFactory.getNew(0.001)));
                 }
             }
         }
@@ -249,4 +253,76 @@ public class Maze {
 
         this.reachablePositions = reachablePositions;
     }
+
+    private void initStrMaze() {
+
+        this.strMaze = new String[this.maze.length + 1][this.maze[0].length() + 1];
+
+        for (int row = 0; row < strMaze.length - 1; row++) {
+
+            for (int col = 0; col < strMaze[0].length; col++) {
+
+                if (col == 0) {
+
+                    this.strMaze[row][col] = new String("[" + (this.maze.length - 1 - row) + "]");
+
+                } else {
+
+                    if (maze[row].charAt(col - 1) == '#') {
+
+                        this.strMaze[row][col] = new String("[##]");
+
+                    } else {
+
+                        this.strMaze[row][col] = new String("[  ]");
+                    }
+                }
+            }
+        }
+
+        this.strMaze[this.strMaze.length - 1][0] = new String("[ ]");
+
+        for (int col = 1; col < this.strMaze[0].length; col++) {
+
+            this.strMaze[this.strMaze.length - 1][col] = String.format("[%2d]", col - 1);
+        }
+    }
+
+    private String[][] loadStringMaze() {
+
+        String[][] strMazeCopy = new String[strMaze.length][strMaze[0].length];
+
+        for (int row = 0; row < strMazeCopy.length; row++) {
+
+            for (int col = 0; col < strMazeCopy[0].length; col++) {
+
+                strMazeCopy[row][col] = new String(strMaze[row][col]);
+            }
+        }
+
+        strMazeCopy[this.strMaze.length - 2 - this.robotPosition.y][this.robotPosition.x + 1] = "[++]";
+
+        return strMazeCopy;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder builder = new StringBuilder();
+
+        String[][] strMaze = loadStringMaze();
+
+        for (int row = 0; row < strMaze.length; row++) {
+
+            for (int col = 0; col < strMaze[0].length; col++) {
+
+                builder.append(strMaze[row][col]);
+            }
+
+            builder.append('\n');
+        }
+
+        return builder.toString();
+    }
+
 }

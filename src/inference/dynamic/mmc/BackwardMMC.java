@@ -51,6 +51,7 @@ public class BackwardMMC {
         System.out.println("OBS INVERT x OBS");
         System.out.println(Matrix.multiply(Matrix.invert(timeEndObs), timeEndObs));
 */
+/*
         System.out.println("TRANS ");
         System.out.println(trans);
 
@@ -59,7 +60,7 @@ public class BackwardMMC {
 
         System.out.println("TRANS * OBS");
         System.out.println(Matrix.multiply(trans, timeEndObs));
-
+*/
 /*
         System.out.println("DENOM");
         System.out.println(denom);

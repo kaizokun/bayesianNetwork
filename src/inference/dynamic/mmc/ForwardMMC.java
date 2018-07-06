@@ -1,8 +1,6 @@
 package inference.dynamic.mmc;
 
-import inference.dynamic.Util;
 import math.Matrix;
-import math.Transpose;
 import network.dynamic.MMC;
 
 import java.util.*;
@@ -79,7 +77,7 @@ public class ForwardMMC implements IForward {
          * et pas forcement sur la totalité et au besoin
          * */
 
-        if (t == 0) {
+        if (t == mmc.getInitTime()) {
             //encapsule le vecteur de base qui est horyzontal dans une transposée pour obtenir un vecteur vertical
 
             if (saveForwards) {
@@ -89,6 +87,8 @@ public class ForwardMMC implements IForward {
 
             return this.mmc.getMatrixState0();
         }
+
+       // System.out.println("PERCEPTS "+t+" "+this.mmc.getMegaVariableObs(t));
 
         Matrix obs = this.mmc.getMatrixObs(t);
 
@@ -110,7 +110,14 @@ public class ForwardMMC implements IForward {
         Matrix forward = forward(t - 1, depth + 1, saveForwards);
 
         Matrix sum = this.multiplyTransitionForward(this.mmc.getMatrixStatesT(), forward);
-
+/*
+        System.out.println("FORWARD");
+        System.out.println(forward);
+        System.out.println("TRANSPOSE TRANSITION");
+        System.out.println(this.mmc.getMatrixStatesT());
+        System.out.println("SUM");
+        System.out.println(sum);
+*/
         //Matrix sum = this.mmc.getMatrixStatesT().multiply(rs.forward);
         //inutile de faire une multiplication matricielle avec les observations
         //qui plutot que d'etre placé sur une diagonale
@@ -119,7 +126,12 @@ public class ForwardMMC implements IForward {
         //cependant la forme carré reste necesaire pour le backward
         //il faudrait deux formes de matrices pour les observations si on veut optimiser un peu.
         forward = obs.multiplyRows(sum);
-
+/*
+        System.out.println("OBSERVATION");
+        System.out.println(obs);
+        System.out.println("NEW FORWARD");
+        System.out.println(forward.normalize());
+*/
         forward = forward.normalize();
         //opération supllémentaire pour le most likely path
         this.mostLikelyPath(forward, sum);
