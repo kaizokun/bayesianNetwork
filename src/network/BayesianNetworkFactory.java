@@ -7,19 +7,14 @@ import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
 import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
-import environment.Cardinal;
-import environment.Maze;
-import environment.Position;
+import environment.*;
 import inference.dynamic.mmc.*;
-import math.Combination;
-import math.Matrix;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.MMC;
 import network.dynamic.Model;
 
 import java.util.*;
 
-import static environment.Cardinal.SOUTH;
 import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
 import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.CAPTOR_POSITION;
@@ -448,22 +443,20 @@ public class BayesianNetworkFactory {
         POSITION, CAPTOR_POSITION
     }
 
-    public static MMC getMazeMMC(Maze maze) {
+    public static MMC initMazeMMC(Maze maze, MazeRobot robot) {
 
-        return getMazeMMC(maze, 0);
+        return initMazeMMC(maze, robot,0);
     }
 
-    public static MMC getMazeMMC(Maze maze, int time) {
-
-        System.out.println("INIT MMC "+time);
+    public static MMC initMazeMMC(Maze maze, MazeRobot robot, int time) {
 
         AbstractDoubleFactory doubleFactory = new MyBigDecimalFactory();
 
-        List<PositionProb> reachablePositions = maze.getReachablePositions();
+        List<PositionProb> reachablePositions = robot.getReachablePositions();
 
         List<PositionProb> reachablePosChild = new LinkedList<>(reachablePositions);
 
-        IDomain positionDomain = DomainFactory.getMazePositionDomain(maze);
+        IDomain positionDomain = DomainFactory.getMazePositionDomain(robot);
 
         //-------------matrice racine
 
@@ -526,7 +519,10 @@ public class BayesianNetworkFactory {
          * on ajoute un peu de bruit pour ne pas avoir de valer 0 par exemple 0.01
          * */
 
-        List<Cardinal>[] percepts = Combination.getSubsets(Cardinal.values());
+
+        //List<Cardinal>[] percepts = Combination.getSubsets(Cardinal.values());
+
+        Percept[] percepts = PerceptWall.getAllPercepts();
 
         Double[][] captor = new Double[positionDomain.getSize()][percepts.length];
 
@@ -536,9 +532,9 @@ public class BayesianNetworkFactory {
 
             int b = 0;
 
-            for (List<Cardinal> percept : percepts) {
+            for (Percept percept : percepts) {
 
-                if (maze.matchPercept(positionParent.getPosition(), percept)) {
+                if (maze.getPercept(positionParent.getPosition()).match(percept)) {
 
                     captor[a][b] = 0.999;
 
@@ -569,6 +565,10 @@ public class BayesianNetworkFactory {
         mmc.setForwardMMC(new ForwardMMC(mmc));
 
         mmc.setBackwardMMC(new BackwardMMC(mmc));
+
+        mmc.setSmoothingMMC(new SmoothingForwardBackwardMMC(mmc, mmc.getForwardMMC(), mmc.getBackwardMMC()));
+
+        robot.setMazeMMC(mmc);
 
         return mmc;
     }

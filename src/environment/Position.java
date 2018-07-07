@@ -1,5 +1,7 @@
 package environment;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class Position {
@@ -42,6 +44,18 @@ public class Position {
         return false;
     }
 
+    public List<Position> getNearbyPositions(){
+
+        List<Position> positions = new LinkedList();
+
+        for(Cardinal cardinal : Cardinal.values()){
+
+            positions.add(this.move(cardinal));
+        }
+
+        return positions;
+    }
+
     public Position move(Cardinal cardinal){
 
         return new Position(this.y + cardinal.getDeltaY(), this.x + cardinal.getDeltaX());
@@ -64,7 +78,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return "("+y+", "+x+")";
+        return "ROW["+y+"] COL["+x+"]";
     }
 
 }

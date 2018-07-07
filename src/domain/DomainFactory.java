@@ -1,9 +1,7 @@
 package domain;
 
 import agent.MazeRobot;
-import environment.Cardinal;
-import environment.Maze;
-import environment.Position;
+import environment.*;
 import math.Combination;
 
 import java.util.List;
@@ -20,13 +18,13 @@ public class DomainFactory {
         return new Domain('a', 'b', 'c', 'd');
     }
 
-    public static IDomain getMazePositionDomain(Maze maze) {
+    public static IDomain getMazePositionDomain(MazeRobot robot) {
 
-        Position[] positions = new Position[maze.countReachablePositions()];
+        Position[] positions = new Position[robot.getReachablePositions().size()];
 
         int xy = 0;
 
-        for (MazeRobot.PositionProb position : maze.getReachablePositions()) {
+        for (MazeRobot.PositionProb position : robot.getReachablePositions()) {
 
             positions[xy] = new Position(position.getPosition().getY(), position.getPosition().getX());
 
@@ -39,10 +37,10 @@ public class DomainFactory {
 
     public static IDomain getMazeWallCaptorDomain() {
 
-        return getMazeWallCaptorDomain(Combination.getSubsets(Cardinal.values()));
+        return getMazeWallCaptorDomain(PerceptWall.getAllPercepts());
     }
 
-    public static IDomain getMazeWallCaptorDomain(List<Cardinal>[] percepts) {
+    public static IDomain getMazeWallCaptorDomain(Percept[] percepts) {
 
         return new Domain(percepts);
     }

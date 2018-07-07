@@ -6,8 +6,8 @@ import domain.IDomain;
 import domain.data.AbstractDouble;
 import environment.Cardinal;
 import environment.Maze;
+import environment.Percept;
 import environment.Position;
-import inference.dynamic.mmc.SmoothingMMC;
 import math.Matrix;
 import network.BayesianNetworkFactory;
 import network.Variable;
@@ -27,34 +27,36 @@ public class MazeRobot {
 
     protected Map<Integer, List<PositionProb>> positions = new Hashtable<>();
 
+    protected List<PositionProb> reachablePositions;
+
     protected Map<Integer, Matrix> positionsDistribs = new Hashtable<>();
 
-    protected LinkedList<List<Cardinal>> percepts = new LinkedList<>();
+    protected LinkedList<Percept> percepts = new LinkedList<>();
 
     protected LinkedList<Cardinal> moves = new LinkedList<>();
-
-    //protected LinkedList<Cardinal> movesTest = new LinkedList<>(Arrays.asList(new Cardinal[]{Cardinal.WEST, Cardinal.EAST, Cardinal.WEST}));
 
     protected Random random = new Random();
 
     //minimum à 0.1 ou un peu moins, si on utilise le même MMC avec toutes les positions accessibles tout le long du processus
     //permet de trouver la position au bout d'un cour laps de temps entre 200ms et 1 seconde
     //minimum à 0 suffit si on recrée le MMC à partir de la liste des positions possibles non nul
-    protected double minProb = 0 ;
+    protected double minProb = 0.0;
 
-    public MazeRobot(MMC mazeMMC, Maze maze) {
-
-        this.mazeMMC = mazeMMC;
+    public MazeRobot( Maze maze) {
 
         this.maze = maze;
 
         this.maze.setRobot(this);
+
+        this.reachablePositions = this.maze.getInitReachablePositions();
+
+        this.positions.put(0, this.reachablePositions);
     }
 
     public void lookUpPosition() {
 
         //récupere le percept à partir de l'environnement
-        List<Cardinal> percept = new ArrayList<>(this.maze.getPercept());
+        Percept percept = this.maze.getPercept();
         //crée une variable observation pour etendre le reseau
         Variable observation = new Variable(CAPTOR_POSITION, captorDomain, percept);
 
@@ -75,7 +77,7 @@ public class MazeRobot {
         //récupère toutes les directions
         Set<Cardinal> reachableDirections = Cardinal.getCardinalSetCopy();
         //retirer celles qui ne sont pas accessible
-        reachableDirections.removeAll(this.percepts.getLast());
+        reachableDirections.removeAll((Collection<?>) this.percepts.getLast().getValue());
         //genere un nombre aléatoire en 0 et le nombre de directions licites
         int rdmId = random.nextInt(reachableDirections.size());
 
@@ -124,20 +126,25 @@ public class MazeRobot {
 
         //récupération les dernieres positions possibles du robot
         List<PositionProb> lastKnownPositions = getLastKnowPositions();
-        //recuperer toutes les positions alentours
-        List<PositionProb> newInitPositions = maze.getNewReachablePosition(lastKnownPositions);
-        //enregistre ces positions dans le labyrinthe
-        //afin de reinitialiser un mmc avec ces positions
-        maze.setReachablePositions(newInitPositions);
+        //si aucune on recommence depuis le debut
+        //peut arriver si on supprimme les positions qui ont une faible probabilité
+        //plutot qu'uniquement celles qui sont à zero.
+        if(lastKnownPositions.isEmpty()){
 
-        SmoothingMMC smoothingMMC = mazeMMC.getSmoothingMMC();
+            this.reachablePositions = this.maze.getInitReachablePositions();
 
-        mazeMMC = BayesianNetworkFactory.getMazeMMC(maze, mazeMMC.getTime());
+        }else{
+            //recuperer toutes les positions alentours
+            List<PositionProb> newInitPositions = maze.getNewReachablePosition(lastKnownPositions);
+            //enregistre ces positions afin de reinitialiser le mmc
+            this.reachablePositions = newInitPositions;
+        }
 
-        mazeMMC.setSmoothingMMC(smoothingMMC);
+        mazeMMC = BayesianNetworkFactory.initMazeMMC(maze, this,  mazeMMC.getTime());
     }
 
-    public static class PositionProb{
+
+    public static class PositionProb {
 
         protected Position position;
 
@@ -166,7 +173,7 @@ public class MazeRobot {
 
         @Override
         public String toString() {
-            return  position +" : "+ prob;
+            return position + " : " + prob;
         }
 
         @Override
@@ -197,6 +204,11 @@ public class MazeRobot {
         return moves;
     }
 
+    public List<PositionProb> getReachablePositions() {
+
+        return reachablePositions;
+    }
+
     public List<PositionProb> getLastKnowPositions() {
 
         return this.positions.get(mazeMMC.getTime());
@@ -205,6 +217,10 @@ public class MazeRobot {
     public void setMazeMMC(MMC mazeMMC) {
 
         this.mazeMMC = mazeMMC;
+    }
+
+    public MMC getMazeMMC() {
+        return mazeMMC;
     }
 
     public void setMinProb(double minProb) {

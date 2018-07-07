@@ -2,14 +2,11 @@ package environment;
 
 import agent.MazeRobot;
 import agent.MazeRobot.PositionProb;
-import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 
 import java.util.*;
 
 public class Maze {
-
-    protected Set<Position> walls = new HashSet<>();
 
     protected MazeRobot robot;
 
@@ -19,9 +16,7 @@ public class Maze {
 
     protected Map<Position, Integer> totalAdjacent = new Hashtable<>();
 
-    protected Map<Position, Set<Cardinal>> percepts = new Hashtable<>();
-
-    protected List<PositionProb> reachablePositions = new LinkedList<>();
+    protected Map<Position, Percept> percepts = new Hashtable<>();
 
     protected String[] maze;
 
@@ -31,24 +26,13 @@ public class Maze {
 
     protected AbstractDoubleFactory doubleFactory;
 
+    private static final char wall = '#';
+
     public Maze(String[] maze, Position robotPosition, AbstractDoubleFactory doubleFactory) {
 
         this.limitX = maze[0].length();
 
         this.limitY = maze.length;
-
-        for (int rowStr = this.limitY - 1, row = 0; rowStr >= 0; rowStr--, row++) {
-
-            String mazeRow = maze[rowStr];
-
-            for (int col = 0; col < mazeRow.length(); col++) {
-
-                if (mazeRow.charAt(col) == '#') {
-
-                    walls.add(new Position(row, col));
-                }
-            }
-        }
 
         this.robotPosition = robotPosition;
 
@@ -59,61 +43,64 @@ public class Maze {
         this.initStrMaze();
     }
 
-    public int countReachablePositions() {
+    public List<PositionProb> getInitReachablePositions() {
 
-        // return (this.limitY * this.limitX) - this.walls.size();
-        return this.getReachablePositions().size();
-    }
+        List<PositionProb> positions = new LinkedList<>();
 
-    //get percepts
+        for (int y = 0; y < limitY; y++) {
 
-    public List<PositionProb> getReachablePositions() {
+            for (int x = 0; x < limitX; x++) {
 
-        if (reachablePositions.isEmpty()) {
+                if (!isWall(new Position(y, x))) {
 
-            for (int y = 0; y < limitY; y++) {
-
-                for (int x = 0; x < limitX; x++) {
-
-                    if (!walls.contains(new Position(y, x))) {
-
-                        reachablePositions.add(new PositionProb(new Position(y, x), null));
-                    }
+                    positions.add(new PositionProb(new Position(y, x), null));
                 }
-            }
-
-            double initProb = 1.0 / reachablePositions.size();
-
-            for (PositionProb positionProb : reachablePositions) {
-
-                positionProb.setProb(doubleFactory.getNew(initProb));
             }
         }
 
-        return reachablePositions;
+        double initProb = 1.0 / positions.size();
+
+        for (PositionProb positionProb : positions) {
+
+            positionProb.setProb(doubleFactory.getNew(initProb));
+        }
+
+        return positions;
     }
 
     public List<PositionProb> getNewReachablePosition(List<PositionProb> positionsProb) {
 
-        Set<PositionProb> allPositions = new LinkedHashSet<>();
-
-        allPositions.addAll(positionsProb);
+        Set<PositionProb> allPositions = new LinkedHashSet<>(positionsProb);
 
         //pour chaque positions
         for (PositionProb position : positionsProb) {
             //chaque position alentours
-            for (Cardinal direction : Cardinal.values()) {
 
-                Position positionB = position.getPosition().move(direction);
-                //si la position est atteignable
-                if (isIn(positionB) && !isWall(positionB)) {
+            for (Position nearbyPosition : position.getPosition().getNearbyPositions()) {
 
-                    allPositions.add(new PositionProb(positionB, doubleFactory.getNew(0.001)));
+                if (isReachablePosition(nearbyPosition)) {
+
+                    allPositions.add(new PositionProb(nearbyPosition, doubleFactory.getNew(0.001)));
                 }
             }
         }
 
         return new ArrayList(allPositions);
+    }
+
+    private boolean isReachablePosition(Position position) {
+
+        return isIn(position) && !isWall(position);
+    }
+
+    private boolean isWall(Position position) {
+
+        return this.maze[this.limitY - 1 - position.y].charAt(position.x) == wall;
+    }
+
+    private boolean isIn(Position pos) {
+
+        return pos.y >= 0 && pos.y < limitY && pos.x >= 0 && pos.x < limitX;
     }
 
     public int totalAdjacent(Position position) {
@@ -124,12 +111,10 @@ public class Maze {
         }
 
         int total = 0;
-        //pour chaque position adjacente N S E W
-        for (Cardinal cardinal : Cardinal.values()) {
-            //copie et deplace la position
-            Position adjacent = position.move(cardinal);
-            //si dans les clous et pas un mur
-            if (isIn(adjacent) && !isWall(adjacent)) {
+
+        for (Position nearbyPosition : position.getNearbyPositions()) {
+
+            if (this.isReachablePosition(nearbyPosition)) {
                 //on compte une case adjacente de plus
                 total++;
             }
@@ -138,21 +123,6 @@ public class Maze {
         totalAdjacent.put(position, total);
 
         return total;
-    }
-
-    public boolean isWall(Position position) {
-
-        return this.walls.contains(position);
-    }
-
-    public boolean isIn(Position pos) {
-
-        return pos.y >= 0 && pos.y < limitY && pos.x >= 0 && pos.x < limitX;
-    }
-
-    public Set<Cardinal> getPercept() {
-
-        return getPercept(this.robotPosition);
     }
 
     public void moveRobot(Cardinal cardinal) {
@@ -165,14 +135,19 @@ public class Maze {
         return robotPosition;
     }
 
-    public Set<Cardinal> getPercept(Position position) {
+    public Percept getPercept() {
+
+        return getPercept(this.robotPosition);
+    }
+
+    public Percept getPercept(Position position) {
 
         if (this.percepts.containsKey(position)) {
 
             return this.percepts.get(position);
         }
 
-        Set<Cardinal> percepts = new LinkedHashSet<>();
+        PerceptWall perceptWall = new PerceptWall();
 
         //pour chaque case adjacente, direction N S E W, contenant un potentiel obstacle
         for (Cardinal cardinal : Cardinal.values()) {
@@ -180,51 +155,17 @@ public class Maze {
             Position closePos = position.move(cardinal);
             //si la position est hors du labyrinthe ou est un mur,
             //il y a un obstacle dans cette direction
-            if (!isIn(closePos) || walls.contains(closePos)) {
 
-                percepts.add(cardinal);
+            if (!isReachablePosition(closePos)) {
+
+                perceptWall.addWallDirection(cardinal);
             }
         }
 
-        this.percepts.put(position, percepts);
+        this.percepts.put(position, perceptWall);
 
-        return percepts;
+        return perceptWall;
     }
-
-    public boolean matchPercept(Position position, List<Cardinal> percept) {
-
-        Set<Cardinal> posPercept = getPercept(position);
-
-        if (percept.size() != posPercept.size()) {
-
-            return false;
-        }
-/*
-        //l'odre des cardinalités est identique à celui declaré dans l'enum
-        //pour les deux ensembles à comparer
-        Iterator<Cardinal> limits = posPercept.iterator();
-
-        for(Cardinal direction : percept){
-
-            if(!direction.equals(limits.next())){
-
-                return false;
-            }
-        }
-        */
-
-        //autre manière un peu moins efficace
-        for (Cardinal direction : percept) {
-
-            if (!posPercept.contains(direction)) {
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 
     public int getLimitX() {
         return limitX;
@@ -250,10 +191,7 @@ public class Maze {
         this.robot = robot;
     }
 
-    public void setReachablePositions(List<PositionProb> reachablePositions) {
-
-        this.reachablePositions = reachablePositions;
-    }
+    /*----------------VIEW----------------*/
 
     private void initStrMaze() {
 
@@ -300,26 +238,27 @@ public class Maze {
         this.resetPositions.clear();
 
         //position robot
-        int y = this.strMaze.length - 2 - this.robotPosition.y;
+        int y, x;
 
-        int x = this.robotPosition.x + 1;
+        //position probables
+        for (PositionProb positionProb : robot.getLastKnowPositions()) {
 
-        this.strMaze[y][x] = "[++]";
+            y = this.strMaze.length - 2 - positionProb.getPosition().y;
 
-        this.resetPositions.add(new Position(y, x));
-
-        //positions probables
-        for(PositionProb positionProb : robot.getLastKnowPositions()){
-
-             y = this.strMaze.length - 2 - positionProb.getPosition().y;
-
-             x = positionProb.getPosition().x + 1;
+            x = positionProb.getPosition().x + 1;
 
             this.strMaze[y][x] = "[??]";
 
             this.resetPositions.add(new Position(y, x));
         }
 
+        y = this.strMaze.length - 2 - this.robotPosition.y;
+
+        x = this.robotPosition.x + 1;
+
+        this.strMaze[y][x] = "[++]";
+
+        this.resetPositions.add(new Position(y, x));
     }
 
     @Override
@@ -328,6 +267,19 @@ public class Maze {
         StringBuilder builder = new StringBuilder();
 
         loadStringMaze();
+
+        builder.append("CURRENT TIME : "+this.getRobot().getMazeMMC().getTime()+"\n");
+
+        builder.append("CURRENT PERCEPT : "+this.getPercept().toString()+"\n");
+
+        builder.append("ROBOT POSITION : "+this.getRobotPosition()+"\n");
+
+        builder.append("ROBOT POSITIONS KNOWN\n");
+
+        for(PositionProb positionProb : this.robot.getLastKnowPositions()) {
+
+            builder.append(positionProb+"\n");
+        }
 
         for (int row = 0; row < strMaze.length; row++) {
 
