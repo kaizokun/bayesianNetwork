@@ -41,9 +41,9 @@ public class Combination {
      *
      * */
 
-    public static class Count{
+    public static class Count {
 
-        public int count = 0 ;
+        public int count = 0;
     }
 
     public static <T> List<T>[] getSubsets(T[] set) {
@@ -72,7 +72,7 @@ public class Combination {
         //si la taille est arrivé à zero
         if (size == 0) {
             //on enregistre une copie du sous ensemble créé
-            subSets[c.count++] =new ArrayList<>(subSet);
+            subSets[c.count++] = new ArrayList<>(subSet);
 
             return;
         }
@@ -88,4 +88,42 @@ public class Combination {
         }
 
     }
+
+    public static <T> List<List<T>> getCombinations(List<List<T>> valuesLists) {
+
+        int combinationSize = 1;
+
+        for (List<T> values : valuesLists) {
+
+            combinationSize *= values.size();
+        }
+
+        List<List<T>> combinationsList = new ArrayList<>(combinationSize);
+
+        List<T> combination = (List<T>)Arrays.asList(new Object[valuesLists.size()] );
+
+        loadCombinations(valuesLists, combinationsList, combination, 0);
+
+        return combinationsList;
+    }
+
+    private static <T> void loadCombinations(List<List<T>> valuesLists, List<List<T>> combinationsList, List<T> combination, int iList) {
+
+        if(iList == valuesLists.size()){
+
+            combinationsList.add(new ArrayList<>(combination));
+
+            return;
+        }
+
+        List<T> values = valuesLists.get(iList);
+
+        for (T value : values) {
+
+            combination.set(iList, value);
+
+            loadCombinations(valuesLists, combinationsList, combination, iList + 1);
+        }
+    }
+
 }

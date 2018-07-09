@@ -9,8 +9,6 @@ import network.dynamic.DynamicBayesianNetwork;
 import java.util.*;
 
 import static inference.dynamic.Util.*;
-import static network.BayesianNetwork.domainValuesCombinations;
-import static network.BayesianNetwork.domainValuesCombinationsCheckInit;
 
 public class Forward {
 
@@ -29,10 +27,7 @@ public class Forward {
         this.network = network;
     }
 
-
-
     /*------------------- PREDICTION--------------------*/
-
 
     public AbstractDouble prediction(Variable request, int time) {
 
@@ -61,16 +56,20 @@ public class Forward {
         return this.filtering(requests2);
     }
 
-
-
-
-
     /*------------------- FILTERING--------------------*/
-
 
     public AbstractDouble filtering(Variable request) {
 
         return this.filtering(Arrays.asList(new Variable[]{request}));
+    }
+
+    public Map<Domain.DomainValue, AbstractDouble> filteringFull(List<Variable> requests) {
+
+        String key = getDistribSavedKey(requests);
+
+        this.forward(requests, key, 0);
+
+        return this.forwardDistribSaved.get(key);
     }
 
     public AbstractDouble filtering(List<Variable> requests) {
@@ -93,10 +92,9 @@ public class Forward {
 
     /*------------------- FORWARD--------------------*/
 
+    public void forward(Variable request) {
 
-    public void forward(Variable request, String key, int depth) {
-
-        List<Variable> requests = new LinkedList<Variable>(Arrays.asList(new Variable[]{request}));
+        List<Variable> requests = Arrays.asList(new Variable[]{request});
 
         this.forward(requests, getDistribSavedKey(requests), 0);
     }
@@ -129,10 +127,10 @@ public class Forward {
         //liste des observations à traiter pour l'ensemble de la requete
         //un etat peut avoir plusieurs observations par exemple une maladie plusieurs symptomes
         //un symptomes peut avoir plusieurs états parent, un symptome identiques pour plusieurs états différents
-        //!differencier les isObservation en fonction du temps la classe variable ne se base que sur le label
+        //!differencier les observation en fonction du temps la classe variable ne se base que sur le label
 
         //certaines variables parents des observations pourraient ne pas faire parti de la requete
-        //et doivent donc être ajoutés sans cela impossible de calculer la valeur de l'isObservation
+        //et doivent donc être ajoutés sans cela impossible de calculer la valeur de l'observation
         //si un de ses parents n'a pas de valeur on complete donc la requete si necessaire
 
         Map<String, Variable> requestsObservations = new Hashtable<>();
@@ -142,9 +140,9 @@ public class Forward {
         for (Variable request : requests) {
             //on ajoute la variable dans la liste complétée
             fullRequest.put(request.getVarTimeId(), request);
-            //pour chaque isObservation des variables de la requete
+            //pour chaque observation des variables de la requete
             for (Variable observation : request.getObservations()) {
-                //si l'isObservation est déja connu on passe
+                //si l'observation est déja connu on passe
                 if (requestsObservations.containsKey(observation.getVarTimeId())) continue;
                 //on ajoute les observations de la requete
                 requestsObservations.put(observation.getVarTimeId(), observation);
@@ -157,7 +155,7 @@ public class Forward {
             }
         }
 
-        //ensuite on recherche les variables qui sont au temps 0 elles n'ont ni observations ni parent
+        //ensuite on recherche les variables qui sont au temps initial elles n'ont ni observations ni parent
         //et doivent être traité differrement par exemple une requete qui contient 1 ou plus variable de temps 0
         //ou une chaine de markov d'ordre 2 qui contient des variables à des coupes temporelles différentes
         //les autres seront traités à partir de leur observations
@@ -165,7 +163,7 @@ public class Forward {
 
         for (Variable request : fullRequest.values()) {
 
-            if (request.getTime() == 0) {
+            if (request.getTime() == network.getInitTime()) {
 
                 requestTime0.add(request);
             }
@@ -196,7 +194,7 @@ public class Forward {
          * on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
          * états parents situées à un temps t - 1
          *
-         * Si on prend un cas simple ou on à une variable requete t, une isObservation unique
+         * Si on prend un cas simple ou on à une variable requete t, une observation unique
          * et un max pour un état d'une variable parent unique t - 1
          *
          * Pour chaque combinaison de valeur de la requete
@@ -231,7 +229,7 @@ public class Forward {
             //les variables au temps zero n'ont pas de dependances dont pas d'appel recursif
             //
             for (Variable observation : requestsObservations.values()) {
-                //au cas ou la variale d'isObservation est nul on obtient une prédiction plutot qu'un filtrage
+                //au cas ou la variale d'observation est nul on obtient une prédiction plutot qu'un filtrage
                 if (observation.getDomainValue() != null) {
 
                     AbstractDouble obsProb = observation.getProbabilityForCurrentValue();
@@ -245,7 +243,7 @@ public class Forward {
                         System.out.println();
                     }
                 }
-                //ici une isObservation peut avoir plusieurs parents et il faut à mon sens
+                //ici une observation peut avoir plusieurs parents et il faut à mon sens
                 //les traiter separemment soit une somme par variable parent
                 //dont les resultats seront multipliés. Fonctionne pour le cas simple
                 //reste à tester sur des exemples plus complexes !
@@ -258,7 +256,7 @@ public class Forward {
                     requestValueMaxProbability = requestValueMaxProbability.multiply(rs.max);
                     //ajoute les variables et leur etats qui ont produit le max
 
-                    //la question est : si on à plusieurs isObservation ainsi que plusieurs états parent observés en t
+                    //la question est : si on à plusieurs observation ainsi que plusieurs états parent observés en t
                     //et qu'au final on obtient des etats situé en t - 1 avec des valeurs differentes
                     //pour differents max obtenus ?
                     maxParentStates.addAll(rs.maxDomainVars);
@@ -367,7 +365,7 @@ public class Forward {
         //mais ce n'est pas le problème, l'erreur se situe plutot au niveau du rappel de la methode forward
         //car on a egalement un appel recursif à forward pour s(1),s(0) qui devient la requete. On va par consequent cette fois si
         //calculer une distribution pour cette combinaison de variable et donc assigner leur assigner des valeurs, ici 4 combinaison pour des variables booleenes
-        //on calcule ensuite une isObservation de s(1) par exemple o(1)|s(1) suivit d'une sommation ( dans cette sous procedure)
+        //on calcule ensuite une observation de s(1) par exemple o(1)|s(1) suivit d'une sommation ( dans cette sous procedure)
         //sur le parent de s(1) ici s(0) qui possede deja une valeur.
         //initialisé precedemment dans la partie forward lorsqu'on boucle sur les combinaisons de la requete s(1),s(0)
         //la sommation ne doit donc se faire que sur la valeur de s(0) déja assignée, si on avait plusieurs parents pour s(1) on aurait des combinaison

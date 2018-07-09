@@ -4,6 +4,8 @@ import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import inference.dynamic.Forward;
+import math.Matrix;
 import network.BayesianNetwork;
 import network.ProbabilityCompute;
 import network.Variable;
@@ -17,7 +19,7 @@ import static network.BayesianNetwork.domainValuesCombinations;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
-    protected int time = 0;
+    protected int time, initTime;
 
     protected Map<Integer, Map<Variable, Variable>> timeVariables = new Hashtable<>();
 
@@ -25,9 +27,29 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     protected Map<Variable, List<Model>> captorsModels = new Hashtable<>();
 
-    public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory) {
+    protected Forward forward;
+
+    protected Matrix lastForward;
+
+    public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory, Forward forward, int time) {
+
+        this(doubleFactory, time);
+
+        this.forward = forward;
+    }
+
+    public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory, int time) {
 
         super(doubleFactory);
+
+        this.initTime = time;
+
+        this.time = time;
+    }
+
+    public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory) {
+
+        this(doubleFactory, 0);
     }
 
     public Variable addRootVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
@@ -135,6 +157,42 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
     }
 
+
+    /**
+     * tableau des variables observations
+     */
+
+    public void extend(List<Variable> requests, List<Variable> observations) {
+
+        this.extend();
+
+        for (Variable observation : observations) {
+
+            this.getVariable(this.time, observation).setDomainValue(observation.getDomainValue());
+        }
+
+        if (forward != null) {
+
+           // this.lastForward = new Matrix(this.forward.filteringFull(requests));
+        }
+    }
+
+    /**
+     * tableau des variables observations
+     */
+
+    public void extend(Variable... variables) {
+
+        this.extend();
+
+        for (Variable variable : variables) {
+
+            Variable observation = this.getVariable(this.time, variable);
+
+            observation.setDomainValue(variable.getDomainValue());
+        }
+    }
+
     public void extend() {
 
         this.time++;
@@ -228,6 +286,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     public int getTime() {
 
         return time;
+    }
+
+    public int getInitTime() {
+
+        return initTime;
     }
 
     /*--------------------------- VIEW -----------------------*/

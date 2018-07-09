@@ -2,31 +2,24 @@ package domain;
 
 import java.util.*;
 
-public class Domain implements IDomain {
+public class Domain<T> implements IDomain {
 
     protected List<DomainValue> values;
 
-    protected List<IDomain> subDomains;
+    protected Hashtable<T, DomainValue> index = new Hashtable<>();
 
-    protected Hashtable<Object, DomainValue> index = new Hashtable<>();
+    public Domain(T... values) {
 
-    public Domain(Object... values) {
+        this.values = Arrays.asList(new DomainValue[values.length]);
 
-        this.values = (List)Arrays.asList(new Object[values.length]);
+        for (int i = 0; i < values.length; i++) {
 
-        for(int i = 0 ; i < values.length ; i ++){
-
-            DomainValue domainValue = new DomainValue(values[i],i);
+            DomainValue domainValue = new DomainValue(values[i], i);
 
             this.values.set(i, domainValue);
 
             this.index.put(values[i], domainValue);
         }
-    }
-
-    public Domain(List<IDomain> subDomains){
-
-        this.subDomains = new LinkedList<>(subDomains);
     }
 
     @Override
@@ -42,37 +35,31 @@ public class Domain implements IDomain {
     }
 
     @Override
-    public Object getValue(int j) {
+    public DomainValue getDomainValue(int j) {
 
         return this.values.get(j);
     }
 
     @Override
-    public Object getObjectValue(int j) {
-
-        return this.values.get(j).getValue();
-    }
-
-    @Override
-    public DomainValue getDomainValue(Object object){
+    public DomainValue getDomainValue(Object object) {
 
         return this.index.get(object);
     }
 
-    public static class DomainValue{
+    public static class DomainValue<T> implements Iterable<DomainValue> {
 
-        private Object value;
+        protected T value;
 
-        private int index;
+        protected int index;
 
         public DomainValue() {
         }
 
-        public DomainValue(Object value) {
+        public DomainValue(T value) {
             this.value = value;
         }
 
-        public DomainValue(Object value, int index) {
+        public DomainValue(T value, int index) {
 
             this.value = value;
 
@@ -84,7 +71,7 @@ public class Domain implements IDomain {
             return value;
         }
 
-        public void setValue(Object value) {
+        public void setValue(T value) {
 
             this.value = value;
         }
@@ -116,13 +103,13 @@ public class Domain implements IDomain {
         public int hashCode() {
             return Objects.hash(value);
         }
+
+
+        @Override
+        public Iterator<DomainValue> iterator() {
+
+            return Arrays.asList(new DomainValue[]{this}).iterator();
+        }
     }
 
-    public List<IDomain> getSubDomains() {
-        return subDomains;
-    }
-
-    public void setSubDomains(List<IDomain> subDomains) {
-        this.subDomains = subDomains;
-    }
 }

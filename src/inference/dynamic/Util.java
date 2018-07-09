@@ -9,7 +9,6 @@ import network.Variable;
 
 import java.util.*;
 
-import static network.BayesianNetwork.domainValuesCombinations;
 
 public class Util {
 

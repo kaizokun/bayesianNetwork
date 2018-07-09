@@ -39,7 +39,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         this.TCP = new Hashtable<>();
 
-        this.initCTP(dependencies, varDom, entries, new LinkedList<>(), 0, doubleFactory);
+        this.initCTP(dependencies, varDom, entries, Arrays.asList(new Domain.DomainValue[dependencies.size()]), 0, doubleFactory);
 
         this.cumulativeFrequencies = new Hashtable<>();
 
@@ -50,8 +50,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
     /*===================== INITIALISATION ==============================*/
 
-
-    private void initCTP(List<Variable> dependencies, IDomain varDom, Double[][] entries, LinkedList<String> keyParts,
+    private void initCTP(List<Variable> dependencies, IDomain varDom, Double[][] entries, List<Domain.DomainValue> keyParts,
                          int iDep, AbstractDoubleFactory doubleFactory) {
 
         //Double[][] entries : valeur de la TCP : la premier dimension correspond à une combinaison de valeur pour les parents
@@ -63,7 +62,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         if (iDep == dependencies.size()) {
 
             //genere la clé sous forme de chaine de charactère à partir des valeurs
-            String key = this.getDependenciesValuesKey(keyParts);
+            // String key = this.getDependenciesValuesKey(keyParts);
 
             //récupere l'indice de la ligne de la TCP
 
@@ -81,18 +80,17 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
                 //si une chaine est trop longue pour une valeur
                 //il faudrait mieux encapsuler les valeur de domaines dans une classe
-                //qui contiendrait la aleur sous forme d'objet et un alias plus court
+                //qui contiendrait la valeur sous forme d'objet et un alias plus court
                 //pour l'indexation
-                Domain.DomainValue domainValue = (Domain.DomainValue) varDom.getValue(j);
+                Domain.DomainValue domainValue = varDom.getDomainValue(j);
 
                 AbstractDouble prob = doubleFactory.getNew(entries[iRow][j]);
 
                 row.put(domainValue, prob);
-
             }
 
             //ajout de la ligne dans la TCP
-            this.TCP.put(key, row);
+            this.TCP.put(getValuesKey(keyParts), row);
 
             return;
         }
@@ -101,13 +99,11 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         IDomain dependencieDomain = variable.getDomain();
 
-        for (Domain.DomainValue o : dependencieDomain.getValues()) {
+        for (Domain.DomainValue value : dependencieDomain.getValues()) {
 
-            keyParts.addLast(o.getValue().toString());
+            keyParts.set(iDep, value);
 
             this.initCTP(dependencies, varDom, entries, keyParts, iDep + 1, doubleFactory);
-
-            keyParts.removeLast();
         }
     }
 
@@ -228,42 +224,42 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         }
     }
 
-
     /**------------------ PRIVATES ----------------*/
 
     /**
      * Génere une clé à partir d'une combinaison de valeurs pour les variables parents
      **/
-    private String getDependenciesValuesKey(List<String> keyParts) {
 
-        StringBuilder key = new StringBuilder();
-
-        for (String keyPart : keyParts) {
-
-            key.append(keyPart);
-
-            key.append("-");
-        }
-
-        if (key.length() != 0) {
-
-            key.deleteCharAt(key.length() - 1);
-        }
-
-        return key.toString();
-    }
-
-    private String getDependenciesKey(Iterable<Variable> dependencies) {
+    private String getDependenciesKey(Collection<Variable> dependencies) {
 
         //création de la clé correspondant à la combinaison de valeur des parents
-        List<String> keyParts = new LinkedList<>();
+        StringBuilder builder = new StringBuilder();
 
         for (Variable dep : dependencies) {
+            //ajoute l'id de domaine de la valeur de la variable
+            //plus court...
+            builder.append(dep.getValueId());
 
-            keyParts.add(dep.getValue().toString());
+            builder.append('.');
         }
 
-        return getDependenciesValuesKey(keyParts);
+        return builder.toString();
+    }
+
+    private String getValuesKey(Collection<Domain.DomainValue> values) {
+
+        //création de la clé correspondant à la combinaison de valeur des parents
+        StringBuilder builder = new StringBuilder();
+
+        for (Domain.DomainValue dep : values) {
+            //ajoute l'id de domaine de la valeur de la variable
+            //plus court...
+            builder.append(dep.getIndex());
+
+            builder.append('.');
+        }
+
+        return builder.toString();
     }
 
     private Domain.DomainValue dichotomicSearch(List<Map.Entry<Domain.DomainValue, FrequencyRange>> rangeEntries, AbstractDouble search, int s, int e) {

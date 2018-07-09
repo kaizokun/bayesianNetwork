@@ -140,7 +140,7 @@ public class MazeRobot {
             this.reachablePositions = newInitPositions;
         }
 
-        mazeMMC = BayesianNetworkFactory.initMazeMMC(maze, this,  mazeMMC.getTime());
+        mazeMMC = BayesianNetworkFactory.initMazeMMCB(maze, this,  mazeMMC.getTime());
     }
 
 

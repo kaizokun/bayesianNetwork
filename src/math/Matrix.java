@@ -6,10 +6,7 @@ import domain.data.AbstractDoubleFactory;
 import network.BayesianNetwork;
 import network.Variable;
 
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Matrix {
 
@@ -25,8 +22,7 @@ public class Matrix {
 
     protected boolean isObservation = false;
 
-    public Matrix() {
-    }
+    public Matrix() { }
 
     public Matrix(Matrix matrix) {
 
@@ -38,7 +34,6 @@ public class Matrix {
         this(matrix, null, null, null, null, doubleFactory);
     }
 
-
     public Matrix(AbstractDouble[][] matrix,
                   List<Variable> rowVars,
                   List<List<Domain.DomainValue>> rowValues,
@@ -47,7 +42,6 @@ public class Matrix {
                   AbstractDoubleFactory doubleFactory) {
 
         this(matrix, rowVars, rowValues, colVars, colValues, doubleFactory, false);
-
     }
 
     public Matrix(AbstractDouble[][] matrix,
@@ -71,22 +65,6 @@ public class Matrix {
         this.doubleFactory = doubleFactory;
 
         this.isObservation = isObservation;
-    }
-
-    public Map<Object, AbstractDouble> getDistributionMap() {
-
-        Map<Object, AbstractDouble> distributionMap = new Hashtable<>();
-
-        int row = 0;
-
-        for (Object value : this.getRowValues()) {
-
-            distributionMap.put(value, this.getValue(row));
-
-            row++;
-        }
-
-        return distributionMap;
     }
 
     public Matrix copy() {
@@ -473,10 +451,10 @@ public class Matrix {
             b[i][i] = doubleFactory.getNew(1.0);
         }
 
-        // Transform the matrix into an upper triangle
+        // Transform the tcp into an upper triangle
         gaussian(matrix, index, doubleFactory);
 
-        // Update the matrix b[i][j] with the ratios stored
+        // Update the tcp b[i][j] with the ratios stored
 
         for (int i = 0; i < n - 1; ++i) {
 
@@ -603,5 +581,6 @@ public class Matrix {
             }
         }
     }
+
 
 }

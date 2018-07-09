@@ -445,7 +445,7 @@ public class BayesianNetworkFactory {
 
     public static MMC initMazeMMC(Maze maze, MazeRobot robot) {
 
-        return initMazeMMC(maze, robot,0);
+        return initMazeMMC(maze, robot, 0);
     }
 
     public static MMC initMazeMMC(Maze maze, MazeRobot robot, int time) {
@@ -573,5 +573,139 @@ public class BayesianNetworkFactory {
         return mmc;
     }
 
+    public static MMC initMazeMMCB(Maze maze, MazeRobot robot) {
+        return initMazeMMCB(maze, robot, 0);
+    }
+
+    public static MMC initMazeMMCB(Maze maze, MazeRobot robot, int time) {
+
+        AbstractDoubleFactory doubleFactory = new MyBigDecimalFactory();
+
+        List<PositionProb> reachablePositions = robot.getReachablePositions();
+
+        List<PositionProb> reachablePosChild = new LinkedList<>(reachablePositions);
+
+        IDomain positionDomain = DomainFactory.getMazePositionDomain(robot);
+
+        //-------------matrice racine
+
+        //-------------variable etat racine
+
+        Variable position0 = new Variable(POSITION, positionDomain);
+
+        Double[][] rootTransition = new Double[1][positionDomain.getSize()];
+
+        int pos = 0;
+        //verifier si l'ordre correspond
+        for (PositionProb positionProb : reachablePositions) {
+
+            rootTransition[0][pos] = positionProb.getProb().getDoubleValue();
+
+            pos++;
+        }
+
+        ProbabilityCompute tcpPositions0 = new MatrixTCP(new ArrayList<>(), position0, rootTransition, doubleFactory);
+
+        position0.setProbabilityCompute(tcpPositions0);
+
+        //-------------matrice transition
+
+        //-------------variable etat
+
+        Variable varPosition = new Variable(POSITION, positionDomain, new Variable[]{position0});
+
+        Double[][] transition = new Double[positionDomain.getSize()][positionDomain.getSize()];
+
+        int a = 0;
+
+        for (PositionProb previousPos : reachablePositions) {
+
+            int b = 0;
+
+            for (PositionProb position : reachablePosChild) {
+
+                if (position.getPosition().adjacent(previousPos.getPosition())) {
+
+                    transition[a][b] = 1.0 / maze.totalAdjacent(previousPos.getPosition());
+
+                } else {
+
+                    transition[a][b] = 0.1;
+                }
+
+                b++;
+            }
+
+            a++;
+        }
+
+        ProbabilityCompute tcpPositions = new MatrixTCP(
+                new Variable[]{position0}, varPosition, transition, doubleFactory);
+
+        varPosition.setProbabilityCompute(tcpPositions);
+
+        //------------- capteur
+
+        /*
+         * les lignes sont les positionsDistrib atteignables
+         * les colones les sous ensembles de positionsDistrib N S E W soit 2^4
+         * la probabilité d'un percept est total si cela correspond aux contours d'une position
+         * on ajoute un peu de bruit pour ne pas avoir de valer 0 par exemple 0.01
+         * */
+
+
+        //List<Cardinal>[] percepts = Combination.getSubsets(Cardinal.values());
+
+        //-------------variable capteur position
+        Percept[] percepts = PerceptWall.getAllPercepts();
+
+        IDomain captorDomain = DomainFactory.getMazeWallCaptorDomain(percepts);
+
+        Variable positionCaptor = new Variable(CAPTOR_POSITION, captorDomain, new Variable[]{varPosition});
+
+        Double[][] captor = new Double[positionDomain.getSize()][percepts.length];
+
+        a = 0;
+
+        for (PositionProb positionParent : reachablePositions) {
+
+            int b = 0;
+
+            for (Percept percept : percepts) {
+
+                if (maze.getPercept(positionParent.getPosition()).match(percept)) {
+
+                    captor[a][b] = 0.999;
+
+                } else {
+
+                    captor[a][b] = 0.0;
+                }
+
+                b++;
+            }
+
+            a++;
+        }
+
+        ProbabilityCompute tcpCaptors = new MatrixTCP(
+                new Variable[]{varPosition}, positionCaptor, captor, doubleFactory);
+
+        positionCaptor.setProbabilityCompute(tcpCaptors);
+
+        //-----------------------------------------
+
+        MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{varPosition}, new Variable[]{positionCaptor}, doubleFactory, time);
+
+        mmc.setForwardMMC(new ForwardMMC(mmc));
+
+        mmc.setBackwardMMC(new BackwardMMC(mmc));
+
+        mmc.setSmoothingMMC(new SmoothingForwardBackwardMMC(mmc, mmc.getForwardMMC(), mmc.getBackwardMMC()));
+
+        robot.setMazeMMC(mmc);
+
+        return mmc;
+    }
 
 }
