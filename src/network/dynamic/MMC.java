@@ -176,9 +176,9 @@ public class MMC extends DynamicBayesianNetwork {
 
     private Variable mergeObservationVariables(List<Variable> obs, List<Variable> states, int time) {
 
-        Variable megaObs = obs.size() == 1 ? obs.get(0) : new MegaVariable(obs, time);
+        Variable megaObs = obs.size() == 1 ? obs.get(0) : new MegaVariable(obs, time, this.doubleFactory);
 
-        Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time);
+        Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time, this.doubleFactory);
 
         //récuperer les combinaisons de valeurs on aura une matrice par valeur
         //que peuvent prendre les observations à un temps t
@@ -220,7 +220,7 @@ public class MMC extends DynamicBayesianNetwork {
 
     private Variable mergeStateVariables(List<Variable> states, int time, boolean first) {
 
-        Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time);
+        Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time, this.doubleFactory);
 
         AbstractDouble[][] matrix;
         //si variables de temps 0
@@ -253,7 +253,7 @@ public class MMC extends DynamicBayesianNetwork {
             //enregistre les états parents qui restent identiques pour un MMC
             //this.parentStates = parentStates;
 
-            Variable megaParent = new MegaVariable(parentStates, time - 1);
+            Variable megaParent = new MegaVariable(parentStates, time - 1, this.doubleFactory);
 
             int row = 0;
             //pour chaque combinaisons de valeurs pouvant être prises par les variables parents

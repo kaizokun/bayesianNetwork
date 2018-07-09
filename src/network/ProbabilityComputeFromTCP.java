@@ -236,9 +236,9 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         StringBuilder builder = new StringBuilder();
 
         for (Variable dep : dependencies) {
-            //ajoute l'id de domaine de la valeur de la variable
+            //ajoute l'id de domain de la valeur de la variable
             //plus court...
-            builder.append(dep.getValueId());
+            builder.append(dep.getDomainValue().getIndex());
 
             builder.append('.');
         }
@@ -294,7 +294,31 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         Domain.DomainValue value = var.getDomainValue();
 
-        return this.TCP.get(depKey).get(value);
+        try {
+
+            return this.TCP.get(depKey).get(value);
+
+        }catch (NullPointerException e){
+
+            e.printStackTrace();
+
+            System.out.println(var);
+
+            System.out.println(var.getDependencies());
+
+            System.out.println("KEY "+depKey);
+
+            System.out.println("DOMAIN VALUE "+var.getDomainValue());
+
+            System.out.println("TCP ENTRY "+this.TCP.get(depKey));
+
+            System.out.println(this);
+
+            System.exit(0);
+
+            throw e;
+        }
+
     }
 
     @Override

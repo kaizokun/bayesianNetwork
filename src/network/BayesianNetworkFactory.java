@@ -309,6 +309,8 @@ public class BayesianNetworkFactory {
 
         mmc.setBackwardMMC(new BackwardMMC(mmc));
 
+        mmc.setSmoothingMMC(new SmoothingForwardBackwardMMC(mmc, mmc.getForwardMMC(), mmc.getBackwardMMC()));
+
         return mmc;
     }
 
@@ -352,6 +354,8 @@ public class BayesianNetworkFactory {
         mmc.setForwardMMC(new ForwardMMC(mmc));
 
         mmc.setBackwardMMC(new BackwardMMC(mmc));
+
+        mmc.setSmoothingMMC(new SmoothingForwardBackwardMMC(mmc, mmc.getForwardMMC(), mmc.getBackwardMMC()));
 
         return mmc;
     }

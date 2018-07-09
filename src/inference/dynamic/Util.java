@@ -123,10 +123,11 @@ public class Util {
     }
 
 
-    public static Map<Domain.DomainValue, AbstractDouble> multiplyDistributions(AbstractDoubleFactory doubleFactory, Map<Domain.DomainValue, AbstractDouble>... distributions) {
+    public static Map<Domain.DomainValue, AbstractDouble> multiplyDistributions(AbstractDoubleFactory doubleFactory,
+                                                                                Map<Domain.DomainValue, AbstractDouble>... distributions) {
 
         //distribution final issue des distributions d'origine
-        //et dont les valerus ont été multipliées pour chaque entrées qui sont identiques dans les tables
+        //et dont les valeurs ont été multipliées pour chaque entrées qui sont identiques dans les tables
         Map<Domain.DomainValue, AbstractDouble> finalDistribution = new Hashtable<>();
         //pour chaque clé de la table : un Object DomainValue ( qui peut être composé d'une liste de DomainValue
         //cas de plusieurs variable par requete )
@@ -136,7 +137,10 @@ public class Util {
 
             AbstractDouble valueTotal = doubleFactory.getNew(1.0);
             //multiplie les entrées pour chaque clé une par une dans chaque distribution
+
             for (Map<Domain.DomainValue, AbstractDouble> distribution : distributions) {
+
+                System.out.println(distribution);
 
                 valueTotal = valueTotal.multiply(distribution.get(domainValue));
             }

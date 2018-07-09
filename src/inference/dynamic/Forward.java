@@ -2,7 +2,6 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
-import network.BayesianNetwork;
 import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -75,7 +74,7 @@ public class Forward {
 
     public AbstractDouble filtering(List<Variable> requests) {
 
-        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.simpleMegaVariable(requests);
+        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
 
         String key = getDistribSavedKey(requests);
 
@@ -176,19 +175,20 @@ public class Forward {
 
         System.out.println(requestTime0);
 
-        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.simpleMegaVariable(requests);
+        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
 
         Variable fullMegaRequest = fullRequest.values().size() == 1 ?
                 fullRequest.values().iterator().next() :
-                MegaVariable.simpleMegaVariable(new ArrayList<>(fullRequest.values()));
+                MegaVariable.encapsulate(new ArrayList<>(fullRequest.values()));
 
         Variable megaRequest0 = null;
 
         if(!requestTime0.isEmpty()) {
-
+            //si pas de variabel en temps 0 on ne fait rien
+            //ici ce la créerait une megavariable vide qui poserait problème
             megaRequest0 = requestTime0.size() == 1 ?
                     requestTime0.iterator().next() :
-                    MegaVariable.simpleMegaVariable(new ArrayList<>(requestTime0));
+                    MegaVariable.encapsulate(new ArrayList<>(requestTime0));
         }
 
         //List<List<Domain.DomainValue>> requestsValuesCombinations = BayesianNetwork.domainValuesCombinations(fullRequest.values());
@@ -354,7 +354,7 @@ public class Forward {
         //si elle fait déja partie de la requete dans la procedure appelante, elle doit rester en l'état
 
         Variable megaHiddenVar = obsParentState.getDependencies().size() == 1 ? obsParentState.getDependencies().get(0) :
-               MegaVariable.simpleMegaVariable(obsParentState.getDependencies());
+               MegaVariable.encapsulate(obsParentState.getDependencies());
 
         Domain.DomainValue originalValues = megaHiddenVar.getDomainValue();
 

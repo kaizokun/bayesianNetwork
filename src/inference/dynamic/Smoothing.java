@@ -2,6 +2,7 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
+import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 
@@ -65,14 +66,9 @@ public class Smoothing {
 
     protected AbstractDouble smoothing(List<Variable> requests, int timeEnd, int markovOrder) {
 
-        List<Domain.DomainValue> domainValues = new LinkedList<>();
+        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
 
         String key = getDistribSavedKey(requests);
-
-        for (Variable request : requests) {
-
-            domainValues.add(request.getDomainValue());
-        }
 
         this.forward.forward(requests, key, 0);
 
@@ -88,7 +84,7 @@ public class Smoothing {
         Map<Domain.DomainValue, AbstractDouble> distributionFinal =
                 this.smootDistribution(this.forward.forwardDistribSaved.get(key), this.backward.backwardDistribSaved.get(key));
 
-        return distributionFinal.get(new Domain.DomainValue(domainValues)).divide(distributionFinal.get(totalDomainValues));
+        return distributionFinal.get(megaRequest.getDomainValue()).divide(distributionFinal.get(totalDomainValues));
     }
 
 

@@ -13,7 +13,7 @@ public class SamplingAsk {
         network.markImportantVars(request, obs);
 
         List<Variable> variables = network.getTopologicalOrder();
-        //sauvegarde les valeurs originales des variables de requete et d'isObservation
+        //sauvegarde les valeurs originales des variables de requete et d'observation
         for (Variable reqVar : request) {
 
             reqVar.saveOriginValue();
@@ -40,7 +40,7 @@ public class SamplingAsk {
             boolean nextSample = false;
 
             for (Variable o : obs) {
-                //si la valeur de la variable d'isObservation ne correspond plus
+                //si la valeur de la variable d'observation ne correspond plus
                 // on passe au prochain echantillon
                 if (!o.originalValueMatch()) {
 

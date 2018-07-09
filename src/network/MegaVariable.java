@@ -4,6 +4,7 @@ import domain.Domain;
 import domain.IDomain;
 import domain.MegaDomain;
 import domain.data.AbstractDouble;
+import domain.data.AbstractDoubleFactory;
 import math.Combination;
 
 import java.util.*;
@@ -11,6 +12,8 @@ import java.util.*;
 public class MegaVariable extends Variable implements Iterable<Variable> {
 
     protected List<Variable> compoVars;
+
+    protected AbstractDoubleFactory doubleFactory;
 
     /**
      * Generate a mega variable from a list of variables
@@ -23,27 +26,24 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
     public MegaVariable(){}
 
-    public MegaVariable(Collection<Variable> compoVars) {
-
-        this(compoVars, 0, initDomain(compoVars));
-    }
-
-    public MegaVariable(Collection<Variable> compoVars, int time) {
+    public MegaVariable(Collection<Variable> compoVars, int time, AbstractDoubleFactory doubleFactory) {
 
         this(compoVars, time, initDomain(compoVars));
+
+        this.doubleFactory = doubleFactory;
     }
 
     public MegaVariable(Collection<Variable> compoVars, int time, IDomain domain) {
 
         this.time = time;
 
-        this.compoVars = new ArrayList<>(compoVars.size());
-
+        this.compoVars = new ArrayList<>(compoVars);
+/*
         for (Variable compoVar : compoVars) {
 
             this.compoVars.add(new Variable(compoVar.label, this.time, compoVar.domainValue, compoVar.domain));
         }
-
+*/
         this.label = getLabel();
 
         this.domain = domain;
@@ -186,7 +186,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
     @Override
     public AbstractDouble getProbabilityForCurrentValue() {
 
-        AbstractDouble prob = this.probabilityCompute.getDoubleFactory().getNew(1.0);
+        AbstractDouble prob = this.doubleFactory.getNew(1.0);
 
         for (Variable variable : this.compoVars) {
 
@@ -233,7 +233,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         return new MegaVariable(this.compoVars, time, this.getDomain());
     }
 
-    public static Variable simpleMegaVariable(List<Variable> variables){
+    public static Variable encapsulate(List<Variable> variables){
 
         MegaVariable megavariable = new MegaVariable();
 
