@@ -10,7 +10,6 @@ import java.util.*;
 
 public class MegaVariable extends Variable implements Iterable<Variable> {
 
-
     protected List<Variable> compoVars;
 
     /**
@@ -22,17 +21,19 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
      * (label, time, domainValue, domain)
      */
 
-    public MegaVariable(Variable megaVariableObs, int time, IDomain domain) {
+    public MegaVariable(){}
 
-        this(megaVariableObs.getCompoVars(), time, domain);
+    public MegaVariable(Collection<Variable> compoVars) {
+
+        this(compoVars, 0, initDomain(compoVars));
     }
 
-    public MegaVariable(List<Variable> compoVars, int time) {
+    public MegaVariable(Collection<Variable> compoVars, int time) {
 
         this(compoVars, time, initDomain(compoVars));
     }
 
-    public MegaVariable(List<Variable> compoVars, int time, IDomain domain) {
+    public MegaVariable(Collection<Variable> compoVars, int time, IDomain domain) {
 
         this.time = time;
 
@@ -48,7 +49,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         this.domain = domain;
     }
 
-    private static IDomain initDomain(List<Variable> compoVars) {
+    private static IDomain initDomain(Collection<Variable> compoVars) {
 
         List<List<Domain.DomainValue>> domainValuesList = new ArrayList<>(compoVars.size());
 
@@ -60,6 +61,39 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         List<List<Domain.DomainValue>> combinations = Combination.getCombinations(domainValuesList);
 
         return new MegaDomain(combinations);
+    }
+
+    public List<Domain.DomainValue> getDomainValuesCheckInit(){
+
+        return getDomainValuesCheckInit(this.getCompoVars());
+    }
+
+    protected static List<Domain.DomainValue> getDomainValuesCheckInit(Collection<Variable> compoVars) {
+
+        List<List<Domain.DomainValue>> domainValuesList = new ArrayList<>(compoVars.size());
+
+        for (Variable variable : compoVars) {
+
+            if(variable.isInit()){
+
+                domainValuesList.add(Arrays.asList(new Domain.DomainValue[]{variable.getDomainValue()}));
+
+            }else {
+
+                domainValuesList.add(variable.getDomainValues());
+            }
+        }
+
+        List<List<Domain.DomainValue>> combinations = Combination.getCombinations(domainValuesList);
+
+        List<Domain.DomainValue> combinations2 = new ArrayList<>(combinations.size());
+
+        for(List<Domain.DomainValue> values : combinations){
+
+            combinations2.add(new Domain.DomainValue(values));
+        }
+
+        return combinations2;
     }
 
     public String getLabel() {
@@ -133,14 +167,20 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
     @Override
     public void setDomainValue(Domain.DomainValue value) {
 
-       Iterator<Domain.DomainValue> domainValueIterator = value.iterator();
+        Iterator<Domain.DomainValue> domainValueIterator = value.iterator();
 
         Iterator<Variable> variableIterator = compoVars.iterator();
 
-        while (domainValueIterator.hasNext() && variableIterator.hasNext()){
+        while (domainValueIterator.hasNext() && variableIterator.hasNext()) {
 
             variableIterator.next().setDomainValue(domainValueIterator.next());
         }
+    }
+
+    @Override
+    public Domain.DomainValue getDomainValue() {
+
+       return this.domain.getDomainValue(this.getMegaVarValues());
     }
 
     @Override
@@ -148,7 +188,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         AbstractDouble prob = this.probabilityCompute.getDoubleFactory().getNew(1.0);
 
-        for(Variable variable : this.compoVars){
+        for (Variable variable : this.compoVars) {
 
             prob = prob.multiply(variable.getProbabilityForCurrentValue());
         }
@@ -171,6 +211,10 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         return compoVars;
     }
 
+    public void setCompoVars(List<Variable> compoVars) {
+        this.compoVars = compoVars;
+    }
+
     @Override
     public String toString() {
 
@@ -181,5 +225,22 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
     public Iterator<Variable> iterator() {
 
         return this.compoVars.iterator();
+    }
+
+    @Override
+    public Variable mmcCopy(int time) {
+
+        return new MegaVariable(this.compoVars, time, this.getDomain());
+    }
+
+    public static Variable simpleMegaVariable(List<Variable> variables){
+
+        MegaVariable megavariable = new MegaVariable();
+
+        megavariable.setDomain(initDomain(variables));
+
+        megavariable.setCompoVars(variables);
+
+        return megavariable;
     }
 }

@@ -14,7 +14,7 @@ public class Matrix {
 
     protected AbstractDoubleFactory doubleFactory;
     //pour l'affichage des matrices
-    protected List<List<Domain.DomainValue>> colValues, rowValues;
+    protected List<Domain.DomainValue> colValues, rowValues;
 
     protected List<Variable> colVars, rowVars;
 
@@ -36,9 +36,9 @@ public class Matrix {
 
     public Matrix(AbstractDouble[][] matrix,
                   List<Variable> rowVars,
-                  List<List<Domain.DomainValue>> rowValues,
+                  List<Domain.DomainValue> rowValues,
                   List<Variable> colVars,
-                  List<List<Domain.DomainValue>> colValues,
+                  List<Domain.DomainValue> colValues,
                   AbstractDoubleFactory doubleFactory) {
 
         this(matrix, rowVars, rowValues, colVars, colValues, doubleFactory, false);
@@ -46,9 +46,9 @@ public class Matrix {
 
     public Matrix(AbstractDouble[][] matrix,
                   List<Variable> rowVars,
-                  List<List<Domain.DomainValue>> rowValues,
+                  List<Domain.DomainValue> rowValues,
                   List<Variable> colVars,
-                  List<List<Domain.DomainValue>> colValues,
+                  List<Domain.DomainValue> colValues,
                   AbstractDoubleFactory doubleFactory,
                   boolean isObservation) {
 
@@ -323,7 +323,7 @@ public class Matrix {
 
             builder.append(ident + String.format("%6s", ""));
 
-            for (List<Domain.DomainValue> domainValues : this.getColValues()) {
+            for (Domain.DomainValue domainValues : this.getColValues()) {
 
                 builder.append(String.format("%-7s", domainValues));
             }
@@ -353,11 +353,11 @@ public class Matrix {
     }
 
 
-    public List<List<Domain.DomainValue>> getColValues() {
+    public List<Domain.DomainValue> getColValues() {
         return colValues;
     }
 
-    public List<List<Domain.DomainValue>> getRowValues() {
+    public List<Domain.DomainValue> getRowValues() {
         return rowValues;
     }
 
@@ -369,11 +369,11 @@ public class Matrix {
         return rowVars;
     }
 
-    public void setColValues(List<List<Domain.DomainValue>> colValues) {
+    public void setColValues(List<Domain.DomainValue> colValues) {
         this.colValues = colValues;
     }
 
-    public void setRowValues(List<List<Domain.DomainValue>> rowValues) {
+    public void setRowValues(List<Domain.DomainValue> rowValues) {
         this.rowValues = rowValues;
     }
 
@@ -406,7 +406,7 @@ public class Matrix {
         return maxPrevious.get(row);
     }
 
-    public List<Domain.DomainValue> getRowValue(int row) {
+    public Domain.DomainValue getRowValue(int row) {
         //retourne la valeur de ligne
         return this.getRowValues().get(row);
     }

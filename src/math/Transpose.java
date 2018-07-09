@@ -13,9 +13,9 @@ public class Transpose extends Matrix {
 
     public Transpose(AbstractDouble[][] matrix,
                      List<Variable> rowVars,
-                     List<List<Domain.DomainValue>> rowValues,
+                     List<Domain.DomainValue> rowValues,
                      List<Variable> colVars,
-                     List<List<Domain.DomainValue>> colValues,
+                     List<Domain.DomainValue> colValues,
                      AbstractDoubleFactory doubleFactory) {
 
         super(matrix, rowVars, rowValues, colVars, colValues, doubleFactory);
@@ -23,7 +23,7 @@ public class Transpose extends Matrix {
 
     public Transpose(AbstractDouble[][] matrix,
                      List<Variable> colVars,
-                     List<List<Domain.DomainValue>> colValues,
+                     List<Domain.DomainValue> colValues,
                      AbstractDoubleFactory doubleFactory) {
 
         super(matrix, null, null, colVars, colValues, doubleFactory);
@@ -72,12 +72,12 @@ public class Transpose extends Matrix {
     }
 
     @Override
-    public List<List<Domain.DomainValue>> getColValues() {
+    public List<Domain.DomainValue> getColValues() {
         return super.getRowValues();
     }
 
     @Override
-    public List<List<Domain.DomainValue>> getRowValues() {
+    public List<Domain.DomainValue> getRowValues() {
         return super.getColValues();
     }
 

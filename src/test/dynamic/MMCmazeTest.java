@@ -26,7 +26,7 @@ public class MMCmazeTest {
 
         MazeRobot robot = new MazeRobot(maze);
 
-        BayesianNetworkFactory.initMazeMMCB(maze, robot);
+        BayesianNetworkFactory.initMazeMMC(maze, robot);
 
         //mmcMaze.setSmootStart(5);
 

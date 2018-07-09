@@ -103,9 +103,9 @@ public class MazeRobot {
         //pour chaque ligne de la matrice ici la megavariable ne contient qu'une sous variable
         int iRow = 0;
 
-        for (List<Domain.DomainValue> row : positionsDistrib.getRowValues()) {
+        for (Domain.DomainValue row : positionsDistrib.getRowValues()) {
 
-            Position position = (Position) row.get(0).getValue();
+            Position position = (Position) row.getValue();
 
             AbstractDouble prob = positionsDistrib.getValue(iRow, 0);
 
@@ -140,7 +140,7 @@ public class MazeRobot {
             this.reachablePositions = newInitPositions;
         }
 
-        mazeMMC = BayesianNetworkFactory.initMazeMMCB(maze, this,  mazeMMC.getTime());
+        mazeMMC = BayesianNetworkFactory.initMazeMMC(maze, this,  mazeMMC.getTime());
     }
 
 

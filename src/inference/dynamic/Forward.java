@@ -3,6 +3,7 @@ package inference.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import network.BayesianNetwork;
+import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 
@@ -74,20 +75,15 @@ public class Forward {
 
     public AbstractDouble filtering(List<Variable> requests) {
 
+        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.simpleMegaVariable(requests);
+
         String key = getDistribSavedKey(requests);
-
-        List<Domain.DomainValue> domainValues = new LinkedList<>();
-
-        for (Variable request : requests) {
-
-            domainValues.add(request.getDomainValue());
-        }
 
         this.forward(requests, key, 0);
 
         Map<Domain.DomainValue, AbstractDouble> distrib = this.forwardDistribSaved.get(key);
 
-        return distrib.get(new Domain.DomainValue(domainValues)).divide(distrib.get(totalDomainValues));
+        return distrib.get(megaRequest.getDomainValue()).divide(distrib.get(totalDomainValues));
     }
 
     /*------------------- FORWARD--------------------*/
@@ -170,12 +166,34 @@ public class Forward {
         }
 
         if (forwardLog) {
+
             System.out.println(ident + "FULL REQUEST " + fullRequest.values());
         }
 
-        List<List<Domain.DomainValue>> requestsValuesCombinations = BayesianNetwork.domainValuesCombinations(fullRequest.values());
+        System.out.println(requests);
 
-        List<Domain.DomainValue> originalValues = Util.getDomainValues(fullRequest.values());
+        System.out.println(fullRequest.values());
+
+        System.out.println(requestTime0);
+
+        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.simpleMegaVariable(requests);
+
+        Variable fullMegaRequest = fullRequest.values().size() == 1 ?
+                fullRequest.values().iterator().next() :
+                MegaVariable.simpleMegaVariable(new ArrayList<>(fullRequest.values()));
+
+        Variable megaRequest0 = null;
+
+        if(!requestTime0.isEmpty()) {
+
+            megaRequest0 = requestTime0.size() == 1 ?
+                    requestTime0.iterator().next() :
+                    MegaVariable.simpleMegaVariable(new ArrayList<>(requestTime0));
+        }
+
+        //List<List<Domain.DomainValue>> requestsValuesCombinations = BayesianNetwork.domainValuesCombinations(fullRequest.values());
+
+        Domain.DomainValue originalValue = fullMegaRequest.getDomainValue();
 
         /*
          * Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
@@ -202,14 +220,9 @@ public class Forward {
          * */
 
         //pour chaque combinaison de valeur de la requete complétée
-        for (List<Domain.DomainValue> domainValues : requestsValuesCombinations) {
+        for (Domain.DomainValue domainValue : fullMegaRequest.getDomainValues()) {
 
-            Iterator<Variable> requestIterator = fullRequest.values().iterator();
-            //initialise les variables avec une combinaison
-            for (Domain.DomainValue domainValue : domainValues) {
-
-                requestIterator.next().setDomainValue(domainValue);
-            }
+            fullMegaRequest.setDomainValue(domainValue);
 
             if (forwardLog) {
 
@@ -227,7 +240,6 @@ public class Forward {
             //si on à plusieurs observations chacune est independantes des autres
             //et est calculé separemment suivit de la partie sommation contenant l'appel recursif au forward
             //les variables au temps zero n'ont pas de dependances dont pas d'appel recursif
-            //
             for (Variable observation : requestsObservations.values()) {
                 //au cas ou la variale d'observation est nul on obtient une prédiction plutot qu'un filtrage
                 if (observation.getDomainValue() != null) {
@@ -262,56 +274,50 @@ public class Forward {
                     maxParentStates.addAll(rs.maxDomainVars);
                 }
             }
-            //pour les variables situées au temps 0 ont obtient directement leur probabilité
-            for (Variable request0 : requestTime0) {
 
-                AbstractDouble reqProb = request0.getProbabilityForCurrentValue();
+            if(!requestTime0.isEmpty()) {
+                //pour les variables situées au temps 0 ont obtient directement leur probabilité
+                AbstractDouble req0Prob = megaRequest0.getProbabilityForCurrentValue();
 
-                requestValueProbability = requestValueProbability.multiply(reqProb);
+                requestValueProbability = requestValueProbability.multiply(req0Prob);
 
-                requestValueMaxProbability = requestValueMaxProbability.multiply(reqProb);
+                requestValueMaxProbability = requestValueMaxProbability.multiply(req0Prob);
 
                 if (forwardLog) {
-                    System.out.println(ident + "STATE_0 P(" + request0 + ") = " + reqProb);
+                    System.out.println(ident + "STATE_0 P(" + megaRequest0 + ") = " + req0Prob);
                 }
             }
-            //Si la combinaison sur laquelle ont travaille actuellement contient
+            //Si la combinaison sur laquelle on travaille actuellement contient
             //plus de variables que celles requete originale
             //mais cependant necessaires pour le calcul on s'interesse
             //ici uniquement à la combinaison de valeurs pour les variables de la requete d'origine
             //sinon il faudrait retrouver cette combinaison parmis plusieurs autres qui la contiendrait
             //P(X1=v,X2=v) = P(X1=v,X2=v,X3=v) + P(X1=v,X2=v,X3=f)
-            List<Domain.DomainValue> requestDomainValues = new LinkedList<>();
 
-            for (Variable request : requests) {
-
-                requestDomainValues.add(request.getDomainValue());
-            }
+            Domain.DomainValue requestDomainValue = megaRequest.getDomainValue();
 
             if (forwardLog) {
-                System.out.println(ident + "ORIGINAL REQUEST COMBINATION " + requests + " : " + requestDomainValues
+                System.out.println(ident + "ORIGINAL REQUEST COMBINATION " + requests + " : " + requestDomainValue
                         + " - total = " + requestValueProbability);
             }
 
-            Domain.DomainValue domainValuesCombi = new Domain.DomainValue(requestDomainValues);
-
-            if (!distribution.containsKey(domainValuesCombi)) {
+            if (!distribution.containsKey(requestDomainValue)) {
                 //enregistrement de la probabilité pour la valeur courante de la requete
-                distribution.put(domainValuesCombi, requestValueProbability);
+                distribution.put(requestDomainValue, requestValueProbability);
                 //enregistre le maximum
-                maxDistribution.put(domainValuesCombi, requestValueMaxProbability);
+                maxDistribution.put(requestDomainValue, requestValueMaxProbability);
 
             } else {
                 //enregistrement de la probabilité pour la valeur courante de la requete additionné à la precedente
                 //pour une même combinaison
-                distribution.put(domainValuesCombi, distribution.get(domainValuesCombi).add(requestValueProbability));
+                distribution.put(requestDomainValue, distribution.get(requestDomainValue).add(requestValueProbability));
 
-                maxDistribution.put(domainValuesCombi, maxDistribution.get(domainValuesCombi).add(requestValueMaxProbability));
+                maxDistribution.put(requestDomainValue, maxDistribution.get(requestDomainValue).add(requestValueMaxProbability));
             }
 
             //pour chaque combinaison de valeur de la requete enregistre
             //la liste des variables et leur valeurs pour celle qui offre le max.
-            mostLikelyPath.put(domainValuesCombi, maxParentStates);
+            mostLikelyPath.put(requestDomainValue, maxParentStates);
 
             totalDistribution = totalDistribution.add(requestValueProbability);
         }
@@ -320,7 +326,7 @@ public class Forward {
         //etant donné que normaliser ne change pas le rapport de grandeur entre les valeurs
         distribution.put(totalDomainValues, totalDistribution);
 
-        Util.resetDomainValues(fullRequest.values(), originalValues);
+        fullMegaRequest.setDomainValue(originalValue);
 
         this.maxDistribSaved.put(key, maxDistribution);
 
@@ -347,7 +353,10 @@ public class Forward {
         //par contre si une variabel parent de "obsParentState" est déja initialisé ce qui peut être le cas
         //si elle fait déja partie de la requete dans la procedure appelante, elle doit rester en l'état
 
-        List<Domain.DomainValue> originalValues = Util.getDomainValues(obsParentState.getDependencies());
+        Variable megaHiddenVar = obsParentState.getDependencies().size() == 1 ? obsParentState.getDependencies().get(0) :
+               MegaVariable.simpleMegaVariable(obsParentState.getDependencies());
+
+        Domain.DomainValue originalValues = megaHiddenVar.getDomainValue();
 
         AbstractDouble hiddenVarMax = this.network.getDoubleFactory().getNew(0.0);
 
@@ -381,19 +390,16 @@ public class Forward {
         //Ca ne pose pas de problème pour une requete avec des variables
         //situées dans la même coupe temporelles ou tout leur parent sont des variables cachées
 
-        List<List<Domain.DomainValue>> hiddenVarsCombinations = BayesianNetwork.domainValuesCombinationsCheckInit(obsParentState.getDependencies());
+
+
+      //  List<List<Domain.DomainValue>> hiddenVarsCombinations = BayesianNetwork.domainValuesCombinationsCheckInit(obsParentState.getDependencies());
 
         String key = getDistribSavedKey(obsParentState.getDependencies());
 
         //pour chaque combinaison de valeurs
-        for (List<Domain.DomainValue> domainValues : hiddenVarsCombinations) {
+        for (Domain.DomainValue domainValue : megaHiddenVar.getDomainValuesCheckInit()) {
 
-            int j = 0;
-            //initialise chaque variable caché avec une valeur de la combinaison
-            for (Variable hiddenVar : obsParentState.getDependencies()) {
-
-                hiddenVar.setDomainValue(domainValues.get(j++));
-            }
+            megaHiddenVar.setDomainValue(domainValue);
 
             //début de la multiplication avec la valeur fourni par le modele de transition
             AbstractDouble mulTransitionForward = obsParentState.getProbabilityForCurrentValue();
@@ -416,24 +422,22 @@ public class Forward {
                 distrib = this.forwardDistribSaved.get(key);
 
                 if (forwardLog) {
-                    System.out.println(ident + "FORWARD REC : " + distrib.get(new Domain.DomainValue(domainValues)));
+                    System.out.println(ident + "FORWARD REC : " + distrib.get(domainValue));
                 }
 
             } else {
 
                 if (forwardLog) {
-                    System.out.println(ident + "FORWARD SAVED : " + distrib.get(new Domain.DomainValue(domainValues)));
+                    System.out.println(ident + "FORWARD SAVED : " + distrib.get(domainValue));
                 }
             }
             //maximum pour une certain valeur de la ou les variables cachées
             //on ne s'interesse pas au maximum sur toutes les valeurs
             //mais bien à une probabilité max donnée parmis l'ensemble des valeurs que peut prendre de la variable cachée
-            AbstractDouble maxValue = max.get(new Domain.DomainValue(domainValues));
+            AbstractDouble maxValue = max.get(domainValue);
             //ce n'est qu'en multipliant cette probabilité par celle de la requete sachant les variable cachées
             //pour une combinaison de valeurs donnée que l'on obtient le chemin max.
             maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
-
-            Domain.DomainValue domainvaluesObj = new Domain.DomainValue(domainValues);
 
             if (maxValue.compareTo(hiddenVarMax) > 0) {
 
@@ -451,14 +455,14 @@ public class Forward {
             }
 
             //recupere le resultat du forward pour la combinaison de valeurs courantes des variables cachées
-            AbstractDouble forward = distrib.get(domainvaluesObj).divide(distrib.get(totalDomainValues));
+            AbstractDouble forward = distrib.get(domainValue).divide(distrib.get(totalDomainValues));
             //on multiplie le resultat du forward avec la partie transition
             mulTransitionForward = mulTransitionForward.multiply(forward);
             //on additionne pour chaque combinaison de valeur pour les variables cachées
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
         }
 
-        Util.resetDomainValues(obsParentState.getDependencies(), originalValues);
+        megaHiddenVar.setDomainValue(originalValues);
 
         return new ForwardSumRs(hiddenVarsSum, hiddenVarMax, maxHiddenvars, key);
     }

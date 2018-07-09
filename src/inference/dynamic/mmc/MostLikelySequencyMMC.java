@@ -35,9 +35,9 @@ public class MostLikelySequencyMMC extends ForwardMMC {
         return forward(t, true);
     }
 
-    public List<List<Domain.DomainValue>> mostLikelyPath(int t) {
+    public List<Domain.DomainValue> mostLikelyPath(int t) {
 
-        LinkedList<List<Domain.DomainValue>> mostLikelySequence = new LinkedList<>();
+        LinkedList<Domain.DomainValue> mostLikelySequence = new LinkedList<>();
 
         //récupère la matrice forward du dernier temps;
         Matrix tForwardMax = forwards.get(t);
@@ -55,8 +55,6 @@ public class MostLikelySequencyMMC extends ForwardMMC {
                 maxRow = row;
             }
         }
-
-
 
         mostLikelySequence.add(tForwardMax.getRowValue(maxRow));
 

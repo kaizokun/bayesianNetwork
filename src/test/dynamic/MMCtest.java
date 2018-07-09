@@ -96,7 +96,7 @@ public class MMCtest {
 
         //System.out.println(forward);
 
-        List<List<Domain.DomainValue>> mostLilelySequency = mostLikelySequency.mostLikelyPath(obsValues.length);
+        List<Domain.DomainValue> mostLilelySequency = mostLikelySequency.mostLikelyPath(obsValues.length);
 
         System.out.println(mostLilelySequency);
     }

@@ -57,6 +57,7 @@ public class Variable implements Iterable<Variable> {
     protected List<Factor> factors = new LinkedList<>();
 
 
+
     public Variable(String label, IDomain domain, int time) {
 
         this(label, domain);
@@ -205,6 +206,7 @@ public class Variable implements Iterable<Variable> {
 
         return domainValue;
     }
+
 
     public Object getValue() {
 
@@ -395,6 +397,18 @@ public class Variable implements Iterable<Variable> {
         return this.domain.getValues();
     }
 
+    public List<Domain.DomainValue> getDomainValuesCheckInit(){
+
+        if(isInit()){
+
+            return Arrays.asList(new Domain.DomainValue[]{this.domainValue});
+
+        }else{
+
+            return this.getDomainValues();
+        }
+    }
+
     public ProbabilityCompute getProbabilityCompute() {
         return probabilityCompute;
     }
@@ -472,14 +486,13 @@ public class Variable implements Iterable<Variable> {
         return observations;
     }
 
-
     public List<Variable> getCompoVars() {
 
         return Arrays.asList(new Variable[]{this});
     }
 
     public void setDomainValuesFromVariables(Variable[] variables) {
-        System.out.println("setDomainValuesFromVariables "+variables);
+
         this.domainValue = variables[0].domainValue;
     }
 
@@ -489,5 +502,8 @@ public class Variable implements Iterable<Variable> {
         return Arrays.asList(new Variable[]{this}).iterator();
     }
 
+    public Variable mmcCopy(int time){
 
+        return new Variable(this.getLabel(), this.getDomain(), time);
+    }
 }

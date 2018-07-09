@@ -66,10 +66,10 @@ public class MMC extends DynamicBayesianNetwork {
 
         this.roots.add(this.megaVariableStatesRoot);
 
-        this.initBackward(states);
+        this.initBackward();
     }
 
-    private void initBackward(Variable[] states) {
+    private void initBackward() {
 
         int rows = 1;
         //la matrice limite contient uniquement des valerus à 1
@@ -86,9 +86,7 @@ public class MMC extends DynamicBayesianNetwork {
             limitMatrix[0][row] = doubleFactory.getNew(1.0);
         }
 
-        List<Variable> varList = Arrays.asList(states);
-
-        this.backwardInit = new Transpose(limitMatrix, varList, domainValuesCombinations(varList), doubleFactory);
+        this.backwardInit = new Transpose(limitMatrix, megaVariableStates.getCompoVars(), megaVariableStates.getDomainValues(), doubleFactory);
     }
 
 
@@ -142,27 +140,9 @@ public class MMC extends DynamicBayesianNetwork {
 
         this.time++;
 
-        Variable newState;
+        Variable newState = this.megaVariableStates.mmcCopy(this.time);
 
-        if(this.megaVariableStates instanceof MegaVariable) {
-
-            newState = new MegaVariable(this.megaVariableStates, this.time, this.megaVariableStates.getDomain());
-
-        }else{
-
-            newState = new Variable(this.megaVariableStates.getLabel(), this.megaVariableStates.getDomain(), this.time);
-        }
-
-        Variable newObs;
-
-        if(this.megaVariableObs instanceof MegaVariable) {
-
-            newObs = new MegaVariable(this.megaVariableObs, this.time, this.megaVariableObs.getDomain());
-
-        }else{
-
-            newObs = new Variable(this.megaVariableObs.getLabel(), this.megaVariableObs.getDomain(), this.time);
-        }
+        Variable newObs = this.megaVariableObs.mmcCopy(this.time);
 
         //si time - 1 vaut zero on recuperera la megavariable root qui a le même label que celles qui la succede...
         newState.addDependency(this.getTimeVariables(this.time - 1).get(this.megaVariableStates));
@@ -230,7 +210,7 @@ public class MMC extends DynamicBayesianNetwork {
             }
 
             this.matrixObs.put(obsDomainValue.toString(), new MatrixDiagonal(obsMatrix,
-                    states, domainValuesCombinations(states),
+                    states, megaObs.getDomainValues(),
                     obs, null,
                     doubleFactory, true));
         }
@@ -252,7 +232,7 @@ public class MMC extends DynamicBayesianNetwork {
 
             this.matrixState0 = new Transpose(new Matrix(matrix,
                     null, null,
-                    states, domainValuesCombinations(states),
+                    megaState.getCompoVars(), megaState.getDomainValues(),
                     doubleFactory, false));
 
         } else {
@@ -288,8 +268,8 @@ public class MMC extends DynamicBayesianNetwork {
                 row++;
             }
 
-            this.matrixStates = new Matrix(matrix, states, domainValuesCombinations(states),
-                    parentStates, domainValuesCombinations(parentStates),
+            this.matrixStates = new Matrix(matrix, megaState.getCompoVars(), megaState.getDomainValues(),
+                    megaParent.getCompoVars(), megaParent.getDomainValues(),
                     doubleFactory, false);
 
             this.matrixStatesT = new Transpose(this.matrixStates);

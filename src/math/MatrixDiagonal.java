@@ -13,8 +13,8 @@ public class MatrixDiagonal extends Matrix {
 
     public MatrixDiagonal() { }
 
-    public MatrixDiagonal(AbstractDouble[][] matrix, List<Variable> rowVars, List<List<Domain.DomainValue>> rowValues
-            , List<Variable> colVars, List<List<Domain.DomainValue>> colValues,
+    public MatrixDiagonal(AbstractDouble[][] matrix, List<Variable> rowVars, List<Domain.DomainValue> rowValues
+            , List<Variable> colVars, List<Domain.DomainValue> colValues,
                           AbstractDoubleFactory doubleFactory, boolean isObservation) {
 
         super(matrix, rowVars, rowValues, colVars, colValues, doubleFactory, isObservation);
