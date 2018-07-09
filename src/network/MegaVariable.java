@@ -1,6 +1,7 @@
 package network;
 
 import domain.Domain;
+import domain.IDomain;
 import domain.MegaDomain;
 import domain.data.AbstractDouble;
 import math.Combination;
@@ -21,12 +22,17 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
      * (label, time, domainValue, domain)
      */
 
-    public MegaVariable(Variable megaVariableObs, int time) {
+    public MegaVariable(Variable megaVariableObs, int time, IDomain domain) {
 
-        this(((MegaVariable) megaVariableObs).compoVars, time);
+        this(megaVariableObs.getCompoVars(), time, domain);
     }
 
     public MegaVariable(List<Variable> compoVars, int time) {
+
+        this(compoVars, time, initDomain(compoVars));
+    }
+
+    public MegaVariable(List<Variable> compoVars, int time, IDomain domain) {
 
         this.time = time;
 
@@ -39,21 +45,21 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         this.label = getLabel();
 
-        this.initDomain();
+        this.domain = domain;
     }
 
-    private void initDomain() {
+    private static IDomain initDomain(List<Variable> compoVars) {
 
-        List<List<Domain.DomainValue>> domainValuesList = new ArrayList<>(this.compoVars.size());
+        List<List<Domain.DomainValue>> domainValuesList = new ArrayList<>(compoVars.size());
 
-        for (Variable variable : this.compoVars) {
+        for (Variable variable : compoVars) {
 
             domainValuesList.add(variable.getDomainValues());
         }
 
         List<List<Domain.DomainValue>> combinations = Combination.getCombinations(domainValuesList);
 
-        this.domain = new MegaDomain(combinations);
+        return new MegaDomain(combinations);
     }
 
     public String getLabel() {
@@ -114,7 +120,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
      */
     public List<Domain.DomainValue> getMegaVarValues() {
 
-        List<Domain.DomainValue> domainValues = new LinkedList<>();
+        List<Domain.DomainValue> domainValues = new ArrayList<>(this.compoVars.size());
 
         for (Variable variable : this.compoVars) {
 

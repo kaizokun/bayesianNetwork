@@ -142,9 +142,28 @@ public class MMC extends DynamicBayesianNetwork {
 
         this.time++;
 
-        Variable newState = new MegaVariable(this.megaVariableStates, this.time);
+        Variable newState;
 
-        Variable newObs = new MegaVariable(this.megaVariableObs, this.time);
+        if(this.megaVariableStates instanceof MegaVariable) {
+
+            newState = new MegaVariable(this.megaVariableStates, this.time, this.megaVariableStates.getDomain());
+
+        }else{
+
+            newState = new Variable(this.megaVariableStates.getLabel(), this.megaVariableStates.getDomain(), this.time);
+        }
+
+        Variable newObs;
+
+        if(this.megaVariableObs instanceof MegaVariable) {
+
+            newObs = new MegaVariable(this.megaVariableObs, this.time, this.megaVariableObs.getDomain());
+
+        }else{
+
+            newObs = new Variable(this.megaVariableObs.getLabel(), this.megaVariableObs.getDomain(), this.time);
+        }
+
         //si time - 1 vaut zero on recuperera la megavariable root qui a le même label que celles qui la succede...
         newState.addDependency(this.getTimeVariables(this.time - 1).get(this.megaVariableStates));
 
@@ -194,7 +213,7 @@ public class MMC extends DynamicBayesianNetwork {
             //initialisation des observations
             megaObs.setDomainValue(obsDomainValue);
 
-            AbstractDouble[][] obsMatrix = new AbstractDouble[megaState.getDomainSize()][megaObs.getDomainSize()];
+            AbstractDouble[][] obsMatrix = new AbstractDouble[megaState.getDomainSize()][megaState.getDomainSize()];
 
             Matrix.initMatrixZero(obsMatrix, doubleFactory);
 
@@ -216,7 +235,7 @@ public class MMC extends DynamicBayesianNetwork {
                     doubleFactory, true));
         }
 
-        return new MegaVariable(obs, time);
+        return megaObs;
     }
 
     private Variable mergeStateVariables(List<Variable> states, int time, boolean first) {
@@ -276,7 +295,7 @@ public class MMC extends DynamicBayesianNetwork {
             this.matrixStatesT = new Transpose(this.matrixStates);
         }
 
-        return new MegaVariable(states, time);
+        return megaState;
     }
 
     /*-------------------- GETTER SETTER --------------------*/

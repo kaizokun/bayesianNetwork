@@ -56,7 +56,13 @@ public class Variable implements Iterable<Variable> {
     //facteurs lié à cette variable
     protected List<Factor> factors = new LinkedList<>();
 
-    protected ArrayList<Domain.DomainValue> combinations;
+
+    public Variable(String label, IDomain domain, int time) {
+
+        this(label, domain);
+
+        this.time = time;
+    }
 
     public Variable(String label, IDomain domain) {
 
@@ -473,7 +479,7 @@ public class Variable implements Iterable<Variable> {
     }
 
     public void setDomainValuesFromVariables(Variable[] variables) {
-
+        System.out.println("setDomainValuesFromVariables "+variables);
         this.domainValue = variables[0].domainValue;
     }
 

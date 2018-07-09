@@ -61,7 +61,7 @@ public class MazeRobot {
         Variable observation = new Variable(CAPTOR_POSITION, captorDomain, percept);
 
         this.percepts.addLast(percept);
-
+        System.out.println(observation);
         this.mazeMMC.extend(observation);
         //récupère le filtrage pour le dernier état
         Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
