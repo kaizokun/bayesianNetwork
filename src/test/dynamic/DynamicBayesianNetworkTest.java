@@ -233,7 +233,7 @@ public class DynamicBayesianNetworkTest {
 
         Variable rainReq = new Variable(RAIN.toString(), DomainFactory.getBooleanDomain());
 
-        rainReq.setValue(1);
+        rainReq.setValue(0);
 
         requests.add(rainReq);
 
