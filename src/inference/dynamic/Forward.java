@@ -96,7 +96,7 @@ public class Forward {
 
     public void forward(List<Variable> requests, String key, int depth) {
 
-        String ident = "";
+        String ident = Util.getIdent(depth);
 
         if (forwardLog) {
             ident = getIdent(depth);
@@ -169,12 +169,6 @@ public class Forward {
             System.out.println(ident + "FULL REQUEST " + fullRequest.values());
         }
 
-        System.out.println(requests);
-
-        System.out.println(fullRequest.values());
-
-        System.out.println(requestTime0);
-
         Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
 
         Variable fullMegaRequest = fullRequest.values().size() == 1 ?
@@ -183,7 +177,7 @@ public class Forward {
 
         Variable megaRequest0 = null;
 
-        if(!requestTime0.isEmpty()) {
+        if (!requestTime0.isEmpty()) {
             //si pas de variabel en temps 0 on ne fait rien
             //ici ce la créerait une megavariable vide qui poserait problème
             megaRequest0 = requestTime0.size() == 1 ?
@@ -193,7 +187,7 @@ public class Forward {
 
         //List<List<Domain.DomainValue>> requestsValuesCombinations = BayesianNetwork.domainValuesCombinations(fullRequest.values());
 
-        Domain.DomainValue originalValue = fullMegaRequest.getDomainValue();
+        Domain.DomainValue originalValue = fullMegaRequest.saveDomainValue();
 
         /*
          * Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
@@ -271,11 +265,12 @@ public class Forward {
                     //la question est : si on à plusieurs observation ainsi que plusieurs états parent observés en t
                     //et qu'au final on obtient des etats situé en t - 1 avec des valeurs differentes
                     //pour differents max obtenus ?
+                    //System.out.println(rs.maxDomainVars);
                     maxParentStates.addAll(rs.maxDomainVars);
                 }
             }
 
-            if(!requestTime0.isEmpty()) {
+            if (!requestTime0.isEmpty()) {
                 //pour les variables situées au temps 0 ont obtient directement leur probabilité
                 AbstractDouble req0Prob = megaRequest0.getProbabilityForCurrentValue();
 
@@ -337,7 +332,7 @@ public class Forward {
 
     protected ForwardSumRs forwardHiddenVarSum(Variable obsParentState, int depth) {
 
-        String ident = "";
+        String ident = Util.getIdent(depth);
 
         if (forwardLog) {
 
@@ -354,9 +349,9 @@ public class Forward {
         //si elle fait déja partie de la requete dans la procedure appelante, elle doit rester en l'état
 
         Variable megaHiddenVar = obsParentState.getDependencies().size() == 1 ? obsParentState.getDependencies().get(0) :
-               MegaVariable.encapsulate(obsParentState.getDependencies());
+                MegaVariable.encapsulate(obsParentState.getDependencies());
 
-        Domain.DomainValue originalValues = megaHiddenVar.getDomainValue();
+        Domain.DomainValue originalValue = megaHiddenVar.saveDomainValue();
 
         AbstractDouble hiddenVarMax = this.network.getDoubleFactory().getNew(0.0);
 
@@ -391,13 +386,16 @@ public class Forward {
         //situées dans la même coupe temporelles ou tout leur parent sont des variables cachées
 
 
-
-      //  List<List<Domain.DomainValue>> hiddenVarsCombinations = BayesianNetwork.domainValuesCombinationsCheckInit(obsParentState.getDependencies());
+        //List<List<Domain.DomainValue>> hiddenVarsCombinations = BayesianNetwork.domainValuesCombinationsCheckInit(obsParentState.getDependencies());
 
         String key = getDistribSavedKey(obsParentState.getDependencies());
 
+        // System.out.println(ident+"COMBINATION check init : "+ megaHiddenVar.getDomainValuesCheckInit());
+
+        List<Domain.DomainValue> domainValues = megaHiddenVar.getDomainValuesCheckInit();
+
         //pour chaque combinaison de valeurs
-        for (Domain.DomainValue domainValue : megaHiddenVar.getDomainValuesCheckInit()) {
+        for (Domain.DomainValue domainValue : domainValues) {
 
             megaHiddenVar.setDomainValue(domainValue);
 
@@ -437,6 +435,7 @@ public class Forward {
             AbstractDouble maxValue = max.get(domainValue);
             //ce n'est qu'en multipliant cette probabilité par celle de la requete sachant les variable cachées
             //pour une combinaison de valeurs donnée que l'on obtient le chemin max.
+
             maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
 
             if (maxValue.compareTo(hiddenVarMax) > 0) {
@@ -462,7 +461,7 @@ public class Forward {
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
         }
 
-        megaHiddenVar.setDomainValue(originalValues);
+        megaHiddenVar.setDomainValue(originalValue);
 
         return new ForwardSumRs(hiddenVarsSum, hiddenVarMax, maxHiddenvars, key);
     }
@@ -508,18 +507,21 @@ public class Forward {
         showDynamicDistributions(this.maxDistribSaved);
     }
 
-    public List<List<Variable>> computeMostLikelyPath(Variable... request) {
+    public List<Variable> computeMostLikelyPath(Variable... request) {
 
         return computeMostLikelyPath(Arrays.asList(request));
     }
 
-    public List<List<Variable>> computeMostLikelyPath(List<Variable> requests) {
+    public List<Variable> computeMostLikelyPath(List<Variable> requests) {
 
+        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
         //la sequence d'états la plus probable est calculée à partir d'une liste d'états
         //de 0 à un temps t. la liste des variables et leur ordre doit être le même
         //que lors du premier appel à la methode forward
         //on récupere la clé correspondant aux variables
-        String key = Util.getDistribSavedKey(requests);
+       // String key = Util.getDistribSavedKey(requests);
+
+        String key = megaRequest.getVarTimeId();
 
         Map<Domain.DomainValue, AbstractDouble> maxProbs = this.maxDistribSaved.get(key);
 
@@ -528,7 +530,7 @@ public class Forward {
         Domain.DomainValue maxValue = null;
 
         AbstractDouble max = network.getDoubleFactory().getNew(0.0);
-        //on calcul la commbinaison de valeur pour la requete
+        //on calcul la combinaison de valeur pour la requete
         //ayant la plus grande probabilité
         for (Domain.DomainValue value : maxProbs.keySet()) {
 
@@ -540,20 +542,12 @@ public class Forward {
             }
         }
 
-        //initialise la liste de variables avec les valeurs max
-        //si il s'agit d'un object domainValue composite
-        if (maxValue.getValue() instanceof List) {
+        megaRequest.setDomainValue(maxValue);
 
-            Util.resetDomainValues(requests, (List<Domain.DomainValue>) maxValue.getValue());
-
-        } else {
-
-            requests.get(0).setDomainValue(maxValue);
-        }
         //ajoute la liste des états initialisés en début de liste
-        List<List<Variable>> mostLikelyPath = new LinkedList();
+        List<Variable> mostLikelyPath = new LinkedList();
 
-        mostLikelyPath.add(requests);
+        mostLikelyPath.add(megaRequest);
         //charge les états suivants en commencant par recuperer la liste des variables
         //parents de la requete avec les valeurs de domaines ayant donné le maximum
         this.loadMostLikelyPath(mostLikelyPath, maxPath.get(maxValue));
@@ -561,20 +555,21 @@ public class Forward {
         return mostLikelyPath;
     }
 
-    protected void loadMostLikelyPath(List<List<Variable>> mostLikelyPath, List<Variable> maxVarsvalues) {
+    protected void loadMostLikelyPath(List<Variable> mostLikelyPath, List<Variable> maxVars) {
 
         //en time = 0 la liste est vide
-        if (maxVarsvalues.isEmpty()) {
+        if (maxVars.isEmpty()) {
+
             return;
         }
+
+        Variable megaMaxVar = maxVars.size() == 1 ? maxVars.get(0) : MegaVariable.encapsulate(maxVars);
+
         //ajoute les variables courantes avec leurs valeurs de domaine
-        mostLikelyPath.add(maxVarsvalues);
+        mostLikelyPath.add(megaMaxVar);
         //récupère la clé correspondant à la liste de variables courantes
-        String varsKey = Util.getDistribSavedKey(maxVarsvalues);
-        //récupère les valeurs de domaines des variables
-        Domain.DomainValue valuesKey = new Domain.DomainValue(Util.getDomainValues(maxVarsvalues));
-        //recupere la suite de la sequence max à partir de la signature des variables et de leurs valeurs
-        this.loadMostLikelyPath(mostLikelyPath, this.mostLikelyPath.get(varsKey).get(valuesKey));
+
+        this.loadMostLikelyPath(mostLikelyPath, this.mostLikelyPath.get(megaMaxVar.getVarTimeId()).get(megaMaxVar.getDomainValue()));
     }
 
     /*------------------------------- GETTER SETTER ----------------------------------*/

@@ -5,6 +5,7 @@ import domain.IDomain;
 import domain.MegaDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import inference.dynamic.Forward;
 import math.Combination;
 
 import java.util.*;
@@ -37,13 +38,23 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         this.time = time;
 
-        this.compoVars = new ArrayList<>(compoVars);
-/*
+        this.compoVars = new ArrayList<>(compoVars.size());
+
         for (Variable compoVar : compoVars) {
 
-            this.compoVars.add(new Variable(compoVar.label, this.time, compoVar.domainValue, compoVar.domain));
+            Variable compoVarCopy = new Variable();
+
+            compoVarCopy.label = compoVar.label;
+
+            compoVarCopy.domain = compoVar.domain;
+
+            compoVarCopy.probabilityCompute = compoVar.probabilityCompute;
+
+            compoVarCopy.dependencies = compoVar.dependencies;
+
+            this.compoVars.add(compoVarCopy);
         }
-*/
+
         this.label = getLabel();
 
         this.domain = domain;
@@ -90,7 +101,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         for(List<Domain.DomainValue> values : combinations){
 
-            combinations2.add(new Domain.DomainValue(values));
+            combinations2.add(new MegaDomain.MegaDomainValue(values));
         }
 
         return combinations2;
@@ -184,6 +195,12 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
     }
 
     @Override
+    public Domain.DomainValue saveDomainValue() {
+
+        return new MegaDomain.MegaDomainValue(this.getMegaVarValues());
+    }
+
+    @Override
     public AbstractDouble getProbabilityForCurrentValue() {
 
         AbstractDouble prob = this.doubleFactory.getNew(1.0);
@@ -194,6 +211,23 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         }
 
         return prob;
+    }
+
+    @Override
+    public String getVarTimeId() {
+
+        StringBuilder keybuilder = new StringBuilder();
+
+        for (Variable variable : compoVars) {
+
+            keybuilder.append(variable.getVarTimeId());
+
+            keybuilder.append('.');
+        }
+
+        keybuilder.deleteCharAt(keybuilder.length() - 1);
+
+        return keybuilder.toString();
     }
 
     @Override

@@ -207,6 +207,10 @@ public class Variable implements Iterable<Variable> {
         return domainValue;
     }
 
+    public Domain.DomainValue saveDomainValue() {
+
+        return getDomainValue();
+    }
 
     public Object getValue() {
 
@@ -255,6 +259,7 @@ public class Variable implements Iterable<Variable> {
     }
 
     public boolean isInit() {
+
         return this.domainValue != null;
     }
 

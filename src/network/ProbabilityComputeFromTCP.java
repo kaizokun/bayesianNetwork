@@ -4,6 +4,7 @@ import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import inference.dynamic.Forward;
 
 import java.util.*;
 
@@ -294,30 +295,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         Domain.DomainValue value = var.getDomainValue();
 
-        try {
-
-            return this.TCP.get(depKey).get(value);
-
-        }catch (NullPointerException e){
-
-            e.printStackTrace();
-
-            System.out.println(var);
-
-            System.out.println(var.getDependencies());
-
-            System.out.println("KEY "+depKey);
-
-            System.out.println("DOMAIN VALUE "+var.getDomainValue());
-
-            System.out.println("TCP ENTRY "+this.TCP.get(depKey));
-
-            System.out.println(this);
-
-            System.exit(0);
-
-            throw e;
-        }
+        return this.TCP.get(depKey).get(value);
 
     }
 

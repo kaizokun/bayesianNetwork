@@ -195,9 +195,9 @@ public class DynamicBayesianNetworkTest {
         System.out.println("MOST LIKELY PATH");
         System.out.println();
 
-        List<List<Variable>> mostLikelySequence = forward.computeMostLikelyPath(requests);
+        List<Variable> mostLikelySequence = forward.computeMostLikelyPath(requests);
 
-        for(List<Variable> states : mostLikelySequence){
+        for(Variable states : mostLikelySequence){
 
             System.out.println(states);
         }

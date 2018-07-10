@@ -198,7 +198,7 @@ public class Util {
 
         for (Variable variable : variables) {
 
-            keybuilder.append(variable.getLabel() + "_" + variable.getTime());
+            keybuilder.append(variable.getVarTimeId());
 
             keybuilder.append('.');
         }
