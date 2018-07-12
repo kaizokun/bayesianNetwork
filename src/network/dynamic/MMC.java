@@ -27,7 +27,6 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected Matrix matrixState0, backwardInit, matrixStates, matrixStatesT;
 
-    protected Map.Entry<Integer, Matrix> lastForward;
     //end decalage avant time pour la fin du lissage, start decalage avant time pour le debut du lissage
     protected int smootStart = 1, smootEnd = 1;
 
@@ -122,7 +121,9 @@ public class MMC extends DynamicBayesianNetwork {
         //on l'initialise à l'aide d'une liste de variables qui la compose et initialisées
         megaVariableObservation.setDomainValuesFromVariables(variables);
         //appliquer le forward sur le dernier etats
-        this.forwardMMC.forward();
+        Matrix forward = this.forwardMMC.forward();
+
+        this.setLastForward(forward);
         //ainsi que le smoothing sur le range souhaité
         this.smoothingMMC.smoothing();
 
@@ -342,14 +343,6 @@ public class MMC extends DynamicBayesianNetwork {
         return backwardInit;
     }
 
-    public Map.Entry<Integer, Matrix> getLastForward() {
-        return lastForward;
-    }
-
-    public void setLastForward(Map.Entry<Integer, Matrix> lastForward) {
-        this.lastForward = lastForward;
-    }
-
     public int getSmootStart() {
         return smootStart;
     }
@@ -415,7 +408,6 @@ public class MMC extends DynamicBayesianNetwork {
     }
 
     /*---------------------- VIEW ---------------*/
-
 
     public String smothingsAndLastForwardToString() {
 

@@ -9,8 +9,6 @@ import java.util.List;
 
 public class Transpose extends Matrix {
 
-
-
     public Transpose(AbstractDouble[][] matrix,
                      List<Variable> rowVars,
                      List<Domain.DomainValue> rowValues,

@@ -1,8 +1,8 @@
 package network;
 
-import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
+import math.Matrix;
 
 import java.util.*;
 
@@ -20,7 +20,6 @@ public class BayesianNetwork {
     protected List<Variable> roots = new ArrayList<>();
 
     protected Hashtable<String, Variable> variables = new Hashtable<>();
-
 
     public ProbabilityCompute getTCP(IDomain booleanDomain, Double[][] doubles) {
 

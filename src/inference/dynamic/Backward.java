@@ -35,7 +35,7 @@ public class Backward {
             System.out.println(ident + "REQUEST " + requests);
         }
 
-        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
+        Variable megaRequest = MegaVariable.encapsulate(requests);
 
         Distribution distribution = new Distribution(megaRequest, network.getDoubleFactory());
 
@@ -107,7 +107,7 @@ public class Backward {
             }
         }
 
-        Variable megaFullRequest = fullRequest.size() == 1 ? fullRequest.get(0) : MegaVariable.encapsulate(fullRequest);
+        Variable megaFullRequest = MegaVariable.encapsulate(fullRequest);
 
         //Variable megaObservation = nextObservations.size() == 1 ? nextObservations.get(0) : MegaVariable.encapsulate(nextObservations);
 
@@ -119,7 +119,7 @@ public class Backward {
             System.out.println(ident + "FULL REQUEST " + fullRequest);
         }
 
-        AbstractDouble totalRequest = network.getDoubleFactory().getNew(0.0);
+        //AbstractDouble totalRequest = network.getDoubleFactory().getNew(0.0);
         //pour combinaison de valeur de la requete
         for (Domain.DomainValue domainValue : megaFullRequest.getDomainValues()) {
 
@@ -151,10 +151,10 @@ public class Backward {
                 distribution.put(requestDomainValue, distribution.get(requestDomainValue).add(multiplyObservations));
             }
 
-            totalRequest = totalRequest.add(multiplyObservations);
+           // totalRequest = totalRequest.add(multiplyObservations);
         }
 
-        distribution.putTotal(totalRequest);
+       // distribution.putTotal(totalRequest);
 
         megaFullRequest.setDomainValue(originalValue);
 
@@ -186,9 +186,7 @@ public class Backward {
 
         AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
 
-        Variable megaHidenVar = nextObservation.getDependencies().size() == 1 ?
-                nextObservation.getDependencies().get(0) :
-                MegaVariable.encapsulate(nextObservation.getDependencies());
+        Variable megaHidenVar = MegaVariable.encapsulate(nextObservation.getDependencies());
 
         Domain.DomainValue megaHidenVarOriginalValue = megaHidenVar.getDomainValue();
 
@@ -236,9 +234,9 @@ public class Backward {
             AbstractDouble combinaisonProb = hiddenVarsDistribution.get(megaHiddenVarValue);
 
             if (backwardLogCompute)
-                System.out.print(" * " + combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+                System.out.print(" * " + combinaisonProb.divide(hiddenVarsDistribution.getTotal()));
 
-            multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsDistribution.get(totalDomainValues)));
+            multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsDistribution.getTotal()));
 
             multiplyUnderSum = multiplyUnderSum.multiply(megaHidenVar.getProbabilityForCurrentValue());
 
@@ -251,7 +249,6 @@ public class Backward {
                     if (backwardLogDetails)
                         System.out.println(ident + "HIDDEN VAR PROB  P(" + hiddenVar + "|" + hiddenVar.getDependencies() + ") = " + hiddenVar.getProbabilityForCurrentValue());
                 }
-
             }
 
             if (backwardLogCompute) System.out.print(" + ");
@@ -274,7 +271,7 @@ public class Backward {
         if (backwardLogDetails)
             System.out.println(ident + "REQUEST " + requests);
 
-        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
+        Variable megaRequest = MegaVariable.encapsulate(requests);
 
         Distribution distribution = new Distribution(megaRequest, network.getDoubleFactory()),
                 fullDistribution = new Distribution(megaRequest, network.getDoubleFactory());
@@ -402,7 +399,7 @@ public class Backward {
 
         String fullKey = getDistribSavedKey(fullRequest);
 
-        Variable megaFullRequest = fullRequest.size() == 1 ? fullRequest.get(0) : MegaVariable.encapsulate(fullRequest);
+        Variable megaFullRequest = MegaVariable.encapsulate(fullRequest);
 
         fullDistribution = new Distribution(megaFullRequest, network.getDoubleFactory());
 
@@ -412,7 +409,7 @@ public class Backward {
             System.out.println(ident + "FULL REQUEST " + fullRequest);
         }
 
-        AbstractDouble totalRequest = network.getDoubleFactory().getNew(0.0);
+        //AbstractDouble totalRequest = network.getDoubleFactory().getNew(0.0);
         //pour combinaison de valeur de la requete
         for (Domain.DomainValue fullRequestValue : megaFullRequest.getDomainValues()) {
 
@@ -444,12 +441,12 @@ public class Backward {
 
             fullDistribution.put(fullRequestValue, multiplyObservations);
 
-            totalRequest = totalRequest.add(multiplyObservations);
+           // totalRequest = totalRequest.add(multiplyObservations);
         }
 
-        distribution.putTotal(totalRequest);
+       // distribution.putTotal(totalRequest);
 
-        fullDistribution.putTotal(totalRequest);
+       // fullDistribution.putTotal(totalRequest);
 
         megaFullRequest.setDomainValue(originalValue);
 
@@ -481,9 +478,7 @@ public class Backward {
 
         AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
 
-        Variable megaHiddenVar = nextObservation.getDependencies().size() == 1 ?
-                nextObservation.getDependencies().get(0) :
-                MegaVariable.encapsulate(nextObservation.getDependencies());
+        Variable megaHiddenVar = MegaVariable.encapsulate(nextObservation.getDependencies());
 
         //récuperer tout les parents de l'observation courante soit
         //normalement uniquement les variables états situées à la même coupe temporelle
@@ -513,7 +508,7 @@ public class Backward {
 
         Collections.sort(keyVars, comparatorVarTimeLabel);
 
-        Variable megaKeyVar = keyVars.size() == 1 ? keyVars.get(0) : MegaVariable.encapsulate(keyVars);
+        Variable megaKeyVar = MegaVariable.encapsulate(keyVars);
 
         String fullKey = getDistribSavedKey(keyVars);
 

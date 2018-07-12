@@ -4,33 +4,38 @@ import domain.Domain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import network.Variable;
+
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
-public class Distribution extends Matrix {
+public class Distribution extends Transpose {
 
     public Map<Domain.DomainValue, Integer> valuesIndex = new Hashtable<>();
 
     public AbstractDouble total;
 
-    public AbstractDoubleFactory doubleFactory;
+    public Distribution(AbstractDouble[][] matrix, List<Variable> rowVars, List<Domain.DomainValue> rowValues,
+                        List<Variable> colVars, List<Domain.DomainValue> colValues,
+                        AbstractDoubleFactory doubleFactory, Map<Domain.DomainValue, Integer> valuesIndex) {
+        super(matrix, rowVars, rowValues, colVars, colValues, doubleFactory);
+
+        this.valuesIndex = valuesIndex;
+    }
 
     public Distribution(Distribution distribution) {
 
-        this.matrix = new AbstractDouble[1][distribution.getColCount()];
+        super(distribution.newMatrix(),
+                distribution.rowVars, distribution.rowValues,
+                distribution.colVars, distribution.colValues,
+                distribution.doubleFactory);
 
-        for (int col = 0; col < distribution.getColCount(); col++) {
+        for (int row = 0; row < distribution.getRowCount(); row++) {
 
-            matrix[0][col] = doubleFactory.getNew(distribution.getValue(0, col).getDoubleValue());
+            this.setValue(row, this.doubleFactory.getNew(distribution.getValue(row).getDoubleValue()));
         }
 
-        this.colValues = distribution.getColValues();
-
-        this.colVars = distribution.getColVars();
-
-        this.total = doubleFactory.getNew(distribution.getTotal().getDoubleValue());
-
-        this.doubleFactory = distribution.doubleFactory;
+        this.total = this.doubleFactory.getNew(distribution.getTotal().getDoubleValue());
 
         this.initValuesIndex();
     }
@@ -47,28 +52,24 @@ public class Distribution extends Matrix {
         this.initValuesIndex();
     }
 
-    public Distribution() {
+    private void initValuesIndex() {
 
-    }
+        int row = 0;
 
-    private void initValuesIndex(){
+        for (Domain.DomainValue domainValue : this.getRowValues()) {
 
-        int c = 0;
-
-        for (Domain.DomainValue domainValue : this.getColValues()) {
-
-            valuesIndex.put(domainValue, c++);
+            valuesIndex.put(domainValue, row++);
         }
     }
 
     public void put(Domain.DomainValue value, AbstractDouble prob) {
 
-        this.setValue(0, valuesIndex.get(value), prob);
+        this.setValue(valuesIndex.get(value), prob);
     }
 
     public AbstractDouble get(Domain.DomainValue value) {
 
-        return this.getValue(0, valuesIndex.get(value));
+        return this.getValue(valuesIndex.get(value));
     }
 
     public void putTotal(AbstractDouble total) {
@@ -78,11 +79,11 @@ public class Distribution extends Matrix {
 
     public AbstractDouble getTotal() {
 
-        if(total == null){
+        if (total == null) {
 
             total = doubleFactory.getNew(0.0);
 
-            for(AbstractDouble prob : matrix[0]){
+            for (AbstractDouble prob : matrix[0]) {
 
                 total = total.add(prob);
             }
@@ -100,34 +101,43 @@ public class Distribution extends Matrix {
 
     public Distribution normalize() {
 
-        for (int col = 0; col < getRowCount(); col++) {
+        for (int row = 0; row < getRowCount(); row++) {
 
-            setValue(0, col, getValue(0, col).divide(getTotal()));
+            setValue(row, getValue(row).divide(getTotal()));
         }
 
         return this;
     }
 
-    public Distribution multiply(Distribution d2){
 
-        Distribution rs = new Distribution();
+    public Distribution multiply(Distribution d2) {
 
-        rs.matrix = new AbstractDouble[1][this.getColCount()];
+        System.out.println(this);
 
-        rs.colValues = this.getColValues();
+        System.out.println(d2);
 
-        rs.colVars = this.getColVars();
+        AbstractDouble[][] matrix = newMatrix();
 
-        rs.doubleFactory = this.doubleFactory;
+        Distribution rs = new Distribution(matrix, null, null, this.colVars,
+                this.colValues, this.doubleFactory, this.valuesIndex);
 
-        rs.initValuesIndex();
+        for (int row = 0; row < this.getRowCount(); row++) {
 
-        for(int col = 0 ; col < this.getColCount() ; col ++){
-
-            rs.setValue(0, col, this.getValue(0, col).multiply(d2.getValue(0, col)));
+            rs.setValue(row, this.getValue(row).multiply(d2.getValue(row)));
         }
 
         return rs;
+    }
+
+    private void setValue(int row, AbstractDouble value) {
+
+        this.matrix[0][row] = value;
+    }
+
+    private AbstractDouble[][] newMatrix(){
+        //nouvelle sous matrice le nombre de colonnes correspond au nombre de ligne de la distribution
+        //étant une transposée verticale d'une matrice horyzontale
+        return new AbstractDouble[1][this.getRowCount()];
     }
 
 }

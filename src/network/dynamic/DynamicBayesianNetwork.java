@@ -3,6 +3,7 @@ package network.dynamic;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
 import inference.dynamic.Forward;
+import math.Distribution;
 import math.Matrix;
 import network.BayesianNetwork;
 import network.ProbabilityCompute;
@@ -26,7 +27,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     protected Forward forward;
 
-    protected Matrix lastForward;
+    protected Map.Entry<Integer, Matrix> lastForward;
+
+    protected List<Variable> stateVariables, observationVariables;
 
     public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory, Forward forward, int time) {
 
@@ -124,12 +127,31 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
     }
 
+    private List<Variable> getStateVariables(){
 
-    /**
-     * tableau des variables observations
-     */
+        if(stateVariables == null){
 
-    public void extend(List<Variable> requests, List<Variable> observations) {
+            stateVariables = new ArrayList<>(this.transitionModels.keySet());
+        }
+
+        return stateVariables;
+    }
+
+
+    private List<Variable> getObservationVariables(){
+
+        if(observationVariables == null){
+
+            observationVariables = new ArrayList<>(this.captorsModels.keySet());
+        }
+
+        return observationVariables;
+    }
+
+    /*
+    * liste de variable observation initialisé pour initialiser celles du reseau au temps courant
+    * */
+    public void extend(List<Variable> observations) {
 
         this.extend();
 
@@ -140,7 +162,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         if (forward != null) {
 
-           // this.lastForward = new Matrix(this.forward.filteringFull(requests));
+            this.setLastForward(forward.forward(this.getStateVariables()).getForward());
         }
     }
 
@@ -293,5 +315,16 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
     }
 
+    public Map.Entry<Integer, Matrix> getLastForward() {
+        return lastForward;
+    }
 
+    public void setLastForward(Map.Entry<Integer, Matrix> lastForward) {
+        this.lastForward = lastForward;
+    }
+
+    public void setLastForward(Matrix forward) {
+
+        this.lastForward = new AbstractMap.SimpleEntry<>(this.getTime(), forward);
+    }
 }

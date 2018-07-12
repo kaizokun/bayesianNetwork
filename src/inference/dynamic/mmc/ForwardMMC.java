@@ -35,10 +35,6 @@ public class ForwardMMC implements IForward {
             forward = incrementForward(mmc.getTime(), lastForward.getValue());
         }
 
-        lastForward = new AbstractMap.SimpleEntry(mmc.getTime(), forward);
-
-        mmc.setLastForward(lastForward);
-
         return forward;
     }
 

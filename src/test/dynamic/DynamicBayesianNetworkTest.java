@@ -129,7 +129,7 @@ public class DynamicBayesianNetworkTest {
 
         Forward forward = new Forward(network);
 
-        AbstractDouble rs = forward.forward(requests);
+        AbstractDouble rs = forward.forwardAsk(requests);
 
         System.out.println();
 

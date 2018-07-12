@@ -268,12 +268,19 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
     public static Variable encapsulate(List<Variable> variables){
 
-        MegaVariable megavariable = new MegaVariable();
+        if(variables.size() > 1) {
 
-        megavariable.setDomain(initDomain(variables));
+            MegaVariable megavariable = new MegaVariable();
 
-        megavariable.setCompoVars(variables);
+            megavariable.setDomain(initDomain(variables));
 
-        return megavariable;
+            megavariable.setCompoVars(variables);
+
+            return megavariable;
+
+        }else{
+
+            return variables.get(0);
+        }
     }
 }
