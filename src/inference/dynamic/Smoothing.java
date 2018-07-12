@@ -2,6 +2,8 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
+import math.Distribution;
+import math.Matrix;
 import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -27,21 +29,18 @@ public class Smoothing {
         this.backward = new Backward(network);
     }
 
-    protected Map<Domain.DomainValue, AbstractDouble> smootDistribution(Map<Domain.DomainValue, AbstractDouble> forward,
-                                                                      Map<Domain.DomainValue, AbstractDouble> backward) {
+    protected Distribution smootDistribution(Distribution forward, Distribution backward) {
         //normalisation de la distribution forward
-        Map<Domain.DomainValue, AbstractDouble> forwardNormal = normalizeDistribution(forward);
+        Distribution forwardNormal = new Distribution(forward).normalize();
         //suppression des valeurs totales
-        Map<Domain.DomainValue, AbstractDouble> smootDistrib = multiplyDistributions(network.getDoubleFactory(), forwardNormal, backward);
-
-        addTotalToDistribution(network.getDoubleFactory(), smootDistrib);
+        Distribution smootDistrib = backward.multiply(forwardNormal);
 
         return smootDistrib;
     }
 
     public AbstractDouble smoothing(Variable request) {
 
-        return this.smoothing(request, this.network.getTime(),1);
+        return this.smoothing(request, this.network.getTime(), 1);
     }
 
     public AbstractDouble smoothing(Variable request, int markovOrder) {
@@ -72,19 +71,19 @@ public class Smoothing {
 
         this.forward.forward(requests, key, 0, true);
 
-        if(markovOrder > 1 ) {
+        if (markovOrder > 1) {
 
-            this.backward.backward(requests, key, 0, timeEnd, markovOrder);
+            this.backward.backward(requests, key, 0, timeEnd, markovOrder, true);
 
-        }else{
+        } else {
 
-            this.backward.backward(requests, key, 0, timeEnd);
+            this.backward.backward(requests, key, 0, timeEnd, true);
         }
 
-        Map<Domain.DomainValue, AbstractDouble> distributionFinal =
-                this.smootDistribution(this.forward.forwardDistrib.get(key), this.backward.backwardDistribSaved.get(key));
+        Distribution distributionFinal =
+                this.smootDistribution(this.forward.forwardMatrices.get(key), this.backward.backwardMatrices.get(key));
 
-        return distributionFinal.get(megaRequest.getDomainValue()).divide(distributionFinal.get(totalDomainValues));
+        return distributionFinal.get(megaRequest.getDomainValue()).divide(distributionFinal.getTotal());
     }
 
 
@@ -133,13 +132,13 @@ public class Smoothing {
 
         this.forward.forward(startForwardVars, forwardKey, 0, true);
 
-        this.backward.backward(startBackwardVars, backwardKey, 0, backWardEnd);
+        this.backward.backward(startBackwardVars, backwardKey, 0, backWardEnd, true);
 
-        Map<String, Map<Domain.DomainValue, AbstractDouble>> forwardDistributionsNormal = new Hashtable<>();
+        Map<String, Matrix> forwardDistributionsNormal = new Hashtable<>();
 
-        Map<String, Map<Domain.DomainValue, AbstractDouble>> smootDistributions = new Hashtable<>();
+        Map<String, Matrix> smootDistributions = new Hashtable<>();
 
-        Map<String, Map<Domain.DomainValue, AbstractDouble>> smootDistributionsNormal = new Hashtable<>();
+        Map<String, Matrix> smootDistributionsNormal = new Hashtable<>();
 
         this.forward.showForward();
 
@@ -151,27 +150,27 @@ public class Smoothing {
 
             String keyBackWard = getDistribSavedKey(requests, time);
 
-            Map<Domain.DomainValue, AbstractDouble> smootDistrib = this.smootDistribution(
-                    this.forward.forwardDistrib.get(keyForward),
-                    this.backward.backwardDistribSaved.get(keyBackWard));
+            Distribution smootDistrib = this.smootDistribution(
+                    this.forward.forwardMatrices.get(keyForward),
+                    this.backward.backwardMatrices.get(keyBackWard));
 
             smootDistributions.put(keyForward, smootDistrib);
 
-            smootDistributionsNormal.put(keyForward, normalizeDistribution(smootDistrib));
+            smootDistributionsNormal.put(keyForward, new Distribution(smootDistrib).normalize());
 
-            forwardDistributionsNormal.put(keyForward, normalizeDistribution(this.forward.forwardDistrib.get(keyForward)));
+            forwardDistributionsNormal.put(keyForward, new Distribution(this.forward.forwardMatrices.get(keyForward)).normalize());
         }
 
-        showDistributions("FORWARD NORMAL", forwardDistributionsNormal);
+        System.out.println("FORWARD NORMAL " + forwardDistributionsNormal);
 
-        showDistributions("FORWARDxBACKWARD", smootDistributions);
+        System.out.println("FORWARDxBACKWARD " + smootDistributions);
 
-        showDistributions("FORWARDxBACKWARD NORMAL", smootDistributionsNormal);
+        System.out.println("FORWARDxBACKWARD NORMAL " + smootDistributionsNormal);
     }
 
     public void forwardBackward(Variable request) {
 
-        this.forwardBackward(request, 0, this.network.getTime(),this.network.getTime());
+        this.forwardBackward(request, 0, this.network.getTime(), this.network.getTime());
     }
 
     public void forwardBackward(Variable request, int smootStart, int smootEnd) {

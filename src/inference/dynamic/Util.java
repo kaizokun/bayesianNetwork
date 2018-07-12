@@ -66,8 +66,6 @@ public class Util {
         }
     }
 
-
-
     public static Map<Domain.DomainValue, AbstractDouble> multiplyDistributions(AbstractDoubleFactory doubleFactory,
                                                                                 Map<Domain.DomainValue, AbstractDouble>... distributions) {
 

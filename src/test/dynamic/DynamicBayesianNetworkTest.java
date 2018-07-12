@@ -5,6 +5,7 @@ import domain.DomainFactory;
 import domain.data.AbstractDouble;
 import inference.dynamic.Forward;
 import inference.dynamic.Smoothing;
+import math.Distribution;
 import network.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -136,7 +137,7 @@ public class DynamicBayesianNetworkTest {
 
         System.out.println();
 
-        forward.showForwardDistributions();
+        forward.showForward();
     }
 
     private void DynamicBayesianNetworkUmbrellaTestFilterAndMax(DynamicBayesianNetwork network) {
@@ -163,17 +164,7 @@ public class DynamicBayesianNetworkTest {
         System.out.println("MAX");
         System.out.println();
 
-        Map<String, Map<Domain.DomainValue, AbstractDouble>> max = forward.getMaxDistribSaved();
-
-        for (String key : max.keySet()) {
-
-            System.out.println("STATE " + key);
-
-            for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : max.get(key).entrySet()) {
-
-                System.out.println(entry.getKey() + " " + entry.getValue());
-            }
-        }
+        forward.showMax();
 
         System.out.println();
         System.out.println("ALL PATH");

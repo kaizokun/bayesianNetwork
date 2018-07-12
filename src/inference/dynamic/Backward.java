@@ -2,6 +2,7 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
+import math.Distribution;
 import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -14,9 +15,7 @@ public class Backward {
 
     protected static boolean backwardLogCompute = false, backwardLogDetails = false;
 
-    protected Map<String, Map<Domain.DomainValue, AbstractDouble>> backwardDistribSaved = new Hashtable<>();
-
-    protected Map<String, Map<Domain.DomainValue, AbstractDouble>> backwardFullDistribSaved = new Hashtable<>();
+    protected Map<String, Distribution> backwardMatrices = new Hashtable<>();
 
     protected DynamicBayesianNetwork network;
 
@@ -27,7 +26,7 @@ public class Backward {
 
     /*------------------- BACKWARD --------------------*/
 
-    public void backward(List<Variable> requests, String key, int depth, int timeEnd) {
+    public Distribution backward(List<Variable> requests, String key, int depth, int timeEnd, boolean saveDistrib) {
 
         String ident = getIdent(depth);
 
@@ -38,7 +37,7 @@ public class Backward {
 
         Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
 
-        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>();
+        Distribution distribution = new Distribution(megaRequest, network.getDoubleFactory());
 
         //atteind une requete située à la derniere phase temporelle si plusieurs elles doivent être au même temps
         if (requests.get(0).getTime() == timeEnd) {
@@ -48,12 +47,17 @@ public class Backward {
                 distribution.put(domainValue, network.getDoubleFactory().getNew(1.0));
             }
 
-            distribution.put(totalDomainValues, network.getDoubleFactory().getNew(1.0));
+            distribution.putTotal(network.getDoubleFactory().getNew(1.0));
 
-            this.backwardDistribSaved.put(key, distribution);
+            if (saveDistrib) {
 
-            return;
+                this.backwardMatrices.put(key, distribution);
+            }
+
+            return distribution;
         }
+
+        Map<String, Distribution> backwardDistribSaved = new Hashtable<>();
 
         //récuperation des observations de la variable au temps suivant
         //et ajout des eventuelles variables manquante à la requete
@@ -131,12 +135,13 @@ public class Backward {
 
             for (Variable nextObservation : nextObservations) {
 
-                multiplyObservations = multiplyObservations.multiply(backwardSum(nextObservation, depth + 1, timeEnd));
+                multiplyObservations = multiplyObservations.multiply(
+                        backwardSum(nextObservation, backwardDistribSaved, depth + 1, timeEnd, saveDistrib));
             }
 
             Domain.DomainValue requestDomainValue = megaRequest.getDomainValue();
 
-            if (!distribution.containsKey(requestDomainValue)) {
+            if (distribution.get(requestDomainValue) == null) {
                 //enregistrement de la probabilité pour la valeur courante de la requete
                 distribution.put(requestDomainValue, multiplyObservations);
 
@@ -149,7 +154,7 @@ public class Backward {
             totalRequest = totalRequest.add(multiplyObservations);
         }
 
-        distribution.put(totalDomainValues, totalRequest);
+        distribution.putTotal(totalRequest);
 
         megaFullRequest.setDomainValue(originalValue);
 
@@ -160,10 +165,17 @@ public class Backward {
             System.out.println(ident + "DISTRIB : " + distribution);
         }
 
-        this.backwardDistribSaved.put(key, distribution);
+        if (saveDistrib) {
+
+            this.backwardMatrices.put(key, distribution);
+        }
+
+        return distribution;
     }
 
-    protected AbstractDouble backwardSum(Variable nextObservation, int depth, int timeEnd) {
+    protected AbstractDouble backwardSum(Variable nextObservation,
+                                         Map<String, Distribution> backwardSaved,
+                                         int depth, int timeEnd, boolean saveDistrib) {
 
         String ident = null;
 
@@ -202,13 +214,15 @@ public class Backward {
 
             multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
 
-            Map<Domain.DomainValue, AbstractDouble> hiddenVarsDistribution = this.backwardDistribSaved.get(key);
+            Distribution hiddenVarsDistribution = backwardSaved.get(key);
 
             if (hiddenVarsDistribution == null) {
 
-                this.backward(nextObservation.getDependencies(), key, depth + 1, timeEnd);
+                Distribution backward = this.backward(nextObservation.getDependencies(), key, depth + 1, timeEnd, saveDistrib);
 
-                hiddenVarsDistribution = this.backwardDistribSaved.get(key);
+                hiddenVarsDistribution = backward;
+
+                backwardSaved.put(key, backward);
             }
 
             Domain.DomainValue megaHiddenVarValue = megaHidenVar.getDomainValue();
@@ -253,7 +267,7 @@ public class Backward {
     /**
      * Tentative d'implementation du backward pour gerer les chaines de markov d'order superieur à 1
      */
-    public void backward(List<Variable> requests, String key, int depth, int timeEnd, int markovOrder) {
+    public BackwardRs backward(List<Variable> requests, String key, int depth, int timeEnd, int markovOrder, boolean saveDistrib) {
 
         String ident = getIdent(depth);
 
@@ -262,8 +276,8 @@ public class Backward {
 
         Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
 
-        Map<Domain.DomainValue, AbstractDouble> distribution = new Hashtable<>(),
-                fullDistribution = new Hashtable<>();
+        Distribution distribution = new Distribution(megaRequest, network.getDoubleFactory()),
+                fullDistribution = new Distribution(megaRequest, network.getDoubleFactory());
 
         //atteind une requete située à la derniere phase temporelle si plusieurs elles doivent être au même temps
         if (requests.get(0).getTime() == timeEnd) {
@@ -275,15 +289,16 @@ public class Backward {
                 fullDistribution.put(domainValue, network.getDoubleFactory().getNew(1.0));
             }
 
-            distribution.put(totalDomainValues, network.getDoubleFactory().getNew(1.0));
+            distribution.putTotal(network.getDoubleFactory().getNew(1.0));
 
-            fullDistribution.put(totalDomainValues, network.getDoubleFactory().getNew(1.0));
+            fullDistribution.putTotal(network.getDoubleFactory().getNew(1.0));
 
-            this.backwardDistribSaved.put(key, distribution);
+            if (saveDistrib) {
 
-            this.backwardFullDistribSaved.put(key, fullDistribution);
+                this.backwardMatrices.put(key, distribution);
+            }
 
-            return;
+            return new BackwardRs(distribution, fullDistribution);
         }
 
         //récuperation des observations de la variable au temps suivant
@@ -324,6 +339,10 @@ public class Backward {
          * sur une profondeur x - 1. Pour une chaine de markov 1 ca donnerait uniquement s(2), d'ordre 2, s(2) et s(1)
          *
          * */
+
+        //Map<String, Distribution> backwardDistribSaved = new Hashtable<>();
+
+        Map<String, Distribution> backwardFullDistribSaved = new Hashtable<>();
 
         Set<String> containState = new HashSet<>(), containObs = new HashSet<>();
 
@@ -385,6 +404,8 @@ public class Backward {
 
         Variable megaFullRequest = fullRequest.size() == 1 ? fullRequest.get(0) : MegaVariable.encapsulate(fullRequest);
 
+        fullDistribution = new Distribution(megaFullRequest, network.getDoubleFactory());
+
         Domain.DomainValue originalValue = megaFullRequest.saveDomainValue();
 
         if (backwardLogDetails) {
@@ -405,12 +426,13 @@ public class Backward {
 
             for (Variable nextObservation : nextObservations) {
 
-                multiplyObservations = multiplyObservations.multiply(backwardSum(nextObservation, depth + 1, timeEnd, markovOrder));
+                multiplyObservations = multiplyObservations.multiply(
+                        backwardSum(nextObservation, backwardFullDistribSaved, depth + 1, timeEnd, markovOrder, saveDistrib));
             }
 
             Domain.DomainValue requestValue = megaRequest.getDomainValue();
 
-            if (!distribution.containsKey(requestValue)) {
+            if (distribution.get(requestValue) == null) {
                 //enregistrement de la probabilité pour la valeur courante de la requete
                 distribution.put(requestValue, multiplyObservations);
 
@@ -425,9 +447,9 @@ public class Backward {
             totalRequest = totalRequest.add(multiplyObservations);
         }
 
-        distribution.put(totalDomainValues, totalRequest);
+        distribution.putTotal(totalRequest);
 
-        fullDistribution.put(totalDomainValues, totalRequest);
+        fullDistribution.putTotal(totalRequest);
 
         megaFullRequest.setDomainValue(originalValue);
 
@@ -442,12 +464,18 @@ public class Backward {
             System.out.println(ident + "FULL DISTRIB : " + fullDistribution);
         }
 
-        this.backwardDistribSaved.put(key, distribution);
+        if (saveDistrib) {
 
-        this.backwardFullDistribSaved.put(fullKey, fullDistribution);
+            this.backwardMatrices.put(key, distribution);
+        }
+
+        return new BackwardRs(distribution, fullDistribution);
     }
 
-    protected AbstractDouble backwardSum(Variable nextObservation, int depth, int timeEnd, int markovOrder) {
+    protected AbstractDouble backwardSum(Variable nextObservation,
+            /*Map<String, Distribution> backwardDistribSaved,*/
+                                         Map<String, Distribution> backwardFullDistribSaved,
+                                         int depth, int timeEnd, int markovOrder, boolean distribSave) {
 
         String ident = getIdent(depth);
 
@@ -514,7 +542,7 @@ public class Backward {
 
             multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
 
-            Map<Domain.DomainValue, AbstractDouble> hiddenVarsFullDistribution = this.backwardFullDistribSaved.get(fullKey);
+            Distribution hiddenVarsFullDistribution = backwardFullDistribSaved.get(fullKey);
 
             /* ici il faut travailler sur la distribution sur le parent de l'observation complétée
              * recuperer en fonction de l'ordre les predecesseurs de ce parent
@@ -527,9 +555,13 @@ public class Backward {
 
             if (hiddenVarsFullDistribution == null) {
 
-                this.backward(nextObservation.getDependencies(), simpleKey, depth + 1, timeEnd, markovOrder);
+                BackwardRs backwardRs = this.backward(nextObservation.getDependencies(), simpleKey, depth + 1, timeEnd, markovOrder, distribSave);
 
-                hiddenVarsFullDistribution = this.backwardFullDistribSaved.get(fullKey);
+                hiddenVarsFullDistribution = backwardRs.full;
+
+                backwardFullDistribSaved.put(fullKey, backwardRs.full);
+
+                //backwardDistribSaved.put(simpleKey, backwardRs.normal);
             }
 
             if (backwardLogDetails) {
@@ -541,10 +573,10 @@ public class Backward {
             AbstractDouble combinaisonProb = hiddenVarsFullDistribution.get(megaKeyVar.getDomainValue());
 
             if (backwardLogCompute) {
-                System.out.print(" * " + combinaisonProb.divide(hiddenVarsFullDistribution.get(totalDomainValues)));
+                System.out.print(" * " + combinaisonProb.divide(hiddenVarsFullDistribution.getTotal()));
             }
 
-            multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsFullDistribution.get(totalDomainValues)));
+            multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsFullDistribution.getTotal()));
 
             multiplyUnderSum = multiplyUnderSum.multiply(megaHiddenVar.getProbabilityForCurrentValue());
 
@@ -573,25 +605,24 @@ public class Backward {
         return sum;
     }
 
+    private class BackwardRs {
+
+        Distribution normal, full;
+
+        public BackwardRs(Distribution normal, Distribution full) {
+
+            this.normal = normal;
+
+            this.full = full;
+        }
+    }
 
     public void showBackward() {
 
-        showDistributions("BACKWARD", this.backwardDistribSaved);
-    }
+        for (Map.Entry<String, Distribution> entry : this.backwardMatrices.entrySet()) {
 
-
-    public void showBackwardDistributions() {
-
-        System.out.println("===========BACKWARD============");
-
-        showDynamicDistributions(this.backwardDistribSaved);
-    }
-
-    public void showFullBackwardDistributions() {
-
-        System.out.println("===========FULL BACKWARD============");
-
-        showDynamicDistributions(this.backwardFullDistribSaved);
+            System.out.println(entry.getKey() + entry.getValue());
+        }
     }
 
 

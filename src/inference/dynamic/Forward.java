@@ -17,14 +17,13 @@ public class Forward {
 
     protected static boolean forwardLog = false;
 
+    protected Map<String, Distribution> forwardMatrices = new Hashtable<>();
 
-    protected Map<String, Matrix> forwardMatrices = new Hashtable<>();
+    protected Map<String, Distribution> maxMatrices = new Hashtable<>();
 
-    protected Map<String, Matrix> maxMatrices = new Hashtable<>();
+    //protected Map<String, Map<Domain.DomainValue, AbstractDouble>> forwardDistrib = new Hashtable<>();
 
-    protected Map<String, Map<Domain.DomainValue, AbstractDouble>> forwardDistrib = new Hashtable<>();
-
-    protected Map<String, Map<Domain.DomainValue, AbstractDouble>> maxDistrib = new Hashtable<>();
+    // protected Map<String, Map<Domain.DomainValue, AbstractDouble>> maxDistrib = new Hashtable<>();
 
     protected Map<String, Map<Domain.DomainValue, List<Variable>>> mostLikelyPath = new Hashtable<>();
 
@@ -77,9 +76,9 @@ public class Forward {
 
         String key = getDistribSavedKey(requests);
 
-        Map<Domain.DomainValue, AbstractDouble> forwardDistrib = this.forward(requests, key, 0, saveDistribs).forward;
+        Distribution forwardDistrib = this.forward(requests, key, 0, saveDistribs).forwardM;
 
-        return forwardDistrib.get(megaRequest.getDomainValue()).divide(forwardDistrib.get(totalDomainValues));
+        return forwardDistrib.get(megaRequest.getDomainValue()).divide(forwardDistrib.getTotal());
     }
 
     public void forward(Variable request) {
@@ -110,17 +109,17 @@ public class Forward {
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete
         //qui peuvent être des combinaisons de valeur si la requete à plusieurs variables
-        Map<Domain.DomainValue, AbstractDouble> forwardDistribution = new Hashtable<>();
+        //   Map<Domain.DomainValue, AbstractDouble> forwardDistribution = new Hashtable<>();
 
-        Map<Domain.DomainValue, AbstractDouble> maxDistribution = new Hashtable<>();
+        //   Map<Domain.DomainValue, AbstractDouble> maxDistribution = new Hashtable<>();
 
         Map<Domain.DomainValue, List<Variable>> mostLikelyPath = new Hashtable<>();
 
         //si pour la requete courante on à plusieurs sommes avec des variables cachées différentes
         //on aura plusieurs distributions differentes
-        Map<String, Map<Domain.DomainValue, AbstractDouble>> lastForwardDistrib = new Hashtable<>();
+        //  Map<String, Map<Domain.DomainValue, AbstractDouble>> lastForwardDistrib = new Hashtable<>();
 
-        Map<String, Map<Domain.DomainValue, AbstractDouble>> lastMaxDistrib = new Hashtable<>();
+        //  Map<String, Map<Domain.DomainValue, AbstractDouble>> lastMaxDistrib = new Hashtable<>();
 
         Map<String, Distribution> forwardMatrices = new Hashtable<>();
 
@@ -278,7 +277,7 @@ public class Forward {
                 for (Variable stateObserved : observation.getDependencies()) {
                     //total de la somme sur les valeurs cachées initialisé à zero
                     ForwardSumRs rs = forwardHiddenVarSum(stateObserved,
-                            lastForwardDistrib, lastMaxDistrib,
+                            /* lastForwardDistrib, lastMaxDistrib,*/
                             forwardMatrices, maxMatrices, depth + 1, saveforward);
                     //qu'on multiplie avec les resultat pour les observations precedentes
                     requestValueProbability = requestValueProbability.multiply(rs.sum);
@@ -327,24 +326,25 @@ public class Forward {
                         + " - total = " + requestValueProbability);
             }
 
-            if (!forwardDistribution.containsKey(requestDomainValue)) {
+            if (forwardMatrix.get(requestDomainValue) == null) {
+                //if (!forwardDistribution.containsKey(requestDomainValue)) {
                 //enregistrement de la probabilité pour la ou les valeur courante attribuées
                 //à la ou les variables de requete
                 forwardMatrix.put(requestDomainValue, requestValueProbability);
 
                 maxMatrix.put(requestDomainValue, requestValueMaxProbability);
 
-                forwardDistribution.put(requestDomainValue, requestValueProbability);
+                // forwardDistribution.put(requestDomainValue, requestValueProbability);
                 //enregistre le maximum
-                maxDistribution.put(requestDomainValue, requestValueMaxProbability);
+                // maxDistribution.put(requestDomainValue, requestValueMaxProbability);
 
             } else {
                 //enregistrement de la probabilité pour la valeur courante de la requete additionnée à la precedente
                 //pour une même combinaison, étant donné que si la requete est complétée par d'autres variables,
                 //la combinaisons de valeurs de la requete d'origine peut apparaitre plusieurs fois
-                forwardDistribution.put(requestDomainValue, forwardDistribution.get(requestDomainValue).add(requestValueProbability));
+                // forwardDistribution.put(requestDomainValue, forwardDistribution.get(requestDomainValue).add(requestValueProbability));
 
-                maxDistribution.put(requestDomainValue, maxDistribution.get(requestDomainValue).add(requestValueMaxProbability));
+                // maxDistribution.put(requestDomainValue, maxDistribution.get(requestDomainValue).add(requestValueMaxProbability));
 
                 forwardMatrix.put(requestDomainValue, forwardMatrix.get(requestDomainValue).add(requestValueProbability));
 
@@ -360,13 +360,13 @@ public class Forward {
         //enregistre les totaux pour toutes les combinaisons
         //pour les maximum inutile d'enregistrer les totaux
         //etant donné que normaliser ne change pas le rapport de grandeur entre les valeurs
-        forwardDistribution.put(totalDomainValues, totalDistribution);
+        // forwardDistribution.put(totalDomainValues, totalDistribution);
 
         forwardMatrix.putTotal(totalDistribution);
 
         System.out.println(forwardMatrix);
 
-        System.out.println(forwardDistribution);
+        // System.out.println(forwardDistribution);
 
         fullMegaRequest.setDomainValue(originalValue);
 
@@ -374,21 +374,21 @@ public class Forward {
 
         if (saveforward) {
 
-            this.forwardDistrib.put(key, forwardDistribution);
+            //this.forwardDistrib.put(key, forwardDistribution);
 
             this.forwardMatrices.put(key, forwardMatrix);
 
-            this.maxDistrib.put(key, maxDistribution);
+            // this.maxDistrib.put(key, maxDistribution);
 
             this.maxMatrices.put(key, maxMatrix);
         }
 
-        return new ForwardMax(forwardDistribution, maxDistribution, forwardMatrix, maxMatrix);
+        return new ForwardMax(/*forwardDistribution, maxDistribution,*/ forwardMatrix, maxMatrix);
     }
 
     protected ForwardSumRs forwardHiddenVarSum(Variable obsParentState,
-                                               Map<String, Map<Domain.DomainValue, AbstractDouble>> lastForwardDistrib,
-                                               Map<String, Map<Domain.DomainValue, AbstractDouble>> lastMaxDistrib,
+                                            /*   Map<String, Map<Domain.DomainValue, AbstractDouble>> lastForwardDistrib,
+                                               Map<String, Map<Domain.DomainValue, AbstractDouble>> lastMaxDistrib,*/
                                                Map<String, Distribution> forwardMatrices, Map<String, Distribution> maxMatrices,
                                                int depth, boolean saveforward) {
 
@@ -471,48 +471,48 @@ public class Forward {
                 System.out.println(ident + "TRANSITION P(" + obsParentState + "|" + obsParentState.getDependencies() + ") = " + obsParentState.getProbabilityForCurrentValue());
             }
 
-            Map<Domain.DomainValue, AbstractDouble> forward = lastForwardDistrib.get(key);
+            //Map<Domain.DomainValue, AbstractDouble> forward = lastForwardDistrib.get(key);
 
-            Map<Domain.DomainValue, AbstractDouble> max = lastMaxDistrib.get(key);
+            // Map<Domain.DomainValue, AbstractDouble> max = lastMaxDistrib.get(key);
 
             Distribution forwardM = forwardMatrices.get(key);
 
             Distribution maxM = maxMatrices.get(key);
 
-            if (forward == null) {
+            if (forwardM == null) {
 
                 ForwardMax forwardMax = this.forward(obsParentState.getDependencies(), key, depth + 1, saveforward);
 
-                max = forwardMax.max;
+                // max = forwardMax.max;
 
-                forward = forwardMax.forward;
+                // forward = forwardMax.forward;
 
                 maxM = forwardMax.maxM;
 
                 forwardM = forwardMax.forwardM;
 
-                lastForwardDistrib.put(key, forwardMax.forward);
+                // lastForwardDistrib.put(key, forwardMax.forward);
 
-                lastMaxDistrib.put(key, forwardMax.max);
+                //lastMaxDistrib.put(key, forwardMax.max);
 
                 forwardMatrices.put(key, forwardM);
 
                 maxMatrices.put(key, maxM);
 
                 if (forwardLog) {
-                    System.out.println(ident + "FORWARD REC : " + forward.get(domainValue));
+                    System.out.println(ident + "FORWARD REC : " + forwardM.get(domainValue));
                 }
 
             } else {
 
                 if (forwardLog) {
-                    System.out.println(ident + "FORWARD SAVED : " + forward.get(domainValue));
+                    System.out.println(ident + "FORWARD SAVED : " + forwardM.get(domainValue));
                 }
             }
 
             //on recupere la probabilité de la sous sequence la plus probable (max) pouvant mener
             //à la (les) valeur courante de la(les) variable cachée
-            AbstractDouble maxValue = max.get(domainValue);
+            // AbstractDouble maxValue = max.get(domainValue);
 
             AbstractDouble maxMValue = maxM.get(domainValue);
             //cette valeur est multipliée par la probabilité obtenu par le modele de transition,
@@ -520,14 +520,14 @@ public class Forward {
             // dans la fonction appelante) sachant les variables cachées et leur valeur courante.
             //ce qui pondère la sous sequence la plus probable.
 
-            maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
+            //maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
 
             maxMValue = maxMValue.multiply(obsParentState.getProbabilityForCurrentValue());
 
-            if(maxMValue.compareTo(hiddenVarMax) >= 0){
-            //if (maxValue.compareTo(hiddenVarMax) >= 0) {
+            if (maxMValue.compareTo(hiddenVarMax) >= 0) {
+                //if (maxValue.compareTo(hiddenVarMax) >= 0) {
 
-                hiddenVarMax = maxValue;
+                hiddenVarMax = maxMValue;
                 //sauvegarde l'état des variables cachées pour le maximum
                 //les valeurs pouvant encore changer dans la procedure
                 List<Variable> copyDependencies = new LinkedList<>();
@@ -541,12 +541,12 @@ public class Forward {
             }
 
             //recupere le resultat du forward pour la combinaison de valeurs courantes des variables cachées
-            AbstractDouble forwardValue = forward.get(domainValue).divide(forward.get(totalDomainValues));
+            // AbstractDouble forwardValue = forward.get(domainValue).divide(forward.get(totalDomainValues));
             AbstractDouble forwardMValue = forwardM.get(domainValue).divide(forwardM.getTotal());
 
             //on multiplie le resultat du forward avec la partie transition
-           // mulTransitionForward = mulTransitionForward.multiply(forwardValue);
-             mulTransitionForward = mulTransitionForward.multiply(forwardMValue);
+            // mulTransitionForward = mulTransitionForward.multiply(forwardValue);
+            mulTransitionForward = mulTransitionForward.multiply(forwardMValue);
 
             //on additionne pour chaque combinaison de valeur pour les variables cachées
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
@@ -559,14 +559,14 @@ public class Forward {
 
     private class ForwardMax {
 
-        Map<Domain.DomainValue, AbstractDouble> forward, max;
+        //Map<Domain.DomainValue, AbstractDouble> forward, max;
 
         Distribution forwardM, maxM;
 
-        public ForwardMax(Map<Domain.DomainValue, AbstractDouble> forward,
-                          Map<Domain.DomainValue, AbstractDouble> max, Distribution forwardMatrix, Distribution maxMatrix) {
-            this.forward = forward;
-            this.max = max;
+        public ForwardMax(/*Map<Domain.DomainValue, AbstractDouble> forward,
+                          Map<Domain.DomainValue, AbstractDouble> max, */Distribution forwardMatrix, Distribution maxMatrix) {
+            // this.forward = forward;
+            // this.max = max;
             this.forwardM = forwardMatrix;
             this.maxM = maxMatrix;
         }
@@ -592,25 +592,23 @@ public class Forward {
         private String hiddenVarKey;
     }
 
-
     /*------------------------------- VIEW ----------------------------------*/
-
 
     public void showForward() {
 
-        showDistributions("FORWARD", this.forwardDistrib);
+        for (Map.Entry<String, Distribution> entry : this.forwardMatrices.entrySet()) {
+
+            System.out.println(entry.getKey() + entry.getValue());
+        }
     }
 
-    public void showForwardDistributions() {
 
-        System.out.println("===========FORWARD============");
+    public void showMax() {
 
-        showDynamicDistributions(this.forwardDistrib);
-    }
+        for (Map.Entry<String, Distribution> entry : this.maxMatrices.entrySet()) {
 
-    public void showMaxDistributions() {
-
-        showDynamicDistributions(this.maxDistrib);
+            System.out.println(entry.getKey() + entry.getValue());
+        }
     }
 
     public List<Variable> computeMostLikelyPath(Variable... request) {
@@ -629,7 +627,7 @@ public class Forward {
 
         String key = megaRequest.getVarTimeId();
 
-        Map<Domain.DomainValue, AbstractDouble> maxProbs = this.maxDistrib.get(key);
+        Distribution maxProbs = this.maxMatrices.get(key);
 
         Map<Domain.DomainValue, List<Variable>> maxPath = this.mostLikelyPath.get(key);
 
@@ -638,7 +636,7 @@ public class Forward {
         AbstractDouble max = network.getDoubleFactory().getNew(0.0);
         //on calcul la combinaison de valeur pour la requete
         //ayant la plus grande probabilité
-        for (Domain.DomainValue value : maxProbs.keySet()) {
+        for (Domain.DomainValue value : maxProbs.getColValues()) {
 
             if (maxProbs.get(value).compareTo(max) > 0) {
 
@@ -680,13 +678,12 @@ public class Forward {
 
     /*------------------------------- GETTER SETTER ----------------------------------*/
 
-
-    public Map<String, Map<Domain.DomainValue, AbstractDouble>> getForwardDistribSaved() {
-        return forwardDistrib;
+    public Map<String, Distribution> getForwardMatrices() {
+        return forwardMatrices;
     }
 
-    public Map<String, Map<Domain.DomainValue, AbstractDouble>> getMaxDistribSaved() {
-        return maxDistrib;
+    public Map<String, Distribution> getMaxMatrices() {
+        return maxMatrices;
     }
 
     public Map<String, Map<Domain.DomainValue, List<Variable>>> getMostLikelyPath() {
