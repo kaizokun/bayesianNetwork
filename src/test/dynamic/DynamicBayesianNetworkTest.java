@@ -128,7 +128,7 @@ public class DynamicBayesianNetworkTest {
 
         Forward forward = new Forward(network);
 
-        AbstractDouble rs = forward.filtering(requests);
+        AbstractDouble rs = forward.forward(requests);
 
         System.out.println();
 
@@ -157,7 +157,7 @@ public class DynamicBayesianNetworkTest {
 
         Forward forward = new Forward(network);
 
-        forward.filtering(requests);
+        forward.forward(requests, true);
 
         System.out.println();
         System.out.println("MAX");

@@ -4,7 +4,6 @@ import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
-import inference.dynamic.Forward;
 
 import java.util.*;
 

@@ -70,7 +70,7 @@ public class Smoothing {
 
         String key = getDistribSavedKey(requests);
 
-        this.forward.forward(requests, key, 0);
+        this.forward.forward(requests, key, 0, true);
 
         if(markovOrder > 1 ) {
 
@@ -82,7 +82,7 @@ public class Smoothing {
         }
 
         Map<Domain.DomainValue, AbstractDouble> distributionFinal =
-                this.smootDistribution(this.forward.forwardDistribSaved.get(key), this.backward.backwardDistribSaved.get(key));
+                this.smootDistribution(this.forward.forwardDistrib.get(key), this.backward.backwardDistribSaved.get(key));
 
         return distributionFinal.get(megaRequest.getDomainValue()).divide(distributionFinal.get(totalDomainValues));
     }
@@ -131,7 +131,7 @@ public class Smoothing {
 
         String backwardKey = getDistribSavedKey(startBackwardVars);
 
-        this.forward.forward(startForwardVars, forwardKey, 0);
+        this.forward.forward(startForwardVars, forwardKey, 0, true);
 
         this.backward.backward(startBackwardVars, backwardKey, 0, backWardEnd);
 
@@ -152,14 +152,14 @@ public class Smoothing {
             String keyBackWard = getDistribSavedKey(requests, time);
 
             Map<Domain.DomainValue, AbstractDouble> smootDistrib = this.smootDistribution(
-                    this.forward.forwardDistribSaved.get(keyForward),
+                    this.forward.forwardDistrib.get(keyForward),
                     this.backward.backwardDistribSaved.get(keyBackWard));
 
             smootDistributions.put(keyForward, smootDistrib);
 
             smootDistributionsNormal.put(keyForward, normalizeDistribution(smootDistrib));
 
-            forwardDistributionsNormal.put(keyForward, normalizeDistribution(this.forward.forwardDistribSaved.get(keyForward)));
+            forwardDistributionsNormal.put(keyForward, normalizeDistribution(this.forward.forwardDistrib.get(keyForward)));
         }
 
         showDistributions("FORWARD NORMAL", forwardDistributionsNormal);

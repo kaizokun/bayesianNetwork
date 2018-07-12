@@ -1,8 +1,6 @@
 package network.dynamic;
 
-import domain.Domain;
 import domain.IDomain;
-import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import inference.dynamic.Forward;
 import math.Matrix;
@@ -15,7 +13,6 @@ import java.util.*;
 
 import static inference.dynamic.Util.getDistribSavedKey;
 import static inference.dynamic.Util.getTreeIdent;
-import static network.BayesianNetwork.domainValuesCombinations;
 
 public class DynamicBayesianNetwork extends BayesianNetwork {
 
@@ -114,37 +111,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
      * ! ou avec cette méthode l'ordre croissant n'est pas obligatoire
      * mais obliger d'indiquer le maximum de modele pour une variable
      */
-    /*
-    public void addTransitionModel(Variable variable, Model model, int time, int maxModels) {
-        //recupere la liste des modeles par limite de temps atteinte pour une variable
-        List<Model> varModels = this.transitionModels.get(variable);
 
-        //crée et ajoute la liste si elle n'existe pas
-        if (varModels == null) {
-
-            varModels = new ArrayList<>(Arrays.asList(new Model[maxModels]));
-
-            this.transitionModels.put(variable, varModels);
-        }
-
-        varModels.set(time, model);
-    }
-
-    public void addCaptorModel(Variable variable, Model model, int time, int maxModels) {
-        //recupere la liste des modeles par limite de temps atteinte pour une variable
-        List<Model> varModels = this.captorsModels.get(variable);
-
-        //crée et ajoute la liste si elle n'existe pas
-        if (varModels == null) {
-
-            varModels = new ArrayList<>(Arrays.asList(new Model[maxModels]));
-
-            this.transitionModels.put(variable, varModels);
-        }
-
-        varModels.set(time, model);
-    }
-*/
     private void addDeeperDependencies(Variable lastDep, LinkedList<Variable> timeDependencies, int limit) {
 
         if (limit > 0) {
@@ -271,8 +238,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
 
         //(1)
-        //cependant peut poser problème en    cas d'ancetre insuffisant
-        //par exemple une variable qui aurait un modele de transition d'ordre 2 par exemple
+        //cependant peut poser problème en cas d'ancetre insuffisant
+        //par exemple une variable qui aurait un modele de transition d'ordre 2
         //lors du deploiement de la variable t1 il ne pourrait récuperer q'un seul parent
         //en t0 par consequent il faudrait une TCP pour ces cas particulier
         //la solution est d'avoir des modeles de transition differents

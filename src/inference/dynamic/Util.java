@@ -52,8 +52,6 @@ public class Util {
         }
     }
 
-
-
     public static void showDynamicDistributions(Map<String, Map<Domain.DomainValue, AbstractDouble>> dynamic) {
 
         for (String key : dynamic.keySet()) {
@@ -68,59 +66,6 @@ public class Util {
         }
     }
 
-
-    public static Map<Domain.DomainValue, AbstractDouble> getCombinatedDistribution(List<Variable> requests, MyDoubleFactory doubleFactory,
-                                                                              List<Map<Domain.DomainValue, AbstractDouble>> distributions) {
-
-        //Il faut récuperer chaque combinaison de valeur pour chaque variable de la requete
-        List<List<Domain.DomainValue>> requestValuesList = BayesianNetwork.domainValuesCombinations(requests);
-
-        Map<Domain.DomainValue, AbstractDouble> finalDistribution = new Hashtable<>();
-
-        AbstractDouble total = doubleFactory.getNew(0.0);
-
-        //pour chaque combinaison de valeurs
-        for (List<Domain.DomainValue> domainValues : requestValuesList) {
-
-            AbstractDouble totalCombination = doubleFactory.getNew(1.0);
-
-            int iRequest = 0;
-            //pour chaque valeur de variable dans la combinaison
-            for (Domain.DomainValue domainValue : domainValues) {
-
-                //on récupère la probabilité correspondant à la valeur dans la distribution de la variable
-                AbstractDouble varValueProb = distributions.get(iRequest).get(domainValue);
-                //que l'on multiplie avec celle de la variable de requete precedente
-                totalCombination = totalCombination.multiply(varValueProb);
-
-                /*
-                AbstractDouble varValueProbNormalised = varValueProb.divide(distributions.get(iVar).get(new Domain.DomainValue(TOTAL_VALUE)));
-
-                totalCombination = totalCombination.multiply(varValueProbNormalised);
-                */
-                iRequest++;
-            }
-
-            finalDistribution.put(new Domain.DomainValue(domainValues), totalCombination);
-
-            total = total.add(totalCombination);
-        }
-
-
-        /*
-        if(requests.size() == 1) {
-            //cas particulier ou la requete ne contient qu'une variable
-            //normalement il faudrait eviter d'appeller cette fonction dans ce cas
-            finalDistribution.put(new Domain.DomainValue(TOTAL_VALUE), distributions.get(0).get(totalDomainValues));
-
-        }else{
-*/
-        finalDistribution.put(new Domain.DomainValue(TOTAL_VALUE), total);
-
-        //}
-
-        return finalDistribution;
-    }
 
 
     public static Map<Domain.DomainValue, AbstractDouble> multiplyDistributions(AbstractDoubleFactory doubleFactory,
@@ -154,6 +99,9 @@ public class Util {
     public static Map<Domain.DomainValue, AbstractDouble> normalizeDistribution(Map<Domain.DomainValue, AbstractDouble> distrib) {
 
         Map<Domain.DomainValue, AbstractDouble> distribNormalized = new Hashtable<>();
+
+        System.out.println("DISTRIB NORMALIZE");
+        System.out.println(distrib);
 
         for (Domain.DomainValue domainValue : distrib.keySet()) {
 

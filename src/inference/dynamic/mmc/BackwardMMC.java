@@ -1,9 +1,7 @@
 package inference.dynamic.mmc;
 
-import domain.data.AbstractDouble;
 import math.Matrix;
 import math.MatrixDiagonal;
-import network.Variable;
 import network.dynamic.MMC;
 
 import java.util.Hashtable;

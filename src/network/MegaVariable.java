@@ -5,7 +5,6 @@ import domain.IDomain;
 import domain.MegaDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
-import inference.dynamic.Forward;
 import math.Combination;
 
 import java.util.*;
