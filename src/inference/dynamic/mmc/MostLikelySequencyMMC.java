@@ -3,6 +3,7 @@ package inference.dynamic.mmc;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import math.Matrix;
+import math.MatrixUtil;
 import network.dynamic.MMC;
 
 import java.util.LinkedList;
@@ -20,7 +21,7 @@ public class MostLikelySequencyMMC extends ForwardMMC {
     protected Matrix multiplyTransitionForward(Matrix matrixStatesT, Matrix forward) {
         //multiplication qui differe de la multiplication habituelle
         //ou plutot que de sommer sur chaque valeur état parent on sauvegarde le maximum
-        return Matrix.multiplyMax(matrixStatesT, forward);
+        return MatrixUtil.multiplyMax(matrixStatesT, forward);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package inference.dynamic.mmc;
 
 import math.Matrix;
+import math.MatrixUtil;
 import network.dynamic.MMC;
 
 import java.util.Hashtable;
@@ -46,14 +47,14 @@ public class SmoothingForwardDecMMC extends SmoothingMMC {
         //récupère la matrice transition
         Matrix transition = this.mmc.getMatrixStates();
         //calcul le backward pour timeEnd courant
-        backwardMatrix = Matrix.multiply(Matrix.multiply(transition, obs), backwardMatrix);
+        backwardMatrix = MatrixUtil.multiply(MatrixUtil.multiply(transition, obs), backwardMatrix);
         //calcul le forward courant à partir du forward en timeEnd + 1
         //inverse de la transposée de la matrice transition
-        Matrix reverseStatesT = Matrix.invert(mmc.getMatrixStatesT());
+        Matrix reverseStatesT = MatrixUtil.invert(mmc.getMatrixStatesT());
         //inverse de la matrice observation
-        Matrix reverseObs = Matrix.invert(obs);
+        Matrix reverseObs = MatrixUtil.invert(obs);
         //forward decrementé
-        forwardMatrix = Matrix.multiply(Matrix.multiply(reverseStatesT, reverseObs), forwardMatrix).normalize();
+        forwardMatrix = MatrixUtil.multiply(MatrixUtil.multiply(reverseStatesT, reverseObs), forwardMatrix).normalize();
         //pour obtenir les bonnes valeurs du smoothing il faut soit normaliser le backward puis le smoothing
         //soit aucun des deux ce qui fait des opérations en moins
         SmoothingMatrices smoothingMatrices = new SmoothingMatrices(forwardMatrix, backwardMatrix, forwardMatrix.multiplyRows(backwardMatrix).normalize(), timeEnd);

@@ -9,6 +9,7 @@ import inference.dynamic.mmc.SmoothingMMC;
 import inference.dynamic.mmc.SmoothingMMC.SmoothingMatrices;
 import math.Matrix;
 import math.MatrixDiagonal;
+import math.MatrixUtil;
 import math.Transpose;
 import network.MegaVariable;
 import network.Variable;
@@ -195,7 +196,7 @@ public class MMC extends DynamicBayesianNetwork {
 
             AbstractDouble[][] obsMatrix = new AbstractDouble[megaState.getDomainSize()][megaState.getDomainSize()];
 
-            Matrix.initMatrixZero(obsMatrix, doubleFactory);
+            MatrixUtil.initMatrixZero(obsMatrix, doubleFactory);
 
             int col = 0;
 

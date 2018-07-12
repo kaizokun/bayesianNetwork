@@ -1,9 +1,12 @@
 package inference.dynamic.mmc;
 
 import math.Matrix;
+import math.MatrixUtil;
 import network.dynamic.MMC;
 
 import java.util.*;
+
+import static math.MatrixUtil.invert;
 
 public class ForwardMMC implements IForward {
 
@@ -57,7 +60,7 @@ public class ForwardMMC implements IForward {
 
         Matrix transT = this.mmc.getMatrixStatesT();
 
-        return obs.multiplyRows(Matrix.multiply(transT, lastForward)).normalize();
+        return obs.multiplyRows(MatrixUtil.multiply(transT, lastForward)).normalize();
     }
 
     public Matrix decrementForward(int timeEnd, Matrix timeEndForward) {
@@ -67,7 +70,7 @@ public class ForwardMMC implements IForward {
         //divise le forward par la matrice observation au temps suivant ainsi que la transition
         //pour retrouver l'état precedent
         //inverse de la transition x ( inverse observation x forward )
-        return Matrix.multiply(Matrix.invert(mmc.getMatrixStatesT()), Matrix.invert(matriceObservation).multiplyRows(timeEndForward)).normalize();
+        return MatrixUtil.multiply(invert(mmc.getMatrixStatesT()), invert(matriceObservation).multiplyRows(timeEndForward)).normalize();
     }
 
     private Matrix forward(int t, int depth, boolean saveForwards) {
@@ -150,7 +153,7 @@ public class ForwardMMC implements IForward {
 
     protected Matrix multiplyTransitionForward(Matrix matrixStatesT, Matrix forward) {
 
-        return Matrix.multiply(this.mmc.getMatrixStatesT(), forward);
+        return MatrixUtil.multiply(this.mmc.getMatrixStatesT(), forward);
     }
 
     public Map<Integer, Matrix> getForwards() {

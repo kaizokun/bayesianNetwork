@@ -1,19 +1,17 @@
 package test.dynamic;
 
 import domain.Domain;
-import domain.DomainFactory;
 import domain.IDomain;
 import inference.dynamic.mmc.*;
 import math.Matrix;
+import math.MatrixUtil;
 import math.Transpose;
 import network.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.MMC;
 import org.junit.Test;
 
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import static domain.DomainFactory.getBooleanDomain;
 import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
@@ -192,11 +190,11 @@ public class MMCtest {
 
         System.out.println(matrixTrans);
 
-        System.out.println(Matrix.multiply(Matrix.invert(matrixObs), Matrix.invert(matrixTrans)));
+        System.out.println(MatrixUtil.multiply(MatrixUtil.invert(matrixObs), MatrixUtil.invert(matrixTrans)));
 
-        System.out.println(Matrix.invert(Matrix.multiply(matrixObs, matrixTrans)));
+        System.out.println(MatrixUtil.invert(MatrixUtil.multiply(matrixObs, matrixTrans)));
 
-        System.out.println(Matrix.invert(Matrix.multiply(matrixTrans, matrixObs)));
+        System.out.println(MatrixUtil.invert(MatrixUtil.multiply(matrixTrans, matrixObs)));
     }
 
     @Test
@@ -252,7 +250,7 @@ public class MMCtest {
 
             //forward = observation.multiply(new Transpose(transition)).multiply(forward).normalize();
 
-            forward = Matrix.multiply(observation, Matrix.multiply(transitionT, forward)).normalize();
+            forward = MatrixUtil.multiply(observation, MatrixUtil.multiply(transitionT, forward)).normalize();
 
             System.out.println("FORWARD " + t);
 
@@ -287,7 +285,7 @@ public class MMCtest {
 
             Matrix observation = mmcOne.getMatrixObs(t);
 
-            backward = Matrix.multiply(transition, Matrix.multiply(mmcOne.getMatrixObs(t), backward));
+            backward = MatrixUtil.multiply(transition, MatrixUtil.multiply(mmcOne.getMatrixObs(t), backward));
 
             //backward = transition.multiply(mmcOne.getMatrixObs(t)).multiply(backward);
 
@@ -304,13 +302,13 @@ public class MMCtest {
 
         Matrix m2 = network.getMatrixStates();
 
-        Matrix m2Invert = Matrix.invert(m2);
+        Matrix m2Invert = MatrixUtil.invert(m2);
 
         System.out.println(m2);
 
         System.out.println(m2Invert);
 
-        System.out.println(Matrix.multiply(m2, m2Invert));
+        System.out.println(MatrixUtil.multiply(m2, m2Invert));
     }
 
 

@@ -2,10 +2,14 @@ package inference.dynamic.mmc;
 
 import math.Matrix;
 import math.MatrixDiagonal;
+import math.MatrixUtil;
 import network.dynamic.MMC;
 
 import java.util.Hashtable;
 import java.util.Map;
+
+import static math.MatrixUtil.invert;
+import static math.MatrixUtil.multiply;
 
 public class BackwardMMC {
 
@@ -33,7 +37,7 @@ public class BackwardMMC {
         //multiplier les inverses ou inverser la multiplication en changeant l'ordre des matrice donne le meme resultat
         //on ne fait qu'une inversion dans le deuxieme cas ...
 
-        Matrix denom = Matrix.multiply(Matrix.invert(timeEndObs), Matrix.invert(trans));
+        Matrix denom = multiply(invert(timeEndObs), invert(trans));
 
        // Matrix denom = Matrix.invert(Matrix.multiply(trans, timeEndObs));
         //partie à ajouter ou à multiplier
@@ -41,7 +45,7 @@ public class BackwardMMC {
         //on commence par multiplier
 
         //Matrix newBackward = Matrix.multiply(num, Matrix.multiply(denom, backward));
-        Matrix newBackward = Matrix.multiply(trans, currentObs.multiplyRows(Matrix.multiply(denom, backward)));
+        Matrix newBackward = multiply(trans, currentObs.multiplyRows(multiply(denom, backward)));
 /*
         System.out.println("OBS INVERT");
         System.out.println(Matrix.invert(timeEndObs));
@@ -83,7 +87,7 @@ public class BackwardMMC {
 
         Matrix matrixObs = mmc.getMatrixObs(timeEnd + 1);
 
-        return Matrix.multiply(mmc.getMatrixStates(), matrixObs.multiplyRows(backward));
+        return multiply(mmc.getMatrixStates(), matrixObs.multiplyRows(backward));
     }
 
     public Matrix backward(int t) {
@@ -114,7 +118,7 @@ public class BackwardMMC {
 
         Matrix backward = this.backward(t + 1, depth + 1, saveBackward);
 
-        backward = Matrix.multiply(transition, obs.multiplyRows(backward));
+        backward = multiply(transition, obs.multiplyRows(backward));
 
         if (saveBackward) {
 

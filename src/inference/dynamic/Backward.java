@@ -2,7 +2,6 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
-import network.BayesianNetwork;
 import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
