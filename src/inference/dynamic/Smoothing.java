@@ -1,6 +1,5 @@
 package inference.dynamic;
 
-import domain.Domain;
 import domain.data.AbstractDouble;
 import math.Distribution;
 import math.Matrix;

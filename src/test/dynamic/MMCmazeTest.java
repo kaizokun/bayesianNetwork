@@ -6,7 +6,9 @@ import domain.data.MyDoubleFactory;
 import environment.Maze;
 import environment.Position;
 
-import network.BayesianNetworkFactory;
+import network.factory.BayesianNetworkFactory;
+import network.factory.MazeDbnFactory;
+import network.factory.MazeMMCFactory;
 import org.junit.Test;
 
 public class MMCmazeTest {
@@ -24,9 +26,9 @@ public class MMCmazeTest {
 
         Maze maze = new Maze(strMaze, new Position(2, 4), new MyDoubleFactory());
 
-        MazeRobot robot = new MazeRobot(maze);
+       // MazeRobot robot = new MazeRobot(maze, new MazeMMCFactory());
 
-        BayesianNetworkFactory.initMazeMMC(maze, robot);
+        MazeRobot robot = new MazeRobot(maze, new MazeDbnFactory());
 
         //mmcMaze.setSmootStart(5);
 

@@ -268,7 +268,7 @@ public class Maze {
 
         loadStringMaze();
 
-        builder.append("CURRENT TIME : "+this.getRobot().getMazeMMC().getTime()+"\n");
+        builder.append("CURRENT TIME : "+this.getRobot().getDbnMaze().getTime()+"\n");
 
         builder.append("CURRENT PERCEPT : "+this.getPercept().toString()+"\n");
 

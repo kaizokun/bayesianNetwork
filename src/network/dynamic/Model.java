@@ -14,19 +14,27 @@ public class Model {
 
     private ProbabilityCompute probabilityCompute;
 
-    public Model( ProbabilityCompute probabilityCompute ) {
+    public Model(ProbabilityCompute probabilityCompute) {
 
         this.probabilityCompute = probabilityCompute;
 
         this.dependencies = new LinkedList<>();
     }
 
-    public void addDependencie(Variable variable){
+    public void addDependencies(Variable... variables) {
+
+        for (Variable variable : variables) {
+
+            this.addDependencie(variable, 1);
+        }
+    }
+
+    public void addDependencie(Variable variable) {
 
         this.addDependencie(variable, 1);
     }
 
-    public void addDependencie(Variable variable, int markovOrder){
+    public void addDependencie(Variable variable, int markovOrder) {
 
         this.dependencies.add(new Dependency(variable, markovOrder));
     }

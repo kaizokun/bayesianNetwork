@@ -5,8 +5,7 @@ import domain.DomainFactory;
 import domain.data.AbstractDouble;
 import inference.dynamic.Forward;
 import inference.dynamic.Smoothing;
-import math.Distribution;
-import network.BayesianNetworkFactory;
+import network.factory.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 import org.junit.Test;
@@ -15,8 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.RAIN;
-import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
+import static network.factory.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.RAIN;
+import static network.factory.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.UMBRELLA;
 
 public class DynamicBayesianNetworkTest {
 

@@ -6,7 +6,7 @@ import inference.dynamic.mmc.*;
 import math.Matrix;
 import math.MatrixUtil;
 import math.Transpose;
-import network.BayesianNetworkFactory;
+import network.factory.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.MMC;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static domain.DomainFactory.getBooleanDomain;
-import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
+import static network.factory.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
 public class MMCtest {
 

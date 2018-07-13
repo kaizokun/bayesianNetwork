@@ -1,14 +1,14 @@
 package test.sampling;
 
 import network.BayesianNetwork;
-import network.BayesianNetworkFactory;
+import network.factory.BayesianNetworkFactory;
 import network.Variable;
 import org.junit.Test;
 
 import java.util.LinkedList;
 
-import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
-import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
+import static network.factory.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
+import static network.factory.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 
 public class SamplingTest {
 

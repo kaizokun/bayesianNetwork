@@ -327,4 +327,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         this.lastForward = new AbstractMap.SimpleEntry<>(this.getTime(), forward);
     }
+
+    public Forward getForward() {
+        return forward;
+    }
+
+    public void setForward(Forward forward) {
+        this.forward = forward;
+    }
 }

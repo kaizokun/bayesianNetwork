@@ -2,7 +2,6 @@ package network;
 
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
-import math.Matrix;
 
 import java.util.*;
 

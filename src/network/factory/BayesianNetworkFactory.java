@@ -1,25 +1,28 @@
-package network;
+package network.factory;
 
 import agent.MazeRobot;
 import agent.MazeRobot.PositionProb;
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
-import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
 import environment.*;
+import inference.dynamic.Forward;
 import inference.dynamic.mmc.*;
+import network.BayesianNetwork;
+import network.ProbabilityCompute;
+import network.ProbabilityComputeFromTCP;
+import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.MMC;
 import network.dynamic.Model;
 
 import java.util.*;
 
-import static network.BayesianNetworkFactory.ABCD_NETWORK_VARS.VAR_A;
-import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
-import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.CAPTOR_POSITION;
-import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.POSITION;
-import static network.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
+import static java.util.Arrays.asList;
+import static network.factory.BayesianNetworkFactory.ABCD_NETWORK_VARS.*;
+import static network.factory.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
+import static network.factory.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;
 
 public class BayesianNetworkFactory {
 
@@ -166,7 +169,7 @@ public class BayesianNetworkFactory {
         //création du model avec la tcp associé
         Model rainExtensionModel = new Model(tcpRain);
         //ajoute une dependence à la variable avec une profondeur de 1
-        rainExtensionModel.addDependencie(rain, 1);
+        rainExtensionModel.addDependencie(rain);
 
         network.addTransitionModel(rain, rainExtensionModel);
 
@@ -441,142 +444,6 @@ public class BayesianNetworkFactory {
 
         return network;
     }
-
-    public enum MAZE_NETWORK_VARS {
-
-        POSITION, CAPTOR_POSITION
-    }
-
-    public static MMC initMazeMMC(Maze maze, MazeRobot robot) {
-
-        return initMazeMMC(maze, robot, 0);
-    }
-
-    public static MMC initMazeMMC(Maze maze, MazeRobot robot, int time) {
-
-        AbstractDoubleFactory doubleFactory = new MyBigDecimalFactory();
-
-        List<PositionProb> reachablePositions = robot.getReachablePositions();
-
-        List<PositionProb> reachablePosChild = new LinkedList<>(reachablePositions);
-
-        IDomain positionDomain = DomainFactory.getMazePositionDomain(robot);
-
-        //-------------matrice racine
-
-        Double[][] rootTransition = new Double[1][positionDomain.getSize()];
-
-        int pos = 0;
-        //verifier si l'ordre correspond
-        for (PositionProb positionProb : reachablePositions) {
-
-            rootTransition[0][pos] = positionProb.getProb().getDoubleValue();
-
-            pos++;
-        }
-
-        ProbabilityCompute tcpPositions0 = new ProbabilityComputeFromTCP(
-                positionDomain, rootTransition, doubleFactory);
-
-        //-------------variable etat racine
-
-        Variable position0 = new Variable(POSITION, positionDomain, tcpPositions0);
-
-        //-------------matrice transition
-
-        Double[][] transition = new Double[positionDomain.getSize()][positionDomain.getSize()];
-
-        int a = 0;
-
-        for (PositionProb previousPos : reachablePositions) {
-
-            int b = 0;
-
-            for (PositionProb position : reachablePosChild) {
-
-                if (position.getPosition().adjacent(previousPos.getPosition())) {
-
-                    transition[a][b] = 1.0 / maze.totalAdjacent(previousPos.getPosition());
-
-                } else {
-
-                    transition[a][b] = 0.1;
-                }
-                b++;
-            }
-            a++;
-        }
-
-        ProbabilityCompute tcpPositions = new ProbabilityComputeFromTCP(
-                new Variable[]{position0}, positionDomain, transition, doubleFactory);
-
-        //-------------variable etat
-
-        Variable position = new Variable(POSITION, positionDomain, tcpPositions, new Variable[]{position0});
-
-        //------------- capteur
-
-        /*
-         * les lignes sont les positionsDistrib atteignables
-         * les colones les sous ensembles de positionsDistrib N S E W soit 2^4
-         * la probabilité d'un percept est total si cela correspond aux contours d'une position
-         * on ajoute un peu de bruit pour ne pas avoir de valer 0 par exemple 0.01
-         * */
-
-
-        //List<Cardinal>[] percepts = Combination.getSubsets(Cardinal.values());
-
-        Percept[] percepts = PerceptWall.getAllPercepts();
-
-        Double[][] captor = new Double[positionDomain.getSize()][percepts.length];
-
-        a = 0;
-
-        for (PositionProb positionParent : reachablePositions) {
-
-            int b = 0;
-
-            for (Percept percept : percepts) {
-
-                if (maze.getPercept(positionParent.getPosition()).match(percept)) {
-
-                    captor[a][b] = 0.999;
-
-                } else {
-
-                    captor[a][b] = 0.0;
-                }
-
-                b++;
-            }
-
-            a++;
-        }
-
-        IDomain captorDomain = DomainFactory.getMazeWallCaptorDomain(percepts);
-
-        ProbabilityCompute tcpCaptors = new ProbabilityComputeFromTCP(
-                new Variable[]{position}, captorDomain, captor, doubleFactory);
-
-        //-------------variable capteur position
-
-        Variable positionCaptor = new Variable(CAPTOR_POSITION, captorDomain, tcpCaptors, new Variable[]{position});
-
-        //-----------------------------------------
-
-        MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{position}, new Variable[]{positionCaptor}, doubleFactory, time);
-
-        mmc.setForwardMMC(new ForwardMMC(mmc));
-
-        mmc.setBackwardMMC(new BackwardMMC(mmc));
-
-        mmc.setSmoothingMMC(new SmoothingForwardBackwardMMC(mmc, mmc.getForwardMMC(), mmc.getBackwardMMC()));
-
-        robot.setMazeMMC(mmc);
-
-        return mmc;
-    }
-
 
 
 }

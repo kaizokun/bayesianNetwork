@@ -1,13 +1,13 @@
 package test.inference;
 
 import network.BayesianNetwork;
-import network.BayesianNetworkFactory;
+import network.factory.BayesianNetworkFactory;
 import network.Variable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static network.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
+import static network.factory.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 
 public class InferenceTest {
 

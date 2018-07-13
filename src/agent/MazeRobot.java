@@ -9,17 +9,18 @@ import environment.Maze;
 import environment.Percept;
 import environment.Position;
 import math.Matrix;
-import network.BayesianNetworkFactory;
+import network.factory.BayesianNetworkFactory;
 import network.Variable;
-import network.dynamic.MMC;
+import network.dynamic.DynamicBayesianNetwork;
+import network.factory.MazeNetworkFactory;
 
 import java.util.*;
 
-import static network.BayesianNetworkFactory.MAZE_NETWORK_VARS.CAPTOR_POSITION;
+import static network.factory.MazeNetworkFactory.MAZE_NETWORK_VARS.*;
 
 public class MazeRobot {
 
-    protected MMC mazeMMC;
+    protected DynamicBayesianNetwork dbnMaze;
 
     protected Maze maze;
 
@@ -37,12 +38,14 @@ public class MazeRobot {
 
     protected Random random = new Random();
 
+    protected MazeNetworkFactory mazeNetworkFactory;
+
     //minimum à 0.1 ou un peu moins, si on utilise le même MMC avec toutes les positions accessibles tout le long du processus
     //permet de trouver la position au bout d'un cour laps de temps entre 200ms et 1 seconde
     //minimum à 0 suffit si on recrée le MMC à partir de la liste des positions possibles non nul
     protected double minProb = 0.0;
 
-    public MazeRobot( Maze maze) {
+    public MazeRobot(Maze maze, MazeNetworkFactory mazeNetworkFactory) {
 
         this.maze = maze;
 
@@ -51,6 +54,10 @@ public class MazeRobot {
         this.reachablePositions = this.maze.getInitReachablePositions();
 
         this.positions.put(0, this.reachablePositions);
+
+        this.mazeNetworkFactory = mazeNetworkFactory;
+
+        this.dbnMaze = this.mazeNetworkFactory.initNewNetwork(this.maze, this);
     }
 
     public void lookUpPosition() {
@@ -61,15 +68,15 @@ public class MazeRobot {
         Variable observation = new Variable(CAPTOR_POSITION, captorDomain, percept);
 
         this.percepts.addLast(percept);
-        System.out.println(observation);
-        this.mazeMMC.extend(observation);
-        //récupère le filtrage pour le dernier état
-        Matrix positionsDistrib = this.mazeMMC.getLastForward().getValue();
 
-        this.positionsDistribs.put(mazeMMC.getTime(), positionsDistrib);
+        this.dbnMaze.extend(observation);
+        //récupère le filtrage pour le dernier état
+        Matrix positionsDistrib = this.dbnMaze.getLastForward().getValue();
+
+        this.positionsDistribs.put(dbnMaze.getTime(), positionsDistrib);
 
         //récupère les positions offrant la plus grande probabilité pour affichage
-        this.positions.put(mazeMMC.getTime(), getMostProbablePositions(positionsDistrib));
+        this.positions.put(dbnMaze.getTime(), getMostProbablePositions(positionsDistrib));
     }
 
     public void move() {
@@ -92,14 +99,14 @@ public class MazeRobot {
 
     public boolean positionKnown() {
 
-        return this.positions.get(this.mazeMMC.getTime()).size() == 1;
+        return this.positions.get(this.dbnMaze.getTime()).size() == 1;
     }
 
     private List<PositionProb> getMostProbablePositions(Matrix positionsDistrib) {
 
         List<PositionProb> mostProbablePositions = new ArrayList<>();
 
-        AbstractDouble minProb = mazeMMC.getDoubleFactory().getNew(this.minProb);
+        AbstractDouble minProb = dbnMaze.getDoubleFactory().getNew(this.minProb);
         //pour chaque ligne de la matrice ici la megavariable ne contient qu'une sous variable
         int iRow = 0;
 
@@ -107,7 +114,7 @@ public class MazeRobot {
 
             Position position = (Position) row.getValue();
 
-            AbstractDouble prob = positionsDistrib.getValue(iRow, 0);
+            AbstractDouble prob = positionsDistrib.getValue(iRow);
 
             int cmp = prob.compareTo(minProb);
 
@@ -129,20 +136,20 @@ public class MazeRobot {
         //si aucune on recommence depuis le debut
         //peut arriver si on supprimme les positions qui ont une faible probabilité
         //plutot qu'uniquement celles qui sont à zero.
-        if(lastKnownPositions.isEmpty()){
+        if (lastKnownPositions.isEmpty()) {
 
             this.reachablePositions = this.maze.getInitReachablePositions();
 
-        }else{
+        } else {
             //recuperer toutes les positions alentours
             List<PositionProb> newInitPositions = maze.getNewReachablePosition(lastKnownPositions);
             //enregistre ces positions afin de reinitialiser le mmc
             this.reachablePositions = newInitPositions;
         }
 
-        mazeMMC = BayesianNetworkFactory.initMazeMMC(maze, this,  mazeMMC.getTime());
-    }
+        this.dbnMaze = this.mazeNetworkFactory.initNewNetwork(this.maze, this, dbnMaze.getTime());
 
+    }
 
     public static class PositionProb {
 
@@ -211,16 +218,16 @@ public class MazeRobot {
 
     public List<PositionProb> getLastKnowPositions() {
 
-        return this.positions.get(mazeMMC.getTime());
+        return this.positions.get(dbnMaze.getTime());
     }
 
-    public void setMazeMMC(MMC mazeMMC) {
+    public void setDbnMaze(DynamicBayesianNetwork dbnMaze) {
 
-        this.mazeMMC = mazeMMC;
+        this.dbnMaze = dbnMaze;
     }
 
-    public MMC getMazeMMC() {
-        return mazeMMC;
+    public DynamicBayesianNetwork getDbnMaze() {
+        return dbnMaze;
     }
 
     public void setMinProb(double minProb) {
