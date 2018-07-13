@@ -125,7 +125,7 @@ public class MMC extends DynamicBayesianNetwork {
 
         this.setLastForward(forward);
         //ainsi que le smoothing sur le range souhaité
-        this.smoothingMMC.smoothing();
+        //this.smoothingMMC.smoothing();
 
         if (log) {
 
@@ -222,7 +222,9 @@ public class MMC extends DynamicBayesianNetwork {
 
     private Variable mergeStateVariables(List<Variable> states, int time, boolean first) {
 
-        Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time, this.doubleFactory);
+        //Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time, this.doubleFactory);
+
+        Variable megaState = MegaVariable.encapsulate(states);
 
         AbstractDouble[][] matrix;
         //si variables de temps 0
@@ -253,9 +255,8 @@ public class MMC extends DynamicBayesianNetwork {
 
             Collections.sort(parentStates, Variable.varLabelComparator);
             //enregistre les états parents qui restent identiques pour un MMC
-            //this.parentStates = parentStates;
 
-            Variable megaParent = new MegaVariable(parentStates, time - 1, this.doubleFactory);
+            Variable megaParent = MegaVariable.encapsulate(parentStates);
 
             int row = 0;
             //pour chaque combinaisons de valeurs pouvant être prises par les variables parents
@@ -275,6 +276,7 @@ public class MMC extends DynamicBayesianNetwork {
                     doubleFactory, false);
 
             this.matrixStatesT = new Transpose(this.matrixStates);
+
         }
 
         return megaState;

@@ -9,13 +9,13 @@ import environment.Maze;
 import environment.Percept;
 import environment.Position;
 import math.Matrix;
-import network.factory.BayesianNetworkFactory;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 import network.factory.MazeNetworkFactory;
 
 import java.util.*;
 
+import static environment.Cardinal.*;
 import static network.factory.MazeNetworkFactory.MAZE_NETWORK_VARS.*;
 
 public class MazeRobot {
@@ -35,6 +35,8 @@ public class MazeRobot {
     protected LinkedList<Percept> percepts = new LinkedList<>();
 
     protected LinkedList<Cardinal> moves = new LinkedList<>();
+
+    protected LinkedList<Cardinal> movesTest = new LinkedList<>(Arrays.asList(WEST, NORTH, NORTH, SOUTH, WEST));
 
     protected Random random = new Random();
 
@@ -72,7 +74,7 @@ public class MazeRobot {
         this.dbnMaze.extend(observation);
         //récupère le filtrage pour le dernier état
         Matrix positionsDistrib = this.dbnMaze.getLastForward().getValue();
-
+       // System.out.println(positionsDistrib);
         this.positionsDistribs.put(dbnMaze.getTime(), positionsDistrib);
 
         //récupère les positions offrant la plus grande probabilité pour affichage
@@ -90,7 +92,7 @@ public class MazeRobot {
 
         Cardinal randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
 
-        //randomDirection = movesTest.removeFirst();
+        randomDirection = movesTest.removeFirst();
 
         this.moves.add(randomDirection);
 

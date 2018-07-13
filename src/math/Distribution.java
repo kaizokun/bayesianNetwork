@@ -109,7 +109,6 @@ public class Distribution extends Transpose {
         return this;
     }
 
-
     public Distribution multiply(Distribution d2) {
 
         System.out.println(this);

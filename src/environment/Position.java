@@ -78,7 +78,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return "ROW["+y+"] COL["+x+"]";
+        return "["+y+","+x+"]";
     }
 
 }

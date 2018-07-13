@@ -1,5 +1,6 @@
 package inference.dynamic.mmc;
 
+import inference.dynamic.Util;
 import math.Matrix;
 import math.MatrixUtil;
 import network.dynamic.MMC;
@@ -31,6 +32,7 @@ public class ForwardMMC implements IForward {
             //calcul un nouveau forward
             forward = forward(mmc.getTime(), 0, false);
         }else{
+            System.out.println("INCREMENT FORWARD");
             //sinon incremente le forward precedent
             forward = incrementForward(mmc.getTime(), lastForward.getValue());
         }
@@ -71,6 +73,10 @@ public class ForwardMMC implements IForward {
 
     private Matrix forward(int t, int depth, boolean saveForwards) {
 
+        //String ident = Util.getIdent(depth);
+
+       // System.out.println(ident+"NEW FORWARD "+t);
+
         /*
          * on pourrait faire des megavariables états observations sur des sous ensemble de colVars du reseau
          * et pas forcement sur la totalité et au besoin
@@ -83,6 +89,10 @@ public class ForwardMMC implements IForward {
 
                 this.forwards.put(t, this.mmc.getMatrixState0());
             }
+
+           // System.out.println(ident+"LIMIT MATRIX STATE 0");
+
+            //System.out.println(this.mmc.getMatrixState0().toString(ident));
 
             return this.mmc.getMatrixState0();
         }
@@ -109,6 +119,18 @@ public class ForwardMMC implements IForward {
         Matrix forward = forward(t - 1, depth + 1, saveForwards);
 
         Matrix sum = this.multiplyTransitionForward(this.mmc.getMatrixStatesT(), forward);
+
+       // System.out.println(ident+"TRANSITION TRANSPOSE");
+
+      //  System.out.println(this.mmc.getMatrixStatesT().toString(ident));
+
+       // System.out.println(ident+"FORWARD");
+
+       // System.out.println(forward.toString(ident));
+
+       // System.out.println(ident+"SOMME");
+
+       // System.out.println(sum.toString(ident));
 /*
         System.out.println("FORWARD");
         System.out.println(forward);

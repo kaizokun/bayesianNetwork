@@ -251,10 +251,10 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         //création de la clé correspondant à la combinaison de valeur des parents
         StringBuilder builder = new StringBuilder();
 
-        for (Domain.DomainValue dep : values) {
+        for (Domain.DomainValue value : values) {
             //ajoute l'id de domaine de la valeur de la variable
             //plus court...
-            builder.append(dep.getIndex());
+            builder.append(value.getIndex());
 
             builder.append('.');
         }

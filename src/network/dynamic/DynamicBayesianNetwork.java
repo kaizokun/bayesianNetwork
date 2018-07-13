@@ -127,20 +127,22 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
     }
 
-    private List<Variable> getStateVariables(){
 
-        if(stateVariables == null){
+    private List<Variable> getLastStateVariables() {
 
-            stateVariables = new ArrayList<>(this.transitionModels.keySet());
+        List<Variable> lastVariables = new ArrayList<>();
+
+        for(Variable variable : this.transitionModels.keySet()){
+
+            lastVariables.add(this.getVariable(this.getTime(), variable));
         }
 
-        return stateVariables;
+        return lastVariables;
     }
 
+    private List<Variable> getObservationVariables() {
 
-    private List<Variable> getObservationVariables(){
-
-        if(observationVariables == null){
+        if (observationVariables == null) {
 
             observationVariables = new ArrayList<>(this.captorsModels.keySet());
         }
@@ -148,39 +150,26 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return observationVariables;
     }
 
-    /*
-    * liste de variable observation initialisé pour initialiser celles du reseau au temps courant
-    * */
-    public void extend(List<Variable> observations) {
-
-        this.extend();
-
-        for (Variable observation : observations) {
-
-            this.getVariable(this.time, observation).setDomainValue(observation.getDomainValue());
-        }
-
-        if (forward != null) {
-
-            this.setLastForward(forward.forward(this.getStateVariables()).getForward());
-        }
-    }
-
-    /**
-     * tableau des variables observations
-     */
-
     public void extend(Variable... variables) {
 
         this.extend();
 
         for (Variable variable : variables) {
 
-            Variable observation = this.getVariable(this.time, variable);
-
-            observation.setDomainValue(variable.getDomainValue());
+            this.getVariable(this.time, variable).setDomainValue(variable.getDomainValue());
         }
+
+        if (forward != null) {
+
+            this.setLastForward(forward.forward(this.getLastStateVariables()).getForward());
+        }
+
+        //System.out.println(this);
+
+       // System.out.println(this.lastForward);
+
     }
+
 
     public void extend() {
 

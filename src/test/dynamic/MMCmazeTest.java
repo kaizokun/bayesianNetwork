@@ -9,12 +9,25 @@ import environment.Position;
 import network.factory.BayesianNetworkFactory;
 import network.factory.MazeDbnFactory;
 import network.factory.MazeMMCFactory;
+import network.factory.MazeNetworkFactory;
 import org.junit.Test;
 
 public class MMCmazeTest {
 
+
     @Test
-    public void mazeInitTest() {
+    public void mazeTestMMC(){
+
+        mazeTest(new MazeMMCFactory());
+    }
+
+    @Test
+    public void mazeTestDBN(){
+
+        mazeTest(new MazeDbnFactory());
+    }
+
+    public void mazeTest(MazeNetworkFactory networkFactory) {
 
         String[] strMaze = new String[]{
                 "    #     #   # ## # ##",
@@ -26,9 +39,7 @@ public class MMCmazeTest {
 
         Maze maze = new Maze(strMaze, new Position(2, 4), new MyDoubleFactory());
 
-       // MazeRobot robot = new MazeRobot(maze, new MazeMMCFactory());
-
-        MazeRobot robot = new MazeRobot(maze, new MazeDbnFactory());
+        MazeRobot robot = new MazeRobot(maze, networkFactory);
 
         //mmcMaze.setSmootStart(5);
 
@@ -38,7 +49,12 @@ public class MMCmazeTest {
 
         do {
 
+            if(robot.getDbnMaze().getTime() == 4)
+                break;
+
             robot.lookUpPosition();
+
+            System.out.println(maze);
 
             if (robot.positionKnown()) {
 
@@ -50,8 +66,6 @@ public class MMCmazeTest {
 
                 robot.reload();
             }
-
-            System.out.println(maze);
 
         } while (lookUp);
 
@@ -67,5 +81,9 @@ public class MMCmazeTest {
         System.out.println(robot.getMoves());
 
     }
+
+
+
+
 
 }

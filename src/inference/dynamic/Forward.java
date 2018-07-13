@@ -3,7 +3,6 @@ package inference.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import math.Distribution;
-import math.Transpose;
 import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -200,6 +199,8 @@ public class Forward {
         if (forwardLog) {
 
             System.out.println(ident + "FULL REQUEST " + fullRequest.values());
+
+            System.out.println(ident + "FULL OBS " + requestsObservations.values());
         }
         //encapsule les varibles dans une megavariable si plusieurs afin de
         //gerer de manière polymorphe les variables uniques des listes de variables
@@ -353,18 +354,10 @@ public class Forward {
 
                 maxMatrix.put(requestDomainValue, requestValueMaxProbability);
 
-                // forwardDistribution.put(requestDomainValue, requestValueProbability);
-                //enregistre le maximum
-                // maxDistribution.put(requestDomainValue, requestValueMaxProbability);
-
             } else {
                 //enregistrement de la probabilité pour la valeur courante de la requete additionnée à la precedente
                 //pour une même combinaison, étant donné que si la requete est complétée par d'autres variables,
                 //la combinaisons de valeurs de la requete d'origine peut apparaitre plusieurs fois
-                // forwardDistribution.put(requestDomainValue, forwardDistribution.get(requestDomainValue).add(requestValueProbability));
-
-                // maxDistribution.put(requestDomainValue, maxDistribution.get(requestDomainValue).add(requestValueMaxProbability));
-
                 forwardMatrix.put(requestDomainValue, forwardMatrix.get(requestDomainValue).add(requestValueProbability));
 
                 maxMatrix.put(requestDomainValue, maxMatrix.get(requestDomainValue).add(requestValueMaxProbability));
@@ -379,11 +372,9 @@ public class Forward {
         //enregistre les totaux pour toutes les combinaisons
         //pour les maximum inutile d'enregistrer les totaux
         //etant donné que normaliser ne change pas le rapport de grandeur entre les valeurs
-        // forwardDistribution.put(totalDomainValues, totalDistribution);
 
         forwardMatrix.putTotal(totalDistribution);
 
-        // System.out.println(forwardDistribution);
 
         fullMegaRequest.setDomainValue(originalValue);
 
@@ -391,16 +382,12 @@ public class Forward {
 
         if (saveforward) {
 
-            //this.forwardDistrib.put(key, forwardDistribution);
-
             this.forwardMatrices.put(key, forwardMatrix);
-
-            // this.maxDistrib.put(key, maxDistribution);
 
             this.maxMatrices.put(key, maxMatrix);
         }
 
-        return new ForwardMax(/*forwardDistribution, maxDistribution,*/ forwardMatrix, maxMatrix);
+        return new ForwardMax(forwardMatrix.normalize(), maxMatrix);
     }
 
     protected ForwardSumRs forwardHiddenVarSum(Variable obsParentState,

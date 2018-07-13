@@ -274,9 +274,9 @@ public class Maze {
 
         builder.append("ROBOT POSITION : "+this.getRobotPosition()+"\n");
 
-        builder.append("ROBOT POSITIONS KNOWN\n");
+        builder.append("ROBOT NEW REACHABLE POSITIONS\n");
 
-        for(PositionProb positionProb : this.robot.getLastKnowPositions()) {
+        for(PositionProb positionProb : this.getNewReachablePosition(this.robot.getLastKnowPositions())) {
 
             builder.append(positionProb+"\n");
         }

@@ -56,6 +56,10 @@ public class MazeMMCFactory extends MazeNetworkFactory {
         ProbabilityCompute tcpPositions = new ProbabilityComputeFromTCP(
                 new Variable[]{position0}, positionDomain, transition, doubleFactory);
 
+       // System.out.println("TCP "+time);
+
+        //System.out.println(tcpPositions);
+
         //-------------variable etat
 
         Variable position = new Variable(POSITION, positionDomain, tcpPositions, new Variable[]{position0});

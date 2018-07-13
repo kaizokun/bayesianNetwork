@@ -4,6 +4,7 @@ import agent.MazeRobot;
 import environment.Maze;
 import environment.Percept;
 import network.dynamic.DynamicBayesianNetwork;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public abstract class MazeNetworkFactory {
         POSITION, CAPTOR_POSITION
     }
 
-    protected Double[][] loadTcpMazeRoot( List<MazeRobot.PositionProb> reachablePositions  ){
+    protected Double[][] loadTcpMazeRoot(List<MazeRobot.PositionProb> reachablePositions) {
 
         Double[][] rootTransition = new Double[1][reachablePositions.size()];
 
@@ -34,7 +35,7 @@ public abstract class MazeNetworkFactory {
         return rootTransition;
     }
 
-    protected Double[][] loadTcpMazeTransition(List<MazeRobot.PositionProb> reachablePositions, Maze maze  ){
+    protected Double[][] loadTcpMazeTransition(List<MazeRobot.PositionProb> reachablePositions, Maze maze) {
 
         Double[][] transition = new Double[reachablePositions.size()][reachablePositions.size()];
 
@@ -64,7 +65,7 @@ public abstract class MazeNetworkFactory {
         return transition;
     }
 
-    protected Double[][] loadTcpCaptor(Percept[] percepts, List<MazeRobot.PositionProb> reachablePositions, Maze maze){
+    protected Double[][] loadTcpCaptor(Percept[] percepts, List<MazeRobot.PositionProb> reachablePositions, Maze maze) {
 
         Double[][] captor = new Double[reachablePositions.size()][percepts.length];
 

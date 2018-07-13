@@ -43,6 +43,8 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
             Variable compoVarCopy = new Variable();
 
+            compoVarCopy.domainValue = compoVar.domainValue;
+
             compoVarCopy.label = compoVar.label;
 
             compoVarCopy.domain = compoVar.domain;
