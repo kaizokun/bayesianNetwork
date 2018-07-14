@@ -20,7 +20,7 @@ public class MMCtest {
 
     protected MMC mmcOne = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkOneVars();
 
-    protected MMC mmcTwo = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
+    //protected MMC mmcTwo = BayesianNetworkFactory.getUmbrellaMMCDynamicNetworkTwoVars();
 
     private Variable[][] getVariablesInit(Object[] varLabels, IDomain[] varDomains, Object[][] valuesTab) {
         //crée un tableau à deux dimensions, la premier pour le nombre de megavariables d'oservations
@@ -197,6 +197,7 @@ public class MMCtest {
         System.out.println(MatrixUtil.invert(MatrixUtil.multiply(matrixTrans, matrixObs)));
     }
 
+    /*
     @Test
     public void forwardAndBackwardTestTwoVar() {
 
@@ -220,7 +221,7 @@ public class MMCtest {
 
         System.out.println(backward);
     }
-
+*/
     @Test
     public void testForwardMultiplicationOrder() {
 

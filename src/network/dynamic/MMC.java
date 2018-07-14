@@ -56,9 +56,9 @@ public class MMC extends DynamicBayesianNetwork {
         //sauvegarde les variables observations
         this.obsVariables = obs;
 
-        this.megaVariableStatesRoot = this.mergeStateVariables(Arrays.asList(statesRoot), time, true);
+        this.megaVariableStatesRoot = this.mergeStateVariables(Arrays.asList(statesRoot), true);
 
-        this.megaVariableStates = this.mergeStateVariables(Arrays.asList(states), time + 1, false);
+        this.megaVariableStates = this.mergeStateVariables(Arrays.asList(states), false);
 
         this.megaVariableObs = this.mergeObservationVariables(Arrays.asList(obs), Arrays.asList(states), time + 1);
 
@@ -178,9 +178,9 @@ public class MMC extends DynamicBayesianNetwork {
 
     private Variable mergeObservationVariables(List<Variable> obs, List<Variable> states, int time) {
 
-        Variable megaObs = obs.size() == 1 ? obs.get(0) : new MegaVariable(obs, time, this.doubleFactory);
+        Variable megaObs = MegaVariable.encapsulate(obs, time, this.doubleFactory);
 
-        Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time, this.doubleFactory);
+        Variable megaState = MegaVariable.encapsulate(states, time, this.doubleFactory);
 
         //récuperer les combinaisons de valeurs on aura une matrice par valeur
         //que peuvent prendre les observations à un temps t
@@ -220,11 +220,9 @@ public class MMC extends DynamicBayesianNetwork {
         return megaObs;
     }
 
-    private Variable mergeStateVariables(List<Variable> states, int time, boolean first) {
+    private Variable mergeStateVariables(List<Variable> states, boolean first) {
 
-        //Variable megaState = states.size() == 1 ? states.get(0) : new MegaVariable(states, time, this.doubleFactory);
-
-        Variable megaState = MegaVariable.encapsulate(states);
+        Variable megaState = MegaVariable.encapsulate(states, 0, doubleFactory);
 
         AbstractDouble[][] matrix;
         //si variables de temps 0

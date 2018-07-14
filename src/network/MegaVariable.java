@@ -24,7 +24,12 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
      * (label, time, domainValue, domain)
      */
 
-    public MegaVariable(){}
+    public MegaVariable() { }
+
+    public MegaVariable(Collection<Variable> compoVars) {
+
+        this(compoVars, 0, initDomain(compoVars));
+    }
 
     public MegaVariable(Collection<Variable> compoVars, int time, AbstractDoubleFactory doubleFactory) {
 
@@ -75,7 +80,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         return new MegaDomain(combinations);
     }
 
-    public List<Domain.DomainValue> getDomainValuesCheckInit(){
+    public List<Domain.DomainValue> getDomainValuesCheckInit() {
 
         return getDomainValuesCheckInit(this.getCompoVars());
     }
@@ -86,11 +91,11 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         for (Variable variable : compoVars) {
 
-            if(variable.isInit()){
+            if (variable.isInit()) {
 
                 domainValuesList.add(Arrays.asList(new Domain.DomainValue[]{variable.getDomainValue()}));
 
-            }else {
+            } else {
 
                 domainValuesList.add(variable.getDomainValues());
             }
@@ -100,7 +105,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         List<Domain.DomainValue> combinations2 = new ArrayList<>(combinations.size());
 
-        for(List<Domain.DomainValue> values : combinations){
+        for (List<Domain.DomainValue> values : combinations) {
 
             combinations2.add(new MegaDomain.MegaDomainValue(values));
         }
@@ -192,7 +197,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
     @Override
     public Domain.DomainValue getDomainValue() {
 
-       return this.domain.getDomainValue(this.getMegaVarValues());
+        return this.domain.getDomainValue(this.getMegaVarValues());
     }
 
     @Override
@@ -268,9 +273,9 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         return new MegaVariable(this.compoVars, time, this.getDomain());
     }
 
-    public static Variable encapsulate(List<Variable> variables){
+    public static Variable encapsulate(List<Variable> variables) {
 
-        if(variables.size() > 1) {
+        if (variables.size() > 1) {
 
             MegaVariable megavariable = new MegaVariable();
 
@@ -280,9 +285,22 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
             return megavariable;
 
-        }else{
+        } else {
 
             return variables.get(0);
         }
     }
+
+    public static Variable encapsulate(List<Variable> variables, int time, AbstractDoubleFactory doubleFactory) {
+
+        if (variables.size() > 1) {
+
+            return new MegaVariable(variables, time, doubleFactory);
+
+        } else {
+
+            return variables.get(0);
+        }
+    }
+
 }
