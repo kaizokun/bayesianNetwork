@@ -88,7 +88,7 @@ public class Domain<T> implements IDomain {
 
         @Override
         public String toString() {
-            return value.toString()+" ("+index+") ";
+            return value.toString();
         }
 
         @Override

@@ -55,7 +55,7 @@ public abstract class MazeNetworkFactory {
 
                 } else {
 
-                    transition[a][b] = 0.1;
+                    transition[a][b] = 0.001;
                 }
                 b++;
             }

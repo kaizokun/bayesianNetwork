@@ -10,7 +10,7 @@ public class Maze {
 
     protected MazeRobot robot;
 
-    protected Position robotPosition;
+    protected LinkedList<Position> robotPosition = new LinkedList<>();
 
     protected int limitX, limitY;
 
@@ -34,7 +34,7 @@ public class Maze {
 
         this.limitY = maze.length;
 
-        this.robotPosition = robotPosition;
+        this.robotPosition.addLast(robotPosition);
 
         this.maze = maze;
 
@@ -127,17 +127,22 @@ public class Maze {
 
     public void moveRobot(Cardinal cardinal) {
 
-        this.robotPosition = this.robotPosition.move(cardinal);
+        this.robotPosition.addLast(this.getRobotPosition().move(cardinal));
     }
 
     public Position getRobotPosition() {
 
-        return robotPosition;
+        return robotPosition.getLast();
+    }
+
+    public Position getPreviousRobotPosition() {
+
+        return robotPosition.get(robotPosition.size() - 2);
     }
 
     public Percept getPercept() {
 
-        return getPercept(this.robotPosition);
+        return getPercept(this.getRobotPosition());
     }
 
     public Percept getPercept(Position position) {
@@ -219,7 +224,7 @@ public class Maze {
             }
         }
 
-        this.strMaze[this.strMaze.length - 1][0] = new String("[ ]");
+        this.strMaze[this.strMaze.length - 1][0] = new String("   ");
 
         for (int col = 1; col < this.strMaze[0].length; col++) {
 
@@ -252,9 +257,9 @@ public class Maze {
             this.resetPositions.add(new Position(y, x));
         }
 
-        y = this.strMaze.length - 2 - this.robotPosition.y;
+        y = this.strMaze.length - 2 - this.getRobotPosition().y;
 
-        x = this.robotPosition.x + 1;
+        x = this.getRobotPosition().x + 1;
 
         this.strMaze[y][x] = "[++]";
 
@@ -272,14 +277,19 @@ public class Maze {
 
         builder.append("CURRENT PERCEPT : "+this.getPercept().toString()+"\n");
 
+        if(this.robotPosition.size() > 1)
+        builder.append("ROBOT PREVIOUS POSITION : "+this.getPreviousRobotPosition()+"\n");
+
         builder.append("ROBOT POSITION : "+this.getRobotPosition()+"\n");
 
         builder.append("ROBOT NEW REACHABLE POSITIONS\n");
 
         for(PositionProb positionProb : this.getNewReachablePosition(this.robot.getLastKnowPositions())) {
 
-            builder.append(positionProb+"\n");
+            builder.append("    "+positionProb+"\n");
         }
+
+        builder.append('\n');
 
         for (int row = 0; row < strMaze.length; row++) {
 

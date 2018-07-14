@@ -13,8 +13,6 @@ import static inference.dynamic.Util.*;
 
 public class Forward {
 
-    protected static boolean forwardLog = false;
-
     protected Map<String, Distribution> forwardMatrices = new Hashtable<>();
 
     protected Map<String, Distribution> maxMatrices = new Hashtable<>();
@@ -58,23 +56,7 @@ public class Forward {
     }
 
     /*------------------- FORWARD--------------------*/
-/*
-    public void forward(){
 
-        Set<Variable> statesVariables = this.network.getStateVariables();
-
-        List<Variable> request = new ArrayList<>(statesVariables.size());
-
-        for(Variable variable : this.network.getStateVariables()){
-
-            request.add(variable);
-        }
-
-        ForwardMax forwardMax = this.forward(request);
-
-        this.network.setLastForward(new Transpose(forwardMax.forward));
-    }
-*/
     public AbstractDouble forwardAsk(Variable request) {
 
         Distribution forward = forward(request, false).forward;
@@ -84,11 +66,11 @@ public class Forward {
 
     public AbstractDouble forwardAsk(List<Variable> request) {
 
-        Variable megaRequest =  MegaVariable.encapsulate(request);
+        Variable megaRequest = MegaVariable.encapsulate(request);
 
         Domain.DomainValue ask = megaRequest.getDomainValue();
 
-        System.out.println("ASK : "+ask);
+        System.out.println("ASK : " + ask);
 
         Distribution forward = forward(request, false).forward;
 
@@ -117,30 +99,15 @@ public class Forward {
 
     protected ForwardMax forward(List<Variable> requests, String key, int depth, boolean saveforward) {
 
-        String ident = Util.getIdent(depth);
-
-        if (forwardLog) {
-            ident = getIdent(depth);
-            System.out.println();
-            System.out.println(ident + "************************************");
-            System.out.println(ident + "FORWARD : " + requests + " - KEY : " + key);
-            System.out.println(ident + "************************************");
-            System.out.println();
-        }
-
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete
         //qui peuvent être des combinaisons de valeur si la requete à plusieurs variables
-        //   Map<Domain.DomainValue, AbstractDouble> forwardDistribution = new Hashtable<>();
-
-        //   Map<Domain.DomainValue, AbstractDouble> maxDistribution = new Hashtable<>();
 
         Map<Domain.DomainValue, List<Variable>> mostLikelyPath = new Hashtable<>();
 
         //si pour la requete courante on à plusieurs sommes avec des variables cachées différentes
         //on aura plusieurs distributions differentes
         //  Map<String, Map<Domain.DomainValue, AbstractDouble>> lastForwardDistrib = new Hashtable<>();
-
         //  Map<String, Map<Domain.DomainValue, AbstractDouble>> lastMaxDistrib = new Hashtable<>();
 
         Map<String, Distribution> forwardMatrices = new Hashtable<>();
@@ -196,12 +163,6 @@ public class Forward {
             }
         }
 
-        if (forwardLog) {
-
-            System.out.println(ident + "FULL REQUEST " + fullRequest.values());
-
-            System.out.println(ident + "FULL OBS " + requestsObservations.values());
-        }
         //encapsule les varibles dans une megavariable si plusieurs afin de
         //gerer de manière polymorphe les variables uniques des listes de variables
         //( gestion des attributions de valeurs etc.)
@@ -214,53 +175,45 @@ public class Forward {
         if (!requestTime0.isEmpty()) {
             //si pas de variabel en temps 0 on ne fait rien
             //ici ce la créerait une megavariable vide qui poserait problème
-            megaRequest0 =  MegaVariable.encapsulate(new ArrayList<>(requestTime0));
+            megaRequest0 = MegaVariable.encapsulate(new ArrayList<>(requestTime0));
         }
 
         Distribution forwardMatrix = new Distribution(megaRequest, network.getDoubleFactory());
 
         Distribution maxMatrix = new Distribution(megaRequest, network.getDoubleFactory());
 
-        //  System.out.println(forwardDistrib);
-
         //valeur originale des variables à restaurer à la fin
         Domain.DomainValue originalValue = fullMegaRequest.saveDomainValue();
 
-        /*
-         * Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
-         * --------------------------------------------------------------------------
-         *
-         * on pourrait rechercher la sequence la plus vraissemblable pour un sous ensemble d'états
-         * de 0 à une certaine coupe temporelle
-         *
-         * le premier appel à cette méthode se fait donc avec ce sous ensemble d'états
-         * ici les variables ne doivent pas être initialisés et comme pour le filtrage
-         * on travaille sur des combinaisons de valeurs si plus d'une variable.
-         * D'abord de manière analogue au filtrage il faut eventuellement completer les variables de la requete
-         * par les parents des observations non compris.
-         *
-         * Ensuite pour chaque combinaison de valeur de la requete courante situé à un temps t
-         * on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
-         * états parents situées à un temps t - 1
-         *
-         * Si on prend un cas simple où on à une variable requete t, une observation unique
-         * et un max pour un état d'une variable parent unique t - 1
-         *
-         * Pour chaque combinaison de valeur de la requete
-         * il faut associer celle des parents ayant donné le maximum
-         * */
+
+         // Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
+         // --------------------------------------------------------------------------
+         //
+         // on pourrait rechercher la sequence la plus vraissemblable pour un sous ensemble d'états
+         // de 0 à une certaine coupe temporelle
+         //
+         // le premier appel à cette méthode se fait donc avec ce sous ensemble d'états
+         // ici les variables ne doivent pas être initialisés et comme pour le filtrage
+         // on travaille sur des combinaisons de valeurs si plus d'une variable.
+         // D'abord de manière analogue au filtrage il faut eventuellement completer les variables de la requete
+         // par les parents des observations non compris.
+         //
+         // Ensuite pour chaque combinaison de valeur de la requete courante situé à un temps t
+         // on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
+         // états parents situées à un temps t - 1
+         //
+         // Si on prend un cas simple où on à une variable requete t, une observation unique
+         // et un max pour un état d'une variable parent unique t - 1
+         //
+         // Pour chaque combinaison de valeur de la requete
+         // il faut associer celle des parents ayant donné le maximum
+
 
         //pour chaque combinaison de valeur de la requete complétée
         for (Domain.DomainValue domainValue : fullMegaRequest.getDomainValues()) {
 
             fullMegaRequest.setDomainValue(domainValue);
 
-            if (forwardLog) {
-
-                System.out.println();
-
-                System.out.println(ident + "FULL REQUEST COMBINATION : " + fullRequest);
-            }
             //initialisation de la multiplication à 1
             AbstractDouble requestValueProbability = this.network.getDoubleFactory().getNew(1.0);
 
@@ -283,12 +236,6 @@ public class Forward {
                     requestValueProbability = requestValueProbability.multiply(obsProb);
                     //idem pour calculer un max pour la sequence la plus vraissemblable
                     requestValueMaxProbability = requestValueMaxProbability.multiply(obsProb);
-
-                    if (forwardLog) {
-                        System.out.println();
-                        System.out.println(ident + "OBS P(" + observation + "|" + observation.getDependencies() + ") = " + observation.getProbabilityForCurrentValue());
-                        System.out.println();
-                    }
                 }
                 //ici une observation peut avoir plusieurs parents et il faut à mon sens
                 //les traiter separemment soit une somme par variable parent
@@ -297,7 +244,6 @@ public class Forward {
                 for (Variable stateObserved : observation.getDependencies()) {
                     //total de la somme sur les valeurs cachées initialisé à zero
                     ForwardSumRs rs = forwardHiddenVarSum(stateObserved,
-                            /* lastForwardDistrib, lastMaxDistrib,*/
                             forwardMatrices, maxMatrices, depth + 1, saveforward);
                     //qu'on multiplie avec les resultat pour les observations precedentes
                     requestValueProbability = requestValueProbability.multiply(rs.sum);
@@ -317,16 +263,13 @@ public class Forward {
             }
 
             if (!requestTime0.isEmpty()) {
+
                 //pour les variables situées au temps 0 ont obtient directement leur probabilité
                 AbstractDouble req0Prob = megaRequest0.getProbabilityForCurrentValue();
 
                 requestValueProbability = requestValueProbability.multiply(req0Prob);
 
                 requestValueMaxProbability = requestValueMaxProbability.multiply(req0Prob);
-
-                if (forwardLog) {
-                    System.out.println(ident + "STATE_0 P(" + megaRequest0 + ") = " + req0Prob);
-                }
             }
             //Si la combinaison sur laquelle on travaille actuellement contient
             //plus de variables que celles requete originale
@@ -341,13 +284,7 @@ public class Forward {
 
             Domain.DomainValue requestDomainValue = megaRequest.getDomainValue();
 
-            if (forwardLog) {
-                System.out.println(ident + "ORIGINAL REQUEST COMBINATION " + requests + " : " + requestDomainValue
-                        + " - total = " + requestValueProbability);
-            }
-
             if (forwardMatrix.get(requestDomainValue) == null) {
-                //if (!forwardDistribution.containsKey(requestDomainValue)) {
                 //enregistrement de la probabilité pour la ou les valeur courante attribuées
                 //à la ou les variables de requete
                 forwardMatrix.put(requestDomainValue, requestValueProbability);
@@ -375,10 +312,12 @@ public class Forward {
 
         forwardMatrix.putTotal(totalDistribution);
 
-
         fullMegaRequest.setDomainValue(originalValue);
 
         this.mostLikelyPath.put(key, mostLikelyPath);
+
+        //normalise le forward
+        forwardMatrix.normalize();
 
         if (saveforward) {
 
@@ -387,25 +326,13 @@ public class Forward {
             this.maxMatrices.put(key, maxMatrix);
         }
 
-        return new ForwardMax(forwardMatrix.normalize(), maxMatrix);
+        return new ForwardMax(forwardMatrix, maxMatrix);
     }
 
     protected ForwardSumRs forwardHiddenVarSum(Variable obsParentState,
-                                            /*   Map<String, Map<Domain.DomainValue, AbstractDouble>> lastForwardDistrib,
-                                               Map<String, Map<Domain.DomainValue, AbstractDouble>> lastMaxDistrib,*/
                                                Map<String, Distribution> forwardMatrices, Map<String, Distribution> maxMatrices,
                                                int depth, boolean saveforward) {
 
-        String ident = Util.getIdent(depth);
-
-        if (forwardLog) {
-
-            ident = getIdent(depth);
-            System.out.println(ident + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println(ident + "SUM ON " + obsParentState + " DEPENDENCIES : " + obsParentState.getDependencies());
-            System.out.println(ident + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println();
-        }
         //avant de demarrer la sommation, les variables parent des observations non initialisées doivent être reseter à la fin
         //car si elles conservent leur valeur la recuperation des combinaison echoue pour celle initialisées
         //lors d'un rappel de la sommation pour une combinaison differente dans la procedure appelante
@@ -450,12 +377,7 @@ public class Forward {
         //Ca ne pose pas de problème pour une requete avec des variables
         //situées dans la même coupe temporelles ou tout leur parent sont des variables cachées
 
-
-        //List<List<Domain.DomainValue>> hiddenVarsCombinations = BayesianNetwork.domainValuesCombinationsCheckInit(obsParentState.getDependencies());
-
         String key = getDistribSavedKey(obsParentState.getDependencies());
-
-        // System.out.println(ident+"COMBINATION check init : "+ megaHiddenVar.getDomainValuesCheckInit());
 
         List<Domain.DomainValue> domainValues = megaHiddenVar.getDomainValuesCheckInit();
 
@@ -467,16 +389,6 @@ public class Forward {
             //début de la multiplication avec la valeur fourni par le modele de transition
             AbstractDouble mulTransitionForward = obsParentState.getProbabilityForCurrentValue();
             //on a ici potentiellement une filtrage sur plusieurs variable si plusieurs variables cachées
-            if (forwardLog) {
-
-                System.out.println(ident + "SUM COMBINAISON : " + obsParentState.getDependencies());
-
-                System.out.println(ident + "TRANSITION P(" + obsParentState + "|" + obsParentState.getDependencies() + ") = " + obsParentState.getProbabilityForCurrentValue());
-            }
-
-            //Map<Domain.DomainValue, AbstractDouble> forward = lastForwardDistrib.get(key);
-
-            // Map<Domain.DomainValue, AbstractDouble> max = lastMaxDistrib.get(key);
 
             Distribution forward = forwardMatrices.get(key);
 
@@ -486,51 +398,30 @@ public class Forward {
 
                 ForwardMax forwardMax = this.forward(obsParentState.getDependencies(), key, depth + 1, saveforward);
 
-                // max = forwardMax.max;
-
-                // forward = forwardMax.forward;
-
                 max = forwardMax.max;
 
                 forward = forwardMax.forward;
 
-                // lastForwardDistrib.put(key, forwardMax.forward);
-
-                //lastMaxDistrib.put(key, forwardMax.max);
-
                 forwardMatrices.put(key, forward);
 
                 maxMatrices.put(key, max);
-
-                if (forwardLog) {
-                    System.out.println(ident + "FORWARD REC : " + forward.get(domainValue));
-                }
-
-            } else {
-
-                if (forwardLog) {
-                    System.out.println(ident + "FORWARD SAVED : " + forward.get(domainValue));
-                }
             }
 
             //on recupere la probabilité de la sous sequence la plus probable (max) pouvant mener
             //à la (les) valeur courante de la(les) variable cachée
             // AbstractDouble maxValue = max.get(domainValue);
 
-            AbstractDouble maxMValue = max.get(domainValue);
+            AbstractDouble maxValue = max.get(domainValue);
             //cette valeur est multipliée par la probabilité obtenu par le modele de transition,
             //soit les variable états enfants avec leur valeurs courantes (les variables de la requete complétée
             // dans la fonction appelante) sachant les variables cachées et leur valeur courante.
             //ce qui pondère la sous sequence la plus probable.
 
-            //maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
+            maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
 
-            maxMValue = maxMValue.multiply(obsParentState.getProbabilityForCurrentValue());
+            if (maxValue.compareTo(hiddenVarMax) >= 0) {
 
-            if (maxMValue.compareTo(hiddenVarMax) >= 0) {
-                //if (maxValue.compareTo(hiddenVarMax) >= 0) {
-
-                hiddenVarMax = maxMValue;
+                hiddenVarMax = maxValue;
                 //sauvegarde l'état des variables cachées pour le maximum
                 //les valeurs pouvant encore changer dans la procedure
                 List<Variable> copyDependencies = new LinkedList<>();
@@ -542,17 +433,14 @@ public class Forward {
 
                 maxHiddenvars = copyDependencies;
             }
-
             //recupere le resultat du forward pour la combinaison de valeurs courantes des variables cachées
-            // AbstractDouble forwardValue = forward.get(domainValue).divide(forward.get(totalDomainValues));
-            AbstractDouble forwardMValue = forward.get(domainValue).divide(forward.getTotal());
-
+            AbstractDouble forwardValue = forward.get(domainValue);//.divide(forward.getTotal());
             //on multiplie le resultat du forward avec la partie transition
-            // mulTransitionForward = mulTransitionForward.multiply(forwardValue);
-            mulTransitionForward = mulTransitionForward.multiply(forwardMValue);
-
+            //mulTransitionForward = mulTransitionForward.multiply(forwardValue);
+            mulTransitionForward = mulTransitionForward.multiply(forwardValue);
             //on additionne pour chaque combinaison de valeur pour les variables cachées
             hiddenVarsSum = hiddenVarsSum.add(mulTransitionForward);
+
         }
 
         megaHiddenVar.setDomainValue(originalValue);

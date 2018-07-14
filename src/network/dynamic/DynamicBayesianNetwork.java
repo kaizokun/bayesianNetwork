@@ -54,9 +54,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public Variable addRootVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
 
-        Variable root = super.addRootVariable(label, domain, probabilityCompute);
+        Variable root = super.addRootVariable(label, domain, probabilityCompute, this.initTime);
 
-        this.getTimeVariables(this.time).put(root, root);
+        this.getTimeVariables(this.initTime).put(root, root);
 
         return root;
     }
@@ -132,7 +132,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         List<Variable> lastVariables = new ArrayList<>();
 
-        for(Variable variable : this.transitionModels.keySet()){
+        for (Variable variable : this.transitionModels.keySet()) {
 
             lastVariables.add(this.getVariable(this.getTime(), variable));
         }
@@ -164,12 +164,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             this.setLastForward(forward.forward(this.getLastStateVariables()).getForward());
         }
 
-        //System.out.println(this);
-
-       // System.out.println(this.lastForward);
-
     }
-
 
     public void extend() {
 

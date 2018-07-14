@@ -7,7 +7,8 @@ import java.util.*;
 
 public class BayesianNetwork {
 
-    public BayesianNetwork() { }
+    public BayesianNetwork() {
+    }
 
     public BayesianNetwork(AbstractDoubleFactory doubleFactory) {
 
@@ -29,7 +30,7 @@ public class BayesianNetwork {
 
         ProbabilityComputeFromTCP tcp = new ProbabilityComputeFromTCP(dependencies, varDom, entries, this.doubleFactory);
 
-       // tcp.initCulumativeFrequencies();
+        // tcp.initCulumativeFrequencies();
 
         return tcp;
     }
@@ -46,7 +47,12 @@ public class BayesianNetwork {
 
     public Variable addRootVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
 
-        Variable newVar = new Variable(label, domain, probabilityCompute);
+        return addRootVariable(label, domain, probabilityCompute, 0);
+    }
+
+    public Variable addRootVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute, int time) {
+
+        Variable newVar = new Variable(label, domain, probabilityCompute, time);
 
         this.addVariable(newVar);
 

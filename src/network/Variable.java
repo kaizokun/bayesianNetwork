@@ -96,7 +96,12 @@ public class Variable implements Iterable<Variable> {
 
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
 
-        this(label, domain, probabilityCompute, new ArrayList<>(), 0);
+        this(label, domain, probabilityCompute,0);
+    }
+
+    public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, int time) {
+
+        this(label, domain, probabilityCompute, new ArrayList<>(), time);
     }
 
     public Variable(Object label, IDomain domain) {

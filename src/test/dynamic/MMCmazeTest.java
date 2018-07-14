@@ -1,19 +1,15 @@
 package test.dynamic;
 
 import agent.MazeRobot;
-
 import domain.data.MyDoubleFactory;
 import environment.Maze;
 import environment.Position;
-
-import network.factory.BayesianNetworkFactory;
 import network.factory.MazeDbnFactory;
 import network.factory.MazeMMCFactory;
 import network.factory.MazeNetworkFactory;
 import org.junit.Test;
 
 public class MMCmazeTest {
-
 
     @Test
     public void mazeTestMMC(){
@@ -45,16 +41,11 @@ public class MMCmazeTest {
 
         boolean lookUp = true;
 
-        //System.out.println(maze);
+        System.out.println(maze);
 
         do {
 
-            if(robot.getDbnMaze().getTime() == 4)
-                break;
-
             robot.lookUpPosition();
-
-            System.out.println(maze);
 
             if (robot.positionKnown()) {
 
@@ -66,6 +57,8 @@ public class MMCmazeTest {
 
                 robot.reload();
             }
+
+            System.out.println(maze);
 
         } while (lookUp);
 
