@@ -9,20 +9,43 @@ import network.factory.MazeDbnFactory;
 import network.factory.MazeMMCFactory;
 import network.factory.MazeNetworkFactory;
 import org.junit.Test;
+import test.TestUtil;
 
 import java.util.LinkedList;
 
 public class MMCmazeTest {
 
+    public LinkedList<Cardinal> moves;
+
     @Test
-    public void mazeTest(){
+    public void mazeTest() {
 
-        LinkedList<Cardinal> moves =  mazeTest(new MazeMMCFactory(), null);
+        TestUtil.initTime();
 
-        mazeTest(new MazeDbnFactory(), moves);
+        mazeTest(new MazeMMCFactory());
+
+        TestUtil.printTimeDelta();
+
+        TestUtil.initTime();
+
+        mazeTest(new MazeDbnFactory());
+
+        TestUtil.printTimeDelta();
     }
 
-    public  LinkedList<Cardinal> mazeTest(MazeNetworkFactory networkFactory, LinkedList<Cardinal> moves) {
+    @Test
+    public void mazeMMCTest() {
+
+        mazeTest(new MazeMMCFactory());
+    }
+
+    @Test
+    public void mazeDBNTest() {
+
+        mazeTest(new MazeDbnFactory());
+    }
+
+    public void mazeTest(MazeNetworkFactory networkFactory) {
 
         System.out.println();
         System.out.println("====================================================");
@@ -80,11 +103,8 @@ public class MMCmazeTest {
 
         System.out.println(robot.getMoves());
 
-        return robot.getMoves();
+        this.moves = robot.getMoves();
     }
-
-
-
 
 
 }

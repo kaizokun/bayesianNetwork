@@ -186,27 +186,27 @@ public class Forward {
         Domain.DomainValue originalValue = fullMegaRequest.saveDomainValue();
 
 
-         // Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
-         // --------------------------------------------------------------------------
-         //
-         // on pourrait rechercher la sequence la plus vraissemblable pour un sous ensemble d'états
-         // de 0 à une certaine coupe temporelle
-         //
-         // le premier appel à cette méthode se fait donc avec ce sous ensemble d'états
-         // ici les variables ne doivent pas être initialisés et comme pour le filtrage
-         // on travaille sur des combinaisons de valeurs si plus d'une variable.
-         // D'abord de manière analogue au filtrage il faut eventuellement completer les variables de la requete
-         // par les parents des observations non compris.
-         //
-         // Ensuite pour chaque combinaison de valeur de la requete courante situé à un temps t
-         // on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
-         // états parents situées à un temps t - 1
-         //
-         // Si on prend un cas simple où on à une variable requete t, une observation unique
-         // et un max pour un état d'une variable parent unique t - 1
-         //
-         // Pour chaque combinaison de valeur de la requete
-         // il faut associer celle des parents ayant donné le maximum
+        // Pour le cas ou il faut calculer la sequence d'etats la plus vraissemblable
+        // --------------------------------------------------------------------------
+        //
+        // on pourrait rechercher la sequence la plus vraissemblable pour un sous ensemble d'états
+        // de 0 à une certaine coupe temporelle
+        //
+        // le premier appel à cette méthode se fait donc avec ce sous ensemble d'états
+        // ici les variables ne doivent pas être initialisés et comme pour le filtrage
+        // on travaille sur des combinaisons de valeurs si plus d'une variable.
+        // D'abord de manière analogue au filtrage il faut eventuellement completer les variables de la requete
+        // par les parents des observations non compris.
+        //
+        // Ensuite pour chaque combinaison de valeur de la requete courante situé à un temps t
+        // on obtient un ou plusieurs combinaisons de valeurs, par somme (ou max), pour les variables
+        // états parents situées à un temps t - 1
+        //
+        // Si on prend un cas simple où on à une variable requete t, une observation unique
+        // et un max pour un état d'une variable parent unique t - 1
+        //
+        // Pour chaque combinaison de valeur de la requete
+        // il faut associer celle des parents ayant donné le maximum
 
 
         //pour chaque combinaison de valeur de la requete complétée
@@ -486,6 +486,85 @@ public class Forward {
         private List<Variable> maxDomainVars;
 
         private String hiddenVarKey;
+    }
+
+    /*------------------------------- FULL FORWARD ----------------------------------*/
+
+    public Distribution forward() {
+
+        //System.out.println("FORWARD "+this.network.getTime());
+
+        Variable megaState = MegaVariable.encapsulate(this.network.getLastStateVariables());
+
+        Variable megaObservation = MegaVariable.encapsulate(this.network.getLastObservationVariables());
+
+        return this.forward(megaState, megaObservation, network.getTime(), false);
+    }
+
+    private Distribution forward(Variable megaState, Variable megaObservation, int time, boolean saveForward) {
+
+        Domain.DomainValue originalValue = megaState.getDomainValue();
+
+        Distribution forward = new Distribution(megaState, network.getDoubleFactory());
+
+        if (time == network.getInitTime()) {
+
+            for (Domain.DomainValue value : megaState.getDomainValues()) {
+
+                megaState.setDomainValue(value);
+
+                forward.put(value, megaState.getProbabilityForCurrentValue());
+            }
+            //version de base déja normalisé (somme des probs de chaque valeur à 100 %)
+            //forward.normalize();
+
+            if (saveForward) {
+
+                this.forwardMatrices.put(megaState.getVarTimeId(), forward);
+            }
+
+            megaState.setDomainValue(originalValue);
+
+            return forward;
+        }
+
+        Distribution lastForward = null;
+
+        Variable previousMegaObservation = MegaVariable.encapsulate(this.network.getLastObservationVariables(time - 1));
+
+        Variable previousMegaState = MegaVariable.encapsulate(this.network.getLastStateVariables(time - 1));
+
+        for (Domain.DomainValue value : megaState.getDomainValues()) {
+
+            megaState.setDomainValue(value);
+
+            AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
+
+            for (Domain.DomainValue hiddenValue : previousMegaState.getDomainValues()) {
+
+                previousMegaState.setDomainValue(hiddenValue);
+
+                if (lastForward == null) {
+
+                    lastForward = forward(previousMegaState, previousMegaObservation, time - 1, saveForward);
+                }
+
+                sum = sum.add(megaState.getProbabilityForCurrentValue().multiply(lastForward.get(hiddenValue)));
+            }
+
+            forward.put(value, megaObservation.getProbabilityForCurrentValue().multiply(sum));
+        }
+
+        megaState.setDomainValue(originalValue);
+
+        forward.normalize();
+
+        if(saveForward){
+
+            this.forwardMatrices.put(megaState.getVarTimeId(), forward);
+        }
+
+        return forward;
     }
 
     /*------------------------------- VIEW ----------------------------------*/

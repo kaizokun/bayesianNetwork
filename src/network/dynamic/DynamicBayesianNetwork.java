@@ -127,27 +127,36 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
     }
 
+    public List<Variable> getLastStateVariables() {
 
-    private List<Variable> getLastStateVariables() {
-
-        List<Variable> lastVariables = new ArrayList<>();
-
-        for (Variable variable : this.transitionModels.keySet()) {
-
-            lastVariables.add(this.getVariable(this.getTime(), variable));
-        }
-
-        return lastVariables;
+        return getLastStateVariables(this.getTime());
     }
 
-    private List<Variable> getObservationVariables() {
+    public List<Variable> getLastStateVariables(int time) {
 
-        if (observationVariables == null) {
+        return getLastVariables(time, this.transitionModels.keySet() );
+    }
 
-            observationVariables = new ArrayList<>(this.captorsModels.keySet());
+    public List<Variable> getLastObservationVariables() {
+
+        return getLastObservationVariables(this.getTime());
+    }
+
+    public List<Variable> getLastObservationVariables(int time) {
+
+        return getLastVariables(time, this.captorsModels.keySet() );
+    }
+
+    private List<Variable> getLastVariables(int time, Set<Variable> varSet) {
+
+        List<Variable> variables = new ArrayList<>();
+
+        for (Variable variable : varSet) {
+
+            variables.add(this.getVariable(time, variable));
         }
 
-        return observationVariables;
+        return variables;
     }
 
     public void extend(Variable... variables) {
@@ -161,7 +170,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         if (forward != null) {
 
-            this.setLastForward(forward.forward(this.getLastStateVariables()).getForward());
+           // this.setLastForward(forward.forward(this.getLastStateVariables()).getForward());
+             this.setLastForward(forward.forward());
+
         }
 
     }

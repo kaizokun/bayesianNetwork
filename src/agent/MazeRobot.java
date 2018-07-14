@@ -36,7 +36,7 @@ public class MazeRobot {
 
     protected LinkedList<Cardinal> moves = new LinkedList<>();
 
-    protected LinkedList<Cardinal> movesTest;// = new LinkedList<>(Arrays.asList(WEST, NORTH, NORTH, SOUTH, WEST));
+    protected LinkedList<Cardinal> movesTest;// = new LinkedList<>(Arrays.asList(EAST, SOUTH, EAST, EAST, WEST, WEST, NORTH, NORTH));
 
     protected Random random = new Random();
 
@@ -86,6 +86,7 @@ public class MazeRobot {
         Cardinal randomDirection;
 
         if(movesTest == null) {
+            System.out.println("RANDOM MOVE");
             //récupère toutes les directions
             Set<Cardinal> reachableDirections = Cardinal.getCardinalSetCopy();
             //retirer celles qui ne sont pas accessible
@@ -96,7 +97,7 @@ public class MazeRobot {
             randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
 
         }else {
-
+            System.out.println("MOVE TEST");
             randomDirection = movesTest.removeFirst();
         }
 
@@ -244,6 +245,7 @@ public class MazeRobot {
     }
 
     public void setMovesTest(LinkedList<Cardinal> movesTest) {
+        System.out.println("SET MOVES "+movesTest);
         this.movesTest = movesTest;
     }
 }
