@@ -4,14 +4,7 @@
     <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/agent/MazeRobot.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/agent/MazeRobot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/domain/Domain.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/domain/Domain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/environment/Maze.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/environment/Maze.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/Variable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/factory/MazeNetworkFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/factory/MazeNetworkFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/environment/Cardinal.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/environment/Cardinal.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -49,20 +42,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Maze.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/environment/Maze.java">
+      <file leaf-file-name="MMCmazeTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="713">
-              <caret line="268" column="13" lean-forward="true" selection-start-line="268" selection-start-column="13" selection-end-line="268" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MazeNetworkFactory.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/factory/MazeNetworkFactory.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="35" column="5" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
+            <state relative-caret-position="288">
+              <caret line="28" column="60" selection-start-line="28" selection-start-column="60" selection-end-line="28" selection-end-column="60" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -70,132 +54,33 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MazeDbnFactory.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/factory/MazeDbnFactory.java">
+      <file leaf-file-name="MazeRobot.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/agent/MazeRobot.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="738">
-              <caret line="68" column="49" lean-forward="true" selection-start-line="68" selection-start-column="49" selection-end-line="68" selection-end-column="49" />
+            <state relative-caret-position="284">
+              <caret line="83" column="24" lean-forward="true" selection-start-line="83" selection-start-column="24" selection-end-line="83" selection-end-column="24" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#6555#6556#0" expanded="true" />
+                <element signature="e#6587#6588#0" expanded="true" />
+                <element signature="e#6645#6646#0" expanded="true" />
+                <element signature="e#6685#6686#0" expanded="true" />
+                <element signature="e#7127#7128#0" expanded="true" />
+                <element signature="e#7157#7158#0" expanded="true" />
+                <element signature="e#7306#7307#0" expanded="true" />
+                <element signature="e#7348#7349#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Forward.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java">
+      <file leaf-file-name="Cardinal.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/environment/Cardinal.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="394">
-              <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
+            <state relative-caret-position="155">
+              <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3844#3908#0" />
-                <element signature="e#4354#4444#0" />
-                <element signature="e#4998#5062#0" />
-                <element signature="e#6844#6945#0" />
-                <element signature="e#7693#7760#0" />
-                <element signature="e#8158#8205#0" />
-                <element signature="e#7857#7934#0" />
-                <element signature="e#10835#10879#0" />
-                <element signature="e#11308#11401#0" />
-                <element signature="e#12324#12396#0" />
-                <element signature="e#13211#13281#0" />
-                <element signature="e#13472#13555#0" />
-                <element signature="e#14730#14797#0" />
-                <element signature="e#14146#14222#0" />
-                <element signature="e#16342#16442#0" />
-                <element signature="e#16925#16985#0" />
-                <element signature="e#17256#17308#0" />
-                <element signature="e#18895#19013#0" />
-                <element signature="e#20064#20172#0" />
-                <element signature="e#25123#25208#0" />
-                <element signature="e#25158#25242#0" />
-                <element signature="e#26141#26198#0" />
-                <element signature="e#26913#26976#0" />
-                <element signature="e#29915#29916#0" expanded="true" />
-                <element signature="e#29953#29954#0" expanded="true" />
-                <element signature="e#30010#30011#0" expanded="true" />
-                <element signature="e#30044#30045#0" expanded="true" />
-                <element signature="e#30131#30132#0" expanded="true" />
-                <element signature="e#30168#30169#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Backward.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="302" column="37" selection-start-line="302" selection-start-column="37" selection-end-line="302" selection-end-column="37" />
-              <folding>
-                <element signature="e#1764#1827#0" />
-                <element signature="e#3257#3335#0" />
-                <element signature="e#4141#4270#0" />
-                <element signature="e#4533#4604#0" />
-                <element signature="e#5708#5807#0" />
-                <element signature="e#8708#8771#0" />
-                <element signature="e#14332#14378#0" />
-                <element signature="e#15283#15361#0" />
-                <element signature="e#17246#17317#0" />
-                <element signature="e#18429#18528#0" />
-                <element signature="e#20029#20088#0" />
-                <element signature="e#20342#20400#0" />
-                <element signature="e#20674#20746#0" />
-                <element signature="e#18631#18718#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MegaVariable.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/MegaVariable.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="587">
-              <caret line="279" lean-forward="true" selection-start-line="279" selection-end-line="279" />
-              <folding>
-                <element signature="e#6557#6558#0" expanded="true" />
-                <element signature="e#6599#6600#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Distribution.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/math/Distribution.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="101" column="24" selection-start-line="101" selection-start-column="24" selection-end-line="101" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DynamicBayesianNetwork.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2654">
-              <caret line="56" column="34" lean-forward="true" selection-start-line="56" selection-start-column="34" selection-end-line="56" selection-end-column="34" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BayesianNetwork.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="321">
-              <caret line="54" column="78" selection-start-line="54" selection-start-column="78" selection-end-line="54" selection-end-column="78" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Variable.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="98" column="50" lean-forward="true" selection-start-line="98" selection-start-column="50" selection-end-line="98" selection-end-column="50" />
-              <folding>
-                <element signature="e#464#465#0" expanded="true" />
-                <element signature="e#541#542#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -274,7 +159,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/test/dynamic/DynamicBayesianNetworkTest.java" />
         <option value="$PROJECT_DIR$/src/network/MegaVariable.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/Backward.java" />
         <option value="$PROJECT_DIR$/src/network/BayesianNetwork.java" />
@@ -316,8 +200,6 @@
         <option value="$PROJECT_DIR$/src/test/dynamic/MMCmazeTest.java" />
         <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
         <option value="$PROJECT_DIR$/../probability/src/domain/Domain.java" />
-        <option value="$PROJECT_DIR$/../probability/src/agent/MazeRobot.java" />
-        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java" />
         <option value="$PROJECT_DIR$/../probability/src/environment/Maze.java" />
         <option value="$PROJECT_DIR$/../probability/src/network/MegaVariable.java" />
         <option value="$PROJECT_DIR$/../probability/src/network/Variable.java" />
@@ -325,6 +207,9 @@
         <option value="$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java" />
         <option value="$PROJECT_DIR$/../probability/src/inference/dynamic/Forward.java" />
         <option value="$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java" />
+        <option value="$PROJECT_DIR$/../probability/src/environment/Cardinal.java" />
+        <option value="$PROJECT_DIR$/../probability/src/agent/MazeRobot.java" />
+        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java" />
       </list>
     </option>
   </component>
@@ -880,14 +765,7 @@
       <workItem from="1531472563147" duration="4964000" />
       <workItem from="1531488971578" duration="11010000" />
       <workItem from="1531506753829" duration="1645000" />
-      <workItem from="1531557372233" duration="6448000" />
-    </task>
-    <task id="LOCAL-00061" summary="implementation d'une megavariable pour MMC à partir de variables simples&#10;corrections">
-      <created>1530022110829</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1530022110830</updated>
+      <workItem from="1531557372233" duration="7199000" />
     </task>
     <task id="LOCAL-00062" summary="implementation d'une megavariable pour MMC à partir de variables simples&#10;partie observations">
       <created>1530029122302</created>
@@ -1225,28 +1103,17 @@
       <option name="project" value="LOCAL" />
       <updated>1531500988682</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <task id="LOCAL-00110" summary="correction erreur création du DBN dans le cas ou l'on recrée le dbn à partir d'un temps initial different de zero">
+      <created>1531564642437</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1531564642438</updated>
+    </task>
+    <option name="localTasksCounter" value="111" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 08m 43s.xml">
-      <configuration name="MMCmazeTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 09m 03s.xml">
-      <configuration name="MMCmazeTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 09m 49s.xml">
-      <configuration name="MMCmazeTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 10m 09s.xml">
-      <configuration name="MMCmazeTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 10m 40s.xml">
-      <configuration name="MMCmazeTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 10m 58s.xml">
-      <configuration name="MMCmazeTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="MMCmazeTest - 2018.07.14 at 12h 12m 11s.xml">
       <configuration name="MMCmazeTest" configurationId="JUnit" />
     </history-entry>
@@ -1259,9 +1126,27 @@
     <history-entry file="MMCmazeTest - 2018.07.14 at 12h 27m 53s.xml">
       <configuration name="MMCmazeTest" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 35m 57s.xml">
+      <configuration name="MMCmazeTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 36m 00s.xml">
+      <configuration name="MMCmazeTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 36m 01s.xml">
+      <configuration name="MMCmazeTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 36m 03s.xml">
+      <configuration name="MMCmazeTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 42m 13s.xml">
+      <configuration name="MMCmazeTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MMCmazeTest - 2018.07.14 at 12h 47m 35s.xml">
+      <configuration name="MMCmazeTest" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="730653000" />
+    <option name="totallyTimeSpent" value="731404000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1286,11 +1171,11 @@
       <window_info anchor="right" id="Maven Projects" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.3922652" />
-      <window_info anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
+      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.19829424" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.19829424" />
       <window_info anchor="right" id="Database" order="9" side_tool="true" weight="0.32995737" />
       <window_info id="Structure" order="1" sideWeight="0.20773481" side_tool="true" weight="0.18976545" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -1345,7 +1230,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="verification forward et smoothing en ligne" />
     <MESSAGE value="verification forward et smoothing en ligne suite" />
     <MESSAGE value="correction de la méthode d'incrementation du backward&#10;au niveau de la multiplication des matrices inverses.&#10;Inv(m1) * Inv(m2) == Inv(m2 * m1) != Inv(m1 * m2)" />
     <MESSAGE value="ajout lissage temps 0" />
@@ -1370,7 +1254,8 @@
     <MESSAGE value="gestion de la matrice distribution du forward dbn sous forme de transposée pour&#10;correspondre à la forme des distributions d'un MMC" />
     <MESSAGE value="test maze robot avec mmc et dbn" />
     <MESSAGE value="correction Bug MMC création de la matrice de transition" />
-    <option name="LAST_COMMIT_MESSAGE" value="correction Bug MMC création de la matrice de transition" />
+    <MESSAGE value="correction erreur création du DBN dans le cas ou l'on recrée le dbn à partir d'un temps initial different de zero" />
+    <option name="LAST_COMMIT_MESSAGE" value="correction erreur création du DBN dans le cas ou l'on recrée le dbn à partir d'un temps initial different de zero" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1378,13 +1263,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/MarkovCoverDistributionComputeStatic.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="9" column="32" lean-forward="true" selection-start-line="9" selection-start-column="32" selection-end-line="9" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/MarkovCoverDistributionCompute.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
@@ -1698,16 +1576,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/agent/MazeRobot.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="69" column="63" selection-start-line="69" selection-start-column="63" selection-end-line="69" selection-end-column="63" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/domain/Domain.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="335">
@@ -1715,16 +1583,6 @@
           <folding>
             <element signature="e#1675#1676#0" expanded="true" />
             <element signature="e#1738#1739#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="43" column="8" selection-start-line="43" selection-start-column="8" selection-end-line="43" selection-end-column="8" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1850,8 +1708,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/inference/dynamic/Backward.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="302" column="37" selection-start-line="302" selection-start-column="37" selection-end-line="302" selection-end-column="37" />
+        <state relative-caret-position="846">
+          <caret line="57" column="43" selection-start-line="57" selection-start-column="43" selection-end-line="57" selection-end-column="43" />
           <folding>
             <element signature="e#1764#1827#0" />
             <element signature="e#3257#3335#0" />
@@ -1867,6 +1725,44 @@
             <element signature="e#20342#20400#0" />
             <element signature="e#20674#20746#0" />
             <element signature="e#18631#18718#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/agent/MazeRobot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="284">
+          <caret line="83" column="24" lean-forward="true" selection-start-line="83" selection-start-column="24" selection-end-line="83" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#6555#6556#0" expanded="true" />
+            <element signature="e#6587#6588#0" expanded="true" />
+            <element signature="e#6645#6646#0" expanded="true" />
+            <element signature="e#6685#6686#0" expanded="true" />
+            <element signature="e#7127#7128#0" expanded="true" />
+            <element signature="e#7157#7158#0" expanded="true" />
+            <element signature="e#7306#7307#0" expanded="true" />
+            <element signature="e#7348#7349#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/environment/Cardinal.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/MMCmazeTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="28" column="60" selection-start-line="28" selection-start-column="60" selection-end-line="28" selection-end-column="60" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -2,6 +2,7 @@ package test.dynamic;
 
 import agent.MazeRobot;
 import domain.data.MyDoubleFactory;
+import environment.Cardinal;
 import environment.Maze;
 import environment.Position;
 import network.factory.MazeDbnFactory;
@@ -9,21 +10,25 @@ import network.factory.MazeMMCFactory;
 import network.factory.MazeNetworkFactory;
 import org.junit.Test;
 
+import java.util.LinkedList;
+
 public class MMCmazeTest {
 
     @Test
-    public void mazeTestMMC(){
+    public void mazeTest(){
 
-        mazeTest(new MazeMMCFactory());
+        LinkedList<Cardinal> moves =  mazeTest(new MazeMMCFactory(), null);
+
+        mazeTest(new MazeDbnFactory(), moves);
     }
 
-    @Test
-    public void mazeTestDBN(){
+    public  LinkedList<Cardinal> mazeTest(MazeNetworkFactory networkFactory, LinkedList<Cardinal> moves) {
 
-        mazeTest(new MazeDbnFactory());
-    }
-
-    public void mazeTest(MazeNetworkFactory networkFactory) {
+        System.out.println();
+        System.out.println("====================================================");
+        System.out.println("=======================MAZE TEST====================");
+        System.out.println("====================================================");
+        System.out.println();
 
         String[] strMaze = new String[]{
                 "    #     #   # ## # ##",
@@ -37,11 +42,13 @@ public class MMCmazeTest {
 
         MazeRobot robot = new MazeRobot(maze, networkFactory);
 
+        robot.setMovesTest(moves);
+
         //mmcMaze.setSmootStart(5);
 
         boolean lookUp = true;
 
-        System.out.println(maze);
+        //System.out.println(maze);
 
         do {
 
@@ -73,6 +80,7 @@ public class MMCmazeTest {
 
         System.out.println(robot.getMoves());
 
+        return robot.getMoves();
     }
 
 

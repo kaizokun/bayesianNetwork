@@ -36,7 +36,7 @@ public class MazeRobot {
 
     protected LinkedList<Cardinal> moves = new LinkedList<>();
 
-    protected LinkedList<Cardinal> movesTest = new LinkedList<>(Arrays.asList(WEST, NORTH, NORTH, SOUTH, WEST));
+    protected LinkedList<Cardinal> movesTest;// = new LinkedList<>(Arrays.asList(WEST, NORTH, NORTH, SOUTH, WEST));
 
     protected Random random = new Random();
 
@@ -83,16 +83,22 @@ public class MazeRobot {
 
     public void move() {
 
-        //récupère toutes les directions
-        Set<Cardinal> reachableDirections = Cardinal.getCardinalSetCopy();
-        //retirer celles qui ne sont pas accessible
-        reachableDirections.removeAll((Collection<?>) this.percepts.getLast().getValue());
-        //genere un nombre aléatoire en 0 et le nombre de directions licites
-        int rdmId = random.nextInt(reachableDirections.size());
+        Cardinal randomDirection;
 
-        Cardinal randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
+        if(movesTest == null) {
+            //récupère toutes les directions
+            Set<Cardinal> reachableDirections = Cardinal.getCardinalSetCopy();
+            //retirer celles qui ne sont pas accessible
+            reachableDirections.removeAll((Collection<?>) this.percepts.getLast().getValue());
+            //genere un nombre aléatoire en 0 et le nombre de directions licites
+            int rdmId = random.nextInt(reachableDirections.size());
 
-        randomDirection = movesTest.removeFirst();
+            randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
+
+        }else {
+
+            randomDirection = movesTest.removeFirst();
+        }
 
         this.moves.add(randomDirection);
 
@@ -235,5 +241,9 @@ public class MazeRobot {
     public void setMinProb(double minProb) {
 
         this.minProb = minProb;
+    }
+
+    public void setMovesTest(LinkedList<Cardinal> movesTest) {
+        this.movesTest = movesTest;
     }
 }

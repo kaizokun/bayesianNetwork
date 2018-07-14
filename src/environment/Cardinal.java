@@ -1,6 +1,8 @@
 package environment;
 
+
 import java.util.LinkedHashSet;
+
 import java.util.Set;
 
 public enum Cardinal {
@@ -25,6 +27,11 @@ public enum Cardinal {
     public static Set<Cardinal> getCardinalSet() {
 
         return cardinalSet;
+    }
+
+    public static Cardinal[] getCardinalTab(){
+
+        return values();
     }
 
     public static Set<Cardinal> getCardinalSetCopy() {
