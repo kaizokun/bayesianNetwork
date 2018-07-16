@@ -3,6 +3,7 @@ package inference.dynamic;
 import domain.Domain;
 import domain.data.AbstractDouble;
 import math.Distribution;
+import math.Matrix;
 import network.MegaVariable;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -18,6 +19,8 @@ public class Forward {
     protected Map<String, Distribution> maxMatrices = new Hashtable<>();
 
     protected Map<String, Map<Domain.DomainValue, List<Variable>>> mostLikelyPath = new Hashtable<>();
+
+    protected Map<String, Map<Domain.DomainValue, Domain.DomainValue>> maxPath = new Hashtable<>();
 
     protected DynamicBayesianNetwork network;
 
@@ -98,6 +101,7 @@ public class Forward {
     }
 
     protected ForwardMax forward(List<Variable> requests, String key, int depth, boolean saveforward) {
+
 
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete
@@ -448,143 +452,6 @@ public class Forward {
         return new ForwardSumRs(hiddenVarsSum, hiddenVarMax, maxHiddenvars, key);
     }
 
-    public class ForwardMax {
-
-        Distribution forward, max;
-
-        public ForwardMax(Distribution forwardMatrix, Distribution maxMatrix) {
-
-            this.forward = forwardMatrix;
-
-            this.max = maxMatrix;
-        }
-
-        public Distribution getForward() {
-            return forward;
-        }
-
-        public Distribution getMax() {
-            return max;
-        }
-    }
-
-    private class ForwardSumRs {
-
-        public ForwardSumRs(AbstractDouble sum, AbstractDouble max, List<Variable> maxDomainVars, String key) {
-
-            this.sum = sum;
-
-            this.max = max;
-
-            this.maxDomainVars = maxDomainVars;
-
-            this.hiddenVarKey = key;
-        }
-
-        private AbstractDouble sum, max;
-
-        private List<Variable> maxDomainVars;
-
-        private String hiddenVarKey;
-    }
-
-    /*------------------------------- FULL FORWARD ----------------------------------*/
-
-    public Distribution forward() {
-
-        //System.out.println("FORWARD "+this.network.getTime());
-
-        Variable megaState = MegaVariable.encapsulate(this.network.getLastStateVariables());
-
-        Variable megaObservation = MegaVariable.encapsulate(this.network.getLastObservationVariables());
-
-        return this.forward(megaState, megaObservation, network.getTime(), false);
-    }
-
-    private Distribution forward(Variable megaState, Variable megaObservation, int time, boolean saveForward) {
-
-        Domain.DomainValue originalValue = megaState.getDomainValue();
-
-        Distribution forward = new Distribution(megaState, network.getDoubleFactory());
-
-        if (time == network.getInitTime()) {
-
-            for (Domain.DomainValue value : megaState.getDomainValues()) {
-
-                megaState.setDomainValue(value);
-
-                forward.put(value, megaState.getProbabilityForCurrentValue());
-            }
-            //version de base déja normalisé (somme des probs de chaque valeur à 100 %)
-            //forward.normalize();
-
-            if (saveForward) {
-
-                this.forwardMatrices.put(megaState.getVarTimeId(), forward);
-            }
-
-            megaState.setDomainValue(originalValue);
-
-            return forward;
-        }
-
-        Distribution lastForward = null;
-
-        Variable previousMegaObservation = MegaVariable.encapsulate(this.network.getLastObservationVariables(time - 1));
-
-        Variable previousMegaState = MegaVariable.encapsulate(this.network.getLastStateVariables(time - 1));
-
-        for (Domain.DomainValue value : megaState.getDomainValues()) {
-
-            megaState.setDomainValue(value);
-
-            AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
-
-            for (Domain.DomainValue hiddenValue : previousMegaState.getDomainValues()) {
-
-                previousMegaState.setDomainValue(hiddenValue);
-
-                if (lastForward == null) {
-
-                    lastForward = forward(previousMegaState, previousMegaObservation, time - 1, saveForward);
-                }
-
-                sum = sum.add(megaState.getProbabilityForCurrentValue().multiply(lastForward.get(hiddenValue)));
-            }
-
-            forward.put(value, megaObservation.getProbabilityForCurrentValue().multiply(sum));
-        }
-
-        megaState.setDomainValue(originalValue);
-
-        forward.normalize();
-
-        if(saveForward){
-
-            this.forwardMatrices.put(megaState.getVarTimeId(), forward);
-        }
-
-        return forward;
-    }
-
-    /*------------------------------- VIEW ----------------------------------*/
-
-    public void showForward() {
-
-        for (Map.Entry<String, Distribution> entry : this.forwardMatrices.entrySet()) {
-
-            System.out.println(entry.getKey() + entry.getValue());
-        }
-    }
-
-
-    public void showMax() {
-
-        for (Map.Entry<String, Distribution> entry : this.maxMatrices.entrySet()) {
-
-            System.out.println(entry.getKey() + entry.getValue());
-        }
-    }
 
     public List<Variable> computeMostLikelyPath(Variable... request) {
 
@@ -651,6 +518,199 @@ public class Forward {
         this.loadMostLikelyPath(mostLikelyPath, this.mostLikelyPath.get(megaMaxVar.getVarTimeId()).get(megaMaxVar.getDomainValue()));
     }
 
+    /*------------------------------- SIMPLE FORWARD ----------------------------------*/
+
+    public ForwardMax forward(Variable megaState, Variable megaObservation) {
+
+        return this.forward(megaState, megaObservation, network.getTime(), null, null, false);
+    }
+
+    public ForwardMax forward(Variable megaState, Variable megaObservation, Matrix previousForward, Matrix previousMax) {
+
+        return this.forward(megaState, megaObservation, network.getTime(), (Distribution) previousForward, (Distribution) previousMax, false);
+    }
+
+    private ForwardMax forward(Variable megaState, Variable megaObservation, int time,
+                               Distribution previousForward, Distribution previousMax, boolean saveForward) {
+
+        //valeur originale de la requete
+        Domain.DomainValue originalValue = megaState.getDomainValue();
+        //distribution pour la requete courante
+        Distribution forward = new Distribution(megaState, network.getDoubleFactory());
+        //distribution max pour la requete courante
+        Distribution forwardMax = new Distribution(megaState, network.getDoubleFactory());
+        //meilleurs valeurs precedentes pour chaque valeur de la requete courante
+        Map<Domain.DomainValue, Domain.DomainValue> maxPath = new Hashtable<>();
+        //distribution de base sans dependances
+        if (time == network.getInitTime()) {
+
+            for (Domain.DomainValue value : megaState.getDomainValues()) {
+
+                megaState.setDomainValue(value);
+
+                AbstractDouble prob = megaState.getProbabilityForCurrentValue();
+
+                forward.put(value, prob);
+
+                forwardMax.put(value, prob);
+            }
+            //version de base déja normalisé (somme des probs de chaque valeur à 100 %)
+            //forward.normalize();
+
+            if (saveForward) {
+
+                this.maxMatrices.put(megaState.getVarTimeId(), forwardMax);
+
+                this.forwardMatrices.put(megaState.getVarTimeId(), forward);
+            }
+
+            megaState.setDomainValue(originalValue);
+
+            return new ForwardMax(forward, forwardMax);
+        }
+        //megavariable états precedents
+        Variable previousMegaObservation = network.getMegaObs(megaState, time - 1);
+        //megavariable observations precedentes
+        Variable previousMegaState = network.getMegaState(megaObservation, time - 1);
+
+        for (Domain.DomainValue requestValue : megaState.getDomainValues()) {
+
+            megaState.setDomainValue(requestValue);
+            //somme des probabilités de transition multiplié par les probablités des états précédents
+            AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
+            //max des probablités de transition multipliés par la probabilité du chemin max menant à l'état precedent
+            AbstractDouble max = network.getDoubleFactory().getNew(0.0);
+
+            Domain.DomainValue maxPreviousValue = null;
+            //pour chaque variables cachés (les parents de la requete courante)
+            //dans cette procedure l'ensemble des états à chaque coupe temporelle
+            for (Domain.DomainValue hiddenValue : previousMegaState.getDomainValues()) {
+                //initialise les variables cachées
+                previousMegaState.setDomainValue(hiddenValue);
+                //appel recursif la premiere pour calculer la distribution forward et max
+                //sur les variables cachées, puis sauvegarde
+                if (previousForward == null) {
+
+                    ForwardMax rs = forward(previousMegaState, previousMegaObservation,
+                            time - 1, previousForward, previousMax, saveForward);
+
+                    previousForward = rs.forward;
+
+                    previousMax = rs.max;
+                }
+                //probabilité de transition de la requete
+                AbstractDouble requestProb = megaState.getProbabilityForCurrentValue();
+                //transition multiplié par le message avant precedent ajouté à la somme
+                sum = sum.add(requestProb.multiply(previousForward.get(hiddenValue)));
+                //transition multiplié par le max precedent
+                AbstractDouble computeMax = requestProb.multiply(previousMax.get(hiddenValue));
+                //calcul de la valeur precedente maximum pondérée par les probabilités de transition
+                if (computeMax.compareTo(max) >= 0) {
+
+                    max = computeMax;
+
+                    maxPreviousValue = hiddenValue;
+                }
+            }
+            //probabilité d'observation par rapport à la valeur de requete courante
+            AbstractDouble observationProb = megaObservation.getProbabilityForCurrentValue();
+            //enregistrement des valeur de distribution forward et max
+            forward.put(requestValue, observationProb.multiply(sum));
+
+            forwardMax.put(requestValue, observationProb.multiply(max));
+            //enregistrement pour la valeur de requete courante de la valeur de
+            //requete precedent offrant la probabilité maximum pour calcul du chemin à postériori
+            maxPath.put(requestValue, maxPreviousValue);
+        }
+        //reset de la valeur de requete
+        megaState.setDomainValue(originalValue);
+        //enregistrement des chemins les plus probables pour la requete courante
+        this.maxPath.put(megaState.getVarTimeId(), maxPath);
+
+        forward.normalize();
+
+        if (saveForward) {
+
+            this.forwardMatrices.put(megaState.getVarTimeId(), forward);
+        }
+
+        return new ForwardMax(forward, forwardMax);
+    }
+
+    public List mostLikelyPath(Variable megaRequest, Matrix lastMax, int time) {
+
+       // System.out.println("MOST LIKELY PATH COMPUTE");
+
+        Distribution lastMaxDistrib = (Distribution) lastMax;
+        //calculer la valeur max pour la derniere requete
+        AbstractDouble max = network.getDoubleFactory().getNew(0.0);
+
+        Domain.DomainValue maxValue = null;
+
+        for (Domain.DomainValue value : lastMaxDistrib.getRowValues()) {
+
+            AbstractDouble valueProb = lastMaxDistrib.get(value);
+
+            if (valueProb.compareTo(max) >= 0) {
+
+                max = valueProb;
+
+                maxValue = value;
+            }
+        }
+
+       // System.out.println("MAX POUR " + megaRequest.getVarTimeId() + " " + maxValue);
+
+        //ajoute la valeur dans la liste
+        LinkedList<Map.Entry<Integer, Domain.DomainValue>> mostLikelyValues = new LinkedList();
+
+        mostLikelyValues.addFirst(new AbstractMap.SimpleEntry<>(time, maxValue));
+        //récupere les chemins vers les valeurs precedentes
+        Map<Domain.DomainValue, Domain.DomainValue> maxPath = this.maxPath.get(megaRequest.getVarTimeId());
+        //récupère la suite du chemin tant qu'il y en a
+        //et tant que le temps est supérieur à 1, le premier forward à lieu au temps 1
+        //qui est le premier temps ou l'on fait une estimation.
+        while (maxPath != null && time > 1 ) {
+            //temps precedent
+            time --;
+
+           // System.out.println("TIME " + (time));
+
+            //la valeur maximum précédente
+            maxValue = maxPath.get(maxValue);
+            //ajout de la valeur dans al liste max
+            mostLikelyValues.addFirst(new AbstractMap.SimpleEntry<>(time, maxValue));
+            //recharge la megaRequete
+            megaRequest = network.getMegaState(megaRequest, time);
+            //et les chemins precedents
+            maxPath = this.maxPath.get(megaRequest.getVarTimeId());
+
+           // System.out.println("MAX POUR " + megaRequest + " " + maxValue);
+        }
+
+        return mostLikelyValues;
+    }
+
+    /*------------------------------- VIEW ----------------------------------*/
+
+    public void showForward() {
+
+        for (Map.Entry<String, Distribution> entry : this.forwardMatrices.entrySet()) {
+
+            System.out.println(entry.getKey() + entry.getValue());
+        }
+    }
+
+
+    public void showMax() {
+
+        for (Map.Entry<String, Distribution> entry : this.maxMatrices.entrySet()) {
+
+            System.out.println(entry.getKey() + entry.getValue());
+        }
+    }
+
+
     /*------------------------------- GETTER SETTER ----------------------------------*/
 
     public Map<String, Distribution> getForwardMatrices() {
@@ -664,4 +724,49 @@ public class Forward {
     public Map<String, Map<Domain.DomainValue, List<Variable>>> getMostLikelyPath() {
         return mostLikelyPath;
     }
+
+
+    /*------------------------------- SOUS CLASSES ----------------------------------*/
+
+
+    public class ForwardMax {
+
+        Distribution forward, max;
+
+        public ForwardMax(Distribution forwardMatrix, Distribution maxMatrix) {
+
+            this.forward = forwardMatrix;
+
+            this.max = maxMatrix;
+        }
+
+        public Distribution getForward() {
+            return forward;
+        }
+
+        public Distribution getMax() {
+            return max;
+        }
+    }
+
+    private class ForwardSumRs {
+
+        public ForwardSumRs(AbstractDouble sum, AbstractDouble max, List<Variable> maxDomainVars, String key) {
+
+            this.sum = sum;
+
+            this.max = max;
+
+            this.maxDomainVars = maxDomainVars;
+
+            this.hiddenVarKey = key;
+        }
+
+        private AbstractDouble sum, max;
+
+        private List<Variable> maxDomainVars;
+
+        private String hiddenVarKey;
+    }
+
 }

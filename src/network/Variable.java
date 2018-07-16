@@ -335,13 +335,13 @@ public class Variable implements Iterable<Variable> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Variable variable = (Variable) o;
-        return Objects.equals(label, variable.label);
+        return Objects.equals(getLabel(), variable.getLabel());
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(label);
+        return Objects.hash(getLabel());
     }
 
     public boolean isRoot() {

@@ -1,11 +1,13 @@
 package network.dynamic;
 
+import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
 import inference.dynamic.Forward;
 import math.Distribution;
 import math.Matrix;
 import network.BayesianNetwork;
+import network.MegaVariable;
 import network.ProbabilityCompute;
 import network.Variable;
 import network.dynamic.Model.Dependency;
@@ -27,7 +29,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     protected Forward forward;
 
-    protected Map.Entry<Integer, Matrix> lastForward;
+    protected Map.Entry<Integer, Matrix> lastForward, lastMax;
 
     protected List<Variable> stateVariables, observationVariables;
 
@@ -79,7 +81,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         //System.out.println(time+" GET VAR : "+this.timeVariables.get(time)+"\n var : "+variable);
 
-        return this.timeVariables.get(time).get(variable);
+        return this.getTimeVariables(time).get(variable);
     }
 
     /**
@@ -134,7 +136,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public List<Variable> getLastStateVariables(int time) {
 
-        return getLastVariables(time, this.transitionModels.keySet() );
+        return getLastVariables(time, this.transitionModels.keySet());
     }
 
     public List<Variable> getLastObservationVariables() {
@@ -144,7 +146,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public List<Variable> getLastObservationVariables(int time) {
 
-        return getLastVariables(time, this.captorsModels.keySet() );
+        return getLastVariables(time, this.captorsModels.keySet());
     }
 
     private List<Variable> getLastVariables(int time, Set<Variable> varSet) {
@@ -159,6 +161,43 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return variables;
     }
 
+    public Variable getMegaState() {
+        return MegaVariable.encapsulate(this.getLastStateVariables());
+    }
+
+    public Variable getMegaState(int time) {
+        return MegaVariable.encapsulate(this.getLastStateVariables(time));
+    }
+
+    public Variable getMegaObs() {
+
+        return MegaVariable.encapsulate(this.getLastObservationVariables());
+    }
+
+    public Variable getMegaObs(int time) {
+
+        return MegaVariable.encapsulate(this.getLastObservationVariables(time));
+    }
+
+
+    public Variable getMegaState(Variable megaState) {
+        return MegaVariable.encapsulate(megaState, this.getLastStateVariables());
+    }
+
+    public Variable getMegaState(Variable megaState, int time) {
+        return MegaVariable.encapsulate(megaState, this.getLastStateVariables(time));
+    }
+
+    public Variable getMegaObs(Variable megaState) {
+
+        return MegaVariable.encapsulate(megaState, this.getLastObservationVariables());
+    }
+
+    public Variable getMegaObs(Variable megaState, int time) {
+
+        return MegaVariable.encapsulate(megaState, this.getLastObservationVariables(time));
+    }
+
     public void extend(Variable... variables) {
 
         this.extend();
@@ -170,11 +209,28 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         if (forward != null) {
 
-           // this.setLastForward(forward.forward(this.getLastStateVariables()).getForward());
-             this.setLastForward(forward.forward());
+            Variable megaState = getMegaState();
+
+            Matrix lastForward = this.lastForward != null ? this.lastForward.getValue() : null;
+
+            Matrix lastMax = this.lastMax != null ? this.lastMax.getValue() : null;
+
+            Forward.ForwardMax forwardMax = this.forward.forward(megaState, getMegaObs(), lastForward, lastMax);
+
+            this.setLastForward(forwardMax.getForward());
+
+            this.setLastMax(forwardMax.getMax());
+
+            if (this.getTime() > this.getInitTime()) {
+
+                System.out.println(this.getTime() + " " + this.getInitTime() + " " + megaState);
+
+                List mostLikelyValues = this.forward.mostLikelyPath(megaState, this.lastMax.getValue(), getTime());
+
+                System.out.println("MOST LIKELY PATH " + getTime() + " : " + mostLikelyValues);
+            }
 
         }
-
     }
 
     public void extend() {
@@ -314,13 +370,18 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return lastForward;
     }
 
-    public void setLastForward(Map.Entry<Integer, Matrix> lastForward) {
-        this.lastForward = lastForward;
-    }
-
     public void setLastForward(Matrix forward) {
 
         this.lastForward = new AbstractMap.SimpleEntry<>(this.getTime(), forward);
+    }
+
+    public Map.Entry<Integer, Matrix> getLastMax() {
+        return lastMax;
+    }
+
+    public void setLastMax(Matrix max) {
+
+        this.lastMax = new AbstractMap.SimpleEntry<>(this.getTime(), max);
     }
 
     public Forward getForward() {

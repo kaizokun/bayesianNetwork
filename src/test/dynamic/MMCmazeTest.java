@@ -85,7 +85,7 @@ public class MMCmazeTest {
 
                 robot.move();
 
-                robot.reload();
+                //robot.reload();
             }
 
             System.out.println(maze);
@@ -101,7 +101,9 @@ public class MMCmazeTest {
 
         System.out.println(("LAST TIME POSITION " + time + " : " + maze.getRobotPosition()));
 
-        System.out.println(robot.getMoves());
+        System.out.println("DEPLACEMENTS : "+robot.getMoves());
+
+        System.out.println("POSITIONS REELES : "+maze.getRobotPositions());
 
         this.moves = robot.getMoves();
     }

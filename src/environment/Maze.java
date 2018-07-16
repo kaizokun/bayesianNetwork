@@ -130,6 +130,11 @@ public class Maze {
         this.robotPosition.addLast(this.getRobotPosition().move(cardinal));
     }
 
+    public List<Position> getRobotPositions() {
+
+        return robotPosition;
+    }
+
     public Position getRobotPosition() {
 
         return robotPosition.getLast();

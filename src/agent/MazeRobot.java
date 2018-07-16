@@ -45,7 +45,7 @@ public class MazeRobot {
     //minimum à 0.1 ou un peu moins, si on utilise le même MMC avec toutes les positions accessibles tout le long du processus
     //permet de trouver la position au bout d'un cour laps de temps entre 200ms et 1 seconde
     //minimum à 0 suffit si on recrée le MMC à partir de la liste des positions possibles non nul
-    protected double minProb = 0.0;
+    protected double minProb = 0.01;
 
     public MazeRobot(Maze maze, MazeNetworkFactory mazeNetworkFactory) {
 

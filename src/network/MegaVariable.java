@@ -80,6 +80,8 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         return new MegaDomain(combinations);
     }
 
+
+
     public List<Domain.DomainValue> getDomainValuesCheckInit() {
 
         return getDomainValuesCheckInit(this.getCompoVars());
@@ -273,6 +275,24 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         return new MegaVariable(this.compoVars, time, this.getDomain());
     }
 
+    public static Variable encapsulate(Variable megaState, List<Variable> variables) {
+
+        if (variables.size() > 1) {
+
+            MegaVariable megavariable = new MegaVariable();
+            //utilise le domaine de la megavariable en parametre qui doit être le même
+            megavariable.setDomain(megaState.getDomain());
+
+            megavariable.setCompoVars(variables);
+
+            return megavariable;
+
+        } else {
+
+            return variables.get(0);
+        }
+    }
+
     public static Variable encapsulate(List<Variable> variables) {
 
         if (variables.size() > 1) {
@@ -302,5 +322,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
             return variables.get(0);
         }
     }
+
+
 
 }
