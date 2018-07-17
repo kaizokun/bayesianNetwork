@@ -54,7 +54,7 @@ public class EnumerationAsk {
 
         if( var.isInit() ){
 
-            AbstractDouble rs = var.getProbabilityForCurrentValue().multiply(enumerateAll(vars, network));
+            AbstractDouble rs = var.getProbability().multiply(enumerateAll(vars, network));
 
             vars.addFirst(var);
 
@@ -68,7 +68,7 @@ public class EnumerationAsk {
 
                 var.setDomainValue(value);
 
-                sum = sum.add(var.getProbabilityForCurrentValue().multiply(enumerateAll(vars, network)));
+                sum = sum.add(var.getProbability().multiply(enumerateAll(vars, network)));
             }
 
             var.clear();

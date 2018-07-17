@@ -48,7 +48,7 @@ public class SmoothingForwardDecBackwardIncMMC extends SmoothingMMC {
             SmoothingMatrices smoothingMatrices = mmc.getSmoothings().get(timeEnd - 1);
             //c'est celui ci dont on va incrementer le forward ainsi que le backward
             //pour calculer le lissage de l'état en timeEnd
-            Matrix timeEndForward = this.forwardMMC.incrementForward(timeEnd, smoothingMatrices.forward);
+            Matrix timeEndForward = this.forwardMMC.incrementForward(timeEnd, smoothingMatrices.forward, false);
 
             Matrix timeEndBackward = this.backwardMMC.incrementBackward(timeEnd, mmc.getTime(), smoothingMatrices.backward);
 

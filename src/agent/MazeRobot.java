@@ -97,7 +97,9 @@ public class MazeRobot {
             randomDirection = new ArrayList<>(reachableDirections).get(rdmId);
 
         }else {
+
             System.out.println("MOVE TEST");
+
             randomDirection = movesTest.removeFirst();
         }
 

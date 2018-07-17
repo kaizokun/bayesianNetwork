@@ -3,6 +3,7 @@ package network.dynamic;
 import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
+import inference.dynamic.Backward;
 import inference.dynamic.Forward;
 import math.Distribution;
 import math.Matrix;
@@ -28,6 +29,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     protected Map<Variable, List<Model>> captorsModels = new Hashtable<>();
 
     protected Forward forward;
+
+    protected Backward backward;
 
     protected Map.Entry<Integer, Matrix> lastForward, lastMax;
 
@@ -220,17 +223,19 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             this.setLastForward(forwardMax.getForward());
 
             this.setLastMax(forwardMax.getMax());
-
-            if (this.getTime() > this.getInitTime()) {
-
-                System.out.println(this.getTime() + " " + this.getInitTime() + " " + megaState);
-
-                List mostLikelyValues = this.forward.mostLikelyPath(megaState, this.lastMax.getValue(), getTime());
-
-                System.out.println("MOST LIKELY PATH " + getTime() + " : " + mostLikelyValues);
-            }
-
         }
+    }
+
+    public List getMostLikelyPath() {
+
+        if (this.getTime() > this.getInitTime()) {
+
+            Variable megaState = getMegaState();
+
+            return this.forward.mostLikelyPath(megaState, this.lastMax.getValue(), getTime());
+        }
+
+        return new LinkedList();
     }
 
     public void extend() {
@@ -390,5 +395,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public void setForward(Forward forward) {
         this.forward = forward;
+    }
+
+    public Backward getBackward() {
+        return backward;
+    }
+
+    public void setBackward(Backward backward) {
+        this.backward = backward;
     }
 }

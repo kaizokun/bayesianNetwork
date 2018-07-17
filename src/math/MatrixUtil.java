@@ -4,6 +4,7 @@ import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 
 public class MatrixUtil {
+
     public static Matrix multiplyMax(Matrix m1, Matrix m2) {
 
         if (m1.getColCount() != m2.getRowCount()) {

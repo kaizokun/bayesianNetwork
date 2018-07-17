@@ -283,7 +283,7 @@ public class Variable implements Iterable<Variable> {
     /**
      * return the probability of the variable from its current domainValue et its rowVars colValues
      */
-    public AbstractDouble getProbabilityForCurrentValue() {
+    public AbstractDouble getProbability() {
 
         return probabilityCompute.getProbability(this);
     }

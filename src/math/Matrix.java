@@ -303,12 +303,10 @@ public class Matrix {
     }
 
     public void setMaxPrevious(Map<Integer, Integer> maxPrevious) {
+
         this.maxPrevious = maxPrevious;
     }
 
-
-
     /*------------------------*/
-
 
 }

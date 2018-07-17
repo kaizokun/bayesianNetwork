@@ -5,6 +5,7 @@ import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import inference.dynamic.mmc.BackwardMMC;
 import inference.dynamic.mmc.ForwardMMC;
+import inference.dynamic.mmc.MostLikelySequencyMMC;
 import inference.dynamic.mmc.SmoothingMMC;
 import inference.dynamic.mmc.SmoothingMMC.SmoothingMatrices;
 import math.Matrix;
@@ -34,9 +35,12 @@ public class MMC extends DynamicBayesianNetwork {
 
     protected ForwardMMC forwardMMC;
 
+    protected MostLikelySequencyMMC mostLikelySequence;
+
     protected BackwardMMC backwardMMC;
 
     protected SmoothingMMC smoothingMMC;
+
 
     public MMC(Variable[] statesRoot, Variable[] states, Variable[] obs, AbstractDoubleFactory doubleFactory) {
 
@@ -123,7 +127,11 @@ public class MMC extends DynamicBayesianNetwork {
         //appliquer le forward sur le dernier etats
         Matrix forward = this.forwardMMC.forward();
 
+        Matrix max = this.mostLikelySequence.mostLikelySequence();
+
         this.setLastForward(forward);
+
+        this.setLastMax(max);
         //ainsi que le smoothing sur le range souhaité
         //this.smoothingMMC.smoothing();
 
@@ -154,7 +162,17 @@ public class MMC extends DynamicBayesianNetwork {
         this.getTimeVariables(this.time).put(newState, newState);
 
         this.getTimeVariables(this.time).put(newObs, newObs);
+    }
 
+    @Override
+    public List getMostLikelyPath() {
+
+        if (this.getTime() > this.getInitTime()) {
+
+            return this.mostLikelySequence.mostLikelyPath(this.getTime());
+        }
+
+        return new LinkedList();
     }
 
     private void loadMegaVarDistrib(AbstractDouble[] row, Variable megaState) {
@@ -168,7 +186,7 @@ public class MMC extends DynamicBayesianNetwork {
 
             megaState.setDomainValue(megaDomainValue);
 
-            AbstractDouble prob = megaState.getProbabilityForCurrentValue();
+            AbstractDouble prob = megaState.getProbability();
 
             row[col] = prob;
 
@@ -206,7 +224,7 @@ public class MMC extends DynamicBayesianNetwork {
 
                 megaState.setDomainValue(stateDomainValue);
 
-                obsMatrix[col][col] = megaObs.getProbabilityForCurrentValue();
+                obsMatrix[col][col] = megaObs.getProbability();
 
                 col++;
             }
@@ -383,6 +401,15 @@ public class MMC extends DynamicBayesianNetwork {
             this.smootRange = smootRange;
         }
     */
+
+    public MostLikelySequencyMMC getMostLikelySequence() {
+        return mostLikelySequence;
+    }
+
+    public void setMostLikelySequence(MostLikelySequencyMMC mostLikelySequence) {
+        this.mostLikelySequence = mostLikelySequence;
+    }
+
     public ForwardMMC getForwardMMC() {
         return forwardMMC;
     }

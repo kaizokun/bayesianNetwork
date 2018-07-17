@@ -33,13 +33,13 @@ public class MMCmazeTest {
         TestUtil.printTimeDelta();
     }
 
-    @Test
+    //@Test
     public void mazeMMCTest() {
 
         mazeTest(new MazeMMCFactory());
     }
 
-    @Test
+   // @Test
     public void mazeDBNTest() {
 
         mazeTest(new MazeDbnFactory());
@@ -104,6 +104,8 @@ public class MMCmazeTest {
         System.out.println("DEPLACEMENTS : "+robot.getMoves());
 
         System.out.println("POSITIONS REELES : "+maze.getRobotPositions());
+
+        System.out.println("MOST LIKELY PATH "+robot.getDbnMaze().getMostLikelyPath());
 
         this.moves = robot.getMoves();
     }

@@ -7,6 +7,7 @@ import domain.data.MyDoubleFactory;
 import environment.Maze;
 import environment.Percept;
 import environment.PerceptWall;
+import inference.dynamic.Backward;
 import inference.dynamic.Forward;
 import network.ProbabilityCompute;
 import network.Variable;
@@ -34,6 +35,8 @@ public class MazeDbnFactory extends MazeNetworkFactory {
         robot.setDbnMaze(network);
 
         network.setForward(new Forward(network));
+
+        network.setBackward(new Backward(network));
 
         //---------------DOMAINES
 

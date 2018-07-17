@@ -1,13 +1,9 @@
 package network.factory;
 
-import agent.MazeRobot;
-import agent.MazeRobot.PositionProb;
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.AbstractDoubleFactory;
 import domain.data.MyDoubleFactory;
-import environment.*;
-import inference.dynamic.Forward;
 import inference.dynamic.mmc.*;
 import network.BayesianNetwork;
 import network.ProbabilityCompute;
@@ -19,7 +15,6 @@ import network.dynamic.Model;
 
 import java.util.*;
 
-import static java.util.Arrays.asList;
 import static network.factory.BayesianNetworkFactory.ABCD_NETWORK_VARS.*;
 import static network.factory.BayesianNetworkFactory.ALARM_NETWORK_VARS.*;
 import static network.factory.BayesianNetworkFactory.UMBRELLA_NETWORK_VARS.*;

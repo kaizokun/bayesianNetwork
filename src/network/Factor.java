@@ -121,7 +121,7 @@ public class Factor {
 
                 if (var != null) {
 
-                    matrix[iVal] = var.getProbabilityForCurrentValue();
+                    matrix[iVal] = var.getProbability();
 
                 } else {
 

@@ -2,8 +2,10 @@ package inference.dynamic.mmc;
 
 import math.Matrix;
 
-public interface IForward {
+public interface IForwardMMC {
     Matrix forward();
+
+    Matrix forward(boolean saveForwards);
 
     Matrix forward(int t);
 

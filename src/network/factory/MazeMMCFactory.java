@@ -10,6 +10,7 @@ import environment.Percept;
 import environment.PerceptWall;
 import inference.dynamic.mmc.BackwardMMC;
 import inference.dynamic.mmc.ForwardMMC;
+import inference.dynamic.mmc.MostLikelySequencyMMC;
 import inference.dynamic.mmc.SmoothingForwardBackwardMMC;
 import network.ProbabilityCompute;
 import network.ProbabilityComputeFromTCP;
@@ -93,6 +94,8 @@ public class MazeMMCFactory extends MazeNetworkFactory {
         MMC mmc = new MMC(new Variable[]{position0}, new Variable[]{position}, new Variable[]{positionCaptor}, doubleFactory, time);
 
         mmc.setForwardMMC(new ForwardMMC(mmc));
+
+        mmc.setMostLikelySequence(new MostLikelySequencyMMC(mmc));
 
         mmc.setBackwardMMC(new BackwardMMC(mmc));
 

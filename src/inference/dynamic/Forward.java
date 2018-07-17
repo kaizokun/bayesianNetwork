@@ -20,7 +20,7 @@ public class Forward {
 
     protected Map<String, Map<Domain.DomainValue, List<Variable>>> mostLikelyPath = new Hashtable<>();
 
-    protected Map<String, Map<Domain.DomainValue, Domain.DomainValue>> maxPath = new Hashtable<>();
+    protected Map<String, Map<Domain.DomainValue, Domain.DomainValue>> mostLikelyPathFull = new Hashtable<>();
 
     protected DynamicBayesianNetwork network;
 
@@ -235,7 +235,7 @@ public class Forward {
                 //soit pas de mise à jour par l'observation de la valeur obtenu par la somme
                 if (observation.getDomainValue() != null) {
 
-                    AbstractDouble obsProb = observation.getProbabilityForCurrentValue();
+                    AbstractDouble obsProb = observation.getProbability();
                     //valeur du modele de capteur
                     requestValueProbability = requestValueProbability.multiply(obsProb);
                     //idem pour calculer un max pour la sequence la plus vraissemblable
@@ -269,7 +269,7 @@ public class Forward {
             if (!requestTime0.isEmpty()) {
 
                 //pour les variables situées au temps 0 ont obtient directement leur probabilité
-                AbstractDouble req0Prob = megaRequest0.getProbabilityForCurrentValue();
+                AbstractDouble req0Prob = megaRequest0.getProbability();
 
                 requestValueProbability = requestValueProbability.multiply(req0Prob);
 
@@ -391,7 +391,7 @@ public class Forward {
             megaHiddenVar.setDomainValue(domainValue);
 
             //début de la multiplication avec la valeur fourni par le modele de transition
-            AbstractDouble mulTransitionForward = obsParentState.getProbabilityForCurrentValue();
+            AbstractDouble mulTransitionForward = obsParentState.getProbability();
             //on a ici potentiellement une filtrage sur plusieurs variable si plusieurs variables cachées
 
             Distribution forward = forwardMatrices.get(key);
@@ -421,7 +421,7 @@ public class Forward {
             // dans la fonction appelante) sachant les variables cachées et leur valeur courante.
             //ce qui pondère la sous sequence la plus probable.
 
-            maxValue = maxValue.multiply(obsParentState.getProbabilityForCurrentValue());
+            maxValue = maxValue.multiply(obsParentState.getProbability());
 
             if (maxValue.compareTo(hiddenVarMax) >= 0) {
 
@@ -533,6 +533,8 @@ public class Forward {
     private ForwardMax forward(Variable megaState, Variable megaObservation, int time,
                                Distribution previousForward, Distribution previousMax, boolean saveForward) {
 
+        System.out.println("FORWARD "+time);
+
         //valeur originale de la requete
         Domain.DomainValue originalValue = megaState.getDomainValue();
         //distribution pour la requete courante
@@ -548,7 +550,7 @@ public class Forward {
 
                 megaState.setDomainValue(value);
 
-                AbstractDouble prob = megaState.getProbabilityForCurrentValue();
+                AbstractDouble prob = megaState.getProbability();
 
                 forward.put(value, prob);
 
@@ -599,7 +601,7 @@ public class Forward {
                     previousMax = rs.max;
                 }
                 //probabilité de transition de la requete
-                AbstractDouble requestProb = megaState.getProbabilityForCurrentValue();
+                AbstractDouble requestProb = megaState.getProbability();
                 //transition multiplié par le message avant precedent ajouté à la somme
                 sum = sum.add(requestProb.multiply(previousForward.get(hiddenValue)));
                 //transition multiplié par le max precedent
@@ -613,7 +615,7 @@ public class Forward {
                 }
             }
             //probabilité d'observation par rapport à la valeur de requete courante
-            AbstractDouble observationProb = megaObservation.getProbabilityForCurrentValue();
+            AbstractDouble observationProb = megaObservation.getProbability();
             //enregistrement des valeur de distribution forward et max
             forward.put(requestValue, observationProb.multiply(sum));
 
@@ -625,7 +627,7 @@ public class Forward {
         //reset de la valeur de requete
         megaState.setDomainValue(originalValue);
         //enregistrement des chemins les plus probables pour la requete courante
-        this.maxPath.put(megaState.getVarTimeId(), maxPath);
+        this.mostLikelyPathFull.put(megaState.getVarTimeId(), maxPath);
 
         forward.normalize();
 
@@ -666,7 +668,7 @@ public class Forward {
 
         mostLikelyValues.addFirst(new AbstractMap.SimpleEntry<>(time, maxValue));
         //récupere les chemins vers les valeurs precedentes
-        Map<Domain.DomainValue, Domain.DomainValue> maxPath = this.maxPath.get(megaRequest.getVarTimeId());
+        Map<Domain.DomainValue, Domain.DomainValue> maxPath = this.mostLikelyPathFull.get(megaRequest.getVarTimeId());
         //récupère la suite du chemin tant qu'il y en a
         //et tant que le temps est supérieur à 1, le premier forward à lieu au temps 1
         //qui est le premier temps ou l'on fait une estimation.
@@ -683,7 +685,7 @@ public class Forward {
             //recharge la megaRequete
             megaRequest = network.getMegaState(megaRequest, time);
             //et les chemins precedents
-            maxPath = this.maxPath.get(megaRequest.getVarTimeId());
+            maxPath = this.mostLikelyPathFull.get(megaRequest.getVarTimeId());
 
            // System.out.println("MAX POUR " + megaRequest + " " + maxValue);
         }

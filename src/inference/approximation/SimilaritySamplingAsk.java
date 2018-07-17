@@ -38,7 +38,7 @@ public class SimilaritySamplingAsk {
 
             for (Variable o : obs) {
                 //on pondere l'echantillon par sa vraissemblance
-                sampleWeight = sampleWeight.multiply(o.getProbabilityForCurrentValue());
+                sampleWeight = sampleWeight.multiply(o.getProbability());
             }
 
             boolean nextSample = false;

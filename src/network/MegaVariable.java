@@ -209,13 +209,13 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
     }
 
     @Override
-    public AbstractDouble getProbabilityForCurrentValue() {
+    public AbstractDouble getProbability() {
 
         AbstractDouble prob = this.doubleFactory.getNew(1.0);
 
         for (Variable variable : this.compoVars) {
 
-            prob = prob.multiply(variable.getProbabilityForCurrentValue());
+            prob = prob.multiply(variable.getProbability());
         }
 
         return prob;

@@ -6,15 +6,27 @@ import math.Matrix;
 import math.MatrixUtil;
 import network.dynamic.MMC;
 
+import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class MostLikelySequencyMMC extends ForwardMMC {
-
 
     public MostLikelySequencyMMC(MMC mmc) {
 
         super(mmc);
+    }
+
+    @Override
+    protected Map.Entry<Integer, Matrix> getLastDistribution() {
+
+        return this.mmc.getLastMax();
+    }
+
+    public Matrix mostLikelySequence() {
+
+        return this.forward(true);
     }
 
     @Override
@@ -36,9 +48,9 @@ public class MostLikelySequencyMMC extends ForwardMMC {
         return forward(t, true);
     }
 
-    public List<Domain.DomainValue> mostLikelyPath(int t) {
+    public List mostLikelyPath(int t) {
 
-        LinkedList<Domain.DomainValue> mostLikelySequence = new LinkedList<>();
+        LinkedList<Map.Entry<Integer, Domain.DomainValue>> mostLikelySequence = new LinkedList<>();
 
         //récupère la matrice forward du dernier temps;
         Matrix tForwardMax = forwards.get(t);
@@ -47,17 +59,17 @@ public class MostLikelySequencyMMC extends ForwardMMC {
 
         int maxRow = 0;
         //max probabilité
-        for(int row = 0 ; row < tForwardMax.getRowCount() ; row ++){
+        for (int row = 0; row < tForwardMax.getRowCount(); row++) {
 
-            if(tForwardMax.getValue(row,0).compareTo(max) > 0){
+            if (tForwardMax.getValue(row, 0).compareTo(max) > 0) {
 
-                max = tForwardMax.getValue(row,0);
+                max = tForwardMax.getValue(row, 0);
 
                 maxRow = row;
             }
         }
 
-        mostLikelySequence.add(tForwardMax.getRowValue(maxRow));
+        mostLikelySequence.add(new AbstractMap.SimpleEntry<>(t, tForwardMax.getRowValue(maxRow)));
 
         //récupere la ligne correspondant à la meilleur valeur precedente
         //à partir des valeurs recu en parametre
@@ -69,7 +81,7 @@ public class MostLikelySequencyMMC extends ForwardMMC {
 
             tForwardMax = forwards.get(t);
 
-            mostLikelySequence.addFirst(tForwardMax.getRowValue(row));
+            mostLikelySequence.addFirst(new AbstractMap.SimpleEntry<>(t, tForwardMax.getRowValue(row)));
 
             row = tForwardMax.getPreviousForwardMaxValueRow(row);
 

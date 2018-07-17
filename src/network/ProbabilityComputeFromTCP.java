@@ -173,12 +173,12 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
                 //prob initialisé à 1
                 AbstractDouble markovProb = doubleFactory.getNew(1.0);
                 //multiplie la probabilité de la variable en fonction des parents
-                markovProb = markovProb.multiply(variable.getProbabilityForCurrentValue());
+                markovProb = markovProb.multiply(variable.getProbability());
 
                 //multiplie la probabilité de chaque enfants en fonction des parents
                 for (Variable child : variable.children) {
 
-                    markovProb = markovProb.multiply(child.getProbabilityForCurrentValue());
+                    markovProb = markovProb.multiply(child.getProbability());
                 }
                 //ajoute au total : pour ensuite calculer sur 100%
                 totalProb = totalProb.add(markovProb);

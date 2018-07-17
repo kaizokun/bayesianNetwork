@@ -24,11 +24,11 @@ public class MarkovCoverDistributionComputeDynamic implements MarkovCoverDistrib
 
             AbstractDouble markovProb = variable.doubleFactory().getNew(1.0);
 
-            markovProb = markovProb.multiply(variable.getProbabilityForCurrentValue());
+            markovProb = markovProb.multiply(variable.getProbability());
 
             for(Variable child : variable.children){
 
-                markovProb = markovProb.multiply(child.getProbabilityForCurrentValue());
+                markovProb = markovProb.multiply(child.getProbability());
             }
 
             distribTotal = distribTotal.add(markovProb);

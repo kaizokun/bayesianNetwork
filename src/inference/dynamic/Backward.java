@@ -156,7 +156,7 @@ public class Backward {
 
             AbstractDouble multiplyUnderSum = network.getDoubleFactory().getNew(1.0);
 
-            multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
+            multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbability());
 
             Distribution hiddenVarsDistribution = backwardSaved.get(key);
 
@@ -175,7 +175,7 @@ public class Backward {
 
             multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsDistribution.getTotal()));
 
-            multiplyUnderSum = multiplyUnderSum.multiply(megaHidenVar.getProbabilityForCurrentValue());
+            multiplyUnderSum = multiplyUnderSum.multiply(megaHidenVar.getProbability());
 
             sum = sum.add(multiplyUnderSum);
         }
@@ -407,7 +407,7 @@ public class Backward {
 
             AbstractDouble multiplyUnderSum = network.getDoubleFactory().getNew(1.0);
 
-            multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbabilityForCurrentValue());
+            multiplyUnderSum = multiplyUnderSum.multiply(nextObservation.getProbability());
 
             Distribution hiddenVarsFullDistribution = backwardFullDistribSaved.get(fullKey);
 
@@ -432,12 +432,88 @@ public class Backward {
 
             multiplyUnderSum = multiplyUnderSum.multiply(combinaisonProb.divide(hiddenVarsFullDistribution.getTotal()));
 
-            multiplyUnderSum = multiplyUnderSum.multiply(megaHiddenVar.getProbabilityForCurrentValue());
+            multiplyUnderSum = multiplyUnderSum.multiply(megaHiddenVar.getProbability());
 
             sum = sum.add(multiplyUnderSum);
         }
 
         return sum;
+    }
+
+    /**
+     * Algorithme backward simplifié qui s'applique sur tout les variables états et toutes les observations
+     * à chaque coupe temporelle, les variables sont encapsulées dans une megavariable pour une meilleur
+     * lisibilité du code.
+     * */
+    public Distribution backward(Variable megaState, Variable megaObservation, int time,
+                                 Distribution nextBackward, boolean saveBackward) {
+
+        //distribution sur les variable état à l'instant time
+        Distribution backward = new Distribution(megaState, network.getDoubleFactory());
+
+        if (time == network.getTime()) {
+
+            //crée une distribution ayant une probabilité de 1 pour chaque valeur du domaine
+            for (Domain.DomainValue value : megaState.getDomainValues()) {
+
+                backward.put(value, network.getDoubleFactory().getNew(1.0));
+            }
+
+            if (saveBackward) {
+
+                this.backwardMatrices.put(megaState.getVarTimeId(), backward);
+            }
+
+            return backward;
+        }
+        //valeur de domaine à restaurer pour ne pas perturber le processus appelant
+        Domain.DomainValue originalValue = megaState.getDomainValue();
+        //états à la coupe temporelle suivante
+        Variable nextMegaState = network.getMegaState(megaState, time + 1);
+        //observation à la coupe temporelle suivante
+        Variable nextMegaObservation = null;
+        //si le temps suivant est le temps t + 1 courant du dbn il n'y à pas d'observation qui suivent t + 2
+        //la fonction sera rappellé avec une variable observation nulle, mais la procedure à la limite ne l'utilise pas
+        //sinon on recupère les observations
+        if((time + 1) == network.getTime()){
+
+            nextMegaObservation = network.getMegaObs(megaObservation, time + 2);
+        }
+
+        //pour chaque valeur de la requete
+        for (Domain.DomainValue stateValue : megaState.getDomainValues()) {
+
+            megaState.setDomainValue(stateValue);
+
+            AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
+
+            for(Domain.DomainValue nextStateValue : nextMegaState.getDomainValues()){
+                //si le backward n'a pas encore été appelé on fait un appel récursif
+                //pour le charger une seule fois.
+                if(nextBackward == null){
+
+                    nextBackward = backward(nextMegaState, nextMegaObservation,
+                            time + 1, null, saveBackward);
+                }
+
+                sum = sum.add(
+                        megaObservation.getProbability()//observation
+                                .multiply(nextBackward.get(nextStateValue))//backward
+                                .multiply(nextMegaState.getProbability()));//transition
+
+            }
+
+            backward.put(stateValue, sum);
+        }
+
+        megaState.setDomainValue(originalValue);
+
+        if (saveBackward) {
+
+            this.backwardMatrices.put(megaState.getVarTimeId(), backward);
+        }
+
+        return backward;
     }
 
     private class BackwardRs {
