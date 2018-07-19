@@ -47,7 +47,6 @@ public class BayesianNetworkFactory {
         return network;
     }
 
-
     public enum ALARM_NETWORK_VARS {
 
         CAMBRIOLAGE, TREMBLEMENT_DE_TERRE, ALARM, JEAN_CALL, MARIE_CALL

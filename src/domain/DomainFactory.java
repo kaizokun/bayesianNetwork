@@ -13,6 +13,11 @@ public class DomainFactory {
         return new Domain(1, 0);
     }
 
+    public static IDomain getBatteryLevelDOmain() {
+
+        return new Domain(0, 1, 2, 3, 4, 5);
+    }
+
     public static IDomain getABCDDomain() {
 
         return new Domain('a', 'b', 'c', 'd');
@@ -44,4 +49,5 @@ public class DomainFactory {
 
         return new Domain(percepts);
     }
+
 }
