@@ -351,7 +351,24 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         StringBuilder builder = new StringBuilder();
 
-        for (String key : this.TCP.keySet()) {
+        builder.append("\n");
+
+        List<String> sortedKeys = new ArrayList<>(this.TCP.keySet());
+
+        Collections.sort(sortedKeys);
+        //clés d'une des ligne de la TCP identiqu epour chaque ligne...
+        List<Domain.DomainValue> sortedKeyD2 = new ArrayList<>(this.TCP.values().iterator().next().keySet());
+
+        Comparator<Domain.DomainValue> cmp = new Comparator<Domain.DomainValue>() {
+            @Override
+            public int compare(Domain.DomainValue o1, Domain.DomainValue o2) {
+                return o1.getValue().toString().compareTo(o2.toString());
+            }
+        };
+
+        Collections.sort(sortedKeyD2, cmp);
+
+        for (String key : sortedKeys) {
 
             if (!key.isEmpty()) {
 
@@ -360,9 +377,11 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
                 builder.append(" : ");
             }
 
-            for (Map.Entry<Domain.DomainValue, AbstractDouble> row : this.TCP.get(key).entrySet()) {
+            Map<Domain.DomainValue, AbstractDouble> row = this.TCP.get(key);
 
-                builder.append(row.getKey() + " = " + row.getValue());
+            for (Domain.DomainValue colKey : sortedKeyD2) {
+
+                builder.append(colKey + " = " + row.get(colKey));
 
                 builder.append(" - ");
             }

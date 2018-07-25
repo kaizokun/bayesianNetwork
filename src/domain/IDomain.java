@@ -1,9 +1,10 @@
 package domain;
 
+import java.util.Comparator;
 import java.util.List;
 
 public interface IDomain {
-    
+
     List<Domain.DomainValue> getValues();
 
     int getSize();

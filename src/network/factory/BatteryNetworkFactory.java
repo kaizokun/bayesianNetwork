@@ -11,6 +11,9 @@ public abstract class BatteryNetworkFactory implements NetworkFactory {
 
     protected Double[][] initBatteryTransitionTable(IDomain batteryLevelDomain) {
 
+        //La batterie à 100% de change de passer d'un niveau supérieur à un niveau strictement inférieur
+        //et aucune pour le reste
+
         Double[][] tab = new Double[batteryLevelDomain.getSize()][batteryLevelDomain.getSize()];
 
         List<Domain.DomainValue> previousBatteryLevels = batteryLevelDomain.getValues();
