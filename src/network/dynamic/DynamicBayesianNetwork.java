@@ -34,6 +34,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     protected Map.Entry<Integer, Matrix> lastForward, lastMax;
 
+    protected List<Map.Entry<Integer, Matrix>> forwards = new LinkedList<>();
+
     protected List<Variable> stateVariables, observationVariables;
 
     public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory, Forward forward, int time) {
@@ -164,12 +166,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return variables;
     }
 
-    public Variable encapsulate(List<Variable> variables){
+    public Variable encapsulate(List<Variable> variables) {
 
         return MegaVariable.encapsulate(variables, this.doubleFactory);
     }
 
-    public Variable encapsulate(Variable megaVar, List<Variable> variables){
+    public Variable encapsulate(Variable megaVar, List<Variable> variables) {
 
         return MegaVariable.encapsulate(megaVar, variables, this.doubleFactory);
     }
@@ -235,9 +237,10 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             this.setLastForward(forwardMax.getForward());
 
+            this.forwards.add(getLastForward());
+
             this.setLastMax(forwardMax.getMax());
         }
-
     }
 
     public List getMostLikelyPath() {
@@ -417,5 +420,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public void setBackward(Backward backward) {
         this.backward = backward;
+    }
+
+    public List<Map.Entry<Integer, Matrix>> getForwards() {
+        return forwards;
     }
 }

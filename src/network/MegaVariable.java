@@ -192,6 +192,8 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         while (domainValueIterator.hasNext() && variableIterator.hasNext()) {
 
+
+
             variableIterator.next().setDomainValue(domainValueIterator.next());
         }
     }

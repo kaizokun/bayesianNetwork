@@ -568,10 +568,11 @@ public class Forward {
 
             return new ForwardMax(forward, forwardMax);
         }
+
         //megavariable états precedents
-        Variable previousMegaObservation = network.getMegaObs(megaState, time - 1);
+        Variable previousMegaObservation = network.getMegaObs(megaObservation, time - 1);
         //megavariable observations precedentes
-        Variable previousMegaState = network.getMegaState(megaObservation, time - 1);
+        Variable previousMegaState = network.getMegaState(megaState, time - 1);
 
         for (Domain.DomainValue requestValue : megaState.getDomainValues()) {
 
@@ -622,8 +623,13 @@ public class Forward {
             //requete precedent offrant la probabilité maximum pour calcul du chemin à postériori
             maxPath.put(requestValue, maxPreviousValue);
         }
+
         //reset de la valeur de requete
-        megaState.setDomainValue(originalValue);
+        if(originalValue != null) {
+
+            megaState.setDomainValue(originalValue);
+        }
+
         //enregistrement des chemins les plus probables pour la requete courante
         this.mostLikelyPathFull.put(megaState.getVarTimeId(), maxPath);
 
