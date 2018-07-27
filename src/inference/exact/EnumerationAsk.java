@@ -13,7 +13,7 @@ public class EnumerationAsk {
     //request : une liste de preference ArrayList
     public static AbstractDouble ask(List<Variable> request, List<Variable> observations, BayesianNetwork network){
 
-        Variable megaRequest = request.size() == 1 ? request.get(0) : MegaVariable.encapsulate(request);
+        Variable megaRequest = request.size() == 1 ? request.get(0) : MegaVariable.encapsulate(request, network.getDoubleFactory());
 
         BayesianNetwork.markImportantVars(request, observations);
 

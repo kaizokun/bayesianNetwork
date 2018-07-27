@@ -64,7 +64,7 @@ public class Smoothing {
 
     protected AbstractDouble smoothing(List<Variable> requests, int timeEnd, int markovOrder) {
 
-        Variable megaRequest = requests.size() == 1 ? requests.get(0) : MegaVariable.encapsulate(requests);
+        Variable megaRequest = requests.size() == 1 ? requests.get(0) : network.encapsulate(requests);
 
         String key = getDistribSavedKey(requests);
 

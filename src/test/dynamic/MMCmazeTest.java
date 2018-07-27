@@ -33,13 +33,13 @@ public class MMCmazeTest {
         TestUtil.printTimeDelta();
     }
 
-    //@Test
+    @Test
     public void mazeMMCTest() {
 
         mazeTest(new MazeMMCFactory());
     }
 
-   // @Test
+    @Test
     public void mazeDBNTest() {
 
         mazeTest(new MazeDbnFactory());

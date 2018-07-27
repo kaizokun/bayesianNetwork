@@ -1,6 +1,6 @@
 package network.factory;
 
-import domain.Domain;
+
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.MyDoubleFactory;
@@ -37,7 +37,7 @@ public class BatteryDBN extends BatteryNetworkFactory {
                 batteryLevelDomain,
                 new Double[][]{{0.0, 0.0, 0.0, 0.0, 0.0, 1.0}});
 
-        System.out.println("TCP BATTERY ROOT "+tcpBatteryRoot);
+        // System.out.println("TCP BATTERY ROOT "+tcpBatteryRoot);
 
         Variable batteryRoot = network.addRootVariable(BATTERY.toString(), batteryLevelDomain, tcpBatteryRoot);
 
@@ -48,7 +48,7 @@ public class BatteryDBN extends BatteryNetworkFactory {
                 booleanDomain,
                 new Double[][]{{0.0, 1.0}});
 
-        System.out.println("TCP GAUGE BROKEN ROOT "+tcpGaugeBrokenRoot);
+        //  System.out.println("TCP GAUGE BROKEN ROOT "+tcpGaugeBrokenRoot);
 
         Variable gaugeBrokenRoot = network.addRootVariable(BROKEN_GAUGE.toString(), booleanDomain, tcpGaugeBrokenRoot);
 
@@ -61,7 +61,7 @@ public class BatteryDBN extends BatteryNetworkFactory {
                 Arrays.asList(batteryRoot),
                 batteryLevelDomain, batteryTransitionTable);
 
-        System.out.println("TCP BATTERY "+tcpBatteryTransition);
+        // System.out.println("TCP BATTERY "+tcpBatteryTransition);
 
         //création du model avec la tcp associé
         Model batteryExtensionModel = new Model(tcpBatteryTransition);
@@ -79,7 +79,7 @@ public class BatteryDBN extends BatteryNetworkFactory {
                 booleanDomain, new Double[][]{{1.0, 0.0},
                         {0.001, 0.999}});
 
-        System.out.println("TCP GAUGE BROKEN "+tcpGaugeBrokenTransition);
+        //  System.out.println("TCP GAUGE BROKEN "+tcpGaugeBrokenTransition);
 
         Model gaugeBrokenExtensionModel = new Model(tcpGaugeBrokenTransition);
 
@@ -112,7 +112,7 @@ public class BatteryDBN extends BatteryNetworkFactory {
                         {0.03, 0.0, 0.0, 0.0, 0.97, 0.0}, //false,4
                         {0.03, 0.0, 0.0, 0.0, 0.0, 0.97}});//false,5
 
-        System.out.println("TCP GAUGE "+tcpGauge);
+        // System.out.println("TCP GAUGE "+tcpGauge);
 
         Variable gauge = new Variable(GAUGE, batteryLevelDomain);
 

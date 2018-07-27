@@ -26,7 +26,7 @@ public class Backward {
 
     public Distribution backward(List<Variable> requests, String key, int depth, int timeEnd, boolean saveDistrib) {
 
-        Variable megaRequest = MegaVariable.encapsulate(requests);
+        Variable megaRequest = network.encapsulate(requests);
 
         Distribution distribution = new Distribution(megaRequest, network.getDoubleFactory());
 
@@ -96,8 +96,8 @@ public class Backward {
             }
         }
 
-        Variable megaFullRequest = MegaVariable.encapsulate(fullRequest);
-        //Variable megaObservation = nextObservations.size() == 1 ? nextObservations.get(0) : MegaVariable.encapsulate(nextObservations);
+        Variable megaFullRequest = network.encapsulate(fullRequest);
+        //Variable megaObservation = nextObservations.size() == 1 ? nextObservations.get(0) : network.encapsulate(nextObservations);
 
         //sauvegarde des valeurs originales de la requete
         Domain.DomainValue originalValue = megaFullRequest.getDomainValue();
@@ -144,7 +144,7 @@ public class Backward {
 
         AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
 
-        Variable megaHidenVar = MegaVariable.encapsulate(nextObservation.getDependencies());
+        Variable megaHidenVar = network.encapsulate(nextObservation.getDependencies());
 
         Domain.DomainValue megaHidenVarOriginalValue = megaHidenVar.getDomainValue();
 
@@ -190,7 +190,7 @@ public class Backward {
      */
     public BackwardRs backward(List<Variable> requests, String key, int depth, int timeEnd, int markovOrder, boolean saveDistrib) {
 
-        Variable megaRequest = MegaVariable.encapsulate(requests);
+        Variable megaRequest = network.encapsulate(requests);
 
         Distribution distribution = new Distribution(megaRequest, network.getDoubleFactory()),
                 fullDistribution = new Distribution(megaRequest, network.getDoubleFactory());
@@ -312,7 +312,7 @@ public class Backward {
 
         String fullKey = getDistribSavedKey(fullRequest);
 
-        Variable megaFullRequest = MegaVariable.encapsulate(fullRequest);
+        Variable megaFullRequest = network.encapsulate(fullRequest);
 
         fullDistribution = new Distribution(megaFullRequest, network.getDoubleFactory());
 
@@ -365,7 +365,7 @@ public class Backward {
 
         AbstractDouble sum = network.getDoubleFactory().getNew(0.0);
 
-        Variable megaHiddenVar = MegaVariable.encapsulate(nextObservation.getDependencies());
+        Variable megaHiddenVar = network.encapsulate(nextObservation.getDependencies());
 
         //récuperer tout les parents de l'observation courante soit
         //normalement uniquement les variables états situées à la même coupe temporelle
@@ -395,7 +395,7 @@ public class Backward {
 
         Collections.sort(keyVars, comparatorVarTimeLabel);
 
-        Variable megaKeyVar = MegaVariable.encapsulate(keyVars);
+        Variable megaKeyVar = network.encapsulate(keyVars);
 
         String fullKey = getDistribSavedKey(keyVars);
 

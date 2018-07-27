@@ -275,7 +275,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         return new MegaVariable(this.compoVars, time, this.getDomain());
     }
 
-    public static Variable encapsulate(Variable megaState, List<Variable> variables) {
+    public static Variable encapsulate(Variable megaState, List<Variable> variables, AbstractDoubleFactory doubleFactory) {
 
         if (variables.size() > 1) {
 
@@ -285,6 +285,8 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
             megavariable.setCompoVars(variables);
 
+            megavariable.doubleFactory = doubleFactory;
+
             return megavariable;
 
         } else {
@@ -293,7 +295,7 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         }
     }
 
-    public static Variable encapsulate(List<Variable> variables) {
+    public static Variable encapsulate(List<Variable> variables, AbstractDoubleFactory doubleFactory) {
 
         if (variables.size() > 1) {
 
@@ -302,6 +304,8 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
             megavariable.setDomain(initDomain(variables));
 
             megavariable.setCompoVars(variables);
+
+            megavariable.doubleFactory = doubleFactory;
 
             return megavariable;
 

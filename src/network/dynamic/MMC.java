@@ -272,7 +272,7 @@ public class MMC extends DynamicBayesianNetwork {
             Collections.sort(parentStates, Variable.varLabelComparator);
             //enregistre les états parents qui restent identiques pour un MMC
 
-            Variable megaParent = MegaVariable.encapsulate(parentStates);
+            Variable megaParent = MegaVariable.encapsulate(parentStates, doubleFactory);
 
             int row = 0;
             //pour chaque combinaisons de valeurs pouvant être prises par les variables parents

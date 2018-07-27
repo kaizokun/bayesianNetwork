@@ -290,12 +290,19 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
     @Override
     public AbstractDouble getProbability(Variable var) {
 
+        System.out.println(this);
+
+        System.out.println(this.TCP);
+
+        System.out.println("GET PROB "+var+" - "+var.dependencies+" - "+var.getDomainValue());
+
         String depKey = getDependenciesKey(var.dependencies);
+
+        System.out.println("KEY : "+depKey);
 
         Domain.DomainValue value = var.getDomainValue();
 
         return this.TCP.get(depKey).get(value);
-
     }
 
     @Override

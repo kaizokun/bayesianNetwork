@@ -69,7 +69,7 @@ public class Forward {
 
     public AbstractDouble forwardAsk(List<Variable> request) {
 
-        Variable megaRequest = MegaVariable.encapsulate(request);
+        Variable megaRequest = network.encapsulate(request);
 
         Domain.DomainValue ask = megaRequest.getDomainValue();
 
@@ -170,16 +170,16 @@ public class Forward {
         //encapsule les varibles dans une megavariable si plusieurs afin de
         //gerer de manière polymorphe les variables uniques des listes de variables
         //( gestion des attributions de valeurs etc.)
-        Variable megaRequest = MegaVariable.encapsulate(requests);
+        Variable megaRequest = network.encapsulate(requests);
 
-        Variable fullMegaRequest = MegaVariable.encapsulate(new ArrayList<>(fullRequest.values()));
+        Variable fullMegaRequest = network.encapsulate(new ArrayList<>(fullRequest.values()));
 
         Variable megaRequest0 = null;
 
         if (!requestTime0.isEmpty()) {
             //si pas de variabel en temps 0 on ne fait rien
             //ici ce la créerait une megavariable vide qui poserait problème
-            megaRequest0 = MegaVariable.encapsulate(new ArrayList<>(requestTime0));
+            megaRequest0 = network.encapsulate(new ArrayList<>(requestTime0));
         }
 
         Distribution forwardMatrix = new Distribution(megaRequest, network.getDoubleFactory());
@@ -345,7 +345,7 @@ public class Forward {
         //si elle fait déja partie de la requete dans la procedure appelante, elle doit rester en l'état
         //(cas spécifique si l'ordre de markov des dependances d'état à état est superieur à 1 ...)
 
-        Variable megaHiddenVar = MegaVariable.encapsulate(obsParentState.getDependencies());
+        Variable megaHiddenVar = network.encapsulate(obsParentState.getDependencies());
 
         Domain.DomainValue originalValue = megaHiddenVar.saveDomainValue();
 
@@ -460,7 +460,7 @@ public class Forward {
 
     public List<Variable> computeMostLikelyPath(List<Variable> requests) {
 
-        Variable megaRequest = MegaVariable.encapsulate(requests);
+        Variable megaRequest = network.encapsulate(requests);
         //la sequence d'états la plus probable est calculée à partir d'une liste d'états
         //de 0 à un temps t. la liste des variables et leur ordre doit être le même
         //que lors du premier appel à la methode forward
@@ -509,7 +509,7 @@ public class Forward {
             return;
         }
 
-        Variable megaMaxVar = MegaVariable.encapsulate(maxVars);
+        Variable megaMaxVar = network.encapsulate(maxVars);
 
         //ajoute les variables courantes avec leurs valeurs de domaine
         mostLikelyPath.add(megaMaxVar);
@@ -532,8 +532,6 @@ public class Forward {
 
     private ForwardMax forward(Variable megaState, Variable megaObservation, int time,
                                Distribution previousForward, Distribution previousMax, boolean saveForward) {
-
-        System.out.println("FORWARD "+time);
 
         //valeur originale de la requete
         Domain.DomainValue originalValue = megaState.getDomainValue();

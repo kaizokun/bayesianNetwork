@@ -164,41 +164,54 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return variables;
     }
 
+    public Variable encapsulate(List<Variable> variables){
+
+        return MegaVariable.encapsulate(variables, this.doubleFactory);
+    }
+
+    public Variable encapsulate(Variable megaVar, List<Variable> variables){
+
+        return MegaVariable.encapsulate(megaVar, variables, this.doubleFactory);
+    }
+
     public Variable getMegaState() {
-        return MegaVariable.encapsulate(this.getLastStateVariables());
+
+        return encapsulate(this.getLastStateVariables());
     }
 
     public Variable getMegaState(int time) {
-        return MegaVariable.encapsulate(this.getLastStateVariables(time));
+
+        return encapsulate(this.getLastStateVariables(time));
     }
 
     public Variable getMegaObs() {
 
-        return MegaVariable.encapsulate(this.getLastObservationVariables());
+        return encapsulate(this.getLastObservationVariables());
     }
 
     public Variable getMegaObs(int time) {
 
-        return MegaVariable.encapsulate(this.getLastObservationVariables(time));
+        return encapsulate(this.getLastObservationVariables(time));
     }
 
-
     public Variable getMegaState(Variable megaState) {
-        return MegaVariable.encapsulate(megaState, this.getLastStateVariables());
+
+        return encapsulate(megaState, this.getLastStateVariables());
     }
 
     public Variable getMegaState(Variable megaState, int time) {
-        return MegaVariable.encapsulate(megaState, this.getLastStateVariables(time));
+
+        return encapsulate(megaState, this.getLastStateVariables(time));
     }
 
     public Variable getMegaObs(Variable megaState) {
 
-        return MegaVariable.encapsulate(megaState, this.getLastObservationVariables());
+        return encapsulate(megaState, this.getLastObservationVariables());
     }
 
     public Variable getMegaObs(Variable megaState, int time) {
 
-        return MegaVariable.encapsulate(megaState, this.getLastObservationVariables(time));
+        return encapsulate(megaState, this.getLastObservationVariables(time));
     }
 
     public void extend(Variable... variables) {
@@ -224,6 +237,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             this.setLastMax(forwardMax.getMax());
         }
+
     }
 
     public List getMostLikelyPath() {

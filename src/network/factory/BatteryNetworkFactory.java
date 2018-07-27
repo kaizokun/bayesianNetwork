@@ -31,10 +31,16 @@ public abstract class BatteryNetworkFactory implements NetworkFactory {
             for (Domain.DomainValue level : batteryLevels) {
 
                 Integer levelInt = (Integer) level.getValue();
-                //le niveau précédent est superieur au suivant et la difference est de 1
-                if (previousLevelInt.compareTo(levelInt) > 0 && previousLevelInt - levelInt == 1) {
 
-                    tab[row][col] = 1.0;
+                int cmp = previousLevelInt.compareTo(levelInt);
+
+                if (cmp == 0) {
+                    // 4 chance sur 5 de conserver le niveau de batterie
+                    tab[row][col] = 0.8;
+                    //le niveau précédent est superieur au suivant et la difference est de 1
+                } else if (cmp > 0 && previousLevelInt - levelInt == 1) {
+                    // 1chance sur  5 de passer à un niveau inferieur de battery
+                    tab[row][col] = 0.2;
 
                     //le niveau précédent est inférieur ou superieur mais de plus de 1
                 } else {
@@ -51,7 +57,7 @@ public abstract class BatteryNetworkFactory implements NetworkFactory {
         return tab;
     }
 
-    enum BATTERY_VARS{
+    public enum BATTERY_VARS {
 
         BATTERY, GAUGE, BROKEN_GAUGE
     }
