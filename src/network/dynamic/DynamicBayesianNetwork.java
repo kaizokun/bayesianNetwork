@@ -425,4 +425,16 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     public List<Map.Entry<Integer, Matrix>> getForwards() {
         return forwards;
     }
+
+    public List<Model> getVarTransitionModels(Variable var){
+
+        return this.transitionModels.get(var);
+    }
+
+    public List<Model> getVarCaptorModels(Variable var){
+
+        return this.captorsModels.get(var);
+    }
+
+
 }

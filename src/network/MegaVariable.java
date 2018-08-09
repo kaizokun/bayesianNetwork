@@ -192,8 +192,6 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
 
         while (domainValueIterator.hasNext() && variableIterator.hasNext()) {
 
-
-
             variableIterator.next().setDomainValue(domainValueIterator.next());
         }
     }
@@ -221,6 +219,15 @@ public class MegaVariable extends Variable implements Iterable<Variable> {
         }
 
         return prob;
+    }
+
+    @Override
+    public void initRdmValue() {
+
+        for(Variable variable : this.compoVars){
+
+            variable.initRdmValue();
+        }
     }
 
     @Override

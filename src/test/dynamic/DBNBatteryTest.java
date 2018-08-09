@@ -24,7 +24,7 @@ public class DBNBatteryTest {
 
         DynamicBayesianNetwork network = batteryDbn.initNetwork();
 
-        int gaugeValues[] = new int[]{5, 5, 5, 5, 5, 4, 4, 4, 0, 0, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0};
+        int gaugeValues[] = new int[]{5, 5, 5, 5, 5, 4, 4, 4, 0, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0};
 
         //Variable[] gaugeVars = new Variable[gaugeValues.length];
 
@@ -62,9 +62,11 @@ public class DBNBatteryTest {
 
             System.out.println(maxDomainValue+" "+max);
 
-            System.out.println(forward.getValue());
+            //System.out.println(forward.getValue());
 
         }
+
+        System.out.println(network);
     }
 
 }
