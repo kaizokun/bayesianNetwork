@@ -56,8 +56,6 @@ public class Variable implements Iterable<Variable> {
     //facteurs lié à cette variable
     protected List<Factor> factors = new LinkedList<>();
 
-
-
     public Variable(String label, IDomain domain, int time) {
 
         this(label, domain);

@@ -2,11 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../probability/src/inference/ParticulateFiltering.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../probability/src/test/dynamic/ParticulateFilteringTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/MegaVariable.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/MegaVariable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/test/dynamic/DBNBatteryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/dynamic/DBNBatteryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/inference/ParticulateFiltering.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/inference/ParticulateFiltering.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/network/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/network/Variable.java" afterDir="false" />
     </list>
     <list id="a68865f3-5ded-48e5-8992-9b37d321358e" name="Revert &quot;forward simplifié&quot;" comment="Revert &quot;forward simplifié&quot;&#10;&#10;This reverts commit c2747ef" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -50,8 +49,8 @@
       <file leaf-file-name="ParticulateFiltering.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/inference/ParticulateFiltering.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="91" column="16" selection-start-line="91" selection-start-column="16" selection-end-line="91" selection-end-column="16" />
+            <state relative-caret-position="443">
+              <caret line="152" lean-forward="true" selection-start-line="152" selection-end-line="152" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -59,24 +58,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Model.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/Model.java">
+      <file leaf-file-name="ParticulateFilteringTest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/ParticulateFilteringTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="41" column="28" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
-              <folding>
-                <element signature="e#920#921#0" expanded="true" />
-                <element signature="e#955#956#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DynamicBayesianNetwork.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="297" column="68" lean-forward="true" selection-start-line="297" selection-start-column="68" selection-end-line="297" selection-end-column="68" />
+            <state relative-caret-position="504">
+              <caret line="28" selection-start-line="28" selection-end-line="28" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -84,20 +70,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BayesianNetwork.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java">
+      <file leaf-file-name="DomainFactory.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/domain/DomainFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="736">
-              <caret line="159" column="20" selection-start-line="159" selection-start-column="20" selection-end-line="159" selection-end-column="20" />
+            <state relative-caret-position="108">
+              <caret line="10" column="26" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ProbabilityComputeFromTCP.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java">
+      <file leaf-file-name="BayesianNetworkFactory.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../probability/src/network/factory/BayesianNetworkFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="264" column="31" selection-start-line="264" selection-start-column="31" selection-end-line="264" selection-end-column="31" />
+            <state relative-caret-position="342">
+              <caret line="135" column="41" selection-start-line="135" selection-start-column="41" selection-end-line="135" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -105,26 +91,8 @@
       <file leaf-file-name="Variable.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="576">
-              <caret line="40" column="58" selection-start-line="40" selection-start-column="41" selection-end-line="40" selection-end-column="58" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MegaVariable.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/MegaVariable.java">
-          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="285">
-              <caret line="199" column="30" selection-start-line="199" selection-start-column="30" selection-end-line="199" selection-end-column="30" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProbabilityCompute.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityCompute.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="13" selection-start-line="13" selection-end-line="13" />
+              <caret line="245" column="16" selection-start-line="245" selection-start-column="16" selection-end-line="245" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -207,10 +175,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/inference/dynamic/Backward.java" />
-        <option value="$PROJECT_DIR$/src/network/factory/MazeDbnFactory.java" />
-        <option value="$PROJECT_DIR$/src/math/Matrix.java" />
-        <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/IForwardMMC.java" />
         <option value="$PROJECT_DIR$/src/network/factory/BayesianNetworkFactory.java" />
         <option value="$PROJECT_DIR$/src/math/MatrixUtil.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/SmoothingForwardDecBackwardIncMMC.java" />
@@ -255,8 +219,12 @@
         <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
         <option value="$PROJECT_DIR$/src/test/dynamic/DBNBatteryTest.java" />
         <option value="$PROJECT_DIR$/src/test/dynamic/DBNBatteryTest.java" />
-        <option value="$PROJECT_DIR$/../probability/src/network/MegaVariable.java" />
-        <option value="$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java" />
+        <option value="$PROJECT_DIR$/src/network/MegaVariable.java" />
+        <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
+        <option value="$PROJECT_DIR$/src/inference/ParticulateFiltering.java" />
+        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/ParticulateFirlteringTest.java" />
+        <option value="$PROJECT_DIR$/../probability/src/network/Variable.java" />
+        <option value="$PROJECT_DIR$/../probability/src/test/dynamic/ParticulateFilteringTest.java" />
         <option value="$PROJECT_DIR$/../probability/src/inference/ParticulateFiltering.java" />
       </list>
     </option>
@@ -292,6 +260,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -308,52 +278,6 @@
               <item name="probability" type="b2602c69:ProjectViewProjectNode" />
               <item name="probability" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="domain" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="inference" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="inference" type="462c0819:PsiDirectoryNode" />
-              <item name="dynamic" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="inference" type="462c0819:PsiDirectoryNode" />
-              <item name="exact" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="network" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="network" type="462c0819:PsiDirectoryNode" />
-              <item name="dynamic" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="network" type="462c0819:PsiDirectoryNode" />
-              <item name="factory" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -362,28 +286,12 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
               <item name="dynamic" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="inference" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="probability" type="b2602c69:ProjectViewProjectNode" />
-              <item name="probability" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="sampling" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -392,7 +300,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/..////////////ShareUrDocMavenMultiModule" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/..//////////////ShareUrDocMavenMultiModule" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
@@ -428,63 +336,17 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.DBNBatteryTest (1)">
+  <component name="RunManager" selected="JUnit.ParticulateFilteringTest.umbrellaParticulateFilteringTest">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     </configuration>
-    <configuration name="DBNBatteryTest (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="probability" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="test.dynamic.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="test.dynamic" />
-      <option name="MAIN_CLASS_NAME" value="test.dynamic.DBNBatteryTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <patterns />
-    </configuration>
     <configuration name="DBNBatteryTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="probability" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="dynamic.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="test.dynamic" />
-      <option name="MAIN_CLASS_NAME" value="dynamic.DBNBatteryTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <patterns />
-    </configuration>
-    <configuration name="DBNBatteryTest.testBatteryDBN (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="probability" />
-      <extension name="coverage">
-        <pattern>
           <option name="PATTERN" value="test.dynamic.*" />
           <option name="ENABLED" value="true" />
         </pattern>
@@ -493,8 +355,8 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="test.dynamic" />
       <option name="MAIN_CLASS_NAME" value="test.dynamic.DBNBatteryTest" />
-      <option name="METHOD_NAME" value="testBatteryDBN" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
@@ -508,16 +370,39 @@
       <module name="probability" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="dynamic.*" />
+          <option name="PATTERN" value="test.dynamic.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="test.dynamic" />
-      <option name="MAIN_CLASS_NAME" value="dynamic.DBNBatteryTest" />
+      <option name="MAIN_CLASS_NAME" value="test.dynamic.DBNBatteryTest" />
       <option name="METHOD_NAME" value="testBatteryDBN" />
       <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <patterns />
+    </configuration>
+    <configuration name="DynamicBayesianNetworkTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="probability" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="test.dynamic.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="test.dynamic" />
+      <option name="MAIN_CLASS_NAME" value="test.dynamic.DynamicBayesianNetworkTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
@@ -573,6 +458,29 @@
       </option>
       <patterns />
     </configuration>
+    <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="probability" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="test.dynamic.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="test.dynamic" />
+      <option name="MAIN_CLASS_NAME" value="test.dynamic.ParticulateFilteringTest" />
+      <option name="METHOD_NAME" value="umbrellaParticulateFilteringTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <patterns />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -613,18 +521,18 @@
     </configuration>
     <list>
       <item itemvalue="JUnit.MMCmazeTest.mazeDBNTest" />
-      <item itemvalue="JUnit.DBNBatteryTest" />
-      <item itemvalue="JUnit.DBNBatteryTest.testBatteryDBN" />
       <item itemvalue="JUnit.DBNBatteryTest.testBatteryDBN (1)" />
       <item itemvalue="JUnit.DBNBatteryTest (1)" />
+      <item itemvalue="JUnit.DynamicBayesianNetworkTest" />
+      <item itemvalue="JUnit.ParticulateFilteringTest.umbrellaParticulateFilteringTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ParticulateFilteringTest.umbrellaParticulateFilteringTest" />
+        <item itemvalue="JUnit.DynamicBayesianNetworkTest" />
         <item itemvalue="JUnit.DBNBatteryTest (1)" />
         <item itemvalue="JUnit.DBNBatteryTest.testBatteryDBN (1)" />
         <item itemvalue="JUnit.MMCmazeTest.mazeDBNTest" />
-        <item itemvalue="JUnit.DBNBatteryTest.testBatteryDBN" />
-        <item itemvalue="JUnit.DBNBatteryTest" />
       </list>
     </recent_temporary>
   </component>
@@ -781,14 +689,9 @@
       <workItem from="1532710973540" duration="2239000" />
       <workItem from="1532784671696" duration="1009000" />
       <workItem from="1532870696702" duration="12000" />
-      <workItem from="1533832682439" duration="5019000" />
-    </task>
-    <task id="LOCAL-00072" summary="most likely path matrix">
-      <created>1530291703853</created>
-      <option name="number" value="00072" />
-      <option name="presentableId" value="LOCAL-00072" />
-      <option name="project" value="LOCAL" />
-      <updated>1530291703854</updated>
+      <workItem from="1533832682439" duration="5058000" />
+      <workItem from="1533890178628" duration="25000" />
+      <workItem from="1533910840071" duration="5328000" />
     </task>
     <task id="LOCAL-00073" summary="separation procedures forward et most likely path">
       <created>1530304202838</created>
@@ -1126,43 +1029,50 @@
       <option name="project" value="LOCAL" />
       <updated>1532713158796</updated>
     </task>
-    <option name="localTasksCounter" value="121" />
+    <task id="LOCAL-00121" summary="filtrage particulaire début d'implementation">
+      <created>1533837729004</created>
+      <option name="number" value="00121" />
+      <option name="presentableId" value="LOCAL-00121" />
+      <option name="project" value="LOCAL" />
+      <updated>1533837729004</updated>
+    </task>
+    <option name="localTasksCounter" value="122" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.27 at 19h 34m 21s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 45m 42s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.27 at 19h 34m 54s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 45m 48s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.27 at 19h 37m 11s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 45m 49s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.28 at 15h 31m 24s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 47m 07s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.28 at 15h 32m 34s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 47m 29s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.28 at 15h 32m 57s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 47m 32s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.28 at 15h 33m 50s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 47m 34s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.28 at 15h 34m 11s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 47m 36s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.28 at 15h 34m 49s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 48m 03s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="DBNBatteryTest_(1) - 2018.07.28 at 15h 36m 02s.xml">
-      <configuration name="DBNBatteryTest (1)" configurationId="JUnit" />
+    <history-entry file="ParticulateFilteringTest_umbrellaParticulateFilteringTest - 2018.08.10 at 17h 48m 06s.xml">
+      <configuration name="ParticulateFilteringTest.umbrellaParticulateFilteringTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="786582000" />
+    <option name="totallyTimeSpent" value="791974000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1179,29 +1089,29 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32928178" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.5038674" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5042644" side_tool="true" weight="0.32928178" />
       <window_info anchor="right" id="Maven Projects" order="6" weight="0.32995737" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
+      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.3403315" />
-      <window_info anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" weight="0.46961325" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.21215352" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.21641791" />
       <window_info anchor="right" id="Database" order="9" side_tool="true" weight="0.32995737" />
       <window_info id="Structure" order="1" sideWeight="0.20773481" side_tool="true" weight="0.18976545" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.32995737" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="Messages" order="11" weight="0.5038674" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -1246,7 +1156,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="affichage maze" />
     <MESSAGE value="affichage maze position probables" />
     <MESSAGE value="..." />
     <MESSAGE value="modification de l'implementation des megavariables et du MMC pour traiter les megavariables comme des variables normal en utilisant le polymorphisme" />
@@ -1271,7 +1180,8 @@
     <MESSAGE value="création dbn battery suite&#10;modification affichage TCP pour trier les clé parents et enfants" />
     <MESSAGE value="correction bug recuperation probabilité test dbn battery state 0" />
     <MESSAGE value="correction bug test dbn battery" />
-    <option name="LAST_COMMIT_MESSAGE" value="correction bug test dbn battery" />
+    <MESSAGE value="filtrage particulaire début d'implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="filtrage particulaire début d'implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1279,13 +1189,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../probability/src/environment/Position.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="700">
-          <caret line="80" column="23" selection-start-line="80" selection-start-column="23" selection-end-line="80" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/environment/Cardinal.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="155">
@@ -1429,13 +1332,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/factory/BayesianNetworkFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="666">
-          <caret line="156" selection-start-line="156" selection-end-line="156" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/environment/Percept.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="54">
@@ -1457,13 +1353,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/domain/DomainFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="846">
-          <caret line="51" selection-start-line="51" selection-end-line="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/domain/Domain.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="900">
@@ -1475,13 +1364,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
           <caret line="4" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
         </state>
       </provider>
     </entry>
@@ -1577,38 +1459,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/MegaVariable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
+        <state relative-caret-position="3456">
           <caret line="199" column="30" selection-start-line="199" selection-start-column="30" selection-end-line="199" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="40" column="58" selection-start-line="40" selection-start-column="41" selection-end-line="40" selection-end-column="58" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/ProbabilityComputeFromTCP.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
+        <state relative-caret-position="4662">
           <caret line="264" column="31" selection-start-line="264" selection-start-column="31" selection-end-line="264" selection-end-column="31" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="297" column="68" lean-forward="true" selection-start-line="297" selection-start-column="68" selection-end-line="297" selection-end-column="68" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="2808">
+          <caret line="159" column="20" selection-start-line="159" selection-start-column="20" selection-end-line="159" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/Model.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
+        <state relative-caret-position="666">
           <caret line="41" column="28" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
           <folding>
             <element signature="e#920#921#0" expanded="true" />
@@ -1617,17 +1489,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/network/BayesianNetwork.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/dynamic/DynamicBayesianNetwork.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="736">
-          <caret line="159" column="20" selection-start-line="159" selection-start-column="20" selection-end-line="159" selection-end-column="20" />
+        <state relative-caret-position="623">
+          <caret line="433" column="23" selection-start-line="433" selection-start-column="23" selection-end-line="433" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/DynamicBayesianNetworkTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="461">
+          <caret line="85" lean-forward="true" selection-start-line="85" selection-end-line="85" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/factory/BayesianNetworkFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="135" column="41" selection-start-line="135" selection-start-column="41" selection-end-line="135" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/network/Variable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="245" column="16" selection-start-line="245" selection-start-column="16" selection-end-line="245" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/domain/DomainFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="10" column="26" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/dynamic/ParticulateFilteringTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="504">
+          <caret line="28" selection-start-line="28" selection-end-line="28" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/inference/ParticulateFiltering.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="91" column="16" selection-start-line="91" selection-start-column="16" selection-end-line="91" selection-end-column="16" />
+        <state relative-caret-position="443">
+          <caret line="152" lean-forward="true" selection-start-line="152" selection-end-line="152" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
