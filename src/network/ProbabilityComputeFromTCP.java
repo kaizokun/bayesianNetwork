@@ -19,6 +19,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
     protected Double[][] matrice;
 
+    protected Random random = new Random();
+
     protected IDomain varDom;
 
     public ProbabilityComputeFromTCP(IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
@@ -323,13 +325,13 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         //AbstractDouble total = doubleFactory.getNew(0.0);
 
-        return this.dichotomicSearch(rangevalues, doubleFactory.getNew(new Random().nextDouble()), 0, rangevalues.size());
+        return this.dichotomicSearch(rangevalues, doubleFactory.getNew(this.random.nextDouble()), 0, rangevalues.size());
     }
 
     @Override
     public Domain.DomainValue getRandomValueFromMarkovCover(Variable variable) {
 
-        AbstractDouble rdm = doubleFactory.getNew(new Random().nextDouble());
+        AbstractDouble rdm = doubleFactory.getNew(this.random.nextDouble());
 
         List<Map.Entry<Domain.DomainValue, FrequencyRange>> cumulFreq = this.cumulativeMarkovFrequencies.get(this.getDependenciesKey(variable.markovKover));
 

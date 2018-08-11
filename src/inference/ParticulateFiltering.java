@@ -6,10 +6,7 @@ import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.Model;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ParticulateFiltering {
 
@@ -145,6 +142,41 @@ public class ParticulateFiltering {
         }
 
         logSample(samples, totalSamples, weighSamples);
+
+        //reechantillonage
+        //jusqu'à atteindre un total de n echantillon
+        //choisir au hazard un element du tableau et en fonction du poids le selectionner ou non
+        //pour cela on genere un nombre aléatoire entre 0 et 1 si ce nombre est inférier ou égal au poids
+        //on selectionne l'echantillon sinon pas
+        //crée une nouvelle liste de samples car certains precedents peuvent être selectionnés plusieurs fois
+        List<Map<Variable, Domain.DomainValue>> newSamples = new ArrayList<>(totalSamples);
+
+        Random rdm = new Random();
+
+        int cpt = 0;
+
+        for(int s = 0 ; s < totalSamples ; cpt ++){
+            //genere un indice de sample aléatoire
+            int i = rdm.nextInt(totalSamples);
+            //récupère le poids associé
+            AbstractDouble rdmWeigh = weighSamples[i];
+            //génére un nombre entre 0 et 1 non compris
+            AbstractDouble limit = network.getDoubleFactory().getNew(rdm.nextDouble());
+            //si la limite est inférieur ou égal au poids le sample est choisi
+            //Par exemple un poids de 0.2 à autant de chance
+            //d'être selectionné que la probabilité de générer un nombre entre
+            //0 et 0.2 qui est approximativement de 20 %
+            if( limit.compareTo(rdmWeigh) <= 0 ){
+                //on remplace
+                newSamples.add(samples.get(i));
+
+                s ++;
+            }
+        }
+
+        logSample(newSamples, totalSamples, weighSamples);
+
+        System.out.println(cpt);
     }
 
     private static void logSample(List<Map<Variable, Domain.DomainValue>> samples, int totalSamples, AbstractDouble[] weigh){
@@ -155,7 +187,7 @@ public class ParticulateFiltering {
 
         for(Map<Variable, Domain.DomainValue> sample : samples){
 
-            System.out.println(sample+" "+weigh[s]);
+            //System.out.println(sample+" "+weigh[s]);
 
             if(sample.values().iterator().next().getValue().equals(1)){
 

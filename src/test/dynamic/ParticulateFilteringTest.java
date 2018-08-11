@@ -24,7 +24,7 @@ public class ParticulateFilteringTest {
 
         obs.setValue(1);
 
-        ParticulateFiltering.ask(network, Arrays.asList(state), Arrays.asList(obs), 10);
+        ParticulateFiltering.ask(network, Arrays.asList(state), Arrays.asList(obs), 100000);
     }
 
 }
