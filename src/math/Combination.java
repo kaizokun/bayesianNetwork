@@ -100,7 +100,7 @@ public class Combination {
 
         List<List<T>> combinationsList = new ArrayList<>(combinationSize);
 
-        List<T> combination = (List<T>)Arrays.asList(new Object[valuesLists.size()] );
+        List<T> combination = (List<T>) Arrays.asList(new Object[valuesLists.size()]);
 
         loadCombinations(valuesLists, combinationsList, combination, 0);
 
@@ -109,7 +109,7 @@ public class Combination {
 
     private static <T> void loadCombinations(List<List<T>> valuesLists, List<List<T>> combinationsList, List<T> combination, int iList) {
 
-        if(iList == valuesLists.size()){
+        if (iList == valuesLists.size()) {
 
             combinationsList.add(new ArrayList<>(combination));
 
@@ -125,5 +125,82 @@ public class Combination {
             loadCombinations(valuesLists, combinationsList, combination, iList + 1);
         }
     }
+
+    public static <T> List<List<List<T>>> loadAssemblements(List<List<T>> lists, int n) {
+
+        //resultat : 1ere dimension, les possibilités
+        //           2eme les assemblements de n pieces pour une possibilité
+        //           3eme les pieces d'un assemblement
+
+        List<List<List<T>>> possibilities = new LinkedList<>();
+
+        List<List<T>> assemblements = new LinkedList();
+
+        possibilities.add(assemblements);
+
+        //à partir de la premiere liste créer une possibilité , composés d'assemblements contenant
+        //chacun une piece de la liste
+
+        for (T item : lists.get(0)) {
+
+            List<T> assemblement = new LinkedList();
+
+            assemblement.add(item);
+
+            assemblements.add(assemblement);
+        }
+
+        List<List<Boolean>> ignoreLists = new ArrayList<>(2);
+
+        for (int l = 0; l < 2; l++) {
+
+            List<Boolean> ignoreItems = new ArrayList<>(n);
+
+            for (int i = 0; i < n; i++) {
+
+                ignoreItems.add(false);
+            }
+
+            ignoreLists.add(ignoreItems);
+        }
+
+        for (int l = 1; l < lists.size(); l++) {
+
+            for(List<List<T>> assemblements2 : possibilities){
+
+                //associer chaque assemblement de la possibilité courante avec les pieces de la prochaines liste d'object
+                //de toute les manières possible pour creer une nouvelle liste d'assemblements
+                //une List<T> et une piece composite
+                createAssemblements(assemblements2, lists.get(l), ignoreLists, 0, n);
+            }
+
+        }
+
+        return possibilities;
+    }
+
+    private static <T> void createAssemblements(List<List<T>> assemblements, List<T> items, List<List<Boolean>> ignoreLists, int i, int n) {
+
+        for (int i1 = 0; i1 < n; i1++) {
+
+            for (int i2 = 0; i2 < n; i2++) {
+
+
+            }
+
+        }
+
+    }
+
+    public static double factorial(int n) {
+
+        if (n <= 1) {
+
+            return 1;
+        }
+
+        return n * factorial(n - 1);
+    }
+
 
 }
