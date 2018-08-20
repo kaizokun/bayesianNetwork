@@ -150,7 +150,7 @@ public class Combination {
         // resultat : 1ere dimension, les possibilités
         //           2eme les assemblements de n pieces pour une possibilité
         //           3eme les pieces d'un assemblement
-        // soit List est un pièce partiellement ou entierrement assemblé
+        // List est un pièce partiellement ou entierrement assemblée
         List<List<List>> possibilities = new LinkedList<>();
         //autant d'assemblement qu'il y a de pieces dans chaque liste soit n
         List<List> assemblements = new ArrayList<>(n);

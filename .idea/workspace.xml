@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+    <list id="a68865f3-5ded-48e5-8992-9b37d321358e" name="Revert &quot;forward simplifié&quot;" comment="Revert &quot;forward simplifié&quot;&#10;&#10;This reverts commit c2747ef" />
     <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../probability/src/math/TestCombination.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/math/Combination.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/math/Combination.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/math/TestCombination.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/math/TestCombination.java" afterDir="false" />
     </list>
-    <list id="a68865f3-5ded-48e5-8992-9b37d321358e" name="Revert &quot;forward simplifié&quot;" comment="Revert &quot;forward simplifié&quot;&#10;&#10;This reverts commit c2747ef" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -45,20 +45,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Combination.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Combination.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/math/Combination.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="385">
-              <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
+            <state relative-caret-position="-749">
+              <caret line="151" column="54" selection-start-line="151" selection-start-column="54" selection-end-line="151" selection-end-column="54" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestCombination.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TestCombination.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/math/TestCombination.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="414">
-              <caret line="23" column="105" selection-start-line="23" selection-start-column="105" selection-end-line="23" selection-end-column="105" />
+            <state relative-caret-position="515">
+              <caret line="31" column="9" lean-forward="true" selection-start-line="31" selection-start-column="9" selection-end-line="31" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -144,7 +144,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/ForwardMMC.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/mmc/MostLikelySequencyMMC.java" />
         <option value="$PROJECT_DIR$/src/inference/dynamic/Forward.java" />
         <option value="$PROJECT_DIR$/src/network/dynamic/DynamicBayesianNetwork.java" />
@@ -192,9 +191,10 @@
         <option value="$PROJECT_DIR$/src/inference/ParticulateFiltering.java" />
         <option value="$PROJECT_DIR$/src/test/dynamic/ParticulateFilteringTest.java" />
         <option value="$PROJECT_DIR$/src/math/Combination.java" />
-        <option value="$PROJECT_DIR$/../probability/src/math/Test.java" />
+        <option value="$PROJECT_DIR$/src/math/Test.java" />
+        <option value="$PROJECT_DIR$/src/math/TestCombination.java" />
+        <option value="$PROJECT_DIR$/src/math/Combination.java" />
         <option value="$PROJECT_DIR$/../probability/src/math/TestCombination.java" />
-        <option value="$PROJECT_DIR$/../probability/src/math/Combination.java" />
       </list>
     </option>
   </component>
@@ -214,7 +214,7 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
+    <option name="x" value="1962" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
     <option name="height" value="1066" />
@@ -229,8 +229,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -259,7 +259,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -268,7 +268,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/..//////////////////ShareUrDocMavenMultiModule" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/..///////////////////ShareUrDocMavenMultiModule" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
@@ -304,35 +304,12 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestCombination.assemblementsTest">
+  <component name="RunManager" selected="JUnit.TestCombination.assemblementsTest2">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="DBNBatteryTest.testBatteryDBN" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="probability" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="test.dynamic.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="test.dynamic" />
-      <option name="MAIN_CLASS_NAME" value="test.dynamic.DBNBatteryTest" />
-      <option name="METHOD_NAME" value="testBatteryDBN" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <patterns />
     </configuration>
     <configuration name="DynamicBayesianNetworkTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="probability" />
@@ -449,6 +426,29 @@
       </option>
       <patterns />
     </configuration>
+    <configuration name="TestCombination.assemblementsTest2" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="probability" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="math.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="math" />
+      <option name="MAIN_CLASS_NAME" value="math.TestCombination" />
+      <option name="METHOD_NAME" value="assemblementsTest2" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <patterns />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -488,14 +488,15 @@
       <listeners />
     </configuration>
     <list>
-      <item itemvalue="JUnit.DBNBatteryTest.testBatteryDBN" />
       <item itemvalue="JUnit.MMCmazeTest.mazeDBNTest" />
       <item itemvalue="JUnit.DynamicBayesianNetworkTest" />
       <item itemvalue="JUnit.ParticulateFilteringTest.umbrellaParticulateFilteringTest" />
       <item itemvalue="JUnit.TestCombination.assemblementsTest" />
+      <item itemvalue="JUnit.TestCombination.assemblementsTest2" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.TestCombination.assemblementsTest2" />
         <item itemvalue="JUnit.TestCombination.assemblementsTest" />
         <item itemvalue="JUnit.ParticulateFilteringTest.umbrellaParticulateFilteringTest" />
         <item itemvalue="JUnit.DynamicBayesianNetworkTest" />
@@ -662,14 +663,8 @@
       <workItem from="1533996346282" duration="2523000" />
       <workItem from="1534063663447" duration="14000" />
       <workItem from="1534608033594" duration="6260000" />
-      <workItem from="1534691476196" duration="5879000" />
-    </task>
-    <task id="LOCAL-00076" summary="smoothing à mémoire constante">
-      <created>1530373960468</created>
-      <option name="number" value="00076" />
-      <option name="presentableId" value="LOCAL-00076" />
-      <option name="project" value="LOCAL" />
-      <updated>1530373960468</updated>
+      <workItem from="1534691476196" duration="6106000" />
+      <workItem from="1534752546946" duration="118000" />
     </task>
     <task id="LOCAL-00077" summary="modification extension du MMC">
       <created>1530460633485</created>
@@ -1007,19 +1002,17 @@
       <option name="project" value="LOCAL" />
       <updated>1534616684768</updated>
     </task>
-    <option name="localTasksCounter" value="125" />
+    <task id="LOCAL-00125" summary="assemblements plusieurs ensemble de même taille de pieces différents + test">
+      <created>1534697404180</created>
+      <option name="number" value="00125" />
+      <option name="presentableId" value="LOCAL-00125" />
+      <option name="project" value="LOCAL" />
+      <updated>1534697404181</updated>
+    </task>
+    <option name="localTasksCounter" value="126" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestCombination_assemblementsTest - 2018.08.19 at 18h 42m 13s.xml">
-      <configuration name="TestCombination.assemblementsTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestCombination_assemblementsTest - 2018.08.19 at 18h 43m 35s.xml">
-      <configuration name="TestCombination.assemblementsTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestCombination_assemblementsTest - 2018.08.19 at 18h 43m 38s.xml">
-      <configuration name="TestCombination.assemblementsTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="TestCombination_assemblementsTest - 2018.08.19 at 18h 44m 30s.xml">
       <configuration name="TestCombination.assemblementsTest" configurationId="JUnit" />
     </history-entry>
@@ -1041,9 +1034,18 @@
     <history-entry file="TestCombination_assemblementsTest - 2018.08.19 at 18h 48m 57s.xml">
       <configuration name="TestCombination.assemblementsTest" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="TestCombination_assemblementsTest - 2018.08.19 at 18h 49m 27s.xml">
+      <configuration name="TestCombination.assemblementsTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestCombination_assemblementsTest - 2018.08.19 at 18h 50m 18s.xml">
+      <configuration name="TestCombination.assemblementsTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestCombination_assemblementsTest2 - 2018.08.20 at 10h 10m 23s.xml">
+      <configuration name="TestCombination.assemblementsTest2" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="806779000" />
+    <option name="totallyTimeSpent" value="807124000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1055,7 +1057,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
+    <frame x="1912" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
@@ -1067,21 +1069,21 @@
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5042644" side_tool="true" weight="0.32928178" />
       <window_info anchor="right" id="Maven Projects" order="6" weight="0.32995737" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
+      <window_info active="true" anchor="bottom" x="0" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.3403315" />
-      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.2249467" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.22707888" />
       <window_info anchor="right" id="Database" order="9" side_tool="true" weight="0.32995737" />
       <window_info id="Structure" order="1" sideWeight="0.20773481" side_tool="true" weight="0.18976545" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.32995737" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -1127,7 +1129,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="correction" />
     <MESSAGE value="suite modifications" />
     <MESSAGE value="corrections bugs" />
     <MESSAGE value="modification forward pour reseau dynamique afin de sauvegarder les distributions à la demande" />
@@ -1152,7 +1153,8 @@
     <MESSAGE value="filtrage particulaire suite d'implementation génération des sampels et calcul des poids, + test" />
     <MESSAGE value="filtrage particulaire suite d'implementation, réechantillonage à partir des poids d'echantillons" />
     <MESSAGE value="assemblements pieces" />
-    <option name="LAST_COMMIT_MESSAGE" value="assemblements pieces" />
+    <MESSAGE value="assemblements plusieurs ensemble de même taille de pieces différents + test" />
+    <option name="LAST_COMMIT_MESSAGE" value="assemblements plusieurs ensemble de même taille de pieces différents + test" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1460,9 +1462,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2736">
           <caret line="158" column="50" selection-start-line="158" selection-start-column="50" selection-end-line="158" selection-end-column="50" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1477,9 +1476,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="16" column="52" selection-start-line="16" selection-start-column="52" selection-end-line="16" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1501,20 +1497,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/math/TestCombination.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/math/Combination.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="23" column="105" selection-start-line="23" selection-start-column="105" selection-end-line="23" selection-end-column="105" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="-749">
+          <caret line="151" column="54" selection-start-line="151" selection-start-column="54" selection-end-line="151" selection-end-column="54" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/math/Combination.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/math/TestCombination.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="385">
-          <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
+        <state relative-caret-position="515">
+          <caret line="31" column="9" lean-forward="true" selection-start-line="31" selection-start-column="9" selection-end-line="31" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
