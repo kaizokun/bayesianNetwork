@@ -12,7 +12,7 @@ public interface MDP<StateType extends State, ActionType extends Action> {
 
     List<Action> getActions(StateType state);
 
-    List<Transition> getTransitionProb(StateType fromState, ActionType action);
+    List<Transition> getTransitions(StateType fromState, ActionType action);
 
     Double getReward(StateType state);
 }

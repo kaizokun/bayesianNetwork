@@ -1,7 +1,9 @@
 package environment;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class SimpleMap implements Environment<Position> {
 
@@ -12,6 +14,8 @@ public class SimpleMap implements Environment<Position> {
     private Position goodExit, badExit;
 
     private List<Position> states = new LinkedList<>();
+
+    private Set<Position> walls = new HashSet<>();
 
     private int xLimit, yLimit;
 
@@ -37,6 +41,10 @@ public class SimpleMap implements Environment<Position> {
                 if (row.charAt(iCol) != WALL) {
 
                     states.add(new Position(yLimit - iRow, iCol + 1));
+
+                }else{
+
+                    walls.add(new Position(yLimit - iRow, iCol + 1));
                 }
             }
         }
@@ -49,9 +57,10 @@ public class SimpleMap implements Environment<Position> {
     *   1 2 3 4
     * */
 
-    public boolean isPositionIn(Position position) {
+    public boolean isPositionReachable(Position position) {
 
-        return position.getX() > 0 && position.getY() > 0 && position.getX() <= xLimit && position.getY() <= yLimit;
+        //dans les limites de la map est pas un mur
+        return position.getX() > 0 && position.getY() > 0 && position.getX() <= xLimit && position.getY() <= yLimit && !walls.contains(position);
     }
 
     @Override
@@ -63,7 +72,7 @@ public class SimpleMap implements Environment<Position> {
 
             Position adjPos = state.move(direction);
 
-            if(isPositionIn(adjPos)){
+            if(isPositionReachable(adjPos)){
 
                 actions.add(direction);
             }
@@ -83,5 +92,10 @@ public class SimpleMap implements Environment<Position> {
 
     public Position getBadExit() {
         return badExit;
+    }
+
+
+    public Set<Position> getWalls() {
+        return walls;
     }
 }

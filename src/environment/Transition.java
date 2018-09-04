@@ -26,4 +26,17 @@ public class Transition {
     public void setRsState(State rsState) {
         this.rsState = rsState;
     }
+
+    public void increaseProbability(double add) {
+
+        this.probability += add;
+    }
+
+    @Override
+    public String toString() {
+        return "Transition{" +
+                "probability=" + probability +
+                ", rsState=" + rsState +
+                '}';
+    }
 }
