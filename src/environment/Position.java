@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class Position {
+public class Position implements State{
 
     protected int x, y;
 

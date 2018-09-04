@@ -5,15 +5,21 @@ import java.util.LinkedHashSet;
 
 import java.util.Set;
 
-public enum Cardinal {
+public enum Cardinal implements Action {
 
     NORTH, SOUTH, EAST, WEST;
 
     private static final int delta[][] = new int[][]{{+1, 0}, {-1, 0}, {0, +1}, {0, -1}};
 
+    //NORTH EAST SOUTH WEST
+    //      N
+    //  W       E
+    //      S
+    private static final int deltaCircle[][] = new int[][]{{+1, 0}, {0, +1}, {-1, 0}, {0, -1}};
+
     private static final Set<Cardinal> cardinalSet = new LinkedHashSet<>();
 
-    static{
+    static {
 
         cardinalSet.add(NORTH);
 
@@ -29,7 +35,7 @@ public enum Cardinal {
         return cardinalSet;
     }
 
-    public static Cardinal[] getCardinalTab(){
+    public static Cardinal[] getCardinalTab() {
 
         return values();
     }
@@ -39,12 +45,12 @@ public enum Cardinal {
         return new LinkedHashSet<>(cardinalSet);
     }
 
-    public int getDeltaY(){
+    public int getDeltaY() {
 
         return delta[this.ordinal()][0];
     }
 
-    public int getDeltaX(){
+    public int getDeltaX() {
 
         return delta[this.ordinal()][1];
     }

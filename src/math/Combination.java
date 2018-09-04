@@ -1,9 +1,6 @@
 package math;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Combination {
 
@@ -124,6 +121,70 @@ public class Combination {
 
             loadCombinations(valuesLists, combinationsList, combination, iList + 1);
         }
+    }
+
+    private static int callCount;
+
+    public static long countDerangementsDynamic(int n) {
+
+        //callCount = 0;
+
+        Map<Integer, Long> saveRs = new Hashtable<>();
+
+        saveRs.put(2, 1L);
+
+        saveRs.put(1, 0L);
+
+        long rs = countDerangementsDynamic(n, saveRs);
+
+        //System.out.println("CALL COUNT "+callCount);
+
+        return rs;
+    }
+
+    private static long countDerangementsDynamic(int n, Map<Integer, Long> saveRs) {
+
+        Long savedRs = saveRs.get(n);
+
+        if (savedRs != null) {
+
+            return savedRs;
+        }
+
+        //callCount ++;
+
+        long rs = (n - 1) * (countDerangementsDynamic(n - 1, saveRs) + countDerangementsDynamic(n - 2, saveRs));
+
+        saveRs.put(n, rs);
+
+        return rs;
+    }
+
+    public static long countDerangements(int n) {
+
+        //callCount = 0;
+
+        long rs = countDerangementsRec(n);
+
+        //System.out.println("CALL COUNT "+callCount);
+
+        return rs;
+    }
+
+    public static long countDerangementsRec(int n) {
+
+        if (n == 2) {
+
+            return 1;
+
+        } else if (n == 1) {
+
+            return 0;
+        }
+
+       // callCount ++;
+
+        return (n - 1) * (countDerangementsRec(n - 1) + countDerangementsRec(n - 2));
     }
 
     public static List<List<List>> loadAssemblements(List<List> lists, int n) {
