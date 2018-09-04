@@ -4,11 +4,14 @@ public class Transition {
 
     private double probability;
 
+    private Action action;
+
     private State rsState;
 
-    public Transition(double probability, State rsState) {
+    public Transition(double probability, State rsState, Action action) {
         this.probability = probability;
         this.rsState = rsState;
+        this.action = action;
     }
 
     public double getProbability() {
@@ -27,6 +30,14 @@ public class Transition {
         this.rsState = rsState;
     }
 
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
     public void increaseProbability(double add) {
 
         this.probability += add;
@@ -36,6 +47,7 @@ public class Transition {
     public String toString() {
         return "Transition{" +
                 "probability=" + probability +
+                ", action=" + action +
                 ", rsState=" + rsState +
                 '}';
     }

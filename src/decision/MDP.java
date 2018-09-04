@@ -10,7 +10,7 @@ public interface MDP<StateType extends State, ActionType extends Action> {
 
     List<? extends State> getStates();
 
-    List<Action> getActions(StateType state);
+    List<? extends Action> getActions(StateType state);
 
     List<Transition> getTransitions(StateType fromState, ActionType action);
 

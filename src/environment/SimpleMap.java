@@ -64,9 +64,9 @@ public class SimpleMap implements Environment<Position> {
     }
 
     @Override
-    public List<Action> getActions(Position state) {
+    public List<Cardinal> getActions(Position state) {
 
-        List<Action> actions = new LinkedList<>();
+        List<Cardinal> actions = new LinkedList<>();
 
         for(Cardinal direction : Cardinal.values()){
 

@@ -57,6 +57,8 @@ public class SimpleMapTest {
         System.out.println(" (1,2) -> EAST " + mdPsimpleMap.getTransitions(new Position(1, 2), Cardinal.EAST));
 
         System.out.println(" (1,2) -> WEST " + mdPsimpleMap.getTransitions(new Position(1, 2), Cardinal.WEST));
+
+        System.out.println(" (2,3) -> EAST " + mdPsimpleMap.getTransitions(new Position(2, 3), Cardinal.EAST));
     }
 
 }

@@ -15,6 +15,8 @@ public enum Cardinal implements Action {
 
     private static final Cardinal[] clockOrderValues = new Cardinal[4];
 
+    private static final int[] clockOrderOrdinal = new int[4];
+
     static {
 
         cardinalSet.add(NORTH);
@@ -32,6 +34,14 @@ public enum Cardinal implements Action {
         clockOrderValues[2] = SOUTH;
 
         clockOrderValues[3] = WEST;
+
+        clockOrderOrdinal[NORTH.ordinal()] = 0;
+
+        clockOrderOrdinal[EAST.ordinal()] = 1;
+
+        clockOrderOrdinal[SOUTH.ordinal()] = 2;
+
+        clockOrderOrdinal[WEST.ordinal()] = 3;
     }
 
     public static Set<Cardinal> getCardinalSet() {
@@ -61,5 +71,10 @@ public enum Cardinal implements Action {
 
     public static Cardinal[] getClockOrderValues() {
         return clockOrderValues;
+    }
+
+    public int ordinalClock(){
+
+        return clockOrderOrdinal[this.ordinal()];
     }
 }
