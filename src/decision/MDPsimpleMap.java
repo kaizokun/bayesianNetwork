@@ -165,6 +165,37 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
     }
 
     @Override
+    public Politic getRdmPolitic() {
+
+        Map<State, Action> politic = new Hashtable<>();
+
+        //pour chaque position non finale
+        for (Position position : this.simpleMap.getNotFinalStates()) {
+
+            List<Cardinal> actions = this.stateActions.get(position);
+
+            int totalActions = actions.size();
+
+            int rdmIAction = new Random().nextInt(totalActions);
+
+            politic.put(position, actions.get(rdmIAction));
+        }
+
+        return new Politic() {
+            @Override
+            public Action getAction(State state) {
+
+                return politic.get(state);
+            }
+
+            @Override
+            public void setAction(Action action, State state) {
+                politic.put(state, action);
+            }
+        };
+    }
+
+    @Override
     public Double getDiscount() {
         return discount;
     }

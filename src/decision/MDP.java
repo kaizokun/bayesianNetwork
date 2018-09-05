@@ -23,4 +23,6 @@ public interface MDP<StateType extends State, ActionType extends Action> {
     Double getDiscount();
 
     Map<State,Double> getInitialUtilityVector();
+
+    Politic getRdmPolitic();
 }
