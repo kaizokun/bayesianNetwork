@@ -15,9 +15,18 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
 
     private Map<State, Map<Cardinal, List<Transition>>> stateTransitions = new Hashtable<>();
 
+    private Double discount;
+
     public MDPsimpleMap(SimpleMap simpleMap) {
 
+        this(simpleMap, null);
+    }
+
+    public MDPsimpleMap(SimpleMap simpleMap, Double discount) {
+
         this.simpleMap = simpleMap;
+
+        this.discount = discount;
 
         this.initActionsTransitions();
     }
@@ -134,5 +143,10 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
         }
 
         return -0.04;
+    }
+
+    @Override
+    public Double getDiscount() {
+        return discount;
     }
 }

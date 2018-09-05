@@ -48,7 +48,7 @@ public class SimpleMapTest {
 
         SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
 
-        MDPsimpleMap mdPsimpleMap = new MDPsimpleMap(simpleMap);
+        MDPsimpleMap mdPsimpleMap = new MDPsimpleMap(simpleMap, null);
 
         System.out.println(" (1,1) -> NORTH " + mdPsimpleMap.getTransitions(new Position(1, 1), Cardinal.NORTH));
 

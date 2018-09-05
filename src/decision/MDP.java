@@ -15,4 +15,6 @@ public interface MDP<StateType extends State, ActionType extends Action> {
     List<Transition> getTransitions(StateType fromState, ActionType action);
 
     Double getReward(StateType state);
+
+    Double getDiscount();
 }
