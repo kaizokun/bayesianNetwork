@@ -192,6 +192,11 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
             public void setAction(Action action, State state) {
                 politic.put(state, action);
             }
+
+            @Override
+            public String toString() {
+                return politic.toString();
+            }
         };
     }
 

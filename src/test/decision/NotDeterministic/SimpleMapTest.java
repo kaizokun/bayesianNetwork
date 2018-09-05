@@ -1,9 +1,6 @@
 package test.decision.NotDeterministic;
 
-import decision.MDP;
-import decision.MDPsimpleMap;
-import decision.Politic;
-import decision.ValueIteration;
+import decision.*;
 import environment.Cardinal;
 import environment.Position;
 import environment.SimpleMap;
@@ -112,6 +109,25 @@ public class SimpleMapTest {
 
             System.out.println("STATE "+state+" - Action "+politic.getAction(state));
         }
+
+    }
+
+    @Test
+    public void simpleMapPoliticIterationTest() {
+
+        double discount = 0.9999;
+
+        String map[] = new String[]{"    ",
+                " #  ",
+                "    "};
+
+        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+
+        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
+
+        Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap);
+
+        System.out.println(politic);
 
     }
 
