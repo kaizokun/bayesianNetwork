@@ -5,10 +5,14 @@ import environment.State;
 import environment.Transition;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface MDP<StateType extends State, ActionType extends Action> {
 
-    List<? extends State> getStates();
+    Set<? extends State> getNotFinalStates();
+
+    Set<? extends State> getFinalStates();
 
     List<? extends Action> getActions(StateType state);
 
@@ -17,4 +21,6 @@ public interface MDP<StateType extends State, ActionType extends Action> {
     Double getReward(StateType state);
 
     Double getDiscount();
+
+    Map<State,Double> getInitialUtilityVector();
 }

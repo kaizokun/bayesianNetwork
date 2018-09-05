@@ -2,10 +2,7 @@ package decision;
 
 import environment.*;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MDPsimpleMap implements MDP<Position, Cardinal> {
 
@@ -33,7 +30,7 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
 
     private void initActionsTransitions() {
 
-        for (Position state : this.simpleMap.getStates()) {
+        for (Position state : this.simpleMap.getNotFinalStates()) {
 
             List<Cardinal> actions = this.simpleMap.getActions(state);
 
@@ -112,9 +109,31 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
     }
 
     @Override
-    public List<? extends State> getStates() {
+    public Map<State, Double> getInitialUtilityVector() {
 
-        return simpleMap.getStates();
+        Map<State, Double> utility = new Hashtable();
+
+        for (State state : this.simpleMap.getNotFinalStates()) {
+
+            utility.put(state, 0.0);
+        }
+
+        utility.put(this.simpleMap.getGoodExit(), 1.0);
+
+        utility.put(this.simpleMap.getBadExit(), -1.0);
+
+        return utility;
+    }
+
+    @Override
+    public Set<? extends State> getNotFinalStates() {
+
+        return simpleMap.getNotFinalStates();
+    }
+
+    @Override
+    public Set<? extends State> getFinalStates() {
+        return this.simpleMap.getFinalStates();
     }
 
     @Override
@@ -149,4 +168,6 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
     public Double getDiscount() {
         return discount;
     }
+
+
 }

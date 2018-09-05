@@ -9,45 +9,40 @@ import java.util.Map;
 
 public class ValueIteration {
 
+    private static int totalIterations;
+
     public static Map<State, Double> getUtility(MDP<State, Action> mdp, double error) {
 
-        Map<State, Double> currentU = new Hashtable<>(), previousU = new Hashtable<>();
+        totalIterations = 0;
+
+        Map<State, Double> currentU, previousU = new Hashtable<>();
 
         double maxUpdate;
 
         double limit = error * (1.0 - mdp.getDiscount()) / mdp.getDiscount();
 
-        for (State state : mdp.getStates()) {
-
-            currentU.put(state, 0.0);
-
-            // previousU.put(state, 0.0);
-        }
-
-        int i = 0;
+        currentU = mdp.getInitialUtilityVector();
 
         do {
 
-            System.out.println("ITERATION "+i);
-
-            maxUpdate = Double.MIN_VALUE;
+            maxUpdate = Double.NEGATIVE_INFINITY;
             //copie les valeurs d'utilité courant dans le vecteur d'utilités precedentes
-            for (State state : mdp.getStates()) {
+            for (State state : mdp.getNotFinalStates()) {
 
                 previousU.put(state, currentU.get(state));
             }
 
-            System.out.println("PREVIOUS "+previousU);
+            //plus recopier les utilités des états finaux qui ne doivent pas êtres modifiés !
+            for (State state : mdp.getFinalStates()) {
 
-            System.out.println("CURRENT "+currentU);
+                previousU.put(state, currentU.get(state));
+            }
 
-            //pour chaque états
-            for (State state : mdp.getStates()) {
-
-                System.out.println("STATE : "+state);
+            //pour chaque états non finaux
+            for (State state : mdp.getNotFinalStates()) {
 
                 //utilité de l'action maximum
-                double uActionMax = -0.00001;
+                double uActionMax = Double.NEGATIVE_INFINITY;
                 //pour chaque action possible à partir de l'état courant
                 for (Action action : mdp.getActions(state)) {
                     //somme des utilités des états resultant de l'action non deterministe
@@ -56,45 +51,34 @@ public class ValueIteration {
 
                     for (Transition transition : mdp.getTransitions(state, action)) {
 
-                        System.out.println(transition.getProbability()+" * "+previousU.get(transition.getRsState()));
-
                         uRsStateSum += transition.getProbability() * previousU.get(transition.getRsState());
                     }
 
-                    System.out.println("SUM "+uRsStateSum);
                     //calcul du maximum
-
-                    System.out.println("MAX : "+uActionMax+" <> "+uRsStateSum+" "+(uRsStateSum > uActionMax));
-
-                    if(uRsStateSum > uActionMax){
+                    if (uRsStateSum > uActionMax) {
 
                         uActionMax = uRsStateSum;
                     }
-
-                    System.out.println("MAX =  "+uActionMax);
-
                 }
                 //mise a jour de l'utilité courante
                 currentU.put(state, mdp.getReward(state) + (mdp.getDiscount() * uActionMax));
 
-                System.out.println("CURRENT UPDATE "+currentU);
-
-                System.out.println(Math.abs(currentU.get(state) - previousU.get(state))+" <> "+limit);
-
                 double currentUpdate = Math.abs(currentU.get(state) - previousU.get(state));
 
-                if(currentUpdate > maxUpdate){
+                if (currentUpdate > maxUpdate) {
 
                     maxUpdate = currentUpdate;
                 }
-
             }
 
-            i ++;
+            totalIterations ++;
 
         } while (maxUpdate >= limit);
 
         return previousU;
     }
 
+    public static int getTotalIterations() {
+        return totalIterations;
+    }
 }

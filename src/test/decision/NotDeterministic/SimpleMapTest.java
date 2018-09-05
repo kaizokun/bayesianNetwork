@@ -23,7 +23,7 @@ public class SimpleMapTest {
 
         SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
 
-        System.out.println("STATES : " + simpleMap.getStates());
+        System.out.println("STATES : " + simpleMap.getNotFinalStates());
 
         System.out.println("WALLS : " + simpleMap.getWalls());
     }
@@ -67,7 +67,11 @@ public class SimpleMapTest {
     }
 
     @Test
-    public void simpleMapValueIterationTest(){
+    public void simpleMapValueIterationTest() {
+
+        double discount = 0.99;
+
+        double error = 0.0001;
 
         String map[] = new String[]{"    ",
                 " #  ",
@@ -75,11 +79,19 @@ public class SimpleMapTest {
 
         SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
 
-        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, 0.9);
+        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
 
-        Map<State,Double> utility = ValueIteration.getUtility(mdPsimpleMap,0.01);
+        Map<State, Double> utility = ValueIteration.getUtility(mdPsimpleMap, error);
 
-        System.out.println(utility);
+        System.out.println("DISCOUNT : "+discount+", ERROR : "+error);
+
+        for (Map.Entry<State, Double> entry : utility.entrySet()) {
+
+            System.out.println("POSITION : "+entry.getKey()+", Utilité : "+entry.getValue());
+        }
+
+        System.out.println("TOTAL ITERATION : "+ValueIteration.getTotalIterations());
+
     }
 
 }

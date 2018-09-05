@@ -13,12 +13,11 @@ public class SimpleMap implements Environment<Position> {
 
     private Position goodExit, badExit;
 
-    private List<Position> states = new LinkedList<>();
+    private Set<Position> notFinalStates = new HashSet<>(), finalStates = new HashSet<>();
 
     private Set<Position> walls = new HashSet<>();
 
     private int xLimit, yLimit;
-
 
     public SimpleMap(String[] map, Position goodExit, Position badExit) {
 
@@ -40,7 +39,7 @@ public class SimpleMap implements Environment<Position> {
 
                 if (row.charAt(iCol) != WALL) {
 
-                    states.add(new Position(yLimit - iRow, iCol + 1));
+                    notFinalStates.add(new Position(yLimit - iRow, iCol + 1));
 
                 }else{
 
@@ -48,6 +47,12 @@ public class SimpleMap implements Environment<Position> {
                 }
             }
         }
+
+        finalStates.add(this.goodExit);
+
+        finalStates.add(this.badExit);
+
+        notFinalStates.removeAll(finalStates);
     }
 
     /*
@@ -81,9 +86,15 @@ public class SimpleMap implements Environment<Position> {
         return actions;
     }
 
-    public List<Position> getStates() {
+    @Override
+    public Set<Position> getNotFinalStates() {
 
-        return states;
+        return notFinalStates;
+    }
+
+    public Set<? extends State> getFinalStates() {
+
+        return finalStates;
     }
 
     public Position getGoodExit() {
@@ -98,4 +109,6 @@ public class SimpleMap implements Environment<Position> {
     public Set<Position> getWalls() {
         return walls;
     }
+
+
 }
