@@ -8,6 +8,10 @@ public interface AbstractDoubleFactory {
 
     AbstractDouble getNew(BigDecimal value);
 
+    AbstractDouble getNew(Double value, int scale);
+
+    AbstractDouble getNew(BigDecimal value, int scale);
+
     static AbstractDouble[][] convert(Double[][] entries, AbstractDoubleFactory factory) {
 
         AbstractDouble[][] matrix = new AbstractDouble[entries.length][entries[0].length];

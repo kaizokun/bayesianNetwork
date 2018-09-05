@@ -1,10 +1,15 @@
 package test.decision.NotDeterministic;
 
+import decision.MDP;
 import decision.MDPsimpleMap;
+import decision.ValueIteration;
 import environment.Cardinal;
 import environment.Position;
 import environment.SimpleMap;
+import environment.State;
 import org.junit.Test;
+
+import java.util.Map;
 
 public class SimpleMapTest {
 
@@ -59,6 +64,22 @@ public class SimpleMapTest {
         System.out.println(" (1,2) -> WEST " + mdPsimpleMap.getTransitions(new Position(1, 2), Cardinal.WEST));
 
         System.out.println(" (2,3) -> EAST " + mdPsimpleMap.getTransitions(new Position(2, 3), Cardinal.EAST));
+    }
+
+    @Test
+    public void simpleMapValueIterationTest(){
+
+        String map[] = new String[]{"    ",
+                " #  ",
+                "    "};
+
+        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+
+        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, 0.9);
+
+        Map<State,Double> utility = ValueIteration.getUtility(mdPsimpleMap,0.01);
+
+        System.out.println(utility);
     }
 
 }

@@ -1,10 +1,11 @@
 package domain.data;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
-public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
+public class MyBigDecimal implements AbstractDouble<MyBigDecimal> {
 
-   private BigDecimal bigDecimal;
+    private BigDecimal bigDecimal;
 
     public MyBigDecimal(BigDecimal bigDecimal) {
 
@@ -14,6 +15,16 @@ public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
     public MyBigDecimal(java.lang.Double d) {
 
         this.bigDecimal = new BigDecimal(d);
+    }
+
+    public MyBigDecimal(BigDecimal bigDecimal, int scale) {
+
+        this.bigDecimal = new BigDecimal(bigDecimal.doubleValue()).setScale(scale, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public MyBigDecimal(java.lang.Double d, int scale) {
+
+        this.bigDecimal = new BigDecimal(d).setScale(scale, BigDecimal.ROUND_HALF_UP);
     }
 
     @Override
@@ -37,7 +48,7 @@ public class MyBigDecimal implements AbstractDouble<MyBigDecimal>{
     @Override
     public AbstractDouble divide(MyBigDecimal value) {
 
-        return new MyBigDecimal(this.bigDecimal.divide(value.bigDecimal,6, BigDecimal.ROUND_HALF_UP));
+        return new MyBigDecimal(this.bigDecimal.divide(value.bigDecimal, 6, BigDecimal.ROUND_HALF_UP));
     }
 
     @Override

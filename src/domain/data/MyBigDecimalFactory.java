@@ -13,4 +13,14 @@ public class MyBigDecimalFactory implements AbstractDoubleFactory {
     public AbstractDouble getNew(BigDecimal value) {
         return new MyBigDecimal(value);
     }
+
+    @Override
+    public AbstractDouble getNew(Double value, int scale) {
+        return new MyBigDecimal(value, scale);
+    }
+
+    @Override
+    public AbstractDouble getNew(BigDecimal value, int scale) {
+        return new MyBigDecimal(value, scale);
+    }
 }

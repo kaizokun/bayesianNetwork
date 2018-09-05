@@ -24,18 +24,30 @@ public class ValueIteration {
             // previousU.put(state, 0.0);
         }
 
+        int i = 0;
+
         do {
 
-            maxUpdate = 0.0;
+            System.out.println("ITERATION "+i);
+
+            maxUpdate = Double.MIN_VALUE;
             //copie les valeurs d'utilité courant dans le vecteur d'utilités precedentes
             for (State state : mdp.getStates()) {
 
                 previousU.put(state, currentU.get(state));
             }
+
+            System.out.println("PREVIOUS "+previousU);
+
+            System.out.println("CURRENT "+currentU);
+
             //pour chaque états
             for (State state : mdp.getStates()) {
+
+                System.out.println("STATE : "+state);
+
                 //utilité de l'action maximum
-                double uActionMax = 0.0;
+                double uActionMax = -0.00001;
                 //pour chaque action possible à partir de l'état courant
                 for (Action action : mdp.getActions(state)) {
                     //somme des utilités des états resultant de l'action non deterministe
@@ -44,19 +56,43 @@ public class ValueIteration {
 
                     for (Transition transition : mdp.getTransitions(state, action)) {
 
+                        System.out.println(transition.getProbability()+" * "+previousU.get(transition.getRsState()));
+
                         uRsStateSum += transition.getProbability() * previousU.get(transition.getRsState());
                     }
+
+                    System.out.println("SUM "+uRsStateSum);
                     //calcul du maximum
-                    uActionMax = Math.max(uRsStateSum, uActionMax);
+
+                    System.out.println("MAX : "+uActionMax+" <> "+uRsStateSum+" "+(uRsStateSum > uActionMax));
+
+                    if(uRsStateSum > uActionMax){
+
+                        uActionMax = uRsStateSum;
+                    }
+
+                    System.out.println("MAX =  "+uActionMax);
 
                 }
                 //mise a jour de l'utilité courante
                 currentU.put(state, mdp.getReward(state) + (mdp.getDiscount() * uActionMax));
 
-                maxUpdate = Math.max(maxUpdate, currentU.get(state) - previousU.get(state));
+                System.out.println("CURRENT UPDATE "+currentU);
+
+                System.out.println(Math.abs(currentU.get(state) - previousU.get(state))+" <> "+limit);
+
+                double currentUpdate = Math.abs(currentU.get(state) - previousU.get(state));
+
+                if(currentUpdate > maxUpdate){
+
+                    maxUpdate = currentUpdate;
+                }
+
             }
 
-        } while (maxUpdate < limit);
+            i ++;
+
+        } while (maxUpdate >= limit);
 
         return previousU;
     }

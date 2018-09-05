@@ -15,4 +15,14 @@ public class MyDoubleFactory implements AbstractDoubleFactory {
 
         return new MyDouble(value.doubleValue());
     }
+
+    @Override
+    public AbstractDouble getNew(Double value, int scale) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AbstractDouble getNew(BigDecimal value, int scale) {
+        throw new UnsupportedOperationException();
+    }
 }
