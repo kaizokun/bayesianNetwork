@@ -115,7 +115,7 @@ public class SimpleMapTest {
     @Test
     public void simpleMapPoliticIterationTest() {
 
-        double discount = 0.9999;
+        double discount = 0.999;
 
         String map[] = new String[]{"    ",
                 " #  ",
@@ -125,9 +125,13 @@ public class SimpleMapTest {
 
         MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
 
-        Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap);
+        for(int i = 0 ; i <  10 ; i ++) {
 
-        System.out.println(politic);
+            Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap);
+
+            System.out.println(politic);
+
+        }
 
     }
 

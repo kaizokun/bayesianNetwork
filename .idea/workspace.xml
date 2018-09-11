@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/decision/MDP.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/decision/MDP.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/decision/MDPsimpleMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/decision/MDPsimpleMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../probability/src/decision/Politic.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/decision/Politic.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/decision/PoliticIteration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/decision/PoliticIteration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/decision/ValueIteration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/decision/ValueIteration.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/test/decision/NotDeterministic/SimpleMapTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/decision/NotDeterministic/SimpleMapTest.java" afterDir="false" />
     </list>
     <list id="a68865f3-5ded-48e5-8992-9b37d321358e" name="Revert &quot;forward simplifié&quot;" comment="Revert &quot;forward simplifié&quot;&#10;&#10;This reverts commit c2747ef" />
@@ -50,8 +51,8 @@
       <file leaf-file-name="MDPsimpleMap.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/MDPsimpleMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="605">
-              <caret line="194" lean-forward="true" selection-start-line="194" selection-end-line="194" />
+            <state relative-caret-position="585">
+              <caret line="228" column="18" selection-start-line="228" selection-start-column="18" selection-end-line="228" selection-end-column="18" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#4178#4179#0" expanded="true" />
@@ -59,7 +60,15 @@
                 <element signature="e#5518#5519#0" expanded="true" />
                 <element signature="e#5576#5577#0" expanded="true" />
                 <element signature="e#5638#5639#0" expanded="true" />
-                <element signature="e#5681#5682#0" expanded="true" />
+                <element signature="e#5695#5696#0" expanded="true" />
+                <element signature="e#6091#6092#0" expanded="true" />
+                <element signature="e#6131#6132#0" expanded="true" />
+                <element signature="e#6185#6186#0" expanded="true" />
+                <element signature="e#6235#6236#0" expanded="true" />
+                <element signature="e#6273#6274#0" expanded="true" />
+                <element signature="e#6311#6312#0" expanded="true" />
+                <element signature="e#6361#6362#0" expanded="true" />
+                <element signature="e#6407#6408#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -68,7 +77,7 @@
       <file leaf-file-name="Cardinal.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/environment/Cardinal.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
+            <state relative-caret-position="18">
               <caret line="7" column="12" selection-start-line="7" selection-start-column="12" selection-end-line="7" selection-end-column="12" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -80,10 +89,12 @@
       <file leaf-file-name="ValueIteration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/ValueIteration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="69">
-              <caret line="13" column="87" selection-start-line="13" selection-start-column="46" selection-end-line="13" selection-end-column="87" />
+            <state relative-caret-position="929">
+              <caret line="62" selection-start-line="62" selection-end-line="62" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#2650#2651#0" expanded="true" />
+                <element signature="e#2688#2689#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -92,8 +103,8 @@
       <file leaf-file-name="PoliticIteration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/PoliticIteration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="23" column="32" selection-start-line="23" selection-start-column="32" selection-end-line="23" selection-end-column="32" />
+            <state relative-caret-position="317">
+              <caret line="56" lean-forward="true" selection-start-line="56" selection-end-line="56" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -104,7 +115,7 @@
       <file leaf-file-name="SimpleMap.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/environment/SimpleMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1260">
+            <state relative-caret-position="821">
               <caret line="73" column="47" selection-start-line="73" selection-start-column="37" selection-end-line="73" selection-end-column="47" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -116,8 +127,8 @@
       <file leaf-file-name="SimpleMapTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/test/decision/NotDeterministic/SimpleMapTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="443">
-              <caret line="117" column="33" lean-forward="true" selection-start-line="117" selection-start-column="33" selection-end-line="117" selection-end-column="33" />
+            <state relative-caret-position="299">
+              <caret line="107" column="57" lean-forward="true" selection-start-line="107" selection-start-column="57" selection-end-line="107" selection-end-column="57" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -129,7 +140,7 @@
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/Politic.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="36">
-              <caret line="2" column="17" lean-forward="true" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
+              <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -137,8 +148,8 @@
       <file leaf-file-name="MDP.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/MDP.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="24" column="22" selection-start-line="24" selection-start-column="22" selection-end-line="24" selection-end-column="22" />
+            <state relative-caret-position="432">
+              <caret line="24" selection-start-line="24" selection-end-line="24" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -226,11 +237,6 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/math/TestCombination.java" />
-        <option value="$PROJECT_DIR$/src/math/Combination.java" />
-        <option value="$PROJECT_DIR$/src/math/TestCombination.java" />
-        <option value="$PROJECT_DIR$/src/math/TestCombination.java" />
-        <option value="$PROJECT_DIR$/src/math/Combination.java" />
-        <option value="$PROJECT_DIR$/src/math/TestCombination.java" />
         <option value="$PROJECT_DIR$/src/environment/SimpleWorld.java" />
         <option value="$PROJECT_DIR$/src/environment/ActionFct.java" />
         <option value="$PROJECT_DIR$/src/environment/Position.java" />
@@ -272,10 +278,15 @@
         <option value="$PROJECT_DIR$/src/decision/Politic.java" />
         <option value="$PROJECT_DIR$/src/decision/MDPsimpleMap.java" />
         <option value="$PROJECT_DIR$/src/decision/PoliticIteration.java" />
-        <option value="$PROJECT_DIR$/../probability/src/decision/Politic.java" />
+        <option value="$PROJECT_DIR$/src/decision/Politic.java" />
+        <option value="$PROJECT_DIR$/src/decision/MDPsimpleMap.java" />
+        <option value="$PROJECT_DIR$/src/test/decision/NotDeterministic/SimpleMapTest.java" />
+        <option value="$PROJECT_DIR$/src/decision/PoliticIteration.java" />
+        <option value="$PROJECT_DIR$/../probability/src/decision/MDP.java" />
         <option value="$PROJECT_DIR$/../probability/src/decision/MDPsimpleMap.java" />
         <option value="$PROJECT_DIR$/../probability/src/test/decision/NotDeterministic/SimpleMapTest.java" />
         <option value="$PROJECT_DIR$/../probability/src/decision/PoliticIteration.java" />
+        <option value="$PROJECT_DIR$/../probability/src/decision/ValueIteration.java" />
       </list>
     </option>
   </component>
@@ -310,6 +321,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
@@ -346,8 +359,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -356,7 +367,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/..///////////////////////////////ShareUrDocMavenMultiModule" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/..////////////////////////////////ShareUrDocMavenMultiModule" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
@@ -586,8 +597,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.SimpleMapTest.simpleMapPoliticIterationTest" />
-        <item itemvalue="JUnit.SimpleMapTest.simpleMapRdmPoliticTest" />
         <item itemvalue="JUnit.SimpleMapTest.simpleMapValueIterationTest" />
+        <item itemvalue="JUnit.SimpleMapTest.simpleMapRdmPoliticTest" />
         <item itemvalue="JUnit.SimpleMapTest.negativeValueCompare" />
         <item itemvalue="JUnit.SimpleMapTest.simpleMapTransitionsTest" />
       </list>
@@ -765,14 +776,8 @@
       <workItem from="1536133147563" duration="9233000" />
       <workItem from="1536155990189" duration="4340000" />
       <workItem from="1536162418432" duration="2290000" />
-      <workItem from="1536180450478" duration="1354000" />
-    </task>
-    <task id="LOCAL-00085" summary="maze robot">
-      <created>1530632962439</created>
-      <option name="number" value="00085" />
-      <option name="presentableId" value="LOCAL-00085" />
-      <option name="project" value="LOCAL" />
-      <updated>1530632962440</updated>
+      <workItem from="1536180450478" duration="1549000" />
+      <workItem from="1536654737945" duration="5579000" />
     </task>
     <task id="LOCAL-00086" summary="maze robot création des tcps transitions et observations">
       <created>1530649171005</created>
@@ -1110,43 +1115,50 @@
       <option name="project" value="LOCAL" />
       <updated>1536164682875</updated>
     </task>
-    <option name="localTasksCounter" value="134" />
+    <task id="LOCAL-00134" summary="suite et fin implémentation itération de la politique, à vérifier">
+      <created>1536181985465</created>
+      <option name="number" value="00134" />
+      <option name="presentableId" value="LOCAL-00134" />
+      <option name="project" value="LOCAL" />
+      <updated>1536181985466</updated>
+    </task>
+    <option name="localTasksCounter" value="135" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="SimpleMapTest_simpleMapRdmPoliticTest - 2018.09.05 at 18h 07m 30s.xml">
-      <configuration name="SimpleMapTest.simpleMapRdmPoliticTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapRdmPoliticTest - 2018.09.05 at 18h 07m 32s.xml">
-      <configuration name="SimpleMapTest.simpleMapRdmPoliticTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapRdmPoliticTest - 2018.09.05 at 18h 07m 33s.xml">
-      <configuration name="SimpleMapTest.simpleMapRdmPoliticTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapRdmPoliticTest - 2018.09.05 at 18h 07m 35s.xml">
-      <configuration name="SimpleMapTest.simpleMapRdmPoliticTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.05 at 23h 03m 54s.xml">
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 01m 43s.xml">
       <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.05 at 23h 06m 28s.xml">
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 01m 45s.xml">
       <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.05 at 23h 06m 35s.xml">
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 01m 47s.xml">
       <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.05 at 23h 06m 37s.xml">
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 01m 49s.xml">
       <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.05 at 23h 06m 50s.xml">
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 01m 51s.xml">
       <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.05 at 23h 08m 12s.xml">
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 01m 54s.xml">
+      <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 01m 58s.xml">
+      <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 02m 02s.xml">
+      <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 05m 29s.xml">
+      <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SimpleMapTest_simpleMapPoliticIterationTest - 2018.09.11 at 12h 05m 32s.xml">
       <configuration name="SimpleMapTest.simpleMapPoliticIterationTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="847897000" />
+    <option name="totallyTimeSpent" value="853671000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1170,19 +1182,19 @@
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5042644" side_tool="true" weight="0.32928178" />
       <window_info anchor="right" id="Maven Projects" order="6" weight="0.32995737" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.15801105" />
+      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.46961325" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.1913646" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.19349681" />
       <window_info anchor="right" id="Database" order="9" side_tool="true" weight="0.32995737" />
       <window_info id="Structure" order="1" sideWeight="0.20773481" side_tool="true" weight="0.18976545" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.32995737" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -1230,7 +1242,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="correction erreur création du DBN dans le cas ou l'on recrée le dbn à partir d'un temps initial different de zero" />
     <MESSAGE value="modification test maze avec deux implementation differentes de DBN &#10;pour effectuer les test avec les mêmes deplacements pour comparaisons" />
     <MESSAGE value="forward simplifié" />
     <MESSAGE value="buggy" />
@@ -1255,7 +1266,8 @@
     <MESSAGE value="implementation iteration valeur debugage" />
     <MESSAGE value="implementation iteration valeur fin debugage, il ne fallait pas modifier les valeurs d'utilités des états finaux" />
     <MESSAGE value="début implémentation itération de la politique" />
-    <option name="LAST_COMMIT_MESSAGE" value="début implémentation itération de la politique" />
+    <MESSAGE value="suite et fin implémentation itération de la politique, à vérifier" />
+    <option name="LAST_COMMIT_MESSAGE" value="suite et fin implémentation itération de la politique, à vérifier" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1551,26 +1563,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/environment/SimpleMap.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1260">
-          <caret line="73" column="47" selection-start-line="73" selection-start-column="37" selection-end-line="73" selection-end-column="47" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/decision/MDP.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="24" column="22" selection-start-line="24" selection-start-column="22" selection-end-line="24" selection-end-column="22" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/../Program Files/Java/jdk1.8.0_141/src.zip!/java/lang/Object.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="293">
@@ -1585,14 +1577,14 @@
     <entry file="file://$PROJECT_DIR$/../probability/src/decision/Politic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="36">
-          <caret line="2" column="17" lean-forward="true" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
+          <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/decision/ValueIteration.java">
+    <entry file="file://$PROJECT_DIR$/../probability/src/environment/SimpleMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="13" column="87" selection-start-line="13" selection-start-column="46" selection-end-line="13" selection-end-column="87" />
+        <state relative-caret-position="821">
+          <caret line="73" column="47" selection-start-line="73" selection-start-column="37" selection-end-line="73" selection-end-column="47" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1601,8 +1593,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/environment/Cardinal.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
+        <state relative-caret-position="18">
           <caret line="7" column="12" selection-start-line="7" selection-start-column="12" selection-end-line="7" selection-end-column="12" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/decision/MDP.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="24" selection-start-line="24" selection-end-line="24" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1611,8 +1613,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/decision/MDPsimpleMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="605">
-          <caret line="194" lean-forward="true" selection-start-line="194" selection-end-line="194" />
+        <state relative-caret-position="585">
+          <caret line="228" column="18" selection-start-line="228" selection-start-column="18" selection-end-line="228" selection-end-column="18" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#4178#4179#0" expanded="true" />
@@ -1620,25 +1622,45 @@
             <element signature="e#5518#5519#0" expanded="true" />
             <element signature="e#5576#5577#0" expanded="true" />
             <element signature="e#5638#5639#0" expanded="true" />
-            <element signature="e#5681#5682#0" expanded="true" />
+            <element signature="e#5695#5696#0" expanded="true" />
+            <element signature="e#6091#6092#0" expanded="true" />
+            <element signature="e#6131#6132#0" expanded="true" />
+            <element signature="e#6185#6186#0" expanded="true" />
+            <element signature="e#6235#6236#0" expanded="true" />
+            <element signature="e#6273#6274#0" expanded="true" />
+            <element signature="e#6311#6312#0" expanded="true" />
+            <element signature="e#6361#6362#0" expanded="true" />
+            <element signature="e#6407#6408#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/test/decision/NotDeterministic/SimpleMapTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="117" column="33" lean-forward="true" selection-start-line="117" selection-start-column="33" selection-end-line="117" selection-end-column="33" />
+        <state relative-caret-position="299">
+          <caret line="107" column="57" lean-forward="true" selection-start-line="107" selection-start-column="57" selection-end-line="107" selection-end-column="57" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/decision/ValueIteration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="929">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2650#2651#0" expanded="true" />
+            <element signature="e#2688#2689#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/decision/PoliticIteration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="23" column="32" selection-start-line="23" selection-start-column="32" selection-end-line="23" selection-end-column="32" />
+        <state relative-caret-position="317">
+          <caret line="56" lean-forward="true" selection-start-line="56" selection-end-line="56" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

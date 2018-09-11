@@ -1,6 +1,5 @@
 package decision;
 
-import environment.Action;
 import environment.State;
 import environment.Transition;
 
@@ -9,94 +8,77 @@ import java.util.Map;
 
 public class PoliticIteration {
 
-    public static Politic getBestPoliticy(MDP<State, Action> mdp) {
+    public static Politic getBestPoliticy(MDP mdp) {
 
+        return getBestPoliticy(mdp, false, 0);
+    }
+
+    public static Politic getBestPoliticy(MDP mdp, boolean hasLimit, int limit) {
+
+        //Vecteur d'utilité de base avec les utilité à zero pour les états non finaux,
+        //pour l'état but -1 pour l'état echec
         Map<State, Double> utility = mdp.getInitialUtilityVector();
-
+        //politique aléatoire associant une action aléatoire à un état
         Politic politic = mdp.getRdmPolitic();
 
-        boolean unchanged;
+        boolean changed;
+
+        int iteration = 0;
 
         do {
+            //évalue l'utilité à partir de l'utilité courante et d'une politique fixe
+            //simplification de l'équation de Bellman ou les actions sont figées
+            //plutôt que de choisir une action maximum
+            evaluatePolitic(utility, politic, mdp);
 
-            utility = evaluatePolitic(utility, politic, mdp);
-
-            System.out.println("POLITIC "+politic);
-
-            System.out.println("UTILITY "+utility);
-
-            unchanged = true;
-
+            changed = false;
+            //pour chaque état final
             for (State state : mdp.getNotFinalStates()) {
 
-                Action maxAction = null;
+                //calcule l'utilité de l'action maximum
 
-                Double uActionMax = Double.NEGATIVE_INFINITY;
-
-                for (Action action : mdp.getActions(state)) {
-
-                    Double sumAction = 0.0;
-
-                    for (Transition transition : mdp.getTransitions(state, action)) {
-
-                        sumAction += transition.getProbability() * utility.get(transition.getRsState());
-                    }
-
-                    if (sumAction > uActionMax) {
-
-                        maxAction = action;
-
-                        uActionMax = sumAction;
-                    }
-                }
+                MDPsimpleMap.MaxAction max = mdp.getMaxAction(state, utility);
 
                 Double uActionPolitic = 0.0;
-
+                //calcul l'utilité espere de l'action de la politique courante
                 for (Transition transition : mdp.getTransitions(state, politic.getAction(state))) {
 
                     uActionPolitic += transition.getProbability() * utility.get(transition.getRsState());
                 }
+                //compare l'action de la politique courante à celle offrant le maximum
+                //et modifie la politique si elle peut être amélioré
+                if (max.getUtility() > uActionPolitic) {
 
-                if (uActionMax > uActionPolitic) {
+                    politic.setAction(max.getAction(), state);
 
-                    politic.setAction(maxAction, state);
-
-                    unchanged = false;
+                    changed = true;
                 }
             }
 
-        } while (!unchanged);
+            iteration++;
+
+            //tant que lapolitique change && que : il n'y a pas de limite ou
+            //qu'il y a une limite et elle n'a pas été franchi
+        } while (changed && (!hasLimit || iteration < limit));
 
         return politic;
     }
 
-    private static Map<State, Double> evaluatePolitic(Map<State, Double> utility, Politic politic, MDP<State, Action> mdp) {
+    private static void evaluatePolitic(Map<State, Double> utility, Politic politic, MDP mdp) {
 
-        Map<State, Double> nextUtility = new Hashtable<>();
-        //recopie les utilités des états finaux dans le nouveau vecteur
-        //si tenté qu'il faille en utiliser un nouveau, le pseudo code du livre
-        //laisse penser qu'il faut utiliser le même vecteur mais dans ce cas on calculerait les utilités
-        //en fonction d'une politique à partir d'utilité en cour de modification ...
-        for (State finalState : mdp.getFinalStates()) {
+        //on calcule les nouvelles utilités à partir du vecteur en cour de modification
+        //sinon les actions ne sont pas cohérents entres elles
 
-            nextUtility.put(finalState, utility.get(finalState));
-        }
-
+        //pour chaque état non final
         for (State state : mdp.getNotFinalStates()) {
 
-            Double sum = 0.0;
-
-            for (Transition transition : mdp.getTransitions(state, politic.getAction(state))) {
-
-                sum += transition.getProbability() * utility.get(transition.getRsState());
-            }
-
-            Double uValue = mdp.getReward(state) + mdp.getDiscount() * sum;
-
-            nextUtility.put(state, uValue);
+            Double sum = mdp.getActionUtility(state, politic.getAction(state), utility);
+            //recompense de l'état plus l'escompte multipliée par la sommme
+            Double uValue = mdp.getReward(state) + (mdp.getDiscount() * sum);
+            //enregistre la nouvelle utilité
+            //nextUtility.put(state, uValue);
+            utility.put(state, uValue);
         }
-
-        return nextUtility;
     }
 
 }

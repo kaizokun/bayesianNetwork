@@ -8,17 +8,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface MDP<StateType extends State, ActionType extends Action> {
+public interface MDP {
 
     Set<? extends State> getNotFinalStates();
 
     Set<? extends State> getFinalStates();
 
-    List<? extends Action> getActions(StateType state);
+    List<? extends Action> getActions(State state);
 
-    List<Transition> getTransitions(StateType fromState, ActionType action);
+    List<Transition> getTransitions(State fromState, Action action);
 
-    Double getReward(StateType state);
+    Double getReward(State state);
+
+    MDPsimpleMap.MaxAction getMaxAction(State state, Map<State, Double> utility);
+
+    Double getActionUtility(State state, Action action, Map<State, Double> utility);
 
     Double getDiscount();
 

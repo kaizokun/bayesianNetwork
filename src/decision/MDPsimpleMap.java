@@ -4,7 +4,7 @@ import environment.*;
 
 import java.util.*;
 
-public class MDPsimpleMap implements MDP<Position, Cardinal> {
+public class MDPsimpleMap implements MDP {
 
     private SimpleMap simpleMap;
 
@@ -137,19 +137,19 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
     }
 
     @Override
-    public List<? extends Action> getActions(Position state) {
+    public List<? extends Action> getActions(State state) {
 
         return stateActions.get(state);
     }
 
     @Override
-    public List<Transition> getTransitions(Position fromState, Cardinal action) {
+    public List<Transition> getTransitions(State fromState, Action action) {
 
         return stateTransitions.get(fromState).get(action);
     }
 
     @Override
-    public Double getReward(Position state) {
+    public Double getReward(State state) {
 
         if (state.equals(simpleMap.getGoodExit())) {
 
@@ -201,9 +201,74 @@ public class MDPsimpleMap implements MDP<Position, Cardinal> {
     }
 
     @Override
+    public MaxAction getMaxAction(State state, Map<State, Double> utility) {
+
+        //calcule l'utilité de l'action maximum
+        Action maxAction = null;
+
+        Double uActionMax = Double.NEGATIVE_INFINITY;
+        //pour chaque action
+        for (Action action : getActions(state)) {
+
+            //calcule la somme des utilités des états resulnat de l'action pondérée par leur probabilité
+            Double sumAction = getActionUtility(state, action, utility);
+
+            //sauvegarde la valeur et l'action max
+            if (sumAction > uActionMax) {
+
+                maxAction = action;
+
+                uActionMax = sumAction;
+            }
+        }
+
+        return new MaxAction(maxAction, uActionMax);
+    }
+
+    @Override
+    public Double getActionUtility(State state, Action action, Map<State, Double> utility) {
+
+        Double sumAction = 0.0;
+        //calcule la somme des utilités des états resulnat de l'action pondérée par leur probabilité
+        for (Transition transition : getTransitions(state, action)) {
+
+            sumAction += transition.getProbability() * utility.get(transition.getRsState());
+        }
+
+        return sumAction;
+    }
+
+    @Override
     public Double getDiscount() {
         return discount;
     }
 
+    class MaxAction {
+
+        private Action action;
+
+        private double utility;
+
+        public MaxAction(Action maxAction, double utility) {
+            this.action = maxAction;
+            this.utility = utility;
+        }
+
+        public Action getAction() {
+            return action;
+        }
+
+        public void setAction(Action action) {
+            this.action = action;
+        }
+
+        public double getUtility() {
+            return utility;
+        }
+
+        public void setUtility(double utility) {
+            this.utility = utility;
+        }
+    }
 
 }
