@@ -1,13 +1,12 @@
 package environment;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import decision.Politic;
+
+import java.util.*;
 
 public class SimpleMap implements Environment<Position> {
 
-    private static final char WALL = '#';
+    private static final char WALL = '#', GOAL = '+', HOLE = '-';
 
     private String[] map;
 
@@ -19,7 +18,7 @@ public class SimpleMap implements Environment<Position> {
 
     private int xLimit, yLimit;
 
-    public SimpleMap(String[] map, Position goodExit, Position badExit) {
+    public SimpleMap(String[] map) {
 
         this.map = map;
 
@@ -37,13 +36,25 @@ public class SimpleMap implements Environment<Position> {
 
             for (int iCol = 0; iCol < row.length(); iCol++) {
 
-                if (row.charAt(iCol) != WALL) {
+                char symbol = row.charAt(iCol);
+
+                int y = yLimit - iRow, x = iCol + 1;
+
+                if (symbol == WALL) {
+
+                    walls.add(new Position(y, x));
+
+                } else if (symbol == GOAL) {
+
+                    goodExit = new Position(y, x);
+
+                } else if (symbol == HOLE) {
+
+                    badExit = new Position(y, x);
+
+                } else {
 
                     notFinalStates.add(new Position(yLimit - iRow, iCol + 1));
-
-                }else{
-
-                    walls.add(new Position(yLimit - iRow, iCol + 1));
                 }
             }
         }
@@ -56,11 +67,11 @@ public class SimpleMap implements Environment<Position> {
     }
 
     /*
-    * 3
-    * 2
-    * 1
-    *   1 2 3 4
-    * */
+     * 3
+     * 2
+     * 1
+     *   1 2 3 4
+     * */
 
     public boolean isPositionReachable(Position position) {
 
@@ -73,11 +84,11 @@ public class SimpleMap implements Environment<Position> {
 
         List<Cardinal> actions = new LinkedList<>();
 
-        for(Cardinal direction : Cardinal.values()){
+        for (Cardinal direction : Cardinal.values()) {
 
             Position adjPos = state.move(direction);
 
-            if(isPositionReachable(adjPos)){
+            if (isPositionReachable(adjPos)) {
 
                 actions.add(direction);
             }
@@ -105,10 +116,47 @@ public class SimpleMap implements Environment<Position> {
         return badExit;
     }
 
-
     public Set<Position> getWalls() {
         return walls;
     }
 
+    public String getPoliticMap(Politic politic) {
+
+        StringBuilder builder = new StringBuilder();
+
+        char[] movSymbols = new char[]{'^', 'v', '>', '<'};
+
+        Map<State, String> statesSymbols = new Hashtable<>();
+
+        for (State state : notFinalStates) {
+
+            Action action = politic.getAction(state);
+
+            Cardinal cardinal = (Cardinal) action;
+
+            statesSymbols.put(state, "[" + movSymbols[cardinal.ordinal()] + "]");
+        }
+
+        statesSymbols.put(badExit, "[-]");
+
+        statesSymbols.put(goodExit, "[+]");
+
+        for (State wall : walls) {
+
+            statesSymbols.put(wall, "[#]");
+        }
+
+        for (int y = yLimit; y > 0; y--) {
+
+            for (int x = 1; x <= xLimit; x++) {
+
+                builder.append(statesSymbols.get(new Position(y, x)));
+            }
+
+            builder.append('\n');
+        }
+
+        return builder.toString();
+    }
 
 }

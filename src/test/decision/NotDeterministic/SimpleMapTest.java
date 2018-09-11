@@ -15,11 +15,11 @@ public class SimpleMapTest {
     @Test
     public void simpleMapConstructTest() {
 
-        String map[] = new String[]{"    ",
-                " #  ",
+        String map[] = new String[]{"   +",
+                " # -",
                 "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+        SimpleMap simpleMap = new SimpleMap(map);
 
         System.out.println("STATES : " + simpleMap.getNotFinalStates());
 
@@ -29,11 +29,11 @@ public class SimpleMapTest {
     @Test
     public void simpleMapActionsTest() {
 
-        String map[] = new String[]{"    ",
-                " #  ",
+        String map[] = new String[]{"   +",
+                " # -",
                 "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+        SimpleMap simpleMap = new SimpleMap(map);
 
         System.out.println(" (1,1) " + simpleMap.getActions(new Position(1, 1)));
 
@@ -45,11 +45,11 @@ public class SimpleMapTest {
     @Test
     public void simpleMapTransitionsTest() {
 
-        String map[] = new String[]{"    ",
-                " #  ",
+        String map[] = new String[]{"   +",
+                " # -",
                 "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+        SimpleMap simpleMap = new SimpleMap(map);
 
         MDPsimpleMap mdPsimpleMap = new MDPsimpleMap(simpleMap, null);
 
@@ -71,11 +71,11 @@ public class SimpleMapTest {
 
         double error = 0.0001;
 
-        String map[] = new String[]{"    ",
-                " #  ",
+        String map[] = new String[]{"   +",
+                " # -",
                 "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+        SimpleMap simpleMap = new SimpleMap(map);
 
         MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
 
@@ -95,11 +95,11 @@ public class SimpleMapTest {
     @Test
     public void simpleMapRdmPoliticTest(){
 
-        String map[] = new String[]{"    ",
-                " #  ",
+        String map[] = new String[]{"   +",
+                " # -",
                 "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+        SimpleMap simpleMap = new SimpleMap(map);
 
         MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, 0.0);
 
@@ -109,7 +109,6 @@ public class SimpleMapTest {
 
             System.out.println("STATE "+state+" - Action "+politic.getAction(state));
         }
-
     }
 
     @Test
@@ -117,11 +116,11 @@ public class SimpleMapTest {
 
         double discount = 0.999;
 
-        String map[] = new String[]{"    ",
-                " #  ",
+        String map[] = new String[]{"   +",
+                " # -",
                 "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map, new Position(3, 4), new Position(2, 4));
+        SimpleMap simpleMap = new SimpleMap(map);
 
         MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
 
@@ -131,8 +130,62 @@ public class SimpleMapTest {
 
             System.out.println(politic);
 
+            System.out.println(simpleMap.getPoliticMap(politic));
         }
 
+        System.out.println("ITERATIONS : "+PoliticIteration.iterations);
+
+    }
+
+    @Test
+    public void simpleMapPoliticLimitedIterationTest() {
+
+        double discount = 0.999;
+
+        String map[] = new String[]{"   +",
+                                    " # -",
+                                    "    "};
+
+        SimpleMap simpleMap = new SimpleMap(map);
+
+        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
+
+        for(int i = 0 ; i <  10 ; i ++) {
+
+            Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap, 10);
+
+            System.out.println(politic);
+
+            System.out.println(simpleMap.getPoliticMap(politic));
+        }
+
+        System.out.println("ITERATIONS : "+PoliticIteration.iterations);
+    }
+
+
+    @Test
+    public void simpleMapPoliticLimitedIterationTest2() {
+
+        double discount = 0.999;
+
+        String map[] = new String[]{"    ##   +",
+                                    " # #   # -",
+                                    "     ### #",
+                                    " ###   #  ",
+                                    "     #   #"};
+
+        SimpleMap simpleMap = new SimpleMap(map);
+
+        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
+
+        for(int i = 0 ; i <  10 ; i ++) {
+
+            Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap, 50);
+
+            System.out.println("ITERATIONS : "+PoliticIteration.iterations);
+
+            System.out.println(simpleMap.getPoliticMap(politic));
+        }
     }
 
 }

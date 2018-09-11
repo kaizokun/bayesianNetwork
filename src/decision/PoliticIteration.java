@@ -3,14 +3,20 @@ package decision;
 import environment.State;
 import environment.Transition;
 
-import java.util.Hashtable;
 import java.util.Map;
 
 public class PoliticIteration {
 
+    public static int iterations;
+
     public static Politic getBestPoliticy(MDP mdp) {
 
         return getBestPoliticy(mdp, false, 0);
+    }
+
+    public static Politic getBestPoliticy(MDP mdp, int limit) {
+
+        return getBestPoliticy(mdp, true, limit);
     }
 
     public static Politic getBestPoliticy(MDP mdp, boolean hasLimit, int limit) {
@@ -23,6 +29,8 @@ public class PoliticIteration {
 
         boolean changed;
 
+        iterations = 0;
+
         int iteration = 0;
 
         do {
@@ -30,6 +38,8 @@ public class PoliticIteration {
             //simplification de l'équation de Bellman ou les actions sont figées
             //plutôt que de choisir une action maximum
             evaluatePolitic(utility, politic, mdp);
+
+           // evaluatePolitic(utility, politic, mdp);
 
             changed = false;
             //pour chaque état final
@@ -61,6 +71,8 @@ public class PoliticIteration {
             //qu'il y a une limite et elle n'a pas été franchi
         } while (changed && (!hasLimit || iteration < limit));
 
+        iterations = iteration;
+
         return politic;
     }
 
@@ -76,7 +88,6 @@ public class PoliticIteration {
             //recompense de l'état plus l'escompte multipliée par la sommme
             Double uValue = mdp.getReward(state) + (mdp.getDiscount() * sum);
             //enregistre la nouvelle utilité
-            //nextUtility.put(state, uValue);
             utility.put(state, uValue);
         }
     }

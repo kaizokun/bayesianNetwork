@@ -6,6 +6,8 @@ import java.util.*;
 
 public class MDPsimpleMap implements MDP {
 
+    private static final double GOAL_UTILITY = 1, FAIL_UTILITY = -1, STATES_REWARD = -0.04;
+
     private SimpleMap simpleMap;
 
     private Map<State, List<Cardinal>> stateActions = new Hashtable<>();
@@ -118,9 +120,9 @@ public class MDPsimpleMap implements MDP {
             utility.put(state, 0.0);
         }
 
-        utility.put(this.simpleMap.getGoodExit(), 1.0);
+        utility.put(this.simpleMap.getGoodExit(), GOAL_UTILITY);
 
-        utility.put(this.simpleMap.getBadExit(), -1.0);
+        utility.put(this.simpleMap.getBadExit(), FAIL_UTILITY);
 
         return utility;
     }
@@ -153,15 +155,15 @@ public class MDPsimpleMap implements MDP {
 
         if (state.equals(simpleMap.getGoodExit())) {
 
-            return 1.0;
+            return GOAL_UTILITY;
         }
 
         if (state.equals(simpleMap.getBadExit())) {
 
-            return -1.0;
+            return FAIL_UTILITY;
         }
 
-        return -0.04;
+        return STATES_REWARD;
     }
 
     @Override
