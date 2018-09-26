@@ -87,3 +87,4 @@ Pour chaque action
 Fin Pour
 
 
+!! pour le forward lors que l'on traites les variables états parent il faut ignorer les actions

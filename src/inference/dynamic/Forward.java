@@ -2,6 +2,7 @@ package inference.dynamic;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
+import environment.Action;
 import math.Distribution;
 import math.Matrix;
 import network.MegaVariable;
@@ -11,6 +12,7 @@ import network.dynamic.DynamicBayesianNetwork;
 import java.util.*;
 
 import static inference.dynamic.Util.*;
+import static java.util.Arrays.asList;
 
 public class Forward {
 
@@ -33,7 +35,7 @@ public class Forward {
 
     public AbstractDouble prediction(Variable request, int time) {
 
-        return this.prediction(new LinkedList(Arrays.asList(new Variable[]{request})), time);
+        return this.prediction(new LinkedList(asList(new Variable[]{request})), time);
     }
 
     public AbstractDouble prediction(List<Variable> requests, int time) {
@@ -87,7 +89,7 @@ public class Forward {
 
     public ForwardMax forward(Variable request, boolean saveDistrib) {
 
-        return forward(Arrays.asList(new Variable[]{request}), saveDistrib);
+        return forward(asList(new Variable[]{request}), saveDistrib);
     }
 
     public ForwardMax forward(List<Variable> requests) {
@@ -102,6 +104,16 @@ public class Forward {
 
     protected ForwardMax forward(List<Variable> requests, String key, int depth, boolean saveforward) {
 
+        return forward(requests, null, key, depth, saveforward, new Hashtable<>());
+    }
+
+    /*
+        protected ForwardMax forward(List<Variable> requests, List<Variable> requestParents, String key, int depth, boolean saveforward) {
+
+            return forward(requests, key, depth, saveforward, new Hashtable<>());
+        }
+    */
+    protected ForwardMax forward(List<Variable> requests, Set<Variable> actions, String key, int depth, boolean saveforward, Map<String, Distribution> forwardMatrices) {
 
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete
@@ -114,7 +126,7 @@ public class Forward {
         //  Map<String, Map<Domain.DomainValue, AbstractDouble>> lastForwardDistrib = new Hashtable<>();
         //  Map<String, Map<Domain.DomainValue, AbstractDouble>> lastMaxDistrib = new Hashtable<>();
 
-        Map<String, Distribution> forwardMatrices = new Hashtable<>();
+        //Map<String, Distribution> forwardMatrices = new Hashtable<>();
 
         Map<String, Distribution> maxMatrices = new Hashtable<>();
 
@@ -177,8 +189,8 @@ public class Forward {
         Variable megaRequest0 = null;
 
         if (!requestTime0.isEmpty()) {
-            //si pas de variabel en temps 0 on ne fait rien
-            //ici ce la créerait une megavariable vide qui poserait problème
+            //si pas de variable en temps 0 on ne fait rien
+            //ici cela créerait une megavariable vide qui poserait problème
             megaRequest0 = network.encapsulate(new ArrayList<>(requestTime0));
         }
 
@@ -247,8 +259,8 @@ public class Forward {
                 //reste à tester sur des exemples plus complexes !
                 for (Variable stateObserved : observation.getDependencies()) {
                     //total de la somme sur les valeurs cachées initialisé à zero
-                    ForwardSumRs rs = forwardHiddenVarSum(stateObserved,
-                            forwardMatrices, maxMatrices, depth + 1, saveforward);
+                    ForwardSumRs rs = this.forwardHiddenVarSum(actions, stateObserved, forwardMatrices, maxMatrices,
+                            depth + 1, saveforward);
                     //qu'on multiplie avec les resultat pour les observations precedentes
                     requestValueProbability = requestValueProbability.multiply(rs.sum);
                     //idem pour le maximum sauf que l'on multiplie le model de capteur par
@@ -333,7 +345,7 @@ public class Forward {
         return new ForwardMax(forwardMatrix, maxMatrix);
     }
 
-    protected ForwardSumRs forwardHiddenVarSum(Variable obsParentState,
+    protected ForwardSumRs forwardHiddenVarSum(Set<Variable> actions, Variable obsParentState,
                                                Map<String, Distribution> forwardMatrices, Map<String, Distribution> maxMatrices,
                                                int depth, boolean saveforward) {
 
@@ -345,7 +357,12 @@ public class Forward {
         //si elle fait déja partie de la requete dans la procedure appelante, elle doit rester en l'état
         //(cas spécifique si l'ordre de markov des dependances d'état à état est superieur à 1 ...)
 
-        Variable megaHiddenVar = network.encapsulate(obsParentState.getDependencies());
+        List<Variable> statesDependencies = new LinkedList<>(obsParentState.getDependencies());
+        //si des actions sont parent d'un état ils sont ignorés, car déja initialisé.
+        statesDependencies.removeAll(actions);
+
+        Variable megaHiddenVar = network.encapsulate(statesDependencies);
+        //Variable megaHiddenVar = network.encapsulate(obsParentState.getDependencies());
 
         Domain.DomainValue originalValue = megaHiddenVar.saveDomainValue();
 
@@ -381,7 +398,8 @@ public class Forward {
         //Ca ne pose pas de problème pour une requete avec des variables
         //situées dans la même coupe temporelles ou tout leur parent sont des variables cachées
 
-        String key = getDistribSavedKey(obsParentState.getDependencies());
+        String key = getDistribSavedKey(statesDependencies);
+        //String key = getDistribSavedKey(obsParentState.getDependencies());
 
         List<Domain.DomainValue> domainValues = megaHiddenVar.getDomainValuesCheckInit();
 
@@ -400,7 +418,9 @@ public class Forward {
 
             if (forward == null) {
 
-                ForwardMax forwardMax = this.forward(obsParentState.getDependencies(), key, depth + 1, saveforward);
+                ForwardMax forwardMax = this.forward(statesDependencies, actions, key, depth + 1, saveforward, forwardMatrices);
+
+                //ForwardMax forwardMax = this.forward(obsParentState.getDependencies(), actions, key, depth + 1, saveforward, forwardMatrices);
 
                 max = forwardMax.max;
 
@@ -430,7 +450,8 @@ public class Forward {
                 //les valeurs pouvant encore changer dans la procedure
                 List<Variable> copyDependencies = new LinkedList<>();
 
-                for (Variable dependencie : obsParentState.getDependencies()) {
+               // for (Variable dependencie : obsParentState.getDependencies()) {
+                for (Variable dependencie : statesDependencies) {
 
                     copyDependencies.add(dependencie.copyLabelTimeValueDom());
                 }
@@ -455,7 +476,7 @@ public class Forward {
 
     public List<Variable> computeMostLikelyPath(Variable... request) {
 
-        return computeMostLikelyPath(Arrays.asList(request));
+        return computeMostLikelyPath(asList(request));
     }
 
     public List<Variable> computeMostLikelyPath(List<Variable> requests) {
@@ -625,7 +646,7 @@ public class Forward {
         }
 
         //reset de la valeur de requete
-        if(originalValue != null) {
+        if (originalValue != null) {
 
             megaState.setDomainValue(originalValue);
         }
@@ -645,7 +666,7 @@ public class Forward {
 
     public List mostLikelyPath(Variable megaRequest, Matrix lastMax, int time) {
 
-       // System.out.println("MOST LIKELY PATH COMPUTE");
+        // System.out.println("MOST LIKELY PATH COMPUTE");
 
         Distribution lastMaxDistrib = (Distribution) lastMax;
         //calculer la valeur max pour la derniere requete
@@ -665,7 +686,7 @@ public class Forward {
             }
         }
 
-       // System.out.println("MAX POUR " + megaRequest.getVarTimeId() + " " + maxValue);
+        // System.out.println("MAX POUR " + megaRequest.getVarTimeId() + " " + maxValue);
 
         //ajoute la valeur dans la liste
         LinkedList<Map.Entry<Integer, Domain.DomainValue>> mostLikelyValues = new LinkedList();
@@ -676,11 +697,11 @@ public class Forward {
         //récupère la suite du chemin tant qu'il y en a
         //et tant que le temps est supérieur à 1, le premier forward à lieu au temps 1
         //qui est le premier temps ou l'on fait une estimation.
-        while (maxPath != null && time > 1 ) {
+        while (maxPath != null && time > 1) {
             //temps precedent
-            time --;
+            time--;
 
-           // System.out.println("TIME " + (time));
+            // System.out.println("TIME " + (time));
 
             //la valeur maximum précédente
             maxValue = maxPath.get(maxValue);
@@ -691,7 +712,7 @@ public class Forward {
             //et les chemins precedents
             maxPath = this.mostLikelyPathFull.get(megaRequest.getVarTimeId());
 
-           // System.out.println("MAX POUR " + megaRequest + " " + maxValue);
+            // System.out.println("MAX POUR " + megaRequest + " " + maxValue);
         }
 
         return mostLikelyValues;
