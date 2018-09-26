@@ -68,7 +68,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return root;
     }
 
-    public Map<Variable, Variable> getTimeVariables(int time) {
+    protected Map<Variable, Variable> getTimeVariables(int time) {
 
         Map<Variable, Variable> variables = this.timeVariables.get(time);
 
@@ -102,7 +102,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         addModel(variable, model, captorsModels);
     }
 
-    private void addModel(Variable variable, Model model, Map<Variable, List<Model>> models) {
+    protected void addModel(Variable variable, Model model, Map<Variable, List<Model>> models) {
 
         List<Model> varModels = models.get(variable);
 
@@ -117,22 +117,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         varModels.add(model);
     }
 
-    /**
-     * ! ou avec cette méthode l'ordre croissant n'est pas obligatoire
-     * mais obliger d'indiquer le maximum de modele pour une variable
-     */
-
-    private void addDeeperDependencies(Variable lastDep, LinkedList<Variable> timeDependencies, int limit) {
-
-        if (limit > 0) {
-
-            Variable depperDep = lastDep.getParent(lastDep.getTime() - 1);
-            //ajoute les dependances plus lointaine dans le temps en premier
-            timeDependencies.addFirst(depperDep);
-
-            addDeeperDependencies(depperDep, timeDependencies, limit - 1);
-        }
-    }
 
     public List<Variable> getLastStateVariables() {
 
@@ -216,10 +200,14 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return encapsulate(megaState, this.getLastObservationVariables(time));
     }
 
+    /*
+    * etend une fois le reseau avec une ou plusieurs assignations pour des variables
+    * */
     public void extend(Variable... variables) {
 
         this.extend();
 
+        //assigne la valeur de domaine recu en parametre à une variable d'observation
         for (Variable variable : variables) {
 
             this.getVariable(this.time, variable).setDomainValue(variable.getDomainValue());
@@ -255,10 +243,15 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return new LinkedList();
     }
 
+    public void initVar(int time, Variable variable){
+
+        this.getVariable(time, variable).setDomainValue(variable.getDomainValue());
+    }
+
     public void extend() {
 
         this.time++;
-
+        //peut aussi servir pour les actions
         this.extend(this.transitionModels, this.time - 1, false);
 
         this.extend(this.captorsModels, this.time, true);
@@ -297,9 +290,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             //en correspondance avec les entrées TCP
             for (Dependency dependencie : model.getDependencies()) {
 
+                //recupere la variable parent au temps precedent
                 Variable lastDep = this.getTimeVariables(timeParent).get(dependencie.getDependency());
-
-                // System.out.println("       DEP : "+dependencie.getDependency()+" "+dependencie.getMarkovOrder());
 
                 //dependances à la même variable mais à des temps plus eloignés
                 LinkedList<Variable> timeDependencies = new LinkedList<>();
@@ -319,7 +311,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             if (captors) {
                 //pour les variables d'observation enregistre dans les variables parents leur indice
-                //dans la liste des enfants
+                //dans la liste ou ils sont enregistrés
                 newVar.saveObservation();
             }
 
@@ -342,6 +334,25 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //en tout cas au début jusqu'à atteindre un temps qu permette d'avoir les
         //dependances completes
     }
+
+
+    /**
+     * ! ou avec cette méthode l'ordre croissant n'est pas obligatoire
+     * mais obliger d'indiquer le maximum de modele pour une variable
+     */
+
+    private void addDeeperDependencies(Variable lastDep, LinkedList<Variable> timeDependencies, int limit) {
+
+        if (limit > 0) {
+
+            Variable depperDep = lastDep.getParent(lastDep.getTime() - 1);
+            //ajoute les dependances plus lointaine dans le temps en premier
+            timeDependencies.addFirst(depperDep);
+
+            addDeeperDependencies(depperDep, timeDependencies, limit - 1);
+        }
+    }
+
 
     /*---------------------------GETTER SETTER -----------------------*/
 

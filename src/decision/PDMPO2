@@ -1,0 +1,54 @@
+Considerer les actions commes des états des le temps 0
+les actions n'ont pas de parents et les états "normaux" dependent des variables actions situées au temps précédent.
+On peut donc etendre le reseau comme pour un RBD ou on assigne non plus uniquement des observations mais egalement des actions
+
+La procedure forward qui prend en parametre une liste de requete peut déja gerer le cas ou l'action à une assignation
+de valeur.
+
+-------------------------------------------------------
+Procedure récursive générale pour l'agent en ligne pour les PDMPO
+
+Params : Temps, RDB, Recompense, PDMPO, Forward
+-------------------------------------------------------
+
+
+On démarre soit avec un état de croyance ou la probabilité de chaque état est uniformement répartie, ou on peut mettre
+à jour une premiere fois cette état avec le premier percept que renvoie l'environnement.
+
+A partir de la distribution d'état (état de croyance sur une variable) on peut savoir pour une variable (ou megavariable)
+quelle sont probabilités pour chaque valeur du domaine celles ayant une probabilité supérieur à zéro sont à prendre en compte
+à partir de ces valeurs d'état probables ont peut determiner les actions (licites) à partir de toute les états
+soit une union sur les actions. Cela limite les actions à celles qui sont réalisables sinon il faudrait appliquer
+tout les actions possibles
+
+Pour chaque action
+
+    On applique l'action aux valeurs d'états probables pour determiner les percepts possibles
+
+    On peut echantilloner un percept ou faire un moyenne de toutes les valeurs d'utilités
+
+    Pour chaque percepts possibles
+
+        On possede un couple action percept qui permet de mettre à jour l'état de croyance
+
+        On étend le reseau si c'est necessaire pour cela il suffit de verifie si le temps de l'appel récursif courant
+        est supérieur au temps du RDB avec la method  extend() de network/dynamic/DynamicBayesianNetwork
+
+        On assigne l'action pour un temps t-1 et le percept pour un temps t
+
+        //si le reseau est déja etendu ce n'est pas un problème on se contente de modifier les valeurs
+        //et de recalculer un forward different
+
+        On applique le forward à la distribution courante
+
+        On calcule la récompense pondérée de l'état de croyance courant que l'on addition à la précédente
+
+        On rapelle la fonction avec le nouvel état de croyance pour le temps suivant avec la recompense
+
+    Fin Pour
+
+    calculer l'action maximum
+
+Fin Pour
+
+

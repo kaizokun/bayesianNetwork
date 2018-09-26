@@ -1,0 +1,72 @@
+PDMPO pour l'exempel simple map.
+L'agent ne sait pas ou il se trouve exactement il possede une distribution de probabilité sur l'ensemble des états
+de l'environement ( chaque case accessible du damier ) par exemple pour le damier avec 12 cases donc 1 innaccessible
+une sortie et un trou si l'agent n'a aucune idée d'ou il se trouve ou qu'il n'est ni dans la sortie ni dans le trou
+il a une chance sur 9 d'être dans n'importe quelle des autres cases acessibles.
+b = {1/9,1/9,1/9,1/9,1/9,1/9,1/9,1/9,1/9,0,0}
+
+Dans un état de croyance l'environnement est parfaitement observable.
+On peut donc utiliser une politique optimale calculée à l'avance.
+
+-----------------------------------------------------------------------------------------------
+Procédure pour un agent en ligne çàd sans aucun plan calculé à l'avance mais au fur et à mesure.
+-----------------------------------------------------------------------------------------------
+
+1. Choisir la meilleur action : ici pour chaque état de l'état de croyance on à une action lié à cet état
+chaque état ayant une probabilité. Pour chaque état et chaque action associée, pour chaque action identique
+on additionne une unité pondérée par la probabilité de l'état. Pour finir on choisi l'action ayant la valeur maximum.
+Exemple b = {S1=0.2, S2=0.1, S3=0.1, S4=0.6} et pour politique : {S1=N, S2=N, S3=N, S4=S}
+on obtient N : 0.2 + 0.1 + 0.1 = 0.4, S : 0.6. L'action optimale est donc S.
+
+2. Après avoir executé l'action l'environement fourni un percept.
+
+3. Reste à mettre à jour l'état de croyance par filtrage avec l'état de croyance courant,
+l'observation et l'action effectué.
+
+-----------------------------------------------------------------------------------------------
+Procédure pour un agent avec planification
+-----------------------------------------------------------------------------------------------
+
+Plus compliqué car on n'a pas l'observation, il faut travailler avec une prevision d'observation.
+
+1. idem qu'un agent en ligne
+
+2. ici on applique l'action sur tout les états de l'état de croyance actuel. Et on recupere tout les percepts possibles
+que peut fournir cet état de croyance non trié.
+
+3. Pour chaque percept obtenu à l'étape 2 on peut appliquer le forward pour obtenir des états de croyance correspondant
+à chaque percepts.
+
+Et ainsi de suite pour obtenir le plan contingent. Au moment de l'execution chaque percept reçu après chaque action
+permet d'obtenir l'action optimale suivante à exécuter.
+
+
+---------------------------
+p 700 eq 17.2.a
+---------------------------
+Solution 1
+
+Loop 1 :
+Pour chaque observation possible ou plutot pour chaque observation possible dans les états atteignables
+à partir de l'état de croyance courant et de l'action. On peut facilement recuperer tout les états atteignable à partir
+de l'état de croyance courant et de l'action soit toutes les transitions, et recuperer uen liste de percepts possible.
+Les percepts restant seront à zero.
+
+Loop 2 :
+Pour chaque état atteignable calculer la probabilité de l'observation à partir de cet état (pas efficace car les états
+atteignable pourrait ne pa produire cette observation)
+
+
+Solution 2
+
+récuperer d'abord les états atteignable à partir de l'état de croyance courant et de l'action.
+Boucler sur chaque états atteignable puis boucler sur chaque observation possible à partir de cet état
+dans le cas ou le système de capteur est bruité.
+En pour finir boucler sur les états precedent l'état atteignable par l'action.
+Les sommes se feront par observation.
+
+
+
+
+
+

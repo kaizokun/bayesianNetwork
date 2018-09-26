@@ -81,19 +81,19 @@ public class SimpleMapTest {
 
         Map<State, Double> utility = ValueIteration.getUtility(mdPsimpleMap, error);
 
-        System.out.println("DISCOUNT : "+discount+", ERROR : "+error);
+        System.out.println("DISCOUNT : " + discount + ", ERROR : " + error);
 
         for (Map.Entry<State, Double> entry : utility.entrySet()) {
 
-            System.out.println("POSITION : "+entry.getKey()+", Utilité : "+entry.getValue());
+            System.out.println("POSITION : " + entry.getKey() + ", Utilité : " + entry.getValue());
         }
 
-        System.out.println("TOTAL ITERATION : "+ValueIteration.getTotalIterations());
+        System.out.println("TOTAL ITERATION : " + ValueIteration.getTotalIterations());
 
     }
 
     @Test
-    public void simpleMapRdmPoliticTest(){
+    public void simpleMapRdmPoliticTest() {
 
         String map[] = new String[]{"   +",
                 " # -",
@@ -105,10 +105,28 @@ public class SimpleMapTest {
 
         Politic politic = mdPsimpleMap.getRdmPolitic();
 
-        for(State state : simpleMap.getNotFinalStates()){
+        for (State state : simpleMap.getNotFinalStates()) {
 
-            System.out.println("STATE "+state+" - Action "+politic.getAction(state));
+            System.out.println("STATE " + state + " - Action " + politic.getAction(state));
         }
+    }
+
+    public void simpleMapPoliticIteration(String map[], double discount, int maxTest, int iterationLimit) {
+
+        SimpleMap simpleMap = new SimpleMap(map);
+
+        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
+
+        for (int i = 0; i < maxTest; i++) {
+
+            Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap, iterationLimit);
+
+            //System.out.println(politic);
+
+            System.out.println(simpleMap.getPoliticMap(politic));
+        }
+
+        System.out.println("ITERATIONS : " + PoliticIteration.iterations);
     }
 
     @Test
@@ -120,21 +138,7 @@ public class SimpleMapTest {
                 " # -",
                 "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map);
-
-        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
-
-        for(int i = 0 ; i <  10 ; i ++) {
-
-            Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap);
-
-            System.out.println(politic);
-
-            System.out.println(simpleMap.getPoliticMap(politic));
-        }
-
-        System.out.println("ITERATIONS : "+PoliticIteration.iterations);
-
+        simpleMapPoliticIteration(map, discount, 10, Integer.MAX_VALUE);
     }
 
     @Test
@@ -143,23 +147,10 @@ public class SimpleMapTest {
         double discount = 0.999;
 
         String map[] = new String[]{"   +",
-                                    " # -",
-                                    "    "};
+                " # -",
+                "    "};
 
-        SimpleMap simpleMap = new SimpleMap(map);
-
-        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
-
-        for(int i = 0 ; i <  10 ; i ++) {
-
-            Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap, 10);
-
-            System.out.println(politic);
-
-            System.out.println(simpleMap.getPoliticMap(politic));
-        }
-
-        System.out.println("ITERATIONS : "+PoliticIteration.iterations);
+        simpleMapPoliticIteration(map, discount, 10, Integer.MAX_VALUE);
     }
 
 
@@ -169,23 +160,12 @@ public class SimpleMapTest {
         double discount = 0.999;
 
         String map[] = new String[]{"    ##   +",
-                                    " # #   # -",
-                                    "     ### #",
-                                    " ###   #  ",
-                                    "     #   #"};
+                " # #   # -",
+                "     ### #",
+                " ###   #  ",
+                "     #   #"};
 
-        SimpleMap simpleMap = new SimpleMap(map);
-
-        MDP mdPsimpleMap = new MDPsimpleMap(simpleMap, discount);
-
-        for(int i = 0 ; i <  10 ; i ++) {
-
-            Politic politic = PoliticIteration.getBestPoliticy(mdPsimpleMap, 50);
-
-            System.out.println("ITERATIONS : "+PoliticIteration.iterations);
-
-            System.out.println(simpleMap.getPoliticMap(politic));
-        }
+        simpleMapPoliticIteration(map, discount, 10, Integer.MAX_VALUE);
     }
 
 }

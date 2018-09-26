@@ -167,7 +167,7 @@ public class Forward {
             }
         }
 
-        //encapsule les varibles dans une megavariable si plusieurs afin de
+        //encapsule les variables dans une megavariable si plusieurs afin de
         //gerer de manière polymorphe les variables uniques des listes de variables
         //( gestion des attributions de valeurs etc.)
         Variable megaRequest = network.encapsulate(requests);
@@ -356,7 +356,7 @@ public class Forward {
         AbstractDouble hiddenVarsSum = this.network.getDoubleFactory().getNew(0.0);
         //une variable de la requete peut avoir plusieurs parents il faut donc récuperer les combinaisons de valeurs
         //pour sommer sur chacune d'entre elle.
-        //CAS TRES SPECIFIQUES POUR LES CHAINES DE MARKOV DE NIVEAU SUPERIEUR A 1
+        //CAS SPECIFIQUES POUR LES CHAINES DE MARKOV DE NIVEAU SUPERIEUR A 1
         //les variables deja initialisé gardent la même valeur et on ne somme pas sur les autres
         //exemple si la requete dans la procedure forward appelante contient deux variable dont l'une
         //est parent de l'autre par exemple pour une chaine de markov d'ordre 2
@@ -569,9 +569,9 @@ public class Forward {
             return new ForwardMax(forward, forwardMax);
         }
 
-        //megavariable états precedents
-        Variable previousMegaObservation = network.getMegaObs(megaObservation, time - 1);
         //megavariable observations precedentes
+        Variable previousMegaObservation = network.getMegaObs(megaObservation, time - 1);
+        //megavariable états precedents
         Variable previousMegaState = network.getMegaState(megaState, time - 1);
 
         for (Domain.DomainValue requestValue : megaState.getDomainValues()) {

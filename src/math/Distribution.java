@@ -133,7 +133,7 @@ public class Distribution extends Transpose {
         this.matrix[0][row] = value;
     }
 
-    private AbstractDouble[][] newMatrix(){
+    private AbstractDouble[][] newMatrix() {
         //nouvelle sous matrice le nombre de colonnes correspond au nombre de ligne de la distribution
         //étant une transposée verticale d'une matrice horyzontale
         return new AbstractDouble[1][this.getRowCount()];
