@@ -17,17 +17,49 @@ On démarre soit avec un état de croyance ou la probabilité de chaque état es
 
 A partir de la distribution d'état (état de croyance sur une variable) on peut savoir pour une variable (ou megavariable)
 quelle sont probabilités pour chaque valeur du domaine celles ayant une probabilité supérieur à zéro sont à prendre en compte
-à partir de ces valeurs d'état probables ont peut determiner les actions (licites) à partir de toute les états
+à partir de ces valeurs d'état probables ont peut determiner les actions (licites) à partir de toute les états,
 soit une union sur les actions. Cela limite les actions à celles qui sont réalisables sinon il faudrait appliquer
 tout les actions possibles
 
 Pour chaque action
 
-    On applique l'action aux valeurs d'états probables pour determiner les percepts possibles
+    //etabir une table clé valeur de clé percepts et valeur probabilité de percept
+
+    Pour chaque état de la distribution courante dont la probabilité est supérieur à zero
+
+        initialiser une variable contenant la probabilité de l'état : PROBA
+
+        Pour chaque état futur resultant de l'action sur l' état
+        //récupérable dans le PDM, ou alors tester tout les états resultats
+
+            multiplier la probabilité de l'état futur par PROBA est stocker le resultat dans PROBA
+            //récuperable dans la table de transition s[i]|s[i-1] & a
+
+            Pour chaque percepts fournit par l'état futur
+            //récuperable dans le PDM, ou tester tout les percepts
+                multiplier la probabilité du percept par PROBA est stocker le resultat dans PROBA
+                //recuperable dnas la table de transition des observations
+                Si percept n'est pas encore enregistré
+
+                    enregistrer PROBA avec le percept
+
+                Sinon
+
+                    ajouter PROBA à la valeur deja enregistré pour le percept
+
+                Fin Si
+
+            Fin Pour
+
+        Fin Pour
+
+    Fin Pour
 
     On peut echantilloner un percept ou faire un moyenne de toutes les valeurs d'utilités
 
-    Pour chaque percepts possibles
+    Moyenne utilité par percept : PERCEPT_AVG
+
+    Pour chaque percept possible
 
         On possede un couple action percept qui permet de mettre à jour l'état de croyance
 
@@ -39,11 +71,14 @@ Pour chaque action
         //si le reseau est déja etendu ce n'est pas un problème on se contente de modifier les valeurs
         //et de recalculer un forward different
 
-        On applique le forward à la distribution courante
+        On applique le forward à la distribution courante et on recupere une nouvelle distribution d'état
 
         On calcule la récompense pondérée de l'état de croyance courant que l'on addition à la précédente
 
         On rapelle la fonction avec le nouvel état de croyance pour le temps suivant avec la recompense
+        qui renvoie l'utilité d'un état de croyance, la somme des recompenses
+
+        multiplié l'utilié par la probabilité du percept et ajouter se resultat à PERCEPT_AVG
 
     Fin Pour
 
