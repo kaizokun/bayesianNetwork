@@ -338,7 +338,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //la solution est d'avoir des modeles de transition differents
         //avec des ordres différents et des TCP differentes pour les differents temps
         //en tout cas au début jusqu'à atteindre un temps qu permette d'avoir les
-        //dependances completes
+        //dependences completes
     }
 
 

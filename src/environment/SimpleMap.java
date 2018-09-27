@@ -84,6 +84,23 @@ public class SimpleMap implements Environment<Position> {
         return position.getX() > 0 && position.getY() > 0 && position.getX() <= xLimit && position.getY() <= yLimit && !walls.contains(position);
     }
 
+    public Percept getPercept(Position position) {
+
+        //creer un set de direction correspondant aux obstacles de la position
+
+        PerceptWall perceptWall = new PerceptWall();
+
+        for(Cardinal cardinal : Cardinal.values()){
+
+            if(isPositionReachable(position.move(cardinal))){
+
+                perceptWall.addWallDirection(cardinal);
+            }
+        }
+
+        return perceptWall;
+    }
+
     @Override
     public List<Cardinal> getActions(Position state) {
 

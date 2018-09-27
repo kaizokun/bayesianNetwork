@@ -4,17 +4,16 @@ import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.MyDoubleFactory;
-import environment.Cardinal;
-import environment.Position;
-import environment.SimpleMap;
+import environment.*;
 import inference.dynamic.Forward;
 import network.ProbabilityCompute;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
+import network.dynamic.Model;
 
 import java.util.Arrays;
-import java.util.Set;
 
+import static java.util.Arrays.asList;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.MOVE;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.POSITION;
 
@@ -48,6 +47,8 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
         IDomain actionsDomain = DomainFactory.getCardinalDomain();
 
+        Variable positionVar = new Variable(POSITION, positionsDomain), actionVar = new Variable(MOVE, actionsDomain);
+
         //----------------------------------------
         //----------------TEMPS 0 ----------------
         //----------------------------------------
@@ -73,26 +74,72 @@ public class MazeRobotRDDFactory implements NetworkFactory {
         //ordre des parents : états precedent et action
         Double[][] stateTCP = initTCPstate(positionsDomain, actionsDomain);
 
-        for (int d1 = 0; d1 < stateTCP.length; d1++) {
+        ProbabilityCompute tcpState = network.getTCP(asList(positionVar, action), positionsDomain, stateTCP);
 
-            for (int d2 = 0; d2 < stateTCP[d1].length; d2++) {
+        //modele extension état
+        Model positionExtensionModel = new Model(tcpState);
+        //depend des variables états et actions
+        positionExtensionModel.addDependencies(positionVar, actionVar);
 
-                System.out.print("[" + stateTCP[d1][d2] + "]");
+        network.addTransitionModel(positionVar, positionExtensionModel);
 
-            }
+        //modele d'extension vide pour l'action qui na pas de dependences et pas de TCP
+        network.addTransitionModel(actionVar, new Model());
 
-            System.out.println();
-        }
+        //TCP du modele de capteur
+        Double[][] perceptTCP = initTCPpercepts(positionsDomain, perceptsDomain);
 
-        ProbabilityCompute tcpState1 = network.getTCP(Arrays.asList(positionRoot, action), positionsDomain, state0TCP);
+        ProbabilityCompute tcpPercept = network.getTCP(asList(positionRoot), perceptsDomain, perceptTCP);
 
         System.out.println(tcpState0);
 
-        System.out.println(tcpState1);
+        System.out.println(tcpState);
+
+        System.out.println(tcpPercept);
 
         return null;
     }
 
+    private Double[][] initTCPpercepts(IDomain positionsDomain, IDomain perceptsDomain) {
+
+        Double[][] TCP = new Double[positionsDomain.getSize()][perceptsDomain.getSize()];
+
+        //le percepts correspondant à la position est correct avec une probabilité de 60% (capteur bruité)
+        //les autres percepts se partagent les 40% de probabilités restantes
+        double probOtherPercepts = 0.4 / perceptsDomain.getValues().size() - 1;
+
+        int d1 = 0;
+        //pour chaque position
+        for(Domain.DomainValue position1 : positionsDomain.getValues()){
+
+            Position position = (Position) position1.getValue();
+            //récupère le percept fourni par la position
+            Percept perceptPos = simpleMap.getPercept(position);
+
+            int d2 = 0;
+
+            //pour chaque percept
+            for(Domain.DomainValue percept1 : perceptsDomain.getValues()){
+
+                PerceptWall perceptWall = (PerceptWall) percept1.getValue();
+                //si le percept correspond à celui forni par l'environnement pour cette position
+                if(perceptPos.match(perceptWall)){
+
+                    TCP[d1][d2] = 0.6;
+
+                }else{
+
+                    TCP[d1][d2] = probOtherPercepts;
+                }
+
+                d2 ++;
+            }
+
+            d1++;
+        }
+
+        return TCP;
+    }
 
     private Double[][] initTCPstate0() {
         //pour toutes les positions du labyrinthe sauf les murs
@@ -125,8 +172,6 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
             for (Domain.DomainValue<Position> action : actionDomain.getValues()) {
 
-               //System.out.println("POSITION : " + position + " ACTION : " + action);
-
                 Position currentPos = (Position) position.getValue();
                 //tout droit 80%
                 Cardinal actionStraight = (Cardinal) action.getValue();
@@ -136,7 +181,7 @@ public class MazeRobotRDDFactory implements NetworkFactory {
                 Cardinal actionLeft = actionStraight.getRelativeLeft();
 
                 Position positionStraight = currentPos.move(actionStraight);
-
+                //si position inatteignable il but sur le mur
                 if (!simpleMap.isPositionReachable(positionStraight)) {
 
                     positionStraight = currentPos;
@@ -155,8 +200,6 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
                     positionLeft = currentPos;
                 }
-
-                //System.out.println(positionStraight + " " + positionLeft + " " + positionRight);
 
                 int d2 = 0;
 
@@ -183,12 +226,7 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
                         TCP[d1][d2] = 0.0;
                     }
-/*
-                    System.out.println(positionRs+" "+TCP[d1][d2]);
-                    System.out.println(positionRs.equals(positionStraight));
-                    System.out.println(positionRs.equals(positionLeft));
-                    System.out.println(positionRs.equals(positionRight));
-                    */
+
                     d2++;
                 }
 

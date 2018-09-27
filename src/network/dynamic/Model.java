@@ -14,6 +14,11 @@ public class Model {
 
     private ProbabilityCompute probabilityCompute;
 
+    public Model() {
+
+        this(null);
+    }
+
     public Model(ProbabilityCompute probabilityCompute) {
 
         this.probabilityCompute = probabilityCompute;

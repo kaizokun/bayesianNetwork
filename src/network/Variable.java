@@ -4,6 +4,7 @@ import domain.Domain;
 import domain.IDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
+import network.factory.VarNameEnum;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -82,6 +83,11 @@ public class Variable implements Iterable<Variable> {
         this.label = label;
 
         this.setValue(value);
+    }
+
+    public Variable(VarNameEnum varNameEnum) {
+
+        this.label = varNameEnum.toString();
     }
 
     public Variable(String label) {

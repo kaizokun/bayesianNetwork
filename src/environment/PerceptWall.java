@@ -45,7 +45,7 @@ public class PerceptWall implements Percept<PerceptWall> {
 
             return false;
         }
-
+/*
         for (Cardinal wall : percept.walls) {
 
             if (!this.walls.contains(wall)) {
@@ -53,8 +53,8 @@ public class PerceptWall implements Percept<PerceptWall> {
                 return false;
             }
         }
-
-        return true;
+*/
+        return this.walls.containsAll(percept.walls) && percept.walls.containsAll(this.walls);
     }
 
     @Override

@@ -23,6 +23,10 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
     protected IDomain varDom;
 
+    protected List<Variable> dependencies;
+
+    private static final char IDX_SEPARATOR = '.';
+
     public ProbabilityComputeFromTCP(IDomain varDom, Double[][] entries, AbstractDoubleFactory doubleFactory) {
 
         this(new ArrayList<>(), varDom, entries, doubleFactory);
@@ -40,6 +44,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         this.doubleFactory = doubleFactory;
 
         this.TCP = new Hashtable<>();
+
+        this.dependencies = dependencies;
 
         this.initCTP(dependencies, varDom, entries, Arrays.asList(new Domain.DomainValue[dependencies.size()]), 0, doubleFactory);
 
@@ -242,7 +248,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
             //plus court...
             builder.append(dep.getDomainValue().getIndex());
 
-            builder.append('.');
+            builder.append(IDX_SEPARATOR);
         }
 
         return builder.toString();
@@ -256,9 +262,10 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         for (Domain.DomainValue value : values) {
             //ajoute l'id de domaine de la valeur de la variable
             //plus court...
+            //on pourrait aussi se baser sur l'index dans les méthodes hascode et equals de la classe DomainValue
             builder.append(value.getIndex());
 
-            builder.append('.');
+            builder.append(IDX_SEPARATOR);
         }
 
         return builder.toString();
@@ -357,7 +364,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         List<String> sortedKeys = new ArrayList<>(this.TCP.keySet());
 
         Collections.sort(sortedKeys);
-        //clés d'une des ligne de la TCP identiqu epour chaque ligne...
+        //clés d'une des ligne de la TCP identique pour chaque ligne...
         List<Domain.DomainValue> sortedKeyD2 = new ArrayList<>(this.TCP.values().iterator().next().keySet());
 
         Comparator<Domain.DomainValue> cmp = new Comparator<Domain.DomainValue>() {
@@ -372,8 +379,27 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         for (String key : sortedKeys) {
 
             if (!key.isEmpty()) {
+                //indexes des valeurs de domaine parent
+                //echapper le . car charactere speciales dans les regex
+                String idxs[] = key.split("\\"+IDX_SEPARATOR);
 
-                builder.append(key);
+                int d = 0;
+                //pour chaque dependence
+                for (Variable dep : dependencies) {
+
+                    //recupere l'index sous forme d'entier
+                    int idx = Integer.parseInt(idxs[d]);
+                    //recupere la valeur de domaine (DOMAINVALUE) à partir de l'index
+                    Domain.DomainValue domainValue = dep.getDomain().getDomainValue(idx);
+
+                    builder.append(domainValue.toString());
+
+                    builder.append(".");
+
+                    d++;
+                }
+                //on retire le dernier point pour l'estetique
+                builder.deleteCharAt(builder.length() - 1);
 
                 builder.append(" : ");
             }
