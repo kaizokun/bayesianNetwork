@@ -16,6 +16,7 @@ import java.util.Arrays;
 import static java.util.Arrays.asList;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.MOVE;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.POSITION;
+import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
 
 public class MazeRobotRDDFactory implements NetworkFactory {
 
@@ -47,7 +48,9 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
         IDomain actionsDomain = DomainFactory.getCardinalDomain();
 
-        Variable positionVar = new Variable(POSITION, positionsDomain), actionVar = new Variable(MOVE, actionsDomain);
+        Variable positionVar = new Variable(POSITION, positionsDomain),
+                actionVar = new Variable(MOVE, actionsDomain),
+                perceptVar = new Variable(WALL_PERCEPT, perceptsDomain);
 
         //----------------------------------------
         //----------------TEMPS 0 ----------------
@@ -91,13 +94,20 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
         ProbabilityCompute tcpPercept = network.getTCP(asList(positionRoot), perceptsDomain, perceptTCP);
 
-        System.out.println(tcpState0);
+        //modele d'extension des percepts
+        Model perceptExtensionModel = new Model(tcpPercept);
 
-        System.out.println(tcpState);
+        perceptExtensionModel.addDependencie(positionVar);
 
-        System.out.println(tcpPercept);
+        network.addCaptorModel(perceptVar, perceptExtensionModel);
 
-        return null;
+        //System.out.println(tcpState0);
+
+        //System.out.println(tcpState);
+
+        //System.out.println(tcpPercept);
+
+        return network;
     }
 
     private Double[][] initTCPpercepts(IDomain positionsDomain, IDomain perceptsDomain) {
@@ -106,33 +116,40 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
         //le percepts correspondant à la position est correct avec une probabilité de 60% (capteur bruité)
         //les autres percepts se partagent les 40% de probabilités restantes
-        double probOtherPercepts = 0.4 / perceptsDomain.getValues().size() - 1;
+        double probOtherPercepts = 0.4 / (perceptsDomain.getValues().size() - 1);
 
         int d1 = 0;
         //pour chaque position
-        for(Domain.DomainValue position1 : positionsDomain.getValues()){
+        for (Domain.DomainValue position1 : positionsDomain.getValues()) {
 
             Position position = (Position) position1.getValue();
             //récupère le percept fourni par la position
-            Percept perceptPos = simpleMap.getPercept(position);
+            PerceptWall perceptPos = simpleMap.getPercept(position);
+
+            //on pourrait faire un modele de capeur bruité plus réaliste ou les sous ensembles
+            //de percepts contenant un percept de moins auraient une chance plus faible
+            //mais plus elevée que ce ne correspondant pas du tout
+            //perceptPos
+
+            //System.out.println("percept pos "+position+" "+perceptPos);
 
             int d2 = 0;
 
             //pour chaque percept
-            for(Domain.DomainValue percept1 : perceptsDomain.getValues()){
+            for (Domain.DomainValue percept1 : perceptsDomain.getValues()) {
 
                 PerceptWall perceptWall = (PerceptWall) percept1.getValue();
                 //si le percept correspond à celui forni par l'environnement pour cette position
-                if(perceptPos.match(perceptWall)){
+                if (perceptPos.match(perceptWall)) {
 
                     TCP[d1][d2] = 0.6;
 
-                }else{
+                } else {
 
                     TCP[d1][d2] = probOtherPercepts;
                 }
 
-                d2 ++;
+                d2++;
             }
 
             d1++;

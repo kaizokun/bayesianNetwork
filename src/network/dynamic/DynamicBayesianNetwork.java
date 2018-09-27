@@ -265,10 +265,14 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     private void extend(Map<Variable, List<Model>> models, int timeParent, boolean captors) {
 
+        //System.out.println("EXTEND "+timeParent+" "+captors);
+
         List<Variable> newVars = new LinkedList<>();
 
         //extension du reseau pour chaque model d'extension
         for (Variable variable : models.keySet()) {
+
+           // System.out.println("          VAR "+variable);
 
             //récupere la liste des modeles d'extension pour une variable
             //en fonction du temps utile pour les modele de markov d'ordre superieur à 1
@@ -314,6 +318,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             Variable newVar = new Variable(variable.getLabel(), variable.getDomain(), model.getProbabilityCompute(),
                     newDependencies, this.time);
+
+           // System.out.println("NEW VAR : "+newVar+" <--- "+newVar.getDependencies());
 
             if (captors) {
                 //pour les variables d'observation enregistre dans les variables parents leur indice
@@ -383,14 +389,25 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         builder.append("------------------------------NETWORK-----------------------------\n");
         builder.append("------------------------------------------------------------------\n\n");
 
-        loadTree(this.roots, builder, 0);
+        //loadTree(this.roots, builder, 0);
+
+        for(int key : timeVariables.keySet()){
+
+            builder.append("\n======TIME ["+key+"]====== \n\n");
+
+            for(Variable variable : this.timeVariables.get(key).values()){
+
+                builder.append("        VAR : "+variable+" <--- "+variable.getDependencies()+"\n");
+            }
+
+        }
 
         builder.append("\n\n");
 
         return builder.toString();
     }
 
-
+/*
     private void loadTree(List<Variable> vars, StringBuilder builder, int depth) {
 
         String ident = getTreeIdent(depth);
@@ -403,8 +420,9 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
             loadTree(var.getChildren(), builder, depth + 1);
         }
-    }
 
+    }
+*/
     public Map.Entry<Integer, Matrix> getLastForward() {
         return lastForward;
     }

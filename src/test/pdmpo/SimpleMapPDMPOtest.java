@@ -10,7 +10,7 @@ public class SimpleMapPDMPOtest {
 
 
     @Test
-    public void initNetworkTest(){
+    public void initAndExtendNetworkTest(){
 
         double discount = 0.999;
 
@@ -22,7 +22,13 @@ public class SimpleMapPDMPOtest {
 
         DynamicBayesianNetwork dynamicBayesianNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
 
+        dynamicBayesianNetwork.extend();
 
+        dynamicBayesianNetwork.extend();
+
+        dynamicBayesianNetwork.extend();
+
+        System.out.println(dynamicBayesianNetwork);
 
     }
 

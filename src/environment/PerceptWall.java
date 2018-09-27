@@ -81,4 +81,12 @@ public class PerceptWall implements Percept<PerceptWall> {
     public String toString() {
         return walls.toString() ;
     }
+
+    public Set<Cardinal> getWalls() {
+        return walls;
+    }
+
+    public void setWalls(Set<Cardinal> walls) {
+        this.walls = walls;
+    }
 }
