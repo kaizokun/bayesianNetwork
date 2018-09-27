@@ -47,7 +47,7 @@ public class Combination {
 
         Count c = new Count();
 
-        //liste des sous ensembles
+        //liste des sous ensembles soit 2 exposant la taille de l'ensemble
         List<T>[] subSets = new List[(int) Math.pow(2, set.length)];
         //ensemble vide
         subSets[c.count++] = new ArrayList<>();
@@ -55,7 +55,7 @@ public class Combination {
         subSets[c.count++] = Arrays.asList(set);
         //sous ensemble vide à charger
         LinkedList<T> subSet = new LinkedList<>();
-        //pour chaqu etaille de sous ensemble de 1 à taille du set - 1
+        //pour chaque taille de sous ensemble de 1 à taille du set - 1
         for (int s = 1; s <= set.length - 1; s++) {
 
             loadSubSet(s, subSets, subSet, set, 0, c);

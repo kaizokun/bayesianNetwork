@@ -47,7 +47,7 @@ public class MDPsimpleMap implements MDP {
 
     private void initTransition(Position fromState, Cardinal action) {
 
-        //permet de savoir si une transition vers une position est déja enregistré pour augpmenter sa probabilité
+        //permet de savoir si une transition vers une position est déja enregistré pour augmenter sa probabilité
         Map<Position, Transition> transitionsMap = new Hashtable<>();
         //action de base toujours valide car les actions dependent des positions atteignables ici immuables
         Position rsState = fromState.move(action);
@@ -56,9 +56,13 @@ public class MDPsimpleMap implements MDP {
 
         //action droite ou direction suivante dans le sens des aiguilles d'une montre
         //repart de nord pour west
-        int idDirection = (action.ordinalClock() + 1) % Cardinal.values().length;
+        //int idDirection = (action.ordinalClock() + 1) % Cardinal.values().length;
 
-        Cardinal relativeRight = Cardinal.getClockOrderValues()[idDirection];
+        //Cardinal relativeRight = Cardinal.getClockOrderValues()[idDirection];
+
+        //rsState = fromState.move(relativeRight);
+
+        Cardinal relativeRight = action.getRelativeRight();
 
         rsState = fromState.move(relativeRight);
 
@@ -72,9 +76,11 @@ public class MDPsimpleMap implements MDP {
 
         //action gauche relativement à la direction de l'action
         //si on se deplace à gauche du nord soit à l'ouest
-        idDirection = action.ordinalClock() - 1 < 0 ? Cardinal.values().length - 1 : action.ordinalClock() - 1;
+        //idDirection = action.ordinalClock() - 1 < 0 ? Cardinal.values().length - 1 : action.ordinalClock() - 1;
 
-        Cardinal relativeLeft = Cardinal.getClockOrderValues()[idDirection];
+        //Cardinal relativeLeft = Cardinal.getClockOrderValues()[idDirection];
+
+        Cardinal relativeLeft = action.getRelativeLeft();
 
         rsState = fromState.move(relativeLeft);
 

@@ -69,11 +69,25 @@ public enum Cardinal implements Action {
         return delta[this.ordinal()][1];
     }
 
-    public static Cardinal[] getClockOrderValues() {
+    private static Cardinal[] getClockOrderValues() {
         return clockOrderValues;
     }
 
-    public int ordinalClock(){
+    public Cardinal getRelativeRight() {
+
+        int idDirection = (ordinalClock() + 1) % values().length;
+
+        return getClockOrderValues()[idDirection];
+    }
+
+    public Cardinal getRelativeLeft() {
+
+        int idDirection = ordinalClock() - 1 < 0 ? Cardinal.values().length - 1 : ordinalClock() - 1;
+
+        return getClockOrderValues()[idDirection];
+    }
+
+    private int ordinalClock() {
 
         return clockOrderOrdinal[this.ordinal()];
     }

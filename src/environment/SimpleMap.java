@@ -12,7 +12,8 @@ public class SimpleMap implements Environment<Position> {
 
     private Position goodExit, badExit;
 
-    private Set<Position> notFinalStates = new HashSet<>(), finalStates = new HashSet<>();
+    private Set<Position> notFinalStates = new HashSet<>(),
+            finalStates = new HashSet<>(), allStates = new HashSet<>();
 
     private Set<Position> walls = new HashSet<>();
 
@@ -64,6 +65,10 @@ public class SimpleMap implements Environment<Position> {
         finalStates.add(this.badExit);
 
         notFinalStates.removeAll(finalStates);
+
+        allStates.addAll(notFinalStates);
+
+        allStates.addAll(finalStates);
     }
 
     /*
@@ -106,6 +111,10 @@ public class SimpleMap implements Environment<Position> {
     public Set<? extends State> getFinalStates() {
 
         return finalStates;
+    }
+
+    public Set<Position> getAllStates() {
+        return allStates;
     }
 
     public Position getGoodExit() {

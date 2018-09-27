@@ -8,6 +8,11 @@ public class Domain<T> implements IDomain {
 
     protected Hashtable<T, DomainValue> index = new Hashtable<>();
 
+    public Domain(Set<T> set){
+
+        this((T[]) set.toArray());
+    }
+
     public Domain(T... values) {
 
         this.values = Arrays.asList(new DomainValue[values.length]);

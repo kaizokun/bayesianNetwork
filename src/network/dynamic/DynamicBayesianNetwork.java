@@ -12,6 +12,7 @@ import network.MegaVariable;
 import network.ProbabilityCompute;
 import network.Variable;
 import network.dynamic.Model.Dependency;
+import network.factory.VarNameEnum;
 
 import java.util.*;
 
@@ -57,6 +58,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     public DynamicBayesianNetwork(AbstractDoubleFactory doubleFactory) {
 
         this(doubleFactory, 0);
+    }
+
+    public Variable addRootVariable(VarNameEnum varNameEnum, IDomain domain, ProbabilityCompute probabilityCompute) {
+
+        return addRootVariable(varNameEnum.toString(), domain, probabilityCompute);
     }
 
     public Variable addRootVariable(String label, IDomain domain, ProbabilityCompute probabilityCompute) {
@@ -201,8 +207,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     }
 
     /*
-    * etend une fois le reseau avec une ou plusieurs assignations pour des variables
-    * */
+     * etend une fois le reseau avec une ou plusieurs assignations pour des variables
+     * */
     public void extend(Variable... variables) {
 
         this.extend();
@@ -243,7 +249,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return new LinkedList();
     }
 
-    public void initVar(int time, Variable variable){
+    public void initVar(int time, Variable variable) {
 
         this.getVariable(time, variable).setDomainValue(variable.getDomainValue());
     }
@@ -437,12 +443,12 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return forwards;
     }
 
-    public List<Model> getVarTransitionModels(Variable var){
+    public List<Model> getVarTransitionModels(Variable var) {
 
         return this.transitionModels.get(var);
     }
 
-    public List<Model> getVarCaptorModels(Variable var){
+    public List<Model> getVarCaptorModels(Variable var) {
 
         return this.captorsModels.get(var);
     }

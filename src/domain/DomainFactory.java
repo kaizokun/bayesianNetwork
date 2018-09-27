@@ -5,6 +5,7 @@ import environment.*;
 import math.Combination;
 
 import java.util.List;
+import java.util.Set;
 
 public class DomainFactory {
 
@@ -23,6 +24,11 @@ public class DomainFactory {
         return new Domain('a', 'b', 'c', 'd');
     }
 
+    public static IDomain getCardinalDomain(){
+
+        return new Domain<>(Cardinal.values());
+    }
+
     public static IDomain getMazePositionDomain(MazeRobot robot) {
 
         Position[] positions = new Position[robot.getReachablePositions().size()];
@@ -39,7 +45,6 @@ public class DomainFactory {
         return new Domain(positions);
     }
 
-
     public static IDomain getMazeWallCaptorDomain() {
 
         return getMazeWallCaptorDomain(PerceptWall.getAllPercepts());
@@ -49,5 +54,11 @@ public class DomainFactory {
 
         return new Domain(percepts);
     }
+
+    public static IDomain getPositionsDomain(Set<Position> positions){
+
+        return new Domain<>(positions);
+    }
+
 
 }
