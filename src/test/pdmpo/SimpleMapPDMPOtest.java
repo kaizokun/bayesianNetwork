@@ -1,5 +1,8 @@
 package test.pdmpo;
 
+import decision.PDMPO;
+import decision.PDMPOSimpleMap;
+import decision.PDMPOexploration;
 import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
@@ -94,6 +97,33 @@ public class SimpleMapPDMPOtest {
         System.out.println(distribution);
 
         //System.out.println(distribution.normalize());
+    }
+
+    @Test
+    public void PDMPOexplorationTest(){
+
+        String map[] = new String[]{"   +",
+                " # -",
+                "    "};
+
+        Random rdm = new Random();
+
+        SimpleMap simpleMap = new SimpleMap(map);
+
+        DynamicBayesianNetwork dynamicBayesianNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
+
+        System.out.println(dynamicBayesianNetwork);
+
+        PDMPO pdmpo = new PDMPOSimpleMap(simpleMap);
+
+        Distribution initForward = dynamicBayesianNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), 0, null);
+
+        System.out.println(initForward);
+
+        PDMPOexploration pdmpoExploration = new PDMPOexploration();
+
+        pdmpoExploration.getBestAction(dynamicBayesianNetwork, pdmpo, initForward);
+
     }
 
 

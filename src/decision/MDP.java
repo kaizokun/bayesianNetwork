@@ -26,7 +26,7 @@ public interface MDP {
 
     Double getDiscount();
 
-    Map<State,Double> getInitialUtilityVector();
+    Map<State, Double> getInitialUtilityVector();
 
     Politic getRdmPolitic();
 }
