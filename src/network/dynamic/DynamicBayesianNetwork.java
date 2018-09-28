@@ -90,8 +90,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public Variable getVariable(int time, Variable variable) {
 
-        //System.out.println(time+" GET VAR : "+this.timeVariables.get(time)+"\n var : "+variable);
-
         return this.getTimeVariables(time).get(variable);
     }
 
@@ -206,6 +204,29 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return encapsulate(megaState, this.getLastObservationVariables(time));
     }
 
+
+    public List getMostLikelyPath() {
+
+        if (this.getTime() > this.getInitTime()) {
+
+            Variable megaState = getMegaState();
+
+            return this.forward.mostLikelyPath(megaState, this.lastMax.getValue(), getTime());
+        }
+
+        return new LinkedList();
+    }
+
+    public void initVar(int time, Variable variable) {
+
+        Variable var = this.getVariable(time, variable);
+
+        var.setDomainValue(variable.getDomainValue());
+
+        System.out.println("Variable "+var+" new value "+var.getDomainValue());
+    }
+
+
     /*
      * etend une fois le reseau avec une ou plusieurs assignations pour des variables
      * */
@@ -237,23 +258,6 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
     }
 
-    public List getMostLikelyPath() {
-
-        if (this.getTime() > this.getInitTime()) {
-
-            Variable megaState = getMegaState();
-
-            return this.forward.mostLikelyPath(megaState, this.lastMax.getValue(), getTime());
-        }
-
-        return new LinkedList();
-    }
-
-    public void initVar(int time, Variable variable) {
-
-        this.getVariable(time, variable).setDomainValue(variable.getDomainValue());
-    }
-
     public void extend() {
 
         this.time++;
@@ -261,6 +265,25 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         this.extend(this.transitionModels, this.time - 1, false);
 
         this.extend(this.captorsModels, this.time, true);
+    }
+
+    public Distribution forward(List<Variable> states, List<Variable> actions, int time, Distribution distribution) {
+
+        List<Variable> lastStates = new LinkedList<>();
+
+        for (Variable state : states) {
+
+            lastStates.add(this.getVariable(time, state));
+        }
+
+        if (distribution == null) {
+
+            return forward.forward(lastStates, actions).getForward();
+
+        } else {
+
+            return forward.forward(lastStates, actions, distribution).getForward();
+        }
     }
 
     private void extend(Map<Variable, List<Model>> models, int timeParent, boolean captors) {
@@ -272,7 +295,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         //extension du reseau pour chaque model d'extension
         for (Variable variable : models.keySet()) {
 
-           // System.out.println("          VAR "+variable);
+            // System.out.println("          VAR "+variable);
 
             //récupere la liste des modeles d'extension pour une variable
             //en fonction du temps utile pour les modele de markov d'ordre superieur à 1
@@ -319,7 +342,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
             Variable newVar = new Variable(variable.getLabel(), variable.getDomain(), model.getProbabilityCompute(),
                     newDependencies, this.time);
 
-           // System.out.println("NEW VAR : "+newVar+" <--- "+newVar.getDependencies());
+            // System.out.println("NEW VAR : "+newVar+" <--- "+newVar.getDependencies());
 
             if (captors) {
                 //pour les variables d'observation enregistre dans les variables parents leur indice
@@ -391,13 +414,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         //loadTree(this.roots, builder, 0);
 
-        for(int key : timeVariables.keySet()){
+        for (int key : timeVariables.keySet()) {
 
-            builder.append("\n======TIME ["+key+"]====== \n\n");
+            builder.append("\n======TIME [" + key + "]====== \n\n");
 
-            for(Variable variable : this.timeVariables.get(key).values()){
+            for (Variable variable : this.timeVariables.get(key).values()) {
 
-                builder.append("        VAR : "+variable+" <--- "+variable.getDependencies()+"\n");
+                builder.append("        VAR : " + variable + " <--- " + variable.getDependencies() + "\n");
             }
 
         }
@@ -407,22 +430,22 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         return builder.toString();
     }
 
-/*
-    private void loadTree(List<Variable> vars, StringBuilder builder, int depth) {
+    /*
+        private void loadTree(List<Variable> vars, StringBuilder builder, int depth) {
 
-        String ident = getTreeIdent(depth);
+            String ident = getTreeIdent(depth);
 
-        for (Variable var : vars) {
+            for (Variable var : vars) {
 
-            builder.append(ident);
+                builder.append(ident);
 
-            builder.append(var + "\n");
+                builder.append(var + "\n");
 
-            loadTree(var.getChildren(), builder, depth + 1);
+                loadTree(var.getChildren(), builder, depth + 1);
+            }
+
         }
-
-    }
-*/
+    */
     public Map.Entry<Integer, Matrix> getLastForward() {
         return lastForward;
     }

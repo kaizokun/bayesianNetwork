@@ -107,13 +107,24 @@ public class Forward {
         return forward(requests, null, key, depth, saveforward, new Hashtable<>());
     }
 
-    /*
-        protected ForwardMax forward(List<Variable> requests, List<Variable> requestParents, String key, int depth, boolean saveforward) {
+    public ForwardMax forward(List<Variable> requests, List<Variable> actions) {
 
-            return forward(requests, key, depth, saveforward, new Hashtable<>());
-        }
-    */
-    protected ForwardMax forward(List<Variable> requests, Set<Variable> actions, String key, int depth, boolean saveforward, Map<String, Distribution> forwardMatrices) {
+        return forward(requests, actions, getDistribSavedKey(requests), 0, false, new Hashtable<>());
+    }
+
+    public ForwardMax forward(List<Variable> requests, List<Variable> actions, Distribution lastForward) {
+
+        Map<String, Distribution> forwardMatrices = new Hashtable<>();
+
+        String key = getDistribSavedKey(requests);
+
+        forwardMatrices.put(key, lastForward);
+
+        return forward(requests, actions, key, 0, false, forwardMatrices);
+    }
+
+    protected ForwardMax forward(List<Variable> requests, List<Variable> actions, String key, int depth,
+                                 boolean saveforward, Map<String, Distribution> forwardMatrices) {
 
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete
@@ -178,6 +189,8 @@ public class Forward {
                 requestTime0.add(request);
             }
         }
+        //retire les actions de la distribution initiale
+        requestTime0.removeAll(actions);
 
         //encapsule les variables dans une megavariable si plusieurs afin de
         //gerer de manière polymorphe les variables uniques des listes de variables
@@ -345,7 +358,7 @@ public class Forward {
         return new ForwardMax(forwardMatrix, maxMatrix);
     }
 
-    protected ForwardSumRs forwardHiddenVarSum(Set<Variable> actions, Variable obsParentState,
+    protected ForwardSumRs forwardHiddenVarSum(List<Variable> actions, Variable obsParentState,
                                                Map<String, Distribution> forwardMatrices, Map<String, Distribution> maxMatrices,
                                                int depth, boolean saveforward) {
 
@@ -358,7 +371,10 @@ public class Forward {
         //(cas spécifique si l'ordre de markov des dependances d'état à état est superieur à 1 ...)
 
         List<Variable> statesDependencies = new LinkedList<>(obsParentState.getDependencies());
-        //si des actions sont parent d'un état ils sont ignorés, car déja initialisé.
+        //si des actions sont parent d'un état ils sont ignorés.
+        //pour le cas du PDMPO on calcule le forward étape par étape en initialiser une action et une observation
+        //en incrementant le temps de 1 à chaque fois, et pour calculer l'état le forward precedent ne doit
+        //porter que sur la ou les variables états
         statesDependencies.removeAll(actions);
 
         Variable megaHiddenVar = network.encapsulate(statesDependencies);
@@ -450,7 +466,7 @@ public class Forward {
                 //les valeurs pouvant encore changer dans la procedure
                 List<Variable> copyDependencies = new LinkedList<>();
 
-               // for (Variable dependencie : obsParentState.getDependencies()) {
+                // for (Variable dependencie : obsParentState.getDependencies()) {
                 for (Variable dependencie : statesDependencies) {
 
                     copyDependencies.add(dependencie.copyLabelTimeValueDom());

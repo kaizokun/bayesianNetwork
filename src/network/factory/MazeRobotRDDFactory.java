@@ -11,8 +11,6 @@ import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.Model;
 
-import java.util.Arrays;
-
 import static java.util.Arrays.asList;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.MOVE;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.POSITION;
@@ -26,7 +24,7 @@ public class MazeRobotRDDFactory implements NetworkFactory {
         this.simpleMap = simpleMap;
     }
 
-    enum SIMPLE_MAP_VARS implements VarNameEnum {
+    public enum SIMPLE_MAP_VARS implements VarNameEnum {
         POSITION, MOVE, WALL_PERCEPT
     }
 
