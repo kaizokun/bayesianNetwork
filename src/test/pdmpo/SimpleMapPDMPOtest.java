@@ -114,7 +114,7 @@ public class SimpleMapPDMPOtest {
 
         System.out.println(dynamicBayesianNetwork);
 
-        PDMPO pdmpo = new PDMPOSimpleMap(simpleMap);
+        PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, dynamicBayesianNetwork.getDoubleFactory());
 
         Distribution initForward = dynamicBayesianNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), 0, null);
 
