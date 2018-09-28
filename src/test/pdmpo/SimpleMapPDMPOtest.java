@@ -58,7 +58,9 @@ public class SimpleMapPDMPOtest {
 
         System.out.println(dynamicBayesianNetwork);
 
-        Distribution distribution = dynamicBayesianNetwork.forward(asList(new Variable(POSITION)), asList(new Variable(MOVE)), 0, null);
+        Distribution distribution = dynamicBayesianNetwork.forward(
+                asList(new Variable(POSITION)),
+                asList(new Variable(MOVE)), 0, null);
 
         System.out.println(distribution);
 
@@ -68,28 +70,30 @@ public class SimpleMapPDMPOtest {
 
         //création de la variable action
         Variable move = new Variable(MOVE);
-        //initialisation de la valeur de domaine de la variable au hazard
+        //initialisation de la valeur de domaine de la variable action au hazard
         move.setDomainValue(domainMove.getDomainValue(Cardinal.values()[rdm.nextInt(Cardinal.values().length)]));
-        //initialisation de la variable move du reseau au temps 1
+        //initialisation de la variable move du temps 1
         dynamicBayesianNetwork.initVar(0, move);
 
         //création de la variable action
         Variable percept = new Variable(WALL_PERCEPT);
-        //initialisation de la valeur de domaine de la variable au hazard
+        //initialisation de la valeur de domaine de la variable percept au hazard
         Domain.DomainValue perceptValue = domainPercept.getValues().get(rdm.nextInt(domainPercept.getSize()));
 
         percept.setDomainValue(perceptValue);
-        //initialisation de la variable move du reseau au temps 1
+        //initialisation de la variable percept au temps 1
         dynamicBayesianNetwork.initVar(1, percept);
 
         System.out.println(dynamicBayesianNetwork);
 
         //calcul distribution temps 1
-
-        distribution = dynamicBayesianNetwork.forward(asList(new Variable(POSITION)), asList(new Variable(MOVE)), 1, distribution);
+        distribution = dynamicBayesianNetwork.forward(
+                asList(new Variable(POSITION)),
+                asList(new Variable(MOVE)), 1, distribution);
 
         System.out.println(distribution);
 
+        //System.out.println(distribution.normalize());
     }
 
 

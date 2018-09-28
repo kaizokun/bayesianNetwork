@@ -222,10 +222,7 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         Variable var = this.getVariable(time, variable);
 
         var.setDomainValue(variable.getDomainValue());
-
-        System.out.println("Variable "+var+" new value "+var.getDomainValue());
     }
-
 
     /*
      * etend une fois le reseau avec une ou plusieurs assignations pour des variables

@@ -106,6 +106,10 @@ public class Distribution extends Transpose {
             setValue(row, getValue(row).divide(getTotal()));
         }
 
+        this.total = null;
+
+        this.getTotal();
+
         return this;
     }
 

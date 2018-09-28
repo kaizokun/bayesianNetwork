@@ -104,27 +104,47 @@ public class Forward {
 
     protected ForwardMax forward(List<Variable> requests, String key, int depth, boolean saveforward) {
 
-        return forward(requests, null, key, depth, saveforward, new Hashtable<>());
+        return forward(requests, null, key, depth, saveforward,
+                new Hashtable<>(), new Hashtable<>());
     }
 
     public ForwardMax forward(List<Variable> requests, List<Variable> actions) {
 
-        return forward(requests, actions, getDistribSavedKey(requests), 0, false, new Hashtable<>());
+        return forward(requests, actions, getDistribSavedKey(requests), 0, false,
+                new Hashtable<>(), new Hashtable<>());
     }
 
     public ForwardMax forward(List<Variable> requests, List<Variable> actions, Distribution lastForward) {
 
-        Map<String, Distribution> forwardMatrices = new Hashtable<>();
+        //Max distribution bogus pour gerer les PDMPO en attendant de reecrire la procedure uniquement pour le PDMPO
+        Map<String, Distribution> forwardMatrices = new Hashtable<>(), maxMatrices = new Hashtable<>();
 
         String key = getDistribSavedKey(requests);
 
-        forwardMatrices.put(key, lastForward);
+        List<Variable> previousRequest = new LinkedList<>();
 
-        return forward(requests, actions, key, 0, false, forwardMatrices);
+        for (Variable request : requests) {
+
+            previousRequest.add(this.network.getVariable(this.network.getTime() - 1, request));
+        }
+
+        Variable megaPreviousRequest = network.encapsulate(previousRequest);
+
+        Distribution lastMaxBogus = new Distribution(megaPreviousRequest, network.getDoubleFactory());
+
+        String previousKey = getDistribSavedKey(previousRequest);
+
+        maxMatrices.put(previousKey, lastMaxBogus);
+
+        forwardMatrices.put(previousKey, lastForward);
+
+        return forward(requests, actions, key, 0, false, forwardMatrices, maxMatrices);
     }
 
     protected ForwardMax forward(List<Variable> requests, List<Variable> actions, String key, int depth,
-                                 boolean saveforward, Map<String, Distribution> forwardMatrices) {
+                                 boolean saveforward, Map<String, Distribution> forwardMatrices, Map<String, Distribution> maxMatrices ) {
+
+        System.out.println("FORWARD " + requests + " - depth : " + depth + " - forward : " + forwardMatrices.keySet());
 
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete
@@ -139,7 +159,7 @@ public class Forward {
 
         //Map<String, Distribution> forwardMatrices = new Hashtable<>();
 
-        Map<String, Distribution> maxMatrices = new Hashtable<>();
+        //Map<String, Distribution> maxMatrices = new Hashtable<>();
 
         //total pour toutes les valeurs de la requete
         AbstractDouble totalDistribution = this.network.getDoubleFactory().getNew(0.0);
@@ -316,6 +336,7 @@ public class Forward {
             if (forwardMatrix.get(requestDomainValue) == null) {
                 //enregistrement de la probabilité pour la ou les valeur courante attribuées
                 //à la ou les variables de requete
+                //System.out.println("forwardMatrix PUT "+requestDomainValue+" = "+requestValueProbability);
                 forwardMatrix.put(requestDomainValue, requestValueProbability);
 
                 maxMatrix.put(requestDomainValue, requestValueMaxProbability);
@@ -324,6 +345,9 @@ public class Forward {
                 //enregistrement de la probabilité pour la valeur courante de la requete additionnée à la precedente
                 //pour une même combinaison, étant donné que si la requete est complétée par d'autres variables,
                 //la combinaisons de valeurs de la requete d'origine peut apparaitre plusieurs fois
+
+                //System.out.println("forwardMatrix ADD AND PUT "+requestDomainValue+" = "+forwardMatrix.get(requestDomainValue)+" + "+requestValueProbability);
+
                 forwardMatrix.put(requestDomainValue, forwardMatrix.get(requestDomainValue).add(requestValueProbability));
 
                 maxMatrix.put(requestDomainValue, maxMatrix.get(requestDomainValue).add(requestValueMaxProbability));
@@ -334,10 +358,14 @@ public class Forward {
             mostLikelyPath.put(requestDomainValue, new ArrayList<>(maxParentStates));
 
             totalDistribution = totalDistribution.add(requestValueProbability);
+
+            //System.out.println("TOTAL : "+totalDistribution+" = "+requestValueProbability);
         }
         //enregistre les totaux pour toutes les combinaisons
         //pour les maximum inutile d'enregistrer les totaux
         //etant donné que normaliser ne change pas le rapport de grandeur entre les valeurs
+
+        //System.out.println("FINAL TOTAL " + totalDistribution);
 
         forwardMatrix.putTotal(totalDistribution);
 
@@ -434,7 +462,7 @@ public class Forward {
 
             if (forward == null) {
 
-                ForwardMax forwardMax = this.forward(statesDependencies, actions, key, depth + 1, saveforward, forwardMatrices);
+                ForwardMax forwardMax = this.forward(statesDependencies, actions, key, depth + 1, saveforward, forwardMatrices, maxMatrices);
 
                 //ForwardMax forwardMax = this.forward(obsParentState.getDependencies(), actions, key, depth + 1, saveforward, forwardMatrices);
 
@@ -452,6 +480,14 @@ public class Forward {
             // AbstractDouble maxValue = max.get(domainValue);
 
             AbstractDouble maxValue = max.get(domainValue);
+
+            //System.out.println("maxValue "+maxValue);
+
+            //pour gerer temporairement les max avec le PDMPO ou la distribution est bogus
+            if(maxValue == null){
+
+                maxValue = network.getDoubleFactory().getNew(0.0);
+            }
             //cette valeur est multipliée par la probabilité obtenu par le modele de transition,
             //soit les variable états enfants avec leur valeurs courantes (les variables de la requete complétée
             // dans la fonction appelante) sachant les variables cachées et leur valeur courante.
@@ -474,6 +510,8 @@ public class Forward {
 
                 maxHiddenvars = copyDependencies;
             }
+
+
             //recupere le resultat du forward pour la combinaison de valeurs courantes des variables cachées
             AbstractDouble forwardValue = forward.get(domainValue);//.divide(forward.getTotal());
             //on multiplie le resultat du forward avec la partie transition
