@@ -100,7 +100,7 @@ public class SimpleMapPDMPOtest {
     }
 
     @Test
-    public void PDMPOexplorationTest(){
+    public void PDMPOexplorationTest() {
 
         String map[] = new String[]{"   +",
                 " # -",
@@ -122,7 +122,11 @@ public class SimpleMapPDMPOtest {
 
         PDMPOexploration pdmpoExploration = new PDMPOexploration();
 
-        pdmpoExploration.getBestAction(dynamicBayesianNetwork, pdmpo, initForward);
+        PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestAction(dynamicBayesianNetwork, pdmpo, initForward, 2);
+
+        System.out.println(result);
+
+        System.out.println("LEAFS "+PDMPOexploration.cptLeaf);
 
     }
 

@@ -2,7 +2,6 @@ package decision;
 
 import domain.Domain;
 import domain.data.AbstractDouble;
-import environment.Percept;
 import math.Distribution;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -20,12 +19,19 @@ public class PDMPOexploration {
      * Distribution forward : état de croyance courant sur les états dans le RBD "réel"
      * */
 
-    public List<Variable> getBestAction(DynamicBayesianNetwork network, PDMPO pdmpo, Distribution forward) {
+    public static int cptLeaf;
 
-        return getBestAction(network, pdmpo, forward, 0);
+    public PDMPOsearchResult getBestAction(DynamicBayesianNetwork network, PDMPO pdmpo, Distribution forward, int limit) {
+
+        cptLeaf = 0;
+
+        return getBestAction(network, pdmpo, forward, 0, limit,  network.getDoubleFactory().getNew(0.0));
     }
 
-    private List<Variable> getBestAction(DynamicBayesianNetwork network, PDMPO pdmpo, Distribution forward, int time) {
+    private PDMPOsearchResult getBestAction(DynamicBayesianNetwork network, PDMPO pdmpo, Distribution forward,
+                                             int time, int limit, AbstractDouble reward) {
+
+        //System.out.println("BEST ACTION "+time+" "+limit);
 
         //on etend le network pour le temps time si necessaire
         if (network.getTime() <= time) {
@@ -38,14 +44,20 @@ public class PDMPOexploration {
         //distribution initiale
         Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward);
 
+        AbstractDouble maxActionUtility = network.getDoubleFactory().getNew(Double.NEGATIVE_INFINITY);
+
+        Domain.DomainValue bestAction = null;
+
         //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
         //pour une combinaison d'action ou aura un object DomainValue composite
         for (Domain.DomainValue action : actions) {
 
-            // System.out.println();
-            // System.out.println("----------- ACTION : " + action);
+            //System.out.println();
+            //System.out.println("----------- ACTION : " + action);
             //crée une liste de percepts possible après avoir appliqué l'action aux états probables
             Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, pdmpo, action);
+
+            AbstractDouble actionUtility = network.getDoubleFactory().getNew(0.0);
 
             for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : perceptsMap.entrySet()) {
 
@@ -65,18 +77,44 @@ public class PDMPOexploration {
                 //initialise le precept pour le temps suivant pour lequel calculer la distribution d'état
                 network.initVar(time + 1, perceptVar);
 
-                System.out.println("ACTION : "+action+" - PERCEPT : "+entry.getKey()+", "+entry.getValue());
+                //System.out.println("ACTION : "+action+" - PERCEPT : "+entry.getKey()+", "+entry.getValue());
 
-                System.out.println(network);
-
+                //System.out.println(network);
+                //calcule la distribution futur en fonction d'une action et d'un percept possible donné
                 Distribution nextForward = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
 
-                System.out.println(nextForward);
+                //System.out.println(nextForward);
+                //récompense de l'états de croyance obtenu
+                AbstractDouble forwardReward = pdmpo.getUtility(nextForward);
+                //recompense totale l'ancienne plus la courante
+                AbstractDouble currentTotalReward = forwardReward.add(reward);
+                //tant que le temps est inferieur à la limite
+                if(time < limit) {
+                    //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
+                    //recupère la meilleure action et son l'utilité
+                    PDMPOsearchResult rs = getBestAction(network, pdmpo, nextForward, time + 1, limit, currentTotalReward);
+                    //utilité fourni par la meilleur action
+                    currentTotalReward = rs.bestUtility;
+                }
 
+                cptLeaf++;
+
+                //on multiplie l'utilité retournée par la meilleur action par la probabilité du percept
+                //on additionne tout les resultats pour obtenir l'utilité moyenne par action
+                actionUtility = actionUtility.add(perceptProb.multiply(currentTotalReward));
             }
+
+            if(actionUtility.compareTo(maxActionUtility) > 0){
+
+                maxActionUtility = actionUtility;
+
+                bestAction = action;
+            }
+
+            //System.out.println("UTILITE ESPERE : " + actionUtility);
         }
 
-        return null;
+        return new PDMPOsearchResult(bestAction, maxActionUtility);
     }
 
     private Map<Domain.DomainValue, AbstractDouble> getPerceptsProb(Distribution forward, PDMPO pdmpo, Domain.DomainValue action) {
@@ -134,6 +172,41 @@ public class PDMPOexploration {
         */
 
         return perceptsMap;
+    }
+
+    public class PDMPOsearchResult{
+
+        private Domain.DomainValue action;
+        private AbstractDouble bestUtility;
+
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility) {
+            this.action = action;
+            this.bestUtility = bestUtility;
+        }
+
+        public Domain.DomainValue getAction() {
+            return action;
+        }
+
+        public void setAction(Domain.DomainValue action) {
+            this.action = action;
+        }
+
+        public AbstractDouble getBestUtility() {
+            return bestUtility;
+        }
+
+        public void setBestUtility(AbstractDouble bestUtility) {
+            this.bestUtility = bestUtility;
+        }
+
+        @Override
+        public String toString() {
+            return "PDMPOsearchResult{" +
+                    "action=" + action +
+                    ", bestUtility=" + bestUtility +
+                    '}';
+        }
     }
 
 }

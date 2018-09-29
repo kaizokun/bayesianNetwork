@@ -12,6 +12,8 @@ import java.util.Set;
 
 public interface PDMPO {
 
+    AbstractDouble getUtility(Distribution forward);
+
     List<Variable> getStates();
 
     List<Variable> getActions();

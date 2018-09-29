@@ -3,10 +3,12 @@ package decision;
 import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
+import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import environment.Cardinal;
 import environment.Position;
 import environment.SimpleMap;
+import javafx.geometry.Pos;
 import math.Distribution;
 import network.Variable;
 
@@ -29,6 +31,8 @@ public class PDMPOSimpleMap implements PDMPO {
 
     protected List<Variable> actionVars, stateVars;
 
+    protected Map<Position, AbstractDouble> statesUtility = new Hashtable<>();
+
     public PDMPOSimpleMap(SimpleMap simpleMap, AbstractDoubleFactory doubleFactory) {
 
         this.simpleMap = simpleMap;
@@ -49,6 +53,36 @@ public class PDMPOSimpleMap implements PDMPO {
         this.stateVars = asList(new Variable(POSITION));
         //fabrique de double ou bigdecimal
         this.doubleFactory = doubleFactory;
+
+        this.initStatesUtility();
+    }
+
+    private void initStatesUtility() {
+
+        for(Position position : simpleMap.getNotFinalStates()){
+
+            statesUtility.put(position, doubleFactory.getNew(-0.04));
+        }
+
+        statesUtility.put(simpleMap.getGoodExit(), doubleFactory.getNew(1.0));
+
+        statesUtility.put(simpleMap.getBadExit(), doubleFactory.getNew(-1.0));
+    }
+
+    @Override
+    public AbstractDouble getUtility(Distribution forward){
+
+        AbstractDouble utility = doubleFactory.getNew(0.0);
+        //pour chaque position
+        for(Domain.DomainValue value : forward.getRowValues()){
+
+            Position position = (Position) value.getValue();
+            //multiplie la probabilité de la position par son utilité
+            //et ajoute chaque utilité pondérée à la somme finale
+            utility = utility.add( statesUtility.get(position).multiply(forward.get( value )));
+        }
+
+        return utility;
     }
 
     @Override
