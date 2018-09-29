@@ -100,7 +100,7 @@ public class SimpleMapPDMPOtest {
     }
 
     @Test
-    public void PDMPOexplorationTest() {
+    public void PDMPOexplorationPerceptAVGTest() {
 
         String map[] = new String[]{"   +",
                 " # -",
@@ -127,7 +127,36 @@ public class SimpleMapPDMPOtest {
         System.out.println(result);
 
         System.out.println("LEAFS "+PDMPOexploration.cptLeaf);
+    }
 
+    @Test
+    public void PDMPOexplorationPerceptSamplingTest() {
+
+        String map[] = new String[]{"   +",
+                " # -",
+                "    "};
+
+        Random rdm = new Random();
+
+        SimpleMap simpleMap = new SimpleMap(map);
+
+        DynamicBayesianNetwork dynamicBayesianNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
+
+        System.out.println(dynamicBayesianNetwork);
+
+        PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, dynamicBayesianNetwork.getDoubleFactory());
+
+        Distribution initForward = dynamicBayesianNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), 0, null);
+
+        System.out.println(initForward);
+
+        PDMPOexploration pdmpoExploration = new PDMPOexploration();
+
+        PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestActionPerceptSampling(dynamicBayesianNetwork, pdmpo, initForward, 5);
+
+        System.out.println(result);
+
+        System.out.println("LEAFS "+PDMPOexploration.cptLeaf);
     }
 
 

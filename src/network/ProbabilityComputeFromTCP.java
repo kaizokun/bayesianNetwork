@@ -129,7 +129,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
             //frequences cumulées pour une combinaison de valeurs parents
             AbstractDouble cumul = doubleFactory.getNew(0.0);
             //crée un tableau de frequence cumulées de la taille du domaine
-            List<Map.Entry<Domain.DomainValue, FrequencyRange>> frequencies = new ArrayList(Arrays.asList(new Map.Entry[varDom.getSize()]));
+            List<Map.Entry<Domain.DomainValue, FrequencyRange>> frequencies = Arrays.asList(new Map.Entry[varDom.getSize()]);
 
             int i = 0;
             //pour chaque entrée de deuxieme dimension de la TCP
@@ -138,11 +138,11 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
                 //on additionne la frequence
                 FrequencyRange range = new FrequencyRange();
 
-                range.min = cumul;
+                range.setMin(cumul);
 
                 cumul = cumul.add(freq.getValue());
 
-                range.max = cumul;
+                range.setMax(cumul);
 
                 Map.Entry<Domain.DomainValue, FrequencyRange> rangeEntry = new AbstractMap.SimpleEntry(freq.getKey(), range);
 
@@ -271,26 +271,6 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         return builder.toString();
     }
 
-    private Domain.DomainValue dichotomicSearch(List<Map.Entry<Domain.DomainValue, FrequencyRange>> rangeEntries, AbstractDouble search, int s, int e) {
-
-        int middle = s + ((e - s) / 2);
-
-        Map.Entry<Domain.DomainValue, FrequencyRange> rangeEntry = rangeEntries.get(middle);
-
-        switch (rangeEntry.getValue().compareTo(search)) {
-            case 0:
-
-                return rangeEntry.getKey();
-
-            case -1:
-
-                return dichotomicSearch(rangeEntries, search, s, middle);
-
-            default:
-
-                return dichotomicSearch(rangeEntries, search, middle + 1, e);
-        }
-    }
 
     /**
      * ------------------ GETTER PROBABILITIES AND VALUES ----------------
@@ -332,7 +312,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         //AbstractDouble total = doubleFactory.getNew(0.0);
 
-        return this.dichotomicSearch(rangevalues, doubleFactory.getNew(this.random.nextDouble()), 0, rangevalues.size());
+        return FrequencyRange.dichotomicSearch(rangevalues, doubleFactory.getNew(this.random.nextDouble()));
     }
 
     @Override
@@ -342,7 +322,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
         List<Map.Entry<Domain.DomainValue, FrequencyRange>> cumulFreq = this.cumulativeMarkovFrequencies.get(this.getDependenciesKey(variable.markovKover));
 
-        return dichotomicSearch(cumulFreq, rdm, 0, cumulFreq.size());
+        return FrequencyRange.dichotomicSearch(cumulFreq, rdm);
     }
 
     @Override
@@ -381,7 +361,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
             if (!key.isEmpty()) {
                 //indexes des valeurs de domaine parent
                 //echapper le . car charactere speciales dans les regex
-                String idxs[] = key.split("\\"+IDX_SEPARATOR);
+                String idxs[] = key.split("\\" + IDX_SEPARATOR);
 
                 int d = 0;
                 //pour chaque dependence
@@ -434,71 +414,6 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
 
                 System.out.println(entry2.getKey() + " : " + entry2.getValue());
             }
-        }
-    }
-
-
-    /**
-     * -------------------------SUB CLASSES--------------------------
-     */
-
-
-    static class FrequencyRange {
-
-        private AbstractDouble min, max;
-
-        public FrequencyRange() {
-        }
-
-        public FrequencyRange(AbstractDouble min, AbstractDouble max) {
-
-            this.min = min;
-
-            this.max = max;
-        }
-
-        public int compareTo(AbstractDouble search) {
-
-            //inférieur au minimum rang inférieur
-            if (search.compareTo(min) < 0) {
-
-                return -1;
-            }
-
-            //inférieur au minimum rang supérieur
-            if (search.compareTo(max) > 0) {
-
-                return 1;
-            }
-
-            //range[0,1]
-            //rdm [0,0.99999]
-            //supérieur ou égal au min et inférieur au max dans le range
-            //return search.compareTo(min) >= 0 && search.compareTo(max) < 0;
-
-            return 0;
-        }
-
-        public AbstractDouble getMin() {
-            return min;
-        }
-
-        public void setMin(AbstractDouble min) {
-            this.min = min;
-        }
-
-        public AbstractDouble getMax() {
-            return max;
-        }
-
-        public void setMax(AbstractDouble max) {
-            this.max = max;
-        }
-
-        @Override
-        public String toString() {
-
-            return "[" + this.min + " - " + this.max + "]";
         }
     }
 
