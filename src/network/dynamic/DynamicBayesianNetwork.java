@@ -219,9 +219,13 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
     public void initVar(int time, Variable variable) {
 
-        Variable var = this.getVariable(time, variable);
+        //la variable en parametre peut être une megavariable
+        for(Variable variable1 : variable.getCompoVars()) {
 
-        var.setDomainValue(variable.getDomainValue());
+            Variable var = this.getVariable(time, variable1);
+
+            var.setDomainValue(variable1.getDomainValue());
+        }
     }
 
     /*

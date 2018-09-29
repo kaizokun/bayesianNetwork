@@ -144,7 +144,7 @@ public class Forward {
     protected ForwardMax forward(List<Variable> requests, List<Variable> actions, String key, int depth,
                                  boolean saveforward, Map<String, Distribution> forwardMatrices, Map<String, Distribution> maxMatrices ) {
 
-        System.out.println("FORWARD " + requests + " - depth : " + depth + " - forward : " + forwardMatrices.keySet());
+        //System.out.println("FORWARD " + requests + " - depth : " + depth + " - forward : " + forwardMatrices.keySet());
 
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete

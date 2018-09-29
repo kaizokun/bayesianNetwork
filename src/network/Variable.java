@@ -9,6 +9,8 @@ import network.factory.VarNameEnum;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static java.util.Arrays.asList;
+
 public class Variable implements Iterable<Variable> {
 
     public static Comparator<Variable> varLabelComparator;
@@ -115,7 +117,7 @@ public class Variable implements Iterable<Variable> {
 
     public Variable(Object label, IDomain domain, Variable[] dependencies) {
 
-        this(label.toString(), domain, null, Arrays.asList(dependencies), 0);
+        this(label.toString(), domain, null, asList(dependencies), 0);
     }
 
     public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute) {
@@ -125,12 +127,12 @@ public class Variable implements Iterable<Variable> {
 
     public Variable(Object label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies) {
 
-        this(label.toString(), domain, probabilityCompute, Arrays.asList(dependencies), 0);
+        this(label.toString(), domain, probabilityCompute, asList(dependencies), 0);
     }
 
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, Variable[] dependencies) {
 
-        this(label, domain, probabilityCompute, Arrays.asList(dependencies), 0);
+        this(label, domain, probabilityCompute, asList(dependencies), 0);
     }
 
     public Variable(String label, IDomain domain, ProbabilityCompute probabilityCompute, List<Variable> dependencies) {
@@ -415,7 +417,7 @@ public class Variable implements Iterable<Variable> {
 
         if(isInit()){
 
-            return Arrays.asList(new Domain.DomainValue[]{this.domainValue});
+            return asList(new Domain.DomainValue[]{this.domainValue});
 
         }else{
 
@@ -502,7 +504,7 @@ public class Variable implements Iterable<Variable> {
 
     public List<Variable> getCompoVars() {
 
-        return Arrays.asList(new Variable[]{this});
+        return asList(this);
     }
 
     public void setDomainValuesFromVariables(Variable[] variables) {
@@ -513,7 +515,7 @@ public class Variable implements Iterable<Variable> {
     @Override
     public Iterator<Variable> iterator() {
 
-        return Arrays.asList(new Variable[]{this}).iterator();
+        return asList(new Variable[]{this}).iterator();
     }
 
     public Variable mmcCopy(int time){

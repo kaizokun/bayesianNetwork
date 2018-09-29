@@ -16,6 +16,10 @@ public interface PDMPO {
 
     List<Variable> getActions();
 
+    Variable getActionVar();
+
+    Variable getPerceptVar();
+
     Set<Domain.DomainValue> getActionsFromState(Distribution forward);
 
     Collection<RsState> getResultStates(Domain.DomainValue state, Domain.DomainValue action);

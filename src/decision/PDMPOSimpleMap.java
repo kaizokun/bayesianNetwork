@@ -15,6 +15,7 @@ import java.util.*;
 import static java.util.Arrays.asList;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.MOVE;
 import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.POSITION;
+import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
 
 public class PDMPOSimpleMap implements PDMPO {
 
@@ -23,6 +24,10 @@ public class PDMPOSimpleMap implements PDMPO {
     protected IDomain actionDomain, perceptDomain, stateDomain;
 
     protected AbstractDoubleFactory doubleFactory;
+
+    protected Variable actionVar, perceptVar;
+
+    protected List<Variable> actionVars, stateVars;
 
     public PDMPOSimpleMap(SimpleMap simpleMap, AbstractDoubleFactory doubleFactory) {
 
@@ -33,22 +38,50 @@ public class PDMPOSimpleMap implements PDMPO {
         this.perceptDomain = DomainFactory.getMazeWallCaptorDomain();
         //normalement l'ordre des positions est identiques que dans le RDB
         this.stateDomain = DomainFactory.getPositionsDomain(simpleMap.getAllStates());
+        //sert à initialiser les variabels du reseau apres extension
+        this.actionVar = new Variable(MOVE, actionDomain);
 
+        this.perceptVar = new Variable(WALL_PERCEPT, perceptDomain);
+        //sert au forward pour la requete et la liste des variables actions à ignorer
+        //lors de la construction de la distribution
+        this.actionVars = asList(new Variable(MOVE));
+
+        this.stateVars = asList(new Variable(POSITION));
+        //fabrique de double ou bigdecimal
         this.doubleFactory = doubleFactory;
     }
 
     @Override
     public List<Variable> getStates() {
 
-        return asList(new Variable(POSITION));
+        return this.stateVars;
     }
 
     @Override
     public List<Variable> getActions() {
 
-        return asList(new Variable(MOVE));
+        return this.actionVars;
     }
 
+    @Override
+    public Variable getActionVar() {
+
+        return this.actionVar;
+    }
+
+    @Override
+    public Variable getPerceptVar() {
+
+        return this.perceptVar;
+    }
+
+    /*
+     * retourne une liste d'acitons possible depuis un etat
+     * si plusieurs action son pourraient avoir des combinaisons d'actions
+     * DomainValue peut être utilisé de manière composite avec une Megavariable
+     * !! l'ordre de DomainValues action doit correspondre à celui des sous variables si Megavariable
+     * retourné par getActionVar
+     * */
     @Override
     public Set<Domain.DomainValue> getActionsFromState(Distribution forward) {
 
@@ -111,13 +144,17 @@ public class PDMPOSimpleMap implements PDMPO {
             //on ajoute la probabilité calculé pour une autre manière d'y acceder
             rsStateb.setProb(rsStateb.getProb().add(rsState.getProb()));
 
-        }else{
+        } else {
             //sinon on se contente de l'ajouter dans la map
             rsStates.put(position, rsState);
         }
 
     }
 
+    /*
+     * !! l'ordre de percept dans le Domainevalue composite  doit correspondre à celui des sous variables percepts
+     * si Megavariable retourné par getPerceptVar()
+     * */
     @Override
     public Domain.DomainValue getPerceptFromState(Domain.DomainValue state) {
         //la classe simple map fourni le percept à partir de la map et de la position
