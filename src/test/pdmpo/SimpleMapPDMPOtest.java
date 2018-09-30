@@ -122,7 +122,7 @@ public class SimpleMapPDMPOtest {
 
         PDMPOexploration pdmpoExploration = new PDMPOexploration();
 
-        PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestAction(dynamicBayesianNetwork, pdmpo, initForward, 2);
+        PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestAction(dynamicBayesianNetwork, pdmpo, initForward, 4, 0.3);
 
         System.out.println(result);
 
@@ -152,7 +152,7 @@ public class SimpleMapPDMPOtest {
 
         PDMPOexploration pdmpoExploration = new PDMPOexploration();
 
-        PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestActionPerceptSampling(dynamicBayesianNetwork, pdmpo, initForward, 5);
+        PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestActionPerceptSampling(dynamicBayesianNetwork, pdmpo, initForward, 2);
 
         System.out.println(result);
 

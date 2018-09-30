@@ -407,21 +407,27 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
     @Override
     public String toString() {
 
+        return toString("");
+    }
+
+
+    public String toString(String ident) {
+
         StringBuilder builder = new StringBuilder();
 
-        builder.append("------------------------------------------------------------------\n");
-        builder.append("------------------------------NETWORK-----------------------------\n");
-        builder.append("------------------------------------------------------------------\n\n");
+        builder.append(ident+"------------------------------------------------------------------\n");
+        builder.append(ident+"------------------------------NETWORK-----------------------------\n");
+        builder.append(ident+"------------------------------------------------------------------\n\n");
 
         //loadTree(this.roots, builder, 0);
 
         for (int key : timeVariables.keySet()) {
 
-            builder.append("\n======TIME [" + key + "]====== \n\n");
+            builder.append("\n"+ident+"======TIME [" + key + "]====== \n\n");
 
             for (Variable variable : this.timeVariables.get(key).values()) {
 
-                builder.append("        VAR : " + variable + " <--- " + variable.getDependencies() + "\n");
+                builder.append(ident+"        VAR : " + variable + " <--- " + variable.getDependencies() + "\n");
             }
 
         }
@@ -430,6 +436,8 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         return builder.toString();
     }
+
+
 
     /*
         private void loadTree(List<Variable> vars, StringBuilder builder, int depth) {
