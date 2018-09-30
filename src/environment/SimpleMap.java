@@ -19,6 +19,8 @@ public class SimpleMap implements Environment<Position> {
 
     private int xLimit, yLimit;
 
+    private Position agentPosition;
+
     public SimpleMap(String[] map) {
 
         this.map = map;
@@ -69,6 +71,8 @@ public class SimpleMap implements Environment<Position> {
         allStates.addAll(notFinalStates);
 
         allStates.addAll(finalStates);
+
+        agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
     }
 
     /*
@@ -99,6 +103,21 @@ public class SimpleMap implements Environment<Position> {
         }
 
         return perceptWall;
+    }
+
+    public PerceptWall getAgentPercept(){
+
+        return this.getPercept(this.agentPosition);
+    }
+
+    public void moveAgent(Cardinal move){
+
+        Position newPosition = this.agentPosition.move(move);
+
+        if( isPositionReachable(newPosition)) {
+
+            this.agentPosition = newPosition;
+        }
     }
 
     @Override
@@ -144,6 +163,10 @@ public class SimpleMap implements Environment<Position> {
 
     public Set<Position> getWalls() {
         return walls;
+    }
+
+    public Position getAgentPosition() {
+        return agentPosition;
     }
 
     public String getPoliticMap(Politic politic) {
