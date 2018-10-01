@@ -6,6 +6,7 @@ import domain.IDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import environment.Cardinal;
+import environment.DirectionMove;
 import environment.Position;
 import environment.SimpleMap;
 import javafx.geometry.Pos;
@@ -37,7 +38,7 @@ public class PDMPOSimpleMap implements PDMPO {
 
         this.simpleMap = simpleMap;
 
-        this.actionDomain = DomainFactory.getCardinalDomain();
+        this.actionDomain = DomainFactory.getDirectionMoveDomain();
 
         this.perceptDomain = DomainFactory.getMazeWallCaptorDomain();
         //normalement l'ordre des positions est identiques que dans le RDB
@@ -128,13 +129,13 @@ public class PDMPOSimpleMap implements PDMPO {
                 //recupere l'object position stocké dans la valeur de domaine
                 Position position = (Position) value.getValue();
                 //pour chaque direction alentours
-                for (Cardinal cardinal : Cardinal.values()) {
+                for (DirectionMove move : DirectionMove.values()) {
 
-                    Position nextPosition = position.move(cardinal);
+                    Position nextPosition = position.move(move);
 
                     if (simpleMap.isPositionReachable(nextPosition)) {
 
-                        actions.add(actionDomain.getDomainValue(cardinal));
+                        actions.add(actionDomain.getDomainValue(move));
                     }
                 }
             }
@@ -150,18 +151,18 @@ public class PDMPOSimpleMap implements PDMPO {
 
         Position position = (Position) state.getValue();
 
-        Cardinal direction = (Cardinal) action.getValue();
+        DirectionMove direction = (DirectionMove) action.getValue();
 
-        addNewPosition(rsStates, position, direction, 0.8);
+        this.addNewPosition(rsStates, position, direction, 0.8);
 
-        addNewPosition(rsStates, position, direction.getRelativeRight(), 0.1);
+        this.addNewPosition(rsStates, position, direction.getRelativeRight(), 0.1);
 
-        addNewPosition(rsStates, position, direction.getRelativeLeft(), 0.1);
+        this.addNewPosition(rsStates, position, direction.getRelativeLeft(), 0.1);
 
         return rsStates.values();
     }
 
-    private void addNewPosition(Map<Position, RsState> rsStates, Position position, Cardinal direction, double prob) {
+    private void addNewPosition(Map<Position, RsState> rsStates, Position position, DirectionMove direction, double prob) {
         //deplace la position dans la direction
         Position moveStraight = position.move(direction);
         //si position accessible dans le labyrinthe

@@ -44,7 +44,7 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
         IDomain perceptsDomain = DomainFactory.getMazeWallCaptorDomain();
 
-        IDomain actionsDomain = DomainFactory.getCardinalDomain();
+        IDomain actionsDomain = DomainFactory.getDirectionMoveDomain();
 
         Variable positionVar = new Variable(POSITION, positionsDomain),
                 actionVar = new Variable(MOVE, actionsDomain),
@@ -189,31 +189,31 @@ public class MazeRobotRDDFactory implements NetworkFactory {
 
                 Position currentPos = (Position) position.getValue();
                 //tout droit 80%
-                Cardinal actionStraight = (Cardinal) action.getValue();
+                DirectionMove actionStraight = (DirectionMove) action.getValue();
                 //à droite 10%
-                Cardinal actionRight = actionStraight.getRelativeRight();
+                DirectionMove actionRight = actionStraight.getRelativeRight();
                 //à gauche 10%
-                Cardinal actionLeft = actionStraight.getRelativeLeft();
+                DirectionMove actionLeft = actionStraight.getRelativeLeft();
 
-                Position positionStraight = currentPos.move(actionStraight);
+                Position moveStraight = currentPos.move(actionStraight);
                 //si position inatteignable il but sur le mur
-                if (!simpleMap.isPositionReachable(positionStraight)) {
+                if (!simpleMap.isPositionReachable(moveStraight)) {
 
-                    positionStraight = currentPos;
+                    moveStraight = currentPos;
                 }
 
-                Position positionRight = currentPos.move(actionRight);
+                Position moveRight = currentPos.move(actionRight);
 
-                if (!simpleMap.isPositionReachable(positionRight)) {
+                if (!simpleMap.isPositionReachable(moveRight)) {
 
-                    positionRight = currentPos;
+                    moveRight = currentPos;
                 }
 
-                Position positionLeft = currentPos.move(actionLeft);
+                Position moveLeft = currentPos.move(actionLeft);
 
-                if (!simpleMap.isPositionReachable(positionLeft)) {
+                if (!simpleMap.isPositionReachable(moveLeft)) {
 
-                    positionLeft = currentPos;
+                    moveLeft = currentPos;
                 }
 
                 int d2 = 0;
@@ -221,25 +221,28 @@ public class MazeRobotRDDFactory implements NetworkFactory {
                 for (Domain.DomainValue<Position> position1 : positionsDomain.getValues()) {
 
                     Position positionRs = (Position) position1.getValue();
+                    //initialise à zéro
+                    TCP[d1][d2] = 0.0;
 
+                    //!!! si un position est atteignable via plusieurs deplacement
+                    //du aux obstacles les probabilités s'accumulent
                     //si la position correspond à celle atteignable en allant tout droit
-                    if (positionRs.equals(positionStraight)) {
+                    if (positionRs.equals(moveStraight)) {
 
                         TCP[d1][d2] = 0.8;
+                    }
 
-                        //si la position correspond à celle atteignable en allant à droite
-                    } else if (positionRs.equals(positionRight)) {
+                    //si la position correspond à celle atteignable en allant à droite
+                    if (positionRs.equals(moveRight)) {
 
-                        TCP[d1][d2] = 0.1;
+                        TCP[d1][d2] += 0.1;
+                    }
 
-                        //si la position correspond à celle atteignable en allant à gauche
-                    } else if (positionRs.equals(positionLeft)) {
+                    //si la position correspond à celle atteignable en allant à gauche
 
-                        TCP[d1][d2] = 0.1;
+                    if (positionRs.equals(moveLeft)) {
 
-                    } else {
-
-                        TCP[d1][d2] = 0.0;
+                        TCP[d1][d2] += 0.1;
                     }
 
                     d2++;

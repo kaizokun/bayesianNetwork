@@ -31,7 +31,6 @@ public class PDMPOexploration {
         return getBestActionPerceptSampling(network, pdmpo, forward, 0, limit, network.getDoubleFactory().getNew(0.0));
     }
 
-
     private PDMPOsearchResult getBestActionPerceptSampling(DynamicBayesianNetwork network, PDMPO pdmpo, Distribution forward,
                                                            int time, int limit, AbstractDouble reward) {
 

@@ -31,9 +31,9 @@ public class Position implements State{
 
     public boolean adjacent(Position p2) {
 
-        for(Cardinal cardinal : Cardinal.values()){
+        for(DirectionMove move : DirectionMove.getMoves()){
 
-            Position adj = move(cardinal);
+            Position adj = move(move);
 
             if(p2.equals(adj)){
 
@@ -48,9 +48,9 @@ public class Position implements State{
 
         List<Position> positions = new LinkedList();
 
-        for(Cardinal cardinal : Cardinal.values()){
+        for(DirectionMove move : DirectionMove.getMoves()){
 
-            positions.add(this.move(cardinal));
+            positions.add(this.move(move));
         }
 
         return positions;
@@ -59,6 +59,11 @@ public class Position implements State{
     public Position move(Cardinal cardinal){
 
         return new Position(this.y + cardinal.getDeltaY(), this.x + cardinal.getDeltaX());
+    }
+
+    public Position move(DirectionMove move){
+
+        return new Position(this.y + move.getDeltaY(), this.x + move.getDeltaX());
     }
 
     @Override

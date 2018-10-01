@@ -6,10 +6,7 @@ import decision.PDMPOexploration;
 import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
-import environment.Cardinal;
-import environment.PerceptWall;
-import environment.Position;
-import environment.SimpleMap;
+import environment.*;
 import math.Distribution;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
@@ -114,6 +111,7 @@ public class SimpleMapPDMPOtest {
         SimpleMap simpleMap = new SimpleMap(map);
         //reseau baysien utilié pour l'exploration
         DynamicBayesianNetwork explorationNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
+
         //reseau bayesien utilisé par l'agent
         DynamicBayesianNetwork agentNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
         //PDMPO simplemap
@@ -123,26 +121,27 @@ public class SimpleMapPDMPOtest {
 
         PDMPOexploration pdmpoExploration = new PDMPOexploration();
 
-        LinkedList<Cardinal> actions = new LinkedList<>();
+        LinkedList<DirectionMove> actions = new LinkedList<>();
 
         LinkedList<Position> positions = new LinkedList<>();
 
         do {
-            System.out.println("AGENT REAL POSITION "+simpleMap.getAgentPosition());
 
-            System.out.println("AGENT REAL PERCEPT "+simpleMap.getAgentPercept());
+            System.out.println("AGENT REAL POSITION " + simpleMap.getAgentPosition());
+
+            System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
 
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
             PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestAction(explorationNetwork, pdmpo, stateOfBelieve, 3, 0.3);
 
             positions.add(simpleMap.getAgentPosition());
 
-            actions.add((Cardinal) result.getAction().getValue());
-            System.out.println("BEST ACTION "+result);
+            actions.add((DirectionMove) result.getAction().getValue());
+            System.out.println("BEST ACTION " + result);
             //deplace l'agent dans l'environnement
-            simpleMap.moveAgent((Cardinal) result.getAction().getValue());
+            simpleMap.moveAgent((DirectionMove) result.getAction().getValue());
 
-            System.out.println("AGENT NEW REAL POSITION "+simpleMap.getAgentPosition());
+            System.out.println("AGENT NEW REAL POSITION " + simpleMap.getAgentPosition());
             //recupère le percept courant de l'agant
             PerceptWall perceptWall = simpleMap.getAgentPercept();
             //met à jour l'état de croyance de l'agent
@@ -166,14 +165,14 @@ public class SimpleMapPDMPOtest {
             System.out.println("AGENT STATE OF BELIEVE ");
             System.out.println(stateOfBelieve);
 
-        }while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
+        } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
 
 
-        do{
+        do {
 
-            System.out.println(positions.removeFirst()+" -> "+actions.removeFirst());
+            System.out.println(positions.removeFirst() + " -> " + actions.removeFirst());
 
-        }while (!actions.isEmpty());
+        } while (!actions.isEmpty());
 
     }
 
@@ -198,26 +197,27 @@ public class SimpleMapPDMPOtest {
 
         PDMPOexploration pdmpoExploration = new PDMPOexploration();
 
-        LinkedList<Cardinal> actions = new LinkedList<>();
+        LinkedList<DirectionMove> actions = new LinkedList<>();
 
         LinkedList<Position> positions = new LinkedList<>();
 
-       do {
-            System.out.println("AGENT REAL POSITION "+simpleMap.getAgentPosition());
+        do {
 
-            System.out.println("AGENT REAL PERCEPT "+simpleMap.getAgentPercept());
+            System.out.println("AGENT REAL POSITION " + simpleMap.getAgentPosition());
+
+            System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
 
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
             PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestActionPerceptSampling(explorationNetwork, pdmpo, stateOfBelieve, 4);
 
             positions.add(simpleMap.getAgentPosition());
 
-            actions.add((Cardinal) result.getAction().getValue());
-            System.out.println("BEST ACTION "+result);
+            actions.add((DirectionMove) result.getAction().getValue());
+            System.out.println("BEST ACTION " + result);
             //deplace l'agent dans l'environnement
-            simpleMap.moveAgent((Cardinal) result.getAction().getValue());
+            simpleMap.moveAgent((DirectionMove) result.getAction().getValue());
 
-            System.out.println("AGENT NEW REAL POSITION "+simpleMap.getAgentPosition());
+            System.out.println("AGENT NEW REAL POSITION " + simpleMap.getAgentPosition());
             //recupère le percept courant de l'agant
             PerceptWall perceptWall = simpleMap.getAgentPercept();
             //met à jour l'état de croyance de l'agent
@@ -241,14 +241,14 @@ public class SimpleMapPDMPOtest {
             System.out.println("AGENT STATE OF BELIEVE ");
             System.out.println(stateOfBelieve);
 
-        }while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
+        } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
 
 
-       do{
+        do {
 
-           System.out.println(positions.removeFirst()+" -> "+actions.removeFirst());
+            System.out.println(positions.removeFirst() + " -> " + actions.removeFirst());
 
-       }while (!actions.isEmpty());
+        } while (!actions.isEmpty());
 
     }
 

@@ -94,9 +94,9 @@ public class SimpleMap implements Environment<Position> {
 
         PerceptWall perceptWall = new PerceptWall();
 
-        for(Cardinal cardinal : Cardinal.values()){
+        for (Cardinal cardinal : Cardinal.values()) {
 
-            if(!isPositionReachable(position.move(cardinal))){
+            if (!isPositionReachable(position.move(cardinal))) {
 
                 perceptWall.addWallDirection(cardinal);
             }
@@ -105,27 +105,27 @@ public class SimpleMap implements Environment<Position> {
         return perceptWall;
     }
 
-    public PerceptWall getAgentPercept(){
+    public PerceptWall getAgentPercept() {
 
         return this.getPercept(this.agentPosition);
     }
 
-    public void moveAgent(Cardinal move){
+    public void moveAgent(DirectionMove move) {
 
         Position newPosition = this.agentPosition.move(move);
 
-        if( isPositionReachable(newPosition)) {
+        if (isPositionReachable(newPosition)) {
 
             this.agentPosition = newPosition;
         }
     }
 
     @Override
-    public List<Cardinal> getActions(Position state) {
+    public List<DirectionMove> getActions(Position state) {
 
-        List<Cardinal> actions = new LinkedList<>();
+        List<DirectionMove> actions = new LinkedList<>();
 
-        for (Cardinal direction : Cardinal.values()) {
+        for (DirectionMove direction : DirectionMove.values()) {
 
             Position adjPos = state.move(direction);
 
@@ -173,7 +173,7 @@ public class SimpleMap implements Environment<Position> {
 
         StringBuilder builder = new StringBuilder();
 
-        char[] movSymbols = new char[]{'^', 'v', '>', '<'};
+        char[] movSymbols = new char[]{'^', '>', 'v', '<'};
 
         Map<State, String> statesSymbols = new Hashtable<>();
 
@@ -181,9 +181,9 @@ public class SimpleMap implements Environment<Position> {
 
             Action action = politic.getAction(state);
 
-            Cardinal cardinal = (Cardinal) action;
+            DirectionMove directionMove = (DirectionMove) action;
 
-            statesSymbols.put(state, "[" + movSymbols[cardinal.ordinal()] + "]");
+            statesSymbols.put(state, "[" + movSymbols[directionMove.ordinal()] + "]");
         }
 
         statesSymbols.put(badExit, "[-]");

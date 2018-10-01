@@ -10,9 +10,9 @@ public class MDPsimpleMap implements MDP {
 
     private SimpleMap simpleMap;
 
-    private Map<State, List<Cardinal>> stateActions = new Hashtable<>();
+    private Map<State, List<DirectionMove>> stateActions = new Hashtable<>();
 
-    private Map<State, Map<Cardinal, List<Transition>>> stateTransitions = new Hashtable<>();
+    private Map<State, Map<DirectionMove, List<Transition>>> stateTransitions = new Hashtable<>();
 
     private Double discount;
 
@@ -32,20 +32,23 @@ public class MDPsimpleMap implements MDP {
 
     private void initActionsTransitions() {
 
+        //pour chaque état non final
         for (Position state : this.simpleMap.getNotFinalStates()) {
-
-            List<Cardinal> actions = this.simpleMap.getActions(state);
-
-            stateActions.put(state, actions);
-
-            for (Cardinal action : actions) {
+            //recupere la liste des actions depuis l'environement
+            //en fonction des positions atteignables
+            List<DirectionMove> actions = this.simpleMap.getActions(state);
+            //lie la liste des actions à un état
+            this.stateActions.put(state, actions);
+            //pour chaque action initialise les transitions possible et leurs probabilités.
+            //actions non deterministe
+            for (DirectionMove action : actions) {
 
                 this.initTransition(state, action);
             }
         }
     }
 
-    private void initTransition(Position fromState, Cardinal action) {
+    private void initTransition(Position fromState, DirectionMove action) {
 
         //permet de savoir si une transition vers une position est déja enregistré pour augmenter sa probabilité
         Map<Position, Transition> transitionsMap = new Hashtable<>();
@@ -62,7 +65,7 @@ public class MDPsimpleMap implements MDP {
 
         //rsState = fromState.move(relativeRight);
 
-        Cardinal relativeRight = action.getRelativeRight();
+        DirectionMove relativeRight = action.getRelativeRight();
 
         rsState = fromState.move(relativeRight);
 
@@ -71,7 +74,7 @@ public class MDPsimpleMap implements MDP {
 
             rsState = fromState;
         }
-
+        //ici on pourrait faire du surplace
         transitionsMap.put(rsState, new Transition(0.1, rsState, relativeRight));
 
         //action gauche relativement à la direction de l'action
@@ -80,7 +83,7 @@ public class MDPsimpleMap implements MDP {
 
         //Cardinal relativeLeft = Cardinal.getClockOrderValues()[idDirection];
 
-        Cardinal relativeLeft = action.getRelativeLeft();
+        DirectionMove relativeLeft = action.getRelativeLeft();
 
         rsState = fromState.move(relativeLeft);
 
@@ -104,7 +107,7 @@ public class MDPsimpleMap implements MDP {
 
         List<Transition> transitions = new LinkedList<>(transitionsMap.values());
 
-        Map<Cardinal, List<Transition>> actionTransitionsMap = this.stateTransitions.get(fromState);
+        Map<DirectionMove, List<Transition>> actionTransitionsMap = this.stateTransitions.get(fromState);
 
         if (actionTransitionsMap == null) {
 
@@ -180,7 +183,7 @@ public class MDPsimpleMap implements MDP {
         //pour chaque position non finale
         for (Position position : this.simpleMap.getNotFinalStates()) {
 
-            List<Cardinal> actions = this.stateActions.get(position);
+            List<DirectionMove> actions = this.stateActions.get(position);
 
             int totalActions = actions.size();
 

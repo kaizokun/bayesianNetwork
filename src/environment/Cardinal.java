@@ -12,11 +12,11 @@ public enum Cardinal implements Action {
     private static final int delta[][] = new int[][]{{+1, 0}, {-1, 0}, {0, +1}, {0, -1}};
 
     private static final Set<Cardinal> cardinalSet = new LinkedHashSet<>();
-
+/*
     private static final Cardinal[] clockOrderValues = new Cardinal[4];
 
     private static final int[] clockOrderOrdinal = new int[4];
-
+*/
     static {
 
         cardinalSet.add(NORTH);
@@ -26,7 +26,7 @@ public enum Cardinal implements Action {
         cardinalSet.add(EAST);
 
         cardinalSet.add(WEST);
-
+/*
         clockOrderValues[0] = NORTH;
 
         clockOrderValues[1] = EAST;
@@ -42,17 +42,9 @@ public enum Cardinal implements Action {
         clockOrderOrdinal[SOUTH.ordinal()] = 2;
 
         clockOrderOrdinal[WEST.ordinal()] = 3;
+        */
     }
 
-    public static Set<Cardinal> getCardinalSet() {
-
-        return cardinalSet;
-    }
-
-    public static Cardinal[] getCardinalTab() {
-
-        return values();
-    }
 
     public static Set<Cardinal> getCardinalSetCopy() {
 
@@ -68,7 +60,7 @@ public enum Cardinal implements Action {
 
         return delta[this.ordinal()][1];
     }
-
+/*
     private static Cardinal[] getClockOrderValues() {
         return clockOrderValues;
     }
@@ -91,4 +83,5 @@ public enum Cardinal implements Action {
 
         return clockOrderOrdinal[this.ordinal()];
     }
+    */
 }

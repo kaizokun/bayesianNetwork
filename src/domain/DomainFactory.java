@@ -29,6 +29,11 @@ public class DomainFactory {
         return new Domain<>(Cardinal.values());
     }
 
+    public static IDomain getDirectionMoveDomain(){
+
+        return new Domain<>(DirectionMove.values());
+    }
+
     public static IDomain getMazePositionDomain(MazeRobot robot) {
 
         Position[] positions = new Position[robot.getReachablePositions().size()];
