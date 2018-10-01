@@ -111,19 +111,34 @@ public class SimpleMapPDMPOtest {
         SimpleMap simpleMap = new SimpleMap(map);
         //reseau baysien utilié pour l'exploration
         DynamicBayesianNetwork explorationNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
-
         //reseau bayesien utilisé par l'agent
         DynamicBayesianNetwork agentNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, explorationNetwork.getDoubleFactory());
-        //distribution d'origine sur les états
-        Distribution stateOfBelieve = explorationNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), 0, null);
+        //premiere extension du reseau de l'agent
+        agentNetwork.extend();
+        //initialisation du premier percepts et d'une action sans deplacement pour effectuer un forward
+        Variable perceptVar = pdmpo.getPerceptVar();
+        //l'environement fourni le percept
+        perceptVar.setValue(simpleMap.getAgentPercept());
+
+        Variable actionVar = pdmpo.getActionVar();
+
+        actionVar.setValue(DirectionMove.ON_THE_SPOT);
+
+        agentNetwork.initVar(0, actionVar);
+
+        agentNetwork.initVar(1, perceptVar);
+
+        Distribution stateOfBelieve = agentNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), 1, null);
 
         PDMPOexploration pdmpoExploration = new PDMPOexploration();
 
         LinkedList<DirectionMove> actions = new LinkedList<>();
 
         LinkedList<Position> positions = new LinkedList<>();
+
+        System.out.println(stateOfBelieve);
 
         do {
 
@@ -132,7 +147,8 @@ public class SimpleMapPDMPOtest {
             System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
 
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
-            PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestAction(explorationNetwork, pdmpo, stateOfBelieve, 3, 0.3);
+            PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestAction(explorationNetwork, pdmpo,
+                    stateOfBelieve, 1, 0.7, 0.01);
 
             positions.add(simpleMap.getAgentPosition());
 
@@ -148,14 +164,10 @@ public class SimpleMapPDMPOtest {
             //1.etend le reseau
             agentNetwork.extend();
             //2.recupere la variable action et initialise sa valeur
-            Variable actionVar = pdmpo.getActionVar();
-
             actionVar.setDomainValue(result.getAction());
             //3.initialise la variable action au temps avant extension dans le reseau
             agentNetwork.initVar(agentNetwork.getTime() - 1, actionVar);
             //4.recupere la variable percept et initialise sa valeur
-            Variable perceptVar = pdmpo.getPerceptVar();
-
             perceptVar.setValue(perceptWall);
             //5.initialise la variable percept au temps courant dans le reseau
             agentNetwork.initVar(agentNetwork.getTime(), perceptVar);
@@ -164,6 +176,8 @@ public class SimpleMapPDMPOtest {
 
             System.out.println("AGENT STATE OF BELIEVE ");
             System.out.println(stateOfBelieve);
+
+            System.exit(0);
 
         } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
 
@@ -208,7 +222,8 @@ public class SimpleMapPDMPOtest {
             System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
 
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
-            PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestActionPerceptSampling(explorationNetwork, pdmpo, stateOfBelieve, 4);
+            PDMPOexploration.PDMPOsearchResult result = pdmpoExploration.getBestActionPerceptSampling(
+                    explorationNetwork, pdmpo, stateOfBelieve, 4, 0.01);
 
             positions.add(simpleMap.getAgentPosition());
 
