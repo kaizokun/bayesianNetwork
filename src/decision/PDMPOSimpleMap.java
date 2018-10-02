@@ -110,6 +110,11 @@ public class PDMPOSimpleMap implements PDMPO {
         return this.perceptVar;
     }
 
+    @Override
+    public Domain.DomainValue geNoAction() {
+        return this.actionDomain.getDomainValue(DirectionMove.ON_THE_SPOT);
+    }
+
     /*
      * retourne une liste d'acitons possible depuis un etat
      * si plusieurs action son pourraient avoir des combinaisons d'actions

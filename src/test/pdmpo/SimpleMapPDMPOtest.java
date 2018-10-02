@@ -176,10 +176,10 @@ public class SimpleMapPDMPOtest {
             stateOfBelieve = agentNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), agentNetwork.getTime(), stateOfBelieve);
 
             System.out.println("AGENT STATE OF BELIEVE ");
+
             System.out.println(stateOfBelieve);
 
         } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
-
 
         do {
 
@@ -194,16 +194,20 @@ public class SimpleMapPDMPOtest {
 
         PDMPOexplorationPerceptTest(
                 new PDMPOexplorationFullPercept(
-                    new MyDoubleFactory(), 0.75, 0.1), 3);
+                    new MyDoubleFactory(), 0.01, 0.7), 3);
 
     }
 
     @Test
     public void PDMPOexplorationPerceptSamplingTest() {
 
+        //algorithme qui ne fait des prevision de percepts que sur un seul echantilloné
+        //à partir de la distribution sur les percepts, maleuresement parfois il echantillone des percepts trop improbable
+        //au detriment des plus probables
+
         PDMPOexplorationPerceptTest(
                 new PDMPOexplorationSamplingPercept(
-                        new MyDoubleFactory(), 0.75), 5);
+                        new MyDoubleFactory(), 0.01), 4);
 
     }
 

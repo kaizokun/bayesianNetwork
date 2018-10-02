@@ -11,6 +11,8 @@ import network.dynamic.DynamicBayesianNetwork;
 
 import java.util.*;
 
+import static java.util.Arrays.asList;
+
 
 public class PDMPOexplorationSamplingPercept extends PDMPOexploration {
 
@@ -35,10 +37,15 @@ public class PDMPOexplorationSamplingPercept extends PDMPOexploration {
     protected List<Map.Entry<Domain.DomainValue, AbstractDouble>> filterPercepts(
             Map<Domain.DomainValue, AbstractDouble> perceptsMap, String ident) {
 
+       // System.out.println();
+       // System.out.println("------ FILTER PERCEPTS-------");
+
+        //System.out.println(Util.printMap(perceptsMap));
+
         //probabilités des percepts cumule à partir de 0
         AbstractDouble cumul = network.getDoubleFactory().getNew(0.0);
         //tableau pour recherche dichotomique d'entrées (DomainValue:Range de probabilité)
-        List<Map.Entry<Domain.DomainValue, FrequencyRange>> frequencies = Arrays.asList(new Map.Entry[perceptsMap.size()]);
+        List<Map.Entry<Domain.DomainValue, FrequencyRange>> frequencies = asList(new Map.Entry[perceptsMap.size()]);
 
         int i = 0;
 
@@ -62,13 +69,15 @@ public class PDMPOexplorationSamplingPercept extends PDMPOexploration {
 
         double rdmDouble = rdm.nextDouble();
 
-        // System.out.println(ident + " " + rdmDouble);
+       // System.out.println(ident + " " + rdmDouble);
 
-        // System.out.println(ident + " " + frequencies);
+       // System.out.println(ident + " " + frequencies);
 
         Domain.DomainValue samplePercept = FrequencyRange.dichotomicSearch(frequencies, network.getDoubleFactory().getNew(rdmDouble));
 
-        return Arrays.asList(new AbstractMap.SimpleEntry(samplePercept, perceptsMap.get(samplePercept)));
+        //System.out.println("SAMPLE PERCEPT : "+samplePercept);
+
+        return asList(new AbstractMap.SimpleEntry(samplePercept, perceptsMap.get(samplePercept)));
     }
 
 

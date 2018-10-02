@@ -214,4 +214,16 @@ public class Util {
         }
     }
 
+    public static String printMap(Map<?,?> map){
+
+        StringBuilder builder = new StringBuilder();
+
+        for(Map.Entry entry : map.entrySet()){
+
+            builder.append(entry.getKey()+" :  "+entry.getValue()+"\n");
+        }
+
+        return builder.toString();
+    }
+
 }
