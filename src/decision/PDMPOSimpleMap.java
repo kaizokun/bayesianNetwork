@@ -5,7 +5,6 @@ import domain.DomainFactory;
 import domain.IDomain;
 import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
-import environment.Cardinal;
 import environment.DirectionMove;
 import environment.Position;
 import environment.SimpleMap;
@@ -16,9 +15,9 @@ import network.Variable;
 import java.util.*;
 
 import static java.util.Arrays.asList;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.MOVE;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.POSITION;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.MOVE;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.POSITION;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
 
 public class PDMPOSimpleMap implements PDMPO {
 
@@ -33,6 +32,8 @@ public class PDMPOSimpleMap implements PDMPO {
     protected List<Variable> actionVars, stateVars;
 
     protected Map<Position, AbstractDouble> statesUtility = new Hashtable<>();
+
+    protected Map<Position, Set<Domain.DomainValue>> positionsMoves = new Hashtable<>();
 
     public PDMPOSimpleMap(SimpleMap simpleMap, AbstractDoubleFactory doubleFactory) {
 
@@ -56,6 +57,31 @@ public class PDMPOSimpleMap implements PDMPO {
         this.doubleFactory = doubleFactory;
 
         this.initStatesUtility();
+
+        this.initPositionsMoves();
+    }
+
+    private void initPositionsMoves() {
+
+        //pour chaque état non final
+        for(Position position : simpleMap.getNotFinalStates()){
+
+            //crée un ensemble de deplacement
+            Set<Domain.DomainValue> positionMoves = new HashSet<>();
+
+            //pour chaque deplacement possible
+            for (DirectionMove move : DirectionMove.getMoves()) {
+                //deplace la position
+                Position nextPosition = position.move(move);
+                //si deplacement possible
+                if (simpleMap.isPositionReachable(nextPosition)) {
+                    //ajout de l'objet DomainValue encapsulant la direction dans le set
+                    positionMoves.add(actionDomain.getDomainValue(move));
+                }
+            }
+
+            positionsMoves.put(position, positionMoves);
+        }
     }
 
     private void initStatesUtility() {
@@ -111,7 +137,7 @@ public class PDMPOSimpleMap implements PDMPO {
     }
 
     @Override
-    public Domain.DomainValue geNoAction() {
+    public Domain.DomainValue getNoAction() {
         return this.actionDomain.getDomainValue(DirectionMove.ON_THE_SPOT);
     }
 
@@ -122,6 +148,8 @@ public class PDMPOSimpleMap implements PDMPO {
      * !! l'ordre de DomainValues action doit correspondre à celui des sous variables si Megavariable
      * retourné par getActionVar
      * */
+
+
     @Override
     public Set<Domain.DomainValue> getActionsFromState(Distribution forward, AbstractDouble minProb) {
 
@@ -135,16 +163,8 @@ public class PDMPOSimpleMap implements PDMPO {
                 Position position = (Position) value.getValue();
                 //deplacement impossible depuis les positions finales
                 if (!simpleMap.isFinalState(position)) {
-                    //pour chaque direction alentours
-                    for (DirectionMove move : DirectionMove.getMoves()) {
-
-                        Position nextPosition = position.move(move);
-
-                        if (simpleMap.isPositionReachable(nextPosition)) {
-
-                            actions.add(actionDomain.getDomainValue(move));
-                        }
-                    }
+                    //ajout des actions possible (précalculées) depuis la position
+                    actions.addAll(positionsMoves.get(position));
                 }
             }
         }
@@ -152,8 +172,17 @@ public class PDMPOSimpleMap implements PDMPO {
         return actions;
     }
 
+    protected Map<String, Collection<RsState>> stateActionResultMap = new Hashtable<>();
+
     @Override
     public Collection<RsState> getResultStates(Domain.DomainValue state, Domain.DomainValue action) {
+
+        String stateActionKey = state.toString() + "." + action.toString();
+
+        if (stateActionResultMap.containsKey(stateActionKey)) {
+
+            return stateActionResultMap.get(stateActionKey);
+        }
 
         //map permetant de savoir si une position resultat est déja enregistré
         //dans quel cas sa probabilité doit augmenter si plusieurs moyens d'access
@@ -175,6 +204,8 @@ public class PDMPOSimpleMap implements PDMPO {
 
         this.addNewPosition(rsStates, positionOrigin, move.getRelativeLeft(), 0.1);
 
+        stateActionResultMap.put(stateActionKey, rsStates.values());
+
         return rsStates.values();
     }
 
@@ -189,7 +220,7 @@ public class PDMPOSimpleMap implements PDMPO {
         //on fait du sur place
         if (!simpleMap.isPositionReachable(nextPosition)) {
 
-           nextPosition = positionOrigin;
+            nextPosition = positionOrigin;
         }
 
         //si l'état resultat a déja été enregistré
@@ -219,5 +250,11 @@ public class PDMPOSimpleMap implements PDMPO {
     public boolean isFinalState(Domain.DomainValue state) {
 
         return this.simpleMap.isFinalState((Position) state.getValue());
+    }
+
+    @Override
+    public AbstractDouble getProbRightPercept(Domain.DomainValue percept) {
+
+        return doubleFactory.getNew(0.6);
     }
 }

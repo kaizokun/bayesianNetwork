@@ -5,7 +5,6 @@ import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import inference.dynamic.Util;
 import math.Distribution;
-import network.FrequencyRange;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
 
@@ -83,7 +82,7 @@ public abstract class PDMPOexploration {
             //System.out.println(forward);
 
             //dans ce cas retourner une action vide avec une utilité correspondant à l'état final
-            return new PDMPOsearchResult(pdmpo.geNoAction(), pdmpo.getUtility(forward));
+            return new PDMPOsearchResult(pdmpo.getNoAction(), pdmpo.getUtility(forward));
         }
 
         //on etend le network pour le temps time si necessaire
@@ -240,7 +239,20 @@ public abstract class PDMPOexploration {
                 }
             }
         }
+/*
+        AbstractDouble total = df.getNew(0.0);
+        //calcule le total pour normaliser au cas ou la distribution ne l'est pas
+        //les percepts sont ponderés pour simuler le bruit dans les capteurs.
+        for(Map.Entry<Domain.DomainValue,AbstractDouble> entry : perceptsMap.entrySet()){
 
+            total = total.add(entry.getValue().multiply(pdmpo.getProbRightPercept(entry.getKey())));
+        }
+
+        for(Map.Entry<Domain.DomainValue,AbstractDouble> entry : perceptsMap.entrySet()){
+
+            entry.setValue(entry.getValue().divide(total));
+        }
+*/
         return perceptsMap;
     }
 

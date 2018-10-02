@@ -74,9 +74,9 @@ public class SimpleMap implements Environment<Position> {
 
         allStates.addAll(finalStates);
 
-        //agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
+        agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
 
-        agentPosition = new Position(3, 1);
+        //agentPosition = new Position(3, 1);
     }
 
     /*

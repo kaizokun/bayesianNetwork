@@ -28,9 +28,11 @@ public interface PDMPO {
 
     Domain.DomainValue getPerceptFromState(Domain.DomainValue state);
 
-    Domain.DomainValue geNoAction();
+    Domain.DomainValue getNoAction();
 
     boolean isFinalState(Domain.DomainValue state);
+
+    AbstractDouble getProbRightPercept(Domain.DomainValue key);
 
     class RsState {
 

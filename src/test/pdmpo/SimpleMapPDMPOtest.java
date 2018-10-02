@@ -4,23 +4,21 @@ import decision.*;
 import domain.Domain;
 import domain.DomainFactory;
 import domain.IDomain;
-import domain.data.MyBigDecimalFactory;
 import domain.data.MyDoubleFactory;
 import environment.*;
 import math.Distribution;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
-import network.factory.MazeRobotRDDFactory;
+import network.factory.SimpleMapRDDFactory;
 import org.junit.Test;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import static java.util.Arrays.asList;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.MOVE;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.POSITION;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.MOVE;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.POSITION;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
 
 public class SimpleMapPDMPOtest {
 
@@ -33,7 +31,7 @@ public class SimpleMapPDMPOtest {
 
         SimpleMap simpleMap = new SimpleMap(map);
 
-        DynamicBayesianNetwork dynamicBayesianNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
+        DynamicBayesianNetwork dynamicBayesianNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
 
         dynamicBayesianNetwork.extend();
 
@@ -58,7 +56,7 @@ public class SimpleMapPDMPOtest {
         IDomain domainPercept = DomainFactory.getMazeWallCaptorDomain(),
                 domainMove = DomainFactory.getCardinalDomain();
 
-        DynamicBayesianNetwork dynamicBayesianNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
+        DynamicBayesianNetwork dynamicBayesianNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
 
         System.out.println(dynamicBayesianNetwork);
 
@@ -101,18 +99,14 @@ public class SimpleMapPDMPOtest {
     }
 
 
-    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, int limit) {
-
-        String map[] = new String[]{"   +",
-                " # -",
-                "    "};
+    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, String[] map, int limit) {
 
         //environnement
         SimpleMap simpleMap = new SimpleMap(map);
         //reseau baysien utilié pour l'exploration
-        DynamicBayesianNetwork explorationNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
+        DynamicBayesianNetwork explorationNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
         //reseau bayesien utilisé par l'agent
-        DynamicBayesianNetwork agentNetwork = new MazeRobotRDDFactory(simpleMap).initNetwork();
+        DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, explorationNetwork.getDoubleFactory());
         //fourni le reseau à l'algo d'exploration
@@ -192,10 +186,24 @@ public class SimpleMapPDMPOtest {
     @Test
     public void PDMPOexplorationPerceptAVGTest() {
 
-        PDMPOexplorationPerceptTest(
-                new PDMPOexplorationFullPercept(
-                    new MyDoubleFactory(), 0.01, 0.7), 3);
+        String map[] = new String[]{
+                "   +",
+                " # -",
+                "    "
+        };
+/*
+        String map[] = new String[]{
+                "  #  +",
+                " #    ",
+                "   # -",
+                " # #  ",
+                "      "
+        };
+*/
+        PDMPOexploration search = new PDMPOexplorationFullPercept(
+                new MyDoubleFactory(), 0.01, 0.5);
 
+        PDMPOexplorationPerceptTest(search, map, 6);
     }
 
     @Test
@@ -204,10 +212,25 @@ public class SimpleMapPDMPOtest {
         //algorithme qui ne fait des prevision de percepts que sur un seul echantilloné
         //à partir de la distribution sur les percepts, maleuresement parfois il echantillone des percepts trop improbable
         //au detriment des plus probables
+/*
+        String map[] = new String[]{
+                "   +",
+                " # -",
+                "    "
+        };
+*/
+        String map[] = new String[]{
+                "  #  +",
+                " #    ",
+                "   # -",
+                " # #  ",
+                "      "
+        };
 
-        PDMPOexplorationPerceptTest(
-                new PDMPOexplorationSamplingPercept(
-                        new MyDoubleFactory(), 0.01), 4);
+
+        PDMPOexploration search = new PDMPOexplorationSamplingPercept(new MyDoubleFactory(), 0.01);
+
+        PDMPOexplorationPerceptTest(search, map, 6);
 
     }
 

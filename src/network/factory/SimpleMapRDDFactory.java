@@ -12,15 +12,15 @@ import network.dynamic.DynamicBayesianNetwork;
 import network.dynamic.Model;
 
 import static java.util.Arrays.asList;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.MOVE;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.POSITION;
-import static network.factory.MazeRobotRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.MOVE;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.POSITION;
+import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
 
-public class MazeRobotRDDFactory implements NetworkFactory {
+public class SimpleMapRDDFactory implements NetworkFactory {
 
     protected SimpleMap simpleMap;
 
-    public MazeRobotRDDFactory(SimpleMap simpleMap) {
+    public SimpleMapRDDFactory(SimpleMap simpleMap) {
         this.simpleMap = simpleMap;
     }
 
