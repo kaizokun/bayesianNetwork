@@ -22,11 +22,15 @@ public interface PDMPO {
 
     Variable getPerceptVar();
 
+    boolean isFinalState(Distribution forward, AbstractDouble minProb);
+
     Set<Domain.DomainValue> getActionsFromState(Distribution forward);
 
     Collection<RsState> getResultStates(Domain.DomainValue state, Domain.DomainValue action);
 
     Domain.DomainValue getPerceptFromState(Domain.DomainValue state);
+
+    boolean isFinalState(Domain.DomainValue state);
 
     class RsState {
 

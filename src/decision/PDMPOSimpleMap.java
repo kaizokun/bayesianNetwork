@@ -60,7 +60,7 @@ public class PDMPOSimpleMap implements PDMPO {
 
     private void initStatesUtility() {
 
-        for(Position position : simpleMap.getNotFinalStates()){
+        for (Position position : simpleMap.getNotFinalStates()) {
 
             statesUtility.put(position, doubleFactory.getNew(-0.04));
         }
@@ -71,16 +71,16 @@ public class PDMPOSimpleMap implements PDMPO {
     }
 
     @Override
-    public AbstractDouble getUtility(Distribution forward){
+    public AbstractDouble getUtility(Distribution forward) {
 
         AbstractDouble utility = doubleFactory.getNew(0.0);
         //pour chaque position
-        for(Domain.DomainValue value : forward.getRowValues()){
+        for (Domain.DomainValue value : forward.getRowValues()) {
 
             Position position = (Position) value.getValue();
             //multiplie la probabilité de la position par son utilité
             //et ajoute chaque utilité pondérée à la somme finale
-            utility = utility.add( statesUtility.get(position).multiply(forward.get( value )));
+            utility = utility.add(statesUtility.get(position).multiply(forward.get(value)));
         }
 
         return utility;
@@ -110,6 +110,23 @@ public class PDMPOSimpleMap implements PDMPO {
         return this.perceptVar;
     }
 
+    @Override
+    public boolean isFinalState(Distribution forward, AbstractDouble minProb){
+
+        //recupere les positions qui ont une probabilité supérieur au seuil minimum
+        List<Position> positions = new LinkedList<>();
+
+        for(Domain.DomainValue position : forward.getRowValues()){
+
+            if(forward.get(position).compareTo(minProb) > 0){
+
+                positions.add((Position) position.getValue());
+            }
+        }
+        //si on à une position et que c'est une position finale on a atteind la limite
+        return (positions.size() == 1 && simpleMap.isFinalState(positions.get(0)) );
+    }
+
     /*
      * retourne une liste d'acitons possible depuis un etat
      * si plusieurs action son pourraient avoir des combinaisons d'actions
@@ -128,15 +145,20 @@ public class PDMPOSimpleMap implements PDMPO {
             if (forward.get(value).getDoubleValue().compareTo(0.0) > 0) {
                 //recupere l'object position stocké dans la valeur de domaine
                 Position position = (Position) value.getValue();
-                //pour chaque direction alentours
-                for (DirectionMove move : DirectionMove.values()) {
+                //deplacement impossible depuis les positions finales
+                if (!simpleMap.getFinalStates().contains(position)) {
 
-                    Position nextPosition = position.move(move);
+                    //pour chaque direction alentours
+                    for (DirectionMove move : DirectionMove.getMoves()) {
 
-                    if (simpleMap.isPositionReachable(nextPosition)) {
+                        Position nextPosition = position.move(move);
 
-                        actions.add(actionDomain.getDomainValue(move));
+                        if (simpleMap.isPositionReachable(nextPosition)) {
+
+                            actions.add(actionDomain.getDomainValue(move));
+                        }
                     }
+
                 }
             }
         }
@@ -151,24 +173,31 @@ public class PDMPOSimpleMap implements PDMPO {
 
         Position position = (Position) state.getValue();
 
-        DirectionMove direction = (DirectionMove) action.getValue();
+        DirectionMove move = (DirectionMove) action.getValue();
 
-        this.addNewPosition(rsStates, position, direction, 0.8);
+        //si position finale l'action à 100% chance de rester au même endroit
+        if(this.simpleMap.isFinalState(position)){
 
-        this.addNewPosition(rsStates, position, direction.getRelativeRight(), 0.1);
+            return Arrays.asList(new RsState(state, doubleFactory.getNew(1.0)));
+        }
 
-        this.addNewPosition(rsStates, position, direction.getRelativeLeft(), 0.1);
+        this.addNewPosition(rsStates, position, move, 0.8);
+
+        this.addNewPosition(rsStates, position, move.getRelativeRight(), 0.1);
+
+        this.addNewPosition(rsStates, position, move.getRelativeLeft(), 0.1);
 
         return rsStates.values();
     }
 
     private void addNewPosition(Map<Position, RsState> rsStates, Position position, DirectionMove direction, double prob) {
-        //deplace la position dans la direction
-        Position moveStraight = position.move(direction);
-        //si position accessible dans le labyrinthe
-        if (simpleMap.isPositionReachable(moveStraight)) {
 
-            position = moveStraight;
+        //deplace la position dans la direction
+        Position nextPosition = position.move(direction);
+        //si position accessible dans le labyrinthe
+        if (simpleMap.isPositionReachable(nextPosition)) {
+
+            position = nextPosition;
         }
         //resultat du deplacement avec probabilité pour action non deterministe
         RsState rsState = new RsState(stateDomain.getDomainValue(position), doubleFactory.getNew(prob));
@@ -194,5 +223,11 @@ public class PDMPOSimpleMap implements PDMPO {
     public Domain.DomainValue getPerceptFromState(Domain.DomainValue state) {
         //la classe simple map fourni le percept à partir de la map et de la position
         return perceptDomain.getDomainValue(this.simpleMap.getPercept((Position) state.getValue()));
+    }
+
+    @Override
+    public boolean isFinalState(Domain.DomainValue state) {
+
+        return this.simpleMap.isFinalState((Position) state.getValue());
     }
 }

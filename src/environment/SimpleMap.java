@@ -72,9 +72,9 @@ public class SimpleMap implements Environment<Position> {
 
         allStates.addAll(finalStates);
 
-        //agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
+        agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
 
-        agentPosition = new Position(1,4);
+       // agentPosition = new Position(1,4);
     }
 
     /*
@@ -149,6 +149,11 @@ public class SimpleMap implements Environment<Position> {
     public Set<? extends State> getFinalStates() {
 
         return finalStates;
+    }
+
+    public boolean isFinalState(Position position){
+
+        return  this.finalStates.contains(position);
     }
 
     public Set<Position> getAllStates() {
