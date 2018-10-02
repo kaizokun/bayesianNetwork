@@ -21,6 +21,8 @@ public class SimpleMap implements Environment<Position> {
 
     private Position agentPosition;
 
+    protected Map<Position, PerceptWall> positionPercept = new Hashtable<>();
+
     public SimpleMap(String[] map) {
 
         this.map = map;
@@ -74,7 +76,7 @@ public class SimpleMap implements Environment<Position> {
 
         agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
 
-       // agentPosition = new Position(1,4);
+        // agentPosition = new Position(1,4);
     }
 
     /*
@@ -94,6 +96,11 @@ public class SimpleMap implements Environment<Position> {
 
         //creer un set de direction correspondant aux obstacles de la position
 
+        if (positionPercept.containsKey(position)) {
+
+            return positionPercept.get(position);
+        }
+
         PerceptWall perceptWall = new PerceptWall();
 
         for (Cardinal cardinal : Cardinal.values()) {
@@ -103,6 +110,8 @@ public class SimpleMap implements Environment<Position> {
                 perceptWall.addWallDirection(cardinal);
             }
         }
+
+        positionPercept.put(position, perceptWall);
 
         return perceptWall;
     }
@@ -151,9 +160,9 @@ public class SimpleMap implements Environment<Position> {
         return finalStates;
     }
 
-    public boolean isFinalState(Position position){
+    public boolean isFinalState(Position position) {
 
-        return  this.finalStates.contains(position);
+        return this.finalStates.contains(position);
     }
 
     public Set<Position> getAllStates() {

@@ -12,7 +12,7 @@ import network.dynamic.DynamicBayesianNetwork;
 import java.util.*;
 
 
-public class PDMPOexploration {
+public abstract class PDMPOexploration {
 
     /*
      * DynamicBayesianNetwork network : nouveau reseau bayesien ou dumoins réinitialisé à zero pour exploration
@@ -21,25 +21,57 @@ public class PDMPOexploration {
 
     public static int cptLeaf;
 
-    private Random rdm = new Random();
+    protected Random rdm = new Random();
 
-    public PDMPOsearchResult getBestActionPerceptSampling(DynamicBayesianNetwork network, PDMPO pdmpo,
-                                                          Distribution forward, int limit, double minStateProb) {
+    protected AbstractDoubleFactory df;
+
+    protected DynamicBayesianNetwork network;
+
+    protected PDMPO pdmpo;
+
+    protected AbstractDouble minStateProb;
+
+    public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb) {
+
+        this.df = doubleFactory;
+
+        this.minStateProb = this.df.getNew(minStateProb);
+    }
+
+    public PDMPOexploration(AbstractDoubleFactory doubleFactory, DynamicBayesianNetwork dynamicBayesianNetwork, PDMPO pdmpo, double minStateProb) {
+
+        this.df = doubleFactory;
+
+        this.network = dynamicBayesianNetwork;
+
+        this.pdmpo = pdmpo;
+
+        this.minStateProb = df.getNew(minStateProb);
+    }
+
+    public PDMPOsearchResult getBestAction(Distribution forward, int limit) {
 
         cptLeaf = 0;
 
-        return getBestActionPerceptSampling(network, pdmpo, forward, 0, limit,
-                network.getDoubleFactory().getNew(0.0),
-                network.getDoubleFactory().getNew(minStateProb));
+        return getBestAction(forward, 0, limit, df.getNew(0.0));
     }
 
-    private PDMPOsearchResult getBestActionPerceptSampling(DynamicBayesianNetwork network, PDMPO pdmpo,
-                                                           Distribution forward, int time, int limit,
-                                                           AbstractDouble reward, AbstractDouble minStateProb) {
+    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward) {
 
         String ident = Util.getIdent(time);
 
         //System.out.println(ident + "========== BEST ACTION - TIME : " + time + " ===============\n");
+
+        //distribution initiale
+        Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward, minStateProb);//v
+
+        //si aucune action n'est disponible c'est que le forward ne contient que des positions
+        //dont la probabilité est superieure au seuil defini et qui sont finales (but ou echec)
+        if (actions.isEmpty()) {
+
+            //dans ce cas retourner une action vide avec une utilité correspondant à l'état final
+            return new PDMPOsearchResult(null, pdmpo.getUtility(forward));
+        }
 
         //on etend le network pour le temps time si necessaire
         if (network.getTime() <= time) {
@@ -48,22 +80,21 @@ public class PDMPOexploration {
 
             //System.out.println(network.toString(ident));
         }
-
-        //distribution initiale
-        Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward);
-
+        //utilité fourni par l'action maximum
         AbstractDouble maxActionUtility = network.getDoubleFactory().getNew(Double.NEGATIVE_INFINITY);
-
+        //meilleur action
         Domain.DomainValue bestAction = null;
 
         //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
         //pour une combinaison d'action ou aura un object DomainValue composite
         for (Domain.DomainValue action : actions) {
 
+            AbstractDouble actionUtility = network.getDoubleFactory().getNew(0.0);
+
             //System.out.println();
             //System.out.println(ident + "--------- ACTION : " + action);
             //crée une liste de percepts possible après avoir appliqué l'action aux états probables
-            Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, pdmpo, action, ident, minStateProb, network.getDoubleFactory());
+            Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, action, ident, minStateProb);//v&f
 /*
             if (perceptsMap.isEmpty()) {
                 //si plus de percepts futur par exemple etats final tres probable et le reste à zero
@@ -71,56 +102,58 @@ public class PDMPOexploration {
                 continue;
             }
 */
-            AbstractDouble actionUtility = network.getDoubleFactory().getNew(0.0);
+            List<Map.Entry<Domain.DomainValue, AbstractDouble>> percepts = filterPercepts(perceptsMap, ident);
 
-            Map.Entry<Domain.DomainValue, AbstractDouble> samplePercept = this.getSamplePercept(perceptsMap, network, ident);
+            for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : percepts) {
 
-            //System.out.println(ident + "--------- SAMPLE PERCEPT : " + samplePercept);
+                //System.out.println(ident + "--------- SAMPLE PERCEPT : " + samplePercept);
 
-            AbstractDouble perceptProb = samplePercept.getValue();
+                AbstractDouble perceptProb = percept.getValue();
 
-            //recupere la variable (ou megavariable) action et percept
-            Variable actionVar = pdmpo.getActionVar();
+                //recupere la variable (ou megavariable) action et percept
+                Variable actionVar = pdmpo.getActionVar();
 
-            Variable perceptVar = pdmpo.getPerceptVar();
-            //initialise la valeur, si DomainValue composite les variables composant
-            //la megavariable seront initialisées
-            actionVar.setDomainValue(action);
+                Variable perceptVar = pdmpo.getPerceptVar();
+                //initialise la valeur, si DomainValue composite les variables composant
+                //la megavariable seront initialisées
+                actionVar.setDomainValue(action);
 
-            perceptVar.setDomainValue(samplePercept.getKey());
-            //initialise l'action pour le temps courant
-            network.initVar(time, actionVar);
-            //initialise le precept pour le temps suivant pour lequel calculer la distribution d'état
-            network.initVar(time + 1, perceptVar);
+                perceptVar.setDomainValue(percept.getKey());
+                //initialise l'action pour le temps courant
+                network.initVar(time, actionVar);
+                //initialise le precept pour le temps suivant pour lequel calculer la distribution d'état
+                network.initVar(time + 1, perceptVar);
 
-            //System.out.println("ACTION : "+action+" - PERCEPT : "+samplePercept.getKey()+", "+samplePercept.getValue());
+                //System.out.println("ACTION : "+action+" - PERCEPT : "+samplePercept.getKey()+", "+samplePercept.getValue());
 
-            //System.out.println(network);
-            //calcule la distribution futur en fonction d'une action et d'un percept possible donné
-            Distribution nextForward = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
+                //System.out.println(network);
+                //calcule la distribution futur en fonction d'une action et d'un percept possible donné
+                Distribution nextForward = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
 
-            //System.out.println(nextForward.toString(ident));
+                //System.out.println(nextForward.toString(ident));
 
-            //System.out.println(nextForward);
-            //récompense de l'états de croyance obtenu
-            AbstractDouble forwardReward = pdmpo.getUtility(nextForward);
-            //recompense totale l'ancienne plus la courante
-            AbstractDouble currentTotalReward = forwardReward.add(reward);
-            //tant que l'on a pas atteind un état final
-            if (!pdmpo.isFinalState(nextForward, minStateProb) && time < limit) {
-                //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
-                //recupère la meilleure action et son l'utilité
-                PDMPOsearchResult rs = getBestActionPerceptSampling(network, pdmpo, nextForward, time + 1, limit,
-                        currentTotalReward, minStateProb);
-                //utilité fourni par la meilleur action
-                currentTotalReward = rs.bestUtility;
+                //System.out.println(nextForward);
+                //récompense de l'états de croyance obtenu
+                AbstractDouble forwardReward = pdmpo.getUtility(nextForward);
+                //recompense totale l'ancienne plus la courante
+                AbstractDouble currentTotalReward = forwardReward.add(reward);
+                //tant que l'on a pas atteind un état final
+                if (time < limit) {
+                    //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
+                    //recupère la meilleure action et son l'utilité
+                    PDMPOsearchResult rs = getBestAction(nextForward, time + 1, limit,
+                            currentTotalReward);
+                    //utilité fourni par la meilleur action
+                    currentTotalReward = rs.bestUtility;
+                }
+
+                actionUtility = actionUtility.add(perceptProb.multiply(currentTotalReward));
             }
-
             //System.out.println(ident + "CURRENT REWARD " + forwardReward + " + " + reward + " = " + currentTotalReward);
 
-            if (currentTotalReward.compareTo(maxActionUtility) > 0) {
+            if (actionUtility.compareTo(maxActionUtility) > 0) {
 
-                maxActionUtility = currentTotalReward;
+                maxActionUtility = actionUtility;
 
                 bestAction = action;
             }
@@ -133,236 +166,27 @@ public class PDMPOexploration {
         return new PDMPOsearchResult(bestAction, maxActionUtility);
     }
 
-    private Map.Entry<Domain.DomainValue, AbstractDouble> getSamplePercept(Map<Domain.DomainValue, AbstractDouble> perceptsMap,
-                                                                           DynamicBayesianNetwork network, String ident) {
-
-        //probabilités des percepts cumule à partir de 0
-        AbstractDouble cumul = network.getDoubleFactory().getNew(0.0);
-        //tableau pour recherche dichotomique d'entrées (DomainValue:Range de probabilité)
-        List<Map.Entry<Domain.DomainValue, FrequencyRange>> frequencies = Arrays.asList(new Map.Entry[perceptsMap.size()]);
-
-        int i = 0;
-
-        for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : perceptsMap.entrySet()) {
-            //initialise un object range min prob max pro
-            FrequencyRange range = new FrequencyRange();
-
-            range.setMin(cumul);
-            //ajoute la frequence du percept au cumul
-            cumul = cumul.add(percept.getValue());
-            //donne la frequence max pour ce percept et la frequence min pour le prochain
-            range.setMax(cumul);
-            //enregistre l'entrée
-            frequencies.set(i, new AbstractMap.SimpleEntry(percept.getKey(), range));
-
-            i++;
-        }
-        //met la limite max à 100%, dans certain cas elle est un peu en de dessous et une nombre aléatoire hors
-        //limite peut etre généré
-        frequencies.get(frequencies.size() - 1).getValue().setMax(network.getDoubleFactory().getNew(1.0));
-
-        double rdmDouble = rdm.nextDouble();
-
-        // System.out.println(ident + " " + rdmDouble);
-
-        // System.out.println(ident + " " + frequencies);
-
-        Domain.DomainValue samplePercept = FrequencyRange.dichotomicSearch(frequencies, network.getDoubleFactory().getNew(rdmDouble));
-
-        return new AbstractMap.SimpleEntry<>(samplePercept, perceptsMap.get(samplePercept));
-    }
-
-
-    public PDMPOsearchResult getBestAction(DynamicBayesianNetwork network, PDMPO pdmpo, Distribution forward,
-                                           int limit, double maxPerceptProb, double minStateProb) {
-
-        cptLeaf = 0;
-
-        return getBestAction(network, pdmpo, forward, 0, limit,
-                network.getDoubleFactory().getNew(0.0),
-                network.getDoubleFactory().getNew(maxPerceptProb),
-                network.getDoubleFactory().getNew(minStateProb));
-    }
-
-    private PDMPOsearchResult getBestAction(DynamicBayesianNetwork network, PDMPO pdmpo, Distribution forward,
-                                            int time, int limit, AbstractDouble reward, AbstractDouble maxPerceptProb,
-                                            AbstractDouble minStateProb) {
-
-        String ident = Util.getIdent(time);
-
-        //System.out.println(ident + "========== BEST ACTION - TIME : " + time + " - REWARD : "+reward+" ===============\n");
-
-
-        //on etend le network pour le temps time si necessaire
-        if (network.getTime() <= time) {
-
-            network.extend();
-
-            //System.out.println(network.toString(ident));
-        }
-
-        //distribution initiale
-        Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward);
-
-        AbstractDouble maxActionUtility = network.getDoubleFactory().getNew(Double.NEGATIVE_INFINITY);
-
-        Domain.DomainValue bestAction = null;
-
-        //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
-        //pour une combinaison d'action ou aura un object DomainValue composite
-        for (Domain.DomainValue action : actions) {
-
-            // System.out.println();
-            // System.out.println(ident + "--------- ACTION ["+time+"] : " + action);
-            //crée une liste de percepts possible après avoir appliqué l'action aux états probables
-            Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, pdmpo, action, "", minStateProb, network.getDoubleFactory());
-
-            List<Map.Entry<Domain.DomainValue, AbstractDouble>> bestPerceptsList =
-                    selectBestPercepts(perceptsMap, maxPerceptProb, "", network.getDoubleFactory());
-
-            AbstractDouble actionUtility = network.getDoubleFactory().getNew(0.0);
-
-            for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : bestPerceptsList) {
-
-                //System.out.println(ident+" PERCEPT : "+entry);
-
-                AbstractDouble perceptProb = entry.getValue();
-
-                //recupere la variable (ou megavariable) action et percept
-                Variable actionVar = pdmpo.getActionVar();
-
-                Variable perceptVar = pdmpo.getPerceptVar();
-                //initialise la valeur, si DomainValue composite les variables composant
-                //la megavariable seront initialisées
-                actionVar.setDomainValue(action);
-
-                perceptVar.setDomainValue(entry.getKey());
-                //initialise l'action pour le temps courant
-                network.initVar(time, actionVar);
-                //initialise le precept pour le temps suivant pour lequel calculer la distribution d'état
-                network.initVar(time + 1, perceptVar);
-
-                //System.out.println(network.toString(ident));
-                //calcule la distribution futur en fonction d'une action et d'un percept possible donné
-                Distribution nextForward = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
-
-
-                //récompense de l'états de croyance obtenu
-                AbstractDouble forwardReward = pdmpo.getUtility(nextForward);
-
-                // System.out.println(ident+"FORWARD REWARD : "+forwardReward);
-                //recompense totale l'ancienne plus la courante
-                AbstractDouble currentTotalReward = forwardReward.add(reward);
-
-                // System.out.println(ident+"FORWARD REWARD + PREVIOUS REWARD : "+forwardReward+" + "+reward+" = "+currentTotalReward);
-                //tant que l'on a pas atteind un état final
-                if (!pdmpo.isFinalState(nextForward, minStateProb) && time < limit) {
-                    //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
-                    //recupère la meilleure action et son l'utilité
-                    PDMPOsearchResult rs = getBestAction(network, pdmpo, nextForward, time + 1, limit,
-                            currentTotalReward, maxPerceptProb, minStateProb);
-
-                    //utilité fourni par la meilleur action
-                    currentTotalReward = rs.bestUtility;
-
-
-                }
-
-                cptLeaf++;
-
-                //on multiplie l'utilité retournée par la meilleur action par la probabilité du percept
-                //on additionne tout les resultats pour obtenir l'utilité moyenne par action
-                actionUtility = actionUtility.add(perceptProb.multiply(currentTotalReward));
-            }
-
-            if (actionUtility.compareTo(maxActionUtility) > 0) {
-
-                maxActionUtility = actionUtility;
-
-                bestAction = action;
-            }
-
-            //System.out.println(ident+"UTILITE ESPERE : " + actionUtility);
-        }
-
-        return new PDMPOsearchResult(bestAction, maxActionUtility);
-    }
-
-    private List<Map.Entry<Domain.DomainValue, AbstractDouble>> selectBestPercepts(
-            Map<Domain.DomainValue, AbstractDouble> perceptsMap,
-            AbstractDouble maxPerceptProb, String ident,
-            AbstractDoubleFactory doubleFactory) {
-
-        //crée un tableau à partir des entrées percept:prob
-        List<Map.Entry<Domain.DomainValue, AbstractDouble>> perceptsTab = new ArrayList<>(perceptsMap.entrySet());
-        //quick sort du tableau
-        Collections.sort(perceptsTab, new Comparator<Map.Entry<Domain.DomainValue, AbstractDouble>>() {
-            @Override
-            public int compare(Map.Entry<Domain.DomainValue, AbstractDouble> o1, Map.Entry<Domain.DomainValue, AbstractDouble> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
-
-        //récupération des percepts les plus probables juqu'à atteindre un certain seul max
-
-        // //System.out.println(ident+" Percepts sorted "+perceptsTab);
-
-        //indice de fin exclusif du sous tableau de percepts
-        int maxIndex = 0;
-
-        AbstractDouble totalProb = doubleFactory.getNew(0.0);
-
-        for (Map.Entry<Domain.DomainValue, AbstractDouble> perceptProb : perceptsTab) {
-            //ajoute la probabilité des percepts dans l'ordre decroissant
-            totalProb = totalProb.add(perceptProb.getValue());
-
-            maxIndex++;
-            //si on atteind le seuil limite on arrete
-            if (totalProb.compareTo(maxPerceptProb) >= 0) break;
-        }
-
-        //System.out.println(ident+" Percepts sorted sublist before normalisation : "+perceptsTab.subList(0, maxIndex));
-
-        //normaliser les probabilités de la sous liste pour obtenir un total de 100 %
-        for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : perceptsTab.subList(0, maxIndex)) {
-
-            percept.setValue(percept.getValue().divide(totalProb));
-        }
-
-        //  //System.out.println(ident+" Percepts sorted sublist normalise : "+perceptsTab.subList(0, maxIndex));
-
-        return perceptsTab.subList(0, maxIndex);
-    }
-
-    private Map<Domain.DomainValue, AbstractDouble> getPerceptsProb(Distribution forward, PDMPO pdmpo,
-                                                                    Domain.DomainValue action, String ident,
-                                                                    AbstractDouble minStateProb, AbstractDoubleFactory doubleFactory) {
+    protected Map<Domain.DomainValue, AbstractDouble> getPerceptsProb(Distribution forward,
+                                                                      Domain.DomainValue action, String ident,
+                                                                      AbstractDouble minStateProb) {
 
         Map<Domain.DomainValue, AbstractDouble> perceptsMap = new Hashtable<>();
 
         //pour chaque état
         for (Domain.DomainValue state : forward.getRowValues()) {
 
-            //si l'état est final on à plus de possibilité de deplacement
-            //sans cela un etat de croyance ayant une forte probabilité pour un état
-            //final correspondant à un echec qui est proche d'une état final but
-            //laisserait encore une chance de se deplacer vers un etat but en appliquant une action
-/*
-            if (pdmpo.isFinalState(state)) {
-
-                //System.out.println(ident+"FINAL STATE "+state+" : "+forward.get(state));
-                continue;
-            }
-*/
             AbstractDouble stateProb = forward.get(state);
             //si cet etat à une probabilité superieur au seuil minimum par exemple 1/50 ou 1/100
             if (stateProb.compareTo(minStateProb) > 0) {
 
-                //  //System.out.println();
-                //  //System.out.println("--> ETAT DE DEPART : " + state);
-                //on applique l'action à un état de l'état de croyance complet
-                //et on obtient les resultants avec leur probabilités si action non deterministe
-                for (PDMPO.RsState rsState : pdmpo.getResultStates(state, action)) {
+                //System.out.println();
+                //System.out.println("--> ETAT DE DEPART : " + state);
+                //on applique l'action à un des états de l'état de croyance complet
+                //et on obtient les états resultants avec leur probabilités si action non deterministe
+
+                Collection<PDMPO.RsState> rsStates = pdmpo.getResultStates(state, action);//v
+
+                for (PDMPO.RsState rsState : rsStates) {
 
                     // //System.out.println("<-- ETAT D' ARRIVEE : " + rsState.getState() + " - PROB : " + rsState.getProb());
 
@@ -371,8 +195,10 @@ public class PDMPOexploration {
                     //multiplié par la probabilite de l'état resultant de l'action
                     //si plusieurs etats resultant fournissent le même percepts leur
                     //probabilités sont additionés
+                    //!!! probleme les probabilités des percepts ici ne tiennent pas compte du
+                    //bruit dans le scapteurs representés dans la TCP des observations ...
 
-                    Domain.DomainValue percept = pdmpo.getPerceptFromState(rsState.getState());
+                    Domain.DomainValue percept = pdmpo.getPerceptFromState(rsState.getState());//v&f
 
                     //System.out.println("(0) PERCEPT " + percept);
 
@@ -391,35 +217,9 @@ public class PDMPOexploration {
 
                     //System.out.println("TOTAL PROB PERCEPT " + perceptsMap.get(percept));
                 }
-            } else {
-
-                //System.out.println(ident+"STATE INSIGNIFIANT "+state);
             }
         }
 
-        //calcul du total pour les percepts
-        //qui n'est pas égal à 100% étant donné que les percpets obtenu à partir
-        //des actions sur les états finaux sont ignorés
-        /*
-        AbstractDouble total = doubleFactory.getNew(0.0);
-
-        for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : perceptsMap.entrySet()) {
-
-            total = total.add(entry.getValue());
-        }
-        //normalisation des probabilités des percepts
-        for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : perceptsMap.entrySet()) {
-
-            perceptsMap.put(entry.getKey(), entry.getValue().divide(total));
-        }
-*/
-        //System.out.println(ident+" PERCEPTS MAP ");
-        /*
-        for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : perceptsMap.entrySet()) {
-
-            System.out.println(ident + entry.getKey() + " : " + entry.getValue());
-        }
-*/
         return perceptsMap;
     }
 
@@ -458,4 +258,17 @@ public class PDMPOexploration {
         }
     }
 
+    protected abstract List<Map.Entry<Domain.DomainValue, AbstractDouble>> filterPercepts(Map<Domain.DomainValue, AbstractDouble> perceptsMap, String ident);
+
+    public void setNetwork(DynamicBayesianNetwork network) {
+        this.network = network;
+    }
+
+    public void setPdmpo(PDMPO pdmpo) {
+        this.pdmpo = pdmpo;
+    }
+
+    public void setMinStateProb(AbstractDouble minStateProb) {
+        this.minStateProb = minStateProb;
+    }
 }
