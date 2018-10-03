@@ -36,6 +36,8 @@ public interface PDMPO {
 
     List<Domain.DomainValue> getPercepts();
 
+    boolean iStateOfBelieveRisky(Distribution forwardPrevision, AbstractDouble minRiskProb);
+
     class RsState {
 
         private Domain.DomainValue state;

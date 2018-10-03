@@ -29,8 +29,9 @@ public class PDMPOexplorationSamplingPercept extends PDMPOexploration {
     }
 */
 
-    public PDMPOexplorationSamplingPercept(AbstractDoubleFactory doubleFactory, double minStateProb) {
-        super(doubleFactory, minStateProb);
+    public PDMPOexplorationSamplingPercept(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb) {
+
+        super(doubleFactory, minStateProb, minRiskProb);
     }
 
     @Override

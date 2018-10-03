@@ -99,10 +99,10 @@ public class SimpleMapPDMPOtest {
     }
 
 
-    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, String[] map, int limit) {
+    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, String[] map, int limit, Position startPosition) {
 
         //environnement
-        SimpleMap simpleMap = new SimpleMap(map);
+        SimpleMap simpleMap = new SimpleMap(map, startPosition);
         //reseau baysien utilié pour l'exploration
         DynamicBayesianNetwork explorationNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
         //reseau bayesien utilisé par l'agent
@@ -173,6 +173,10 @@ public class SimpleMapPDMPOtest {
 
             System.out.println(stateOfBelieve);
 
+            System.out.println("TOTAL PERCEPTS CHECK : " + pdmpoSearch.cptPercepts);
+
+            //System.exit(0);
+
         } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
 
         do {
@@ -180,30 +184,27 @@ public class SimpleMapPDMPOtest {
             System.out.println(positions.removeFirst() + " -> " + actions.removeFirst());
 
         } while (!actions.isEmpty());
-
     }
 
     @Test
     public void PDMPOexplorationPerceptAVGTest() {
 
-        String map[] = new String[]{
+        String map1[] = new String[]{
                 "   +",
                 " # -",
                 "    "
         };
-/*
-        String map[] = new String[]{
-                "  #  +",
-                " #    ",
-                "   # -",
-                " # #  ",
-                "      "
-        };
-*/
-        PDMPOexploration search = new PDMPOexplorationFullPercept(
-                new MyDoubleFactory(), 0.01, 0.5);
 
-        PDMPOexplorationPerceptTest(search, map, 6);
+        String map2[] = new String[]{
+                "   # +",
+                " #   -",
+                "   #  "
+        };
+
+        PDMPOexploration search = new PDMPOexplorationFullPercept(
+                new MyDoubleFactory(), 0, 0.75, 0.1, 0.2);
+
+        PDMPOexplorationPerceptTest(search, map2, 4, new Position(1,6));
     }
 
     @Test
@@ -228,9 +229,9 @@ public class SimpleMapPDMPOtest {
         };
 
 
-        PDMPOexploration search = new PDMPOexplorationSamplingPercept(new MyDoubleFactory(), 0.01);
+        PDMPOexploration search = new PDMPOexplorationSamplingPercept(new MyDoubleFactory(), 0.01, 0.1);
 
-        PDMPOexplorationPerceptTest(search, map, 6);
+        PDMPOexplorationPerceptTest(search, map, 6, new Position(1,2));
 
     }
 

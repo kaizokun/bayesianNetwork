@@ -23,7 +23,7 @@ public abstract class PDMPOexploration {
 
     private static boolean showlog = false;
 
-    public static int cptLeaf;
+    public static int cptLeaf, cptPercepts;
 
     protected Random rdm = new Random();
 
@@ -33,13 +33,15 @@ public abstract class PDMPOexploration {
 
     protected PDMPO pdmpo;
 
-    protected AbstractDouble minStateProb;
+    protected AbstractDouble minStateProb, minRiskProb;
 
-    public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb) {
+    public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb) {
 
         this.df = doubleFactory;
 
         this.minStateProb = this.df.getNew(minStateProb);
+
+        this.minRiskProb = this.df.getNew(minRiskProb);
     }
 
     public PDMPOexploration(AbstractDoubleFactory doubleFactory, DynamicBayesianNetwork dynamicBayesianNetwork, PDMPO pdmpo, double minStateProb) {
@@ -56,6 +58,8 @@ public abstract class PDMPOexploration {
     public PDMPOsearchResult getBestAction(Distribution forward, int limit) {
 
         cptLeaf = 0;
+
+        cptPercepts = 0;
 
         return getBestAction(forward, 0, limit, df.getNew(0.0));
     }
@@ -118,12 +122,45 @@ public abstract class PDMPOexploration {
                 System.out.println();
                 System.out.println(ident + "--------- ACTION : " + action);
             }
-            //crée une liste de percepts possible après avoir appliqué l'action aux états probables
-            Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, action, ident, minStateProb);//v&f
 
-            //Map<Domain.DomainValue, AbstractDouble> perceptsMap1 = loadPerceptsPrevision(forward, time, minStateProb, ident);//v&f
+            //forward sans percept uniquement l'action
+            //reset des observations necessaires car le reseau étant déja potentiellement etendu
+            //les variables d'observations peuvent avoir été initialisées
+            //ça ne pose pas de problème ensuite où les valeurs sont juste ecrasées par les nouvelles
+            network.resetVar(time + 1, pdmpo.getPerceptVar());
+
+            Distribution forwardPrevision = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
+            //prevision des percepts à partir de l'état de croyance brut après application
+            //de l'action sur l'état de croyance courant
+
+            //vérifie si l'état de croyance comprte des états finaux d'echec ayant une probabilité supérieur à un seuil
+            //dans ce cas l'action doit être évité
+            if(pdmpo.iStateOfBelieveRisky(forwardPrevision, minRiskProb)){
+/*
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                System.out.println(forward);
+
+                System.out.println("RISKY ACTIONS "+action);
+
+                System.out.println(forwardPrevision);
+
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                System.out.println();
+*/
+                continue;
+            }
+
+            Map<Domain.DomainValue, AbstractDouble> perceptsMap = this.loadPerceptsPrevision(forwardPrevision, time, ident);//v
+
+            //crée une liste de percepts possible après avoir appliqué l'action aux états probables
+            //netiens pas compte des bruits dans les capteurs... contrairement à loadPerceptsPrevision()
+            //Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, action, ident, minStateProb);//v&f
 
             List<Map.Entry<Domain.DomainValue, AbstractDouble>> percepts = this.filterPercepts(perceptsMap, ident);
+
+            cptPercepts += percepts.size();
 
             for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : percepts) {
 
@@ -182,21 +219,11 @@ public abstract class PDMPOexploration {
         return new PDMPOsearchResult(bestAction, maxActionUtility);
     }
 
-    protected Map<Domain.DomainValue, AbstractDouble> loadPerceptsPrevision(Distribution forward,
+    protected Map<Domain.DomainValue, AbstractDouble> loadPerceptsPrevision(Distribution forwardPrevision,
                                                                             int time,
-                                                                            AbstractDouble minStateProb,
                                                                             String ident) {
 
-
-        //forward sans percept uniquement l'action
-        //reset des observations necessaires car le reseau étant le même est déja etendu
-        //les variables d'observations peuvent avoir été initialisées
-        //ca ne pose pas de problème lors de l'exploration ou les valeurs sont juste ecrasées par les nouvelles
-        network.resetVar(time + 1, pdmpo.getPerceptVar());
-
-        Distribution forwardPrevision = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
-
-        System.out.println(forwardPrevision);
+        //System.out.println(forwardPrevision);
         //table des percepts
         Map<Domain.DomainValue, AbstractDouble> perceptsMap = new Hashtable<>();
         //variable percept pour recuperer la TCP
@@ -239,6 +266,9 @@ public abstract class PDMPOexploration {
         return perceptsMap;
     }
 
+    //methode de recuperation des percepts mais moins rigoureuse que loadPerceptsPrevision
+    //qui tiens compte du bruit dans les capteurs simulé dans la TCP des percepts
+    //mais genere 10 fois moins de percepts
     protected Map<Domain.DomainValue, AbstractDouble> getPerceptsProb(Distribution forward,
                                                                       Domain.DomainValue action, String ident,
                                                                       AbstractDouble minStateProb) {

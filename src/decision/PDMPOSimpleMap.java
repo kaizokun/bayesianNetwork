@@ -155,17 +155,29 @@ public class PDMPOSimpleMap implements PDMPO {
 
         //pour chaque valeur ou combinaison de valeur d'état
         for (Domain.DomainValue value : forward.getRowValues()) {
-            //pour les états probables > 0
-            if (forward.get(value).compareTo(minProb) > 0) {
+            //pour les états probables > min
+
+            //idée : verifie si l'état est probable au dessus d'un seuil
+            //mais la prevision de percepts se fait elle sur tout les états...
+            //if (forward.get(value).compareTo(minProb) > 0) {
                 //recupere l'object Position stocké dans la valeur de domaine
                 Position position = (Position) value.getValue();
                 //deplacement impossible depuis les positions finales
+                //pas forcement utile à tester
                 if (!simpleMap.isFinalState(position)) {
                     //ajout des actions possible (précalculées) depuis la position
                     actions.addAll(positionsMoves.get(position));
                 }
-            }
+          //  }
         }
+        //autre solution utilisée ignorer les actions qui
+        //fournissent un état ou les position echec sont probables
+        //this.removeRiskyActions(forward, actions, minProb);
+
+        return actions;
+    }
+
+    protected void removeRiskyActions(Distribution forward, Set<Domain.DomainValue> actions, AbstractDouble minProb){
 
         Set<Domain.DomainValue> riskyActions = new HashSet<>();
 
@@ -197,8 +209,6 @@ public class PDMPOSimpleMap implements PDMPO {
         actions.removeAll(riskyActions);
 
         //System.out.println("ACTIONS "+actions);
-
-        return actions;
     }
 
     protected Map<String, Collection<RsState>> stateActionResultMap = new Hashtable<>();
@@ -288,8 +298,16 @@ public class PDMPOSimpleMap implements PDMPO {
     }
 
     @Override
+    public boolean iStateOfBelieveRisky(Distribution forwardPrevision, AbstractDouble minRiskProb) {
+
+        return forwardPrevision.get(stateDomain.getDomainValue(simpleMap.getBadExit())).compareTo(minRiskProb) > 0;
+    }
+
+    @Override
     public List<Domain.DomainValue> getPercepts() {
 
         return this.perceptDomain.getValues();
     }
+
+
 }

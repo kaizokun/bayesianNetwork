@@ -25,13 +25,16 @@ public class SimpleMap implements Environment<Position> {
 
     protected Map<Position, PerceptWall> positionPercept = new Hashtable<>();
 
+    public SimpleMap(String[] map, Position startPosition) {
+
+        this(map);
+
+        this.agentPosition = startPosition;
+    }
+
     public SimpleMap(String[] map) {
 
         this.map = map;
-
-        this.goodExit = goodExit;
-
-        this.badExit = badExit;
 
         this.xLimit = map[0].length();
 
@@ -45,42 +48,40 @@ public class SimpleMap implements Environment<Position> {
 
                 char symbol = row.charAt(iCol);
 
-                int y = yLimit - iRow, x = iCol + 1;
+                int y =  this.yLimit - iRow, x = iCol + 1;
 
                 if (symbol == WALL) {
 
-                    walls.add(new Position(y, x));
+                    this.walls.add(new Position(y, x));
 
                 } else if (symbol == GOAL) {
 
-                    goodExit = new Position(y, x);
+                    this.goodExit = new Position(y, x);
 
                 } else if (symbol == HOLE) {
 
-                    badExit = new Position(y, x);
+                    this.badExit = new Position(y, x);
 
                 } else {
 
-                    notFinalStates.add(new Position(yLimit - iRow, iCol + 1));
+                    this.notFinalStates.add(new Position( this.yLimit - iRow, iCol + 1));
                 }
             }
         }
 
-        finalStates.add(this.goodExit);
+        this.finalStates.add(this.goodExit);
 
-        finalStates.add(this.badExit);
+        this.finalStates.add(this.badExit);
 
-        notFinalStates.removeAll(finalStates);
+        this.notFinalStates.removeAll( this.finalStates);
 
-        allStates.addAll(notFinalStates);
+        this.allStates.addAll( this.notFinalStates);
 
-        allStates.addAll(finalStates);
+        this.allStates.addAll( this.finalStates);
 
-        agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
+        this.agentPosition = new ArrayList<>( this.notFinalStates).get(new Random().nextInt( this.notFinalStates.size()));
 
-        initRiskyPositions();
-
-        //agentPosition = new Position(3, 1);
+        this.initRiskyPositions();
     }
 
     private void initRiskyPositions() {
