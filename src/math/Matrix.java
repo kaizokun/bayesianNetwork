@@ -309,4 +309,18 @@ public class Matrix {
 
     /*------------------------*/
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Matrix)) return false;
+        Matrix matrix1 = (Matrix) o;
+        return Arrays.equals(getMatrix(), matrix1.getMatrix());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(getMatrix());
+    }
+
+
 }

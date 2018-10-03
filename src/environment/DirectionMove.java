@@ -1,5 +1,7 @@
 package environment;
 
+import domain.Domain;
+
 //implementation plu ssimple directement dans le sens des aiguilles d'une montre
 //avec possibilité de sur place plutot qu'avec Cardinal qui necessite une table de conversion car
 //modifier pourrait poser problèmes...
@@ -11,7 +13,7 @@ public enum DirectionMove implements Action {
 
     private static final DirectionMove[] moves = new DirectionMove[]{NORTH, EAST, SOUTH, WEST};
 
-    private static final DirectionMove[] oppositeMoves = new DirectionMove[]{SOUTH, WEST, NORTH, EAST};
+    private static final DirectionMove[] oppositeMoves = new DirectionMove[]{SOUTH, WEST, NORTH, EAST, ON_THE_SPOT};
 
     public int getDeltaY() {
 
@@ -54,5 +56,10 @@ public enum DirectionMove implements Action {
 
     public static DirectionMove[] getMoves() {
         return moves;
+    }
+
+    public DirectionMove getOppositeDirection() {
+
+        return oppositeMoves[ordinal()];
     }
 }

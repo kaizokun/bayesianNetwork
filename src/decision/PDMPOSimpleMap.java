@@ -63,7 +63,7 @@ public class PDMPOSimpleMap implements PDMPO {
     private void initPositionsMoves() {
 
         //pour chaque état non final
-        for(Position position : simpleMap.getNotFinalStates()){
+        for (Position position : simpleMap.getNotFinalStates()) {
 
             //crée un ensemble de deplacement
             Set<Domain.DomainValue> positionMoves = new HashSet<>();
@@ -149,7 +149,7 @@ public class PDMPOSimpleMap implements PDMPO {
      * */
 
     @Override
-    public Set<Domain.DomainValue> getActionsFromState(Distribution forward, AbstractDouble minProb) {
+    public Set<Domain.DomainValue> getActionsFromState(Distribution forward, Domain.DomainValue lastAction, AbstractDouble minProb) {
 
         Set<Domain.DomainValue> actions = new HashSet<>();
 
@@ -159,7 +159,7 @@ public class PDMPOSimpleMap implements PDMPO {
 
             //idée : verifie si l'état est probable au dessus d'un seuil
             //mais la prevision de percepts se fait elle sur tout les états...
-            //if (forward.get(value).compareTo(minProb) > 0) {
+            if (forward.get(value).compareTo(minProb) > 0) {
                 //recupere l'object Position stocké dans la valeur de domaine
                 Position position = (Position) value.getValue();
                 //deplacement impossible depuis les positions finales
@@ -168,16 +168,23 @@ public class PDMPOSimpleMap implements PDMPO {
                     //ajout des actions possible (précalculées) depuis la position
                     actions.addAll(positionsMoves.get(position));
                 }
-          //  }
+            }
         }
         //autre solution utilisée ignorer les actions qui
         //fournissent un état ou les position echec sont probables
         //this.removeRiskyActions(forward, actions, minProb);
 
+        //retire l'action directement opposée à la precedente
+        DirectionMove lastDirection = (DirectionMove) lastAction.getValue();
+
+        DirectionMove oppositeDirection = lastDirection.getOppositeDirection();
+
+        actions.remove(actionDomain.getDomainValue(oppositeDirection));
+
         return actions;
     }
 
-    protected void removeRiskyActions(Distribution forward, Set<Domain.DomainValue> actions, AbstractDouble minProb){
+    protected void removeRiskyActions(Distribution forward, Set<Domain.DomainValue> actions, AbstractDouble minProb) {
 
         Set<Domain.DomainValue> riskyActions = new HashSet<>();
 
@@ -186,17 +193,17 @@ public class PDMPOSimpleMap implements PDMPO {
         //pour chaque position proche de la position de sortie
         Set<Position> riskyPositions = simpleMap.getRiskyPositions();
 
-        for(Position riskyPosition : riskyPositions){
+        for (Position riskyPosition : riskyPositions) {
             //si la probabilité d'une position proche est supérieure à zero
-            if(forward.get(stateDomain.getDomainValue(riskyPosition)).compareTo(minProb) > 0 ){
+            if (forward.get(stateDomain.getDomainValue(riskyPosition)).compareTo(minProb) > 0) {
 
                 //System.out.println("POSITION RISQUE PROBABLE "+riskyPosition+" "+forward.get(stateDomain.getDomainValue(riskyPosition)));
                 //et qu'une action possible mène à la position d'echec
-                for(Domain.DomainValue action : actions){
+                for (Domain.DomainValue action : actions) {
 
                     Position rsPos = riskyPosition.move((DirectionMove) action.getValue());
 
-                    if(rsPos.equals(simpleMap.getBadExit())){
+                    if (rsPos.equals(simpleMap.getBadExit())) {
 
                         //System.out.println("ACTION RISQUE "+action);
                         //on ajoute l'action aux actions proscrites
@@ -307,7 +314,7 @@ public class PDMPOSimpleMap implements PDMPO {
     public boolean isGoal(Distribution forward) {
         //retourne vrai si la probabilité de la position but est supérieur ou égal à 80 %
         return forward.get(stateDomain.getDomainValue(simpleMap.getGoodExit()))
-                .compareTo(doubleFactory.getNew(0.8)) >= 0 ;
+                .compareTo(doubleFactory.getNew(0.8)) >= 0;
     }
 
     @Override
@@ -326,7 +333,21 @@ public class PDMPOSimpleMap implements PDMPO {
         return this.perceptDomain.getValues();
     }
 
+    @Override
+    public String getApproximationForward(Distribution forward) {
 
+        StringBuilder builder = new StringBuilder();
+
+        for (int row = 0; row < forward.getRowCount(); row++) {
+
+            AbstractDouble abstractDouble = forward.getValue(row);
+
+            builder.append(String.format("%.1f", abstractDouble.getDoubleValue()));
+            builder.append('.');
+        }
+
+        return builder.toString();
+    }
 
 
 }

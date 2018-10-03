@@ -29,7 +29,10 @@ public class SimpleMap implements Environment<Position> {
 
         this(map);
 
-        this.agentPosition = startPosition;
+        if(startPosition != null) {
+
+            this.agentPosition = startPosition;
+        }
     }
 
     public SimpleMap(String[] map) {

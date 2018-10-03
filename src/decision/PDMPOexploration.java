@@ -23,7 +23,7 @@ public abstract class PDMPOexploration {
 
     private static boolean showlog = false;
 
-    public static int cptLeaf, cptPercepts;
+    public static int cptLeaf, cptPercepts, cptLoopState;
 
     protected Random rdm = new Random();
 
@@ -63,10 +63,13 @@ public abstract class PDMPOexploration {
 
         cptPercepts = 0;
 
-        return getBestAction(forward, 0, limit, df.getNew(0.0), pdmpo.getNoAction());
+        cptLoopState = 0;
+
+        return getBestAction(forward, 0, limit, df.getNew(0.0), pdmpo.getNoAction(), new HashSet<String>());
     }
 
-    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward, Domain.DomainValue lastAction) {
+    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward,
+                                              Domain.DomainValue lastAction, Set<String> visitedStates) {
 
         String ident = null;
 
@@ -77,7 +80,7 @@ public abstract class PDMPOexploration {
             System.out.println(ident + "========== BEST ACTION - TIME : " + time + " ===============\n");
         }
         //distribution initiale
-        Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward, minStateProb);//v
+        Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward, lastAction, minStateProb);//v
 
         if (showlog)
             System.out.println("ACTIONS : " + actions);
@@ -98,11 +101,6 @@ public abstract class PDMPOexploration {
         //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
         //pour une combinaison d'action ou aura un object DomainValue composite
         for (Domain.DomainValue action : actions) {
-
-            if (pdmpo.isOppositeAction(action, lastAction)) {
-
-                continue;
-            }
 
             //initialisation de la valeur de la variable action du reseau
             Variable actionVar = pdmpo.getActionVar();
@@ -171,11 +169,31 @@ public abstract class PDMPOexploration {
                 //recompense totale l'ancienne plus la courante
                 AbstractDouble currentTotalReward = forwardReward.add(reward);
                 //tant que l'on a pas atteind un état final ou la limite
-                if (time < limit && !pdmpo.isGoal(nextForward)) {
+
+                String key = pdmpo.getApproximationForward(nextForward);
+
+                if (visitedStates.contains(key)) {
+
+                    cptLoopState ++;
+                    /*
+                    System.out.println("visited "+key);
+
+                    System.out.println(nextForward);*/
+                }
+                //le système d'approcimation sur les états de croyance pour eviter les loops
+                //fonctionne sans limite imposé laprecision est reglable dans le pdmpo à 1 ou plusieurs
+                //chiffre après la virgule ce qui crée un ensemble pouvant englober plusieurs états de croyances proches
+                if (time < limit && !pdmpo.isGoal(nextForward) && !visitedStates.contains(key)) {
                     //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
                     //recupère la meilleure action et son l'utilité
+
+                    visitedStates.add(key);
+
                     PDMPOsearchResult rs = getBestAction(nextForward, time + 1, limit,
-                            currentTotalReward, action);
+                            currentTotalReward, action, visitedStates);
+
+                    visitedStates.remove(key);
+
                     //utilité fourni par la meilleur action
                     currentTotalReward = rs.bestUtility;
                 }

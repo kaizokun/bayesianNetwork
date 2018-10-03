@@ -134,7 +134,13 @@ public class SimpleMapPDMPOtest {
 
         LinkedList<Position> positions = new LinkedList<>();
 
+        System.out.println("----------- DEPART ---------");
+
         System.out.println(stateOfBelieve);
+
+        System.out.println("--- EXPLO ---");
+
+        int move = 0;
 
         do {
 
@@ -175,7 +181,16 @@ public class SimpleMapPDMPOtest {
 
             System.out.println("TOTAL PERCEPTS CHECK : " + pdmpoSearch.cptPercepts);
 
+            System.out.println("TOTAL LOOP : "+pdmpoSearch.cptLoopState);
+
             //System.exit(0);
+
+            move ++;
+
+            if(move == 30 ){
+
+                break;
+            }
 
         } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
 
@@ -204,7 +219,7 @@ public class SimpleMapPDMPOtest {
         PDMPOexploration search = new PDMPOexplorationFullPercept(
                 new MyDoubleFactory(), 0.0, 0.75, 0.1, 0.2);
 
-        PDMPOexplorationPerceptTest(search, map2, 5, new Position(1,1));
+        PDMPOexplorationPerceptTest(search, map2, Integer.MAX_VALUE, new Position(3,1));
     }
 
     @Test
@@ -228,7 +243,7 @@ public class SimpleMapPDMPOtest {
         PDMPOexploration search = new PDMPOexplorationSamplingPercept(
                 new MyDoubleFactory(), 0.0, 0.1, 0.2);
 
-        PDMPOexplorationPerceptTest(search, map2, 5, new Position(1,1));
+        PDMPOexplorationPerceptTest(search, map2, 6, null);
 
     }
 

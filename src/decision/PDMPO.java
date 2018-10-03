@@ -22,7 +22,7 @@ public interface PDMPO {
 
     Variable getPerceptVar();
 
-    Set<Domain.DomainValue> getActionsFromState(Distribution forward, AbstractDouble minProb);
+    Set<Domain.DomainValue> getActionsFromState(Distribution forward, Domain.DomainValue lastAction, AbstractDouble minProb);
 
     Collection<RsState> getResultStates(Domain.DomainValue state, Domain.DomainValue action);
 
@@ -41,6 +41,8 @@ public interface PDMPO {
     boolean isGoal(Distribution forward);
 
     boolean isOppositeAction(Domain.DomainValue action, Domain.DomainValue lastAction);
+
+    String getApproximationForward(Distribution forward);
 
     class RsState {
 

@@ -116,6 +116,7 @@ public class Domain<T> implements IDomain {
             return Arrays.asList(new DomainValue[]{this}).iterator();
         }
 
+
     }
 
 }

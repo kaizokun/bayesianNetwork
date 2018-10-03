@@ -143,4 +143,6 @@ public class Distribution extends Transpose {
         return new AbstractDouble[1][this.getRowCount()];
     }
 
+
+
 }
