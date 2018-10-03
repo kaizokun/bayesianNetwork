@@ -34,6 +34,8 @@ public interface PDMPO {
 
     AbstractDouble getProbRightPercept(Domain.DomainValue key);
 
+    List<Domain.DomainValue> getPercepts();
+
     class RsState {
 
         private Domain.DomainValue state;

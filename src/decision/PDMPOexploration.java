@@ -5,8 +5,11 @@ import domain.data.AbstractDouble;
 import domain.data.AbstractDoubleFactory;
 import inference.dynamic.Util;
 import math.Distribution;
+import network.ProbabilityCompute;
+import network.ProbabilityComputeFromTCP;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
+import network.dynamic.Model;
 
 import java.util.*;
 
@@ -102,6 +105,13 @@ public abstract class PDMPOexploration {
         //pour une combinaison d'action ou aura un object DomainValue composite
         for (Domain.DomainValue action : actions) {
 
+            //initialisation de la valeur de la variable action du reseau
+            Variable actionVar = pdmpo.getActionVar();
+
+            actionVar.setDomainValue(action);
+
+            network.initVar(time, actionVar);
+
             AbstractDouble actionUtility = network.getDoubleFactory().getNew(0.0);
 
             if (showlog) {
@@ -110,43 +120,29 @@ public abstract class PDMPOexploration {
             }
             //crée une liste de percepts possible après avoir appliqué l'action aux états probables
             Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, action, ident, minStateProb);//v&f
-/*
-            if (perceptsMap.isEmpty()) {
-                //si plus de percepts futur par exemple etats final tres probable et le reste à zero
-                //ou en dessous de la limite de consideration
-                continue;
-            }
-*/
+
+            //Map<Domain.DomainValue, AbstractDouble> perceptsMap1 = loadPerceptsPrevision(forward, time, minStateProb, ident);//v&f
+
             List<Map.Entry<Domain.DomainValue, AbstractDouble>> percepts = this.filterPercepts(perceptsMap, ident);
 
             for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : percepts) {
 
-                if(showlog)
-                System.out.println(ident + "---------  PERCEPT : " + percept);
+                if (showlog)
+                    System.out.println(ident + "---------  PERCEPT : " + percept);
 
                 AbstractDouble perceptProb = percept.getValue();
-
-                //recupere la variable (ou megavariable) action et percept
-                Variable actionVar = pdmpo.getActionVar();
-
+                //recupere la variable  percept
                 Variable perceptVar = pdmpo.getPerceptVar();
-                //initialise la valeur, si DomainValue composite les variables composant
-                //la megavariable seront initialisées
-                actionVar.setDomainValue(action);
 
                 perceptVar.setDomainValue(percept.getKey());
-                //initialise l'action pour le temps courant
-                network.initVar(time, actionVar);
                 //initialise le precept pour le temps suivant pour lequel calculer la distribution d'état
                 network.initVar(time + 1, perceptVar);
 
-                if(showlog)
-                System.out.println("ACTION : "+action+" - PERCEPT : "+percept.getKey()+", "+percept.getValue());
+                if (showlog)
+                    System.out.println("ACTION : " + action + " - PERCEPT : " + percept.getKey() + ", " + percept.getValue());
 
-                //System.out.println(network);
                 //calcule la distribution futur en fonction d'une action et d'un percept possible donné
                 Distribution nextForward = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
-
                 //System.out.println(nextForward.toString(ident));
 
                 //System.out.println(nextForward);
@@ -179,11 +175,68 @@ public abstract class PDMPOexploration {
 
             cptLeaf++;
 
-            if(showlog)
-            System.out.println("UTILITE ESPERE : " + actionUtility);
+            if (showlog)
+                System.out.println("UTILITE ESPERE : " + actionUtility);
         }
 
         return new PDMPOsearchResult(bestAction, maxActionUtility);
+    }
+
+    protected Map<Domain.DomainValue, AbstractDouble> loadPerceptsPrevision(Distribution forward,
+                                                                            int time,
+                                                                            AbstractDouble minStateProb,
+                                                                            String ident) {
+
+
+        //forward sans percept uniquement l'action
+        //reset des observations necessaires car le reseau étant le même est déja etendu
+        //les variables d'observations peuvent avoir été initialisées
+        //ca ne pose pas de problème lors de l'exploration ou les valeurs sont juste ecrasées par les nouvelles
+        network.resetVar(time + 1, pdmpo.getPerceptVar());
+
+        Distribution forwardPrevision = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
+
+        System.out.println(forwardPrevision);
+        //table des percepts
+        Map<Domain.DomainValue, AbstractDouble> perceptsMap = new Hashtable<>();
+        //variable percept pour recuperer la TCP
+        Variable perceptVar = network.getVariable(time + 1, pdmpo.getPerceptVar());
+        //TCP variable Percept
+        ProbabilityCompute tcpPercept =  perceptVar.getProbabilityCompute();
+        //pour chaque états
+        for (Domain.DomainValue state : forwardPrevision.getRowValues()) {
+            //probabilité de l'état
+            AbstractDouble stateProb = forwardPrevision.get(state);
+            //récupère l'entrée de la TCP des percepts dependent des états correspondant à l'état courant
+            Map<Domain.DomainValue, AbstractDouble> statePerceptsProbs = tcpPercept.getTCP().get(tcpPercept.getValueKey(state));
+
+            //pour chaque percept
+            for(Domain.DomainValue percept : pdmpo.getPercepts()){
+
+                //probabilité du percept en fonction de l'état
+                //la probabilité du percept est multipliée par celle de l'état qui le fournit
+                AbstractDouble statePerceptProb = statePerceptsProbs.get(percept).multiply(stateProb);
+                //recupere la probabilité enregistré dans la map
+                AbstractDouble perceptProb = perceptsMap.get(percept);
+                //si pas encore enregistré on l'initialise
+                if(perceptProb == null){
+
+                    perceptProb = statePerceptProb;
+                //sinon on cumule les probabilités
+                }else{
+
+                    perceptProb = perceptProb.add(statePerceptProb);
+                }
+
+                //reste à mettre à jour la map
+                perceptsMap.put(percept, perceptProb);
+            }
+        }
+
+        //System.out.println("METHODE 2");
+        //System.out.println(Util.printMap(perceptsMap));
+
+        return perceptsMap;
     }
 
     protected Map<Domain.DomainValue, AbstractDouble> getPerceptsProb(Distribution forward,
@@ -253,6 +306,10 @@ public abstract class PDMPOexploration {
             entry.setValue(entry.getValue().divide(total));
         }
 */
+
+        //System.out.println("METHODE 1");
+       // System.out.println(Util.printMap(perceptsMap));
+
         return perceptsMap;
     }
 

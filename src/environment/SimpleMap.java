@@ -21,6 +21,8 @@ public class SimpleMap implements Environment<Position> {
 
     private Position agentPosition;
 
+    private Set<Position> riskyPositions = new HashSet<>();
+
     protected Map<Position, PerceptWall> positionPercept = new Hashtable<>();
 
     public SimpleMap(String[] map) {
@@ -76,7 +78,20 @@ public class SimpleMap implements Environment<Position> {
 
         agentPosition = new ArrayList<>(notFinalStates).get(new Random().nextInt(notFinalStates.size()));
 
+        initRiskyPositions();
+
         //agentPosition = new Position(3, 1);
+    }
+
+    private void initRiskyPositions() {
+
+        for(Position nearPosition : badExit.getNearbyPositions()){
+
+            if(isPositionReachable(nearPosition)){
+
+                riskyPositions.add(nearPosition);
+            }
+        }
     }
 
     /*
@@ -225,4 +240,8 @@ public class SimpleMap implements Environment<Position> {
         return builder.toString();
     }
 
+    public Set<Position> getRiskyPositions() {
+
+        return riskyPositions;
+    }
 }

@@ -108,13 +108,13 @@ public class Forward {
                 new Hashtable<>(), new Hashtable<>());
     }
 
-    public ForwardMax forward(List<Variable> requests, List<Variable> actions) {
+    public ForwardMax forward(List<Variable> requests, List<Variable> actions, int timeRequest) {
 
         return forward(requests, actions, getDistribSavedKey(requests), 0, false,
                 new Hashtable<>(), new Hashtable<>());
     }
 
-    public ForwardMax forward(List<Variable> requests, List<Variable> actions, Distribution lastForward) {
+    public ForwardMax forward(List<Variable> requests, List<Variable> actions, Distribution lastForward, int timeRequest) {
 
         //Max distribution bogus pour gerer les PDMPO en attendant de reecrire la procedure uniquement pour le PDMPO
         Map<String, Distribution> forwardMatrices = new Hashtable<>(), maxMatrices = new Hashtable<>();
@@ -124,8 +124,9 @@ public class Forward {
         List<Variable> previousRequest = new LinkedList<>();
 
         for (Variable request : requests) {
-
-            previousRequest.add(this.network.getVariable(this.network.getTime() - 1, request));
+            //recupere les variables pour generer la clé au temps precedent la requete
+            //afin d'enregistrer le forward precedent dans la map
+            previousRequest.add(this.network.getVariable(timeRequest - 1, request));
         }
 
         Variable megaPreviousRequest = network.encapsulate(previousRequest);
@@ -138,13 +139,17 @@ public class Forward {
 
         forwardMatrices.put(previousKey, lastForward);
 
+        //System.out.println("PREVIOUS KEY "+previousKey);
+
+        //System.out.println("CURRENT KEY "+key);
+
         return forward(requests, actions, key, 0, false, forwardMatrices, maxMatrices);
     }
 
     protected ForwardMax forward(List<Variable> requests, List<Variable> actions, String key, int depth,
                                  boolean saveforward, Map<String, Distribution> forwardMatrices, Map<String, Distribution> maxMatrices ) {
 
-        //System.out.println("FORWARD " + requests + " - depth : " + depth + " - forward : " + forwardMatrices.keySet());
+       // System.out.println("FORWARD " + requests + " - depth : " + depth + " - forward : " + forwardMatrices.keySet());
 
         //les variables de requete d'origine doivent avoir le même temps
         //création d'une distribution vide pour chaque valeur de la requete
@@ -280,12 +285,18 @@ public class Forward {
                 //soit pas de mise à jour par l'observation de la valeur obtenu par la somme
                 if (observation.getDomainValue() != null) {
 
+                   // System.out.println("OBSERVATION "+observation.getDomainValue());
+
                     AbstractDouble obsProb = observation.getProbability();
                     //valeur du modele de capteur
                     requestValueProbability = requestValueProbability.multiply(obsProb);
                     //idem pour calculer un max pour la sequence la plus vraissemblable
                     requestValueMaxProbability = requestValueMaxProbability.multiply(obsProb);
-                }
+                }//else{
+
+                  //  System.out.println("OBSERVATION  NULLE "+observation.getDomainValue());
+
+               // }
                 //ici une observation peut avoir plusieurs parents et il faut à mon sens
                 //les traiter separemment soit une somme par variable parent
                 //dont les resultats seront multipliés. Fonctionne pour le cas simple
@@ -443,6 +454,8 @@ public class Forward {
         //situées dans la même coupe temporelles ou tout leur parent sont des variables cachées
 
         String key = getDistribSavedKey(statesDependencies);
+
+        //System.out.println("FORWARD SUM DEPENDENCIES KEY "+key);
         //String key = getDistribSavedKey(obsParentState.getDependencies());
 
         List<Domain.DomainValue> domainValues = megaHiddenVar.getDomainValuesCheckInit();
@@ -461,6 +474,8 @@ public class Forward {
             Distribution max = maxMatrices.get(key);
 
             if (forward == null) {
+
+                //System.out.println("!!!!!!! FORWARD NULL RAPPEL RECURSIF !!!!!!!!!!!!");
 
                 ForwardMax forwardMax = this.forward(statesDependencies, actions, key, depth + 1, saveforward, forwardMatrices, maxMatrices);
 

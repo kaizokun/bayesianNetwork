@@ -254,7 +254,7 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         return builder.toString();
     }
 
-    private String getValuesKey(Collection<Domain.DomainValue> values) {
+    public String getValuesKey(Collection<Domain.DomainValue> values) {
 
         //création de la clé correspondant à la combinaison de valeur des parents
         StringBuilder builder = new StringBuilder();
@@ -271,7 +271,11 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         return builder.toString();
     }
 
+    @Override
+    public String getValueKey(Domain.DomainValue value) {
 
+        return value.getIndex()+""+IDX_SEPARATOR;
+    }
     /**
      * ------------------ GETTER PROBABILITIES AND VALUES ----------------
      */
@@ -427,4 +431,8 @@ public class ProbabilityComputeFromTCP implements ProbabilityCompute {
         return doubleFactory;
     }
 
+    @Override
+    public Hashtable<String, Hashtable<Domain.DomainValue, AbstractDouble>> getTCP() {
+        return TCP;
+    }
 }

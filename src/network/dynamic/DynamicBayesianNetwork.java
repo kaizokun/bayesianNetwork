@@ -228,6 +228,18 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
         }
     }
 
+    public void resetVar(int time, Variable variable) {
+
+        //la variable en parametre peut être une megavariable
+        for(Variable variable1 : variable.getCompoVars()) {
+
+            Variable var = this.getVariable(time, variable1);
+
+            var.setDomainValue(null);
+        }
+    }
+
+
     /*
      * etend une fois le reseau avec une ou plusieurs assignations pour des variables
      * */
@@ -279,11 +291,11 @@ public class DynamicBayesianNetwork extends BayesianNetwork {
 
         if (distribution == null) {
 
-            return forward.forward(lastStates, actions).getForward();
+            return forward.forward(lastStates, actions, time).getForward();
 
         } else {
 
-            return forward.forward(lastStates, actions, distribution).getForward();
+            return forward.forward(lastStates, actions, distribution, time).getForward();
         }
     }
 

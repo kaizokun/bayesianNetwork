@@ -8,7 +8,6 @@ import domain.data.AbstractDoubleFactory;
 import environment.DirectionMove;
 import environment.Position;
 import environment.SimpleMap;
-import javafx.geometry.Pos;
 import math.Distribution;
 import network.Variable;
 
@@ -149,7 +148,6 @@ public class PDMPOSimpleMap implements PDMPO {
      * retourné par getActionVar
      * */
 
-
     @Override
     public Set<Domain.DomainValue> getActionsFromState(Distribution forward, AbstractDouble minProb) {
 
@@ -168,6 +166,37 @@ public class PDMPOSimpleMap implements PDMPO {
                 }
             }
         }
+
+        Set<Domain.DomainValue> riskyActions = new HashSet<>();
+
+        //System.out.println("ACTIONS "+actions);
+
+        //pour chaque position proche de la position de sortie
+        Set<Position> riskyPositions = simpleMap.getRiskyPositions();
+
+        for(Position riskyPosition : riskyPositions){
+            //si la probabilité d'une position proche est supérieure à zero
+            if(forward.get(stateDomain.getDomainValue(riskyPosition)).compareTo(minProb) > 0 ){
+
+                //System.out.println("POSITION RISQUE PROBABLE "+riskyPosition+" "+forward.get(stateDomain.getDomainValue(riskyPosition)));
+                //et qu'une action possible mène à la position d'echec
+                for(Domain.DomainValue action : actions){
+
+                    Position rsPos = riskyPosition.move((DirectionMove) action.getValue());
+
+                    if(rsPos.equals(simpleMap.getBadExit())){
+
+                        //System.out.println("ACTION RISQUE "+action);
+                        //on ajoute l'action aux actions proscrites
+                        riskyActions.add(action);
+                    }
+                }
+            }
+        }
+        //on retire les actions proscrites
+        actions.removeAll(riskyActions);
+
+        //System.out.println("ACTIONS "+actions);
 
         return actions;
     }
@@ -256,5 +285,11 @@ public class PDMPOSimpleMap implements PDMPO {
     public AbstractDouble getProbRightPercept(Domain.DomainValue percept) {
 
         return doubleFactory.getNew(0.6);
+    }
+
+    @Override
+    public List<Domain.DomainValue> getPercepts() {
+
+        return this.perceptDomain.getValues();
     }
 }
