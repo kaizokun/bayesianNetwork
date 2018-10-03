@@ -11,6 +11,8 @@ public enum DirectionMove implements Action {
 
     private static final DirectionMove[] moves = new DirectionMove[]{NORTH, EAST, SOUTH, WEST};
 
+    private static final DirectionMove[] oppositeMoves = new DirectionMove[]{SOUTH, WEST, NORTH, EAST};
+
     public int getDeltaY() {
 
         return delta[this.ordinal()][0];
@@ -19,6 +21,11 @@ public enum DirectionMove implements Action {
     public int getDeltaX() {
 
         return delta[this.ordinal()][1];
+    }
+
+    public boolean isLoop(DirectionMove lastAction) {
+
+        return oppositeMoves[ordinal()] == lastAction;
     }
 
     public DirectionMove getRelativeRight() {

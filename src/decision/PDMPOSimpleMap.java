@@ -304,10 +304,29 @@ public class PDMPOSimpleMap implements PDMPO {
     }
 
     @Override
+    public boolean isGoal(Distribution forward) {
+        //retourne vrai si la probabilité de la position but est supérieur ou égal à 80 %
+        return forward.get(stateDomain.getDomainValue(simpleMap.getGoodExit()))
+                .compareTo(doubleFactory.getNew(0.8)) >= 0 ;
+    }
+
+    @Override
+    public boolean isOppositeAction(Domain.DomainValue action_d, Domain.DomainValue lastAction_d) {
+
+        DirectionMove action = (DirectionMove) action_d.getValue();
+
+        DirectionMove lastAction = (DirectionMove) lastAction_d.getValue();
+        //si la nouvelle action est opposé directement à la précédente
+        return action.isLoop(lastAction);
+    }
+
+    @Override
     public List<Domain.DomainValue> getPercepts() {
 
         return this.perceptDomain.getValues();
     }
+
+
 
 
 }

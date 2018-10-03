@@ -29,19 +29,15 @@ public class PDMPOexplorationSamplingPercept extends PDMPOexploration {
     }
 */
 
-    public PDMPOexplorationSamplingPercept(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb) {
+    public PDMPOexplorationSamplingPercept(AbstractDoubleFactory doubleFactory,
+                                           double minStateProb,double minPerceptProb, double minRiskProb) {
 
-        super(doubleFactory, minStateProb, minRiskProb);
+        super(doubleFactory, minStateProb, minRiskProb, minPerceptProb);
     }
 
     @Override
     protected List<Map.Entry<Domain.DomainValue, AbstractDouble>> filterPercepts(
             Map<Domain.DomainValue, AbstractDouble> perceptsMap, String ident) {
-
-       // System.out.println();
-       // System.out.println("------ FILTER PERCEPTS-------");
-
-        //System.out.println(Util.printMap(perceptsMap));
 
         //probabilités des percepts cumule à partir de 0
         AbstractDouble cumul = network.getDoubleFactory().getNew(0.0);
@@ -64,19 +60,10 @@ public class PDMPOexplorationSamplingPercept extends PDMPOexploration {
 
             i++;
         }
-        //met la limite max à 100%, dans certain cas elle est un peu en de dessous et une nombre aléatoire hors
-        //limite peut etre généré
-        frequencies.get(frequencies.size() - 1).getValue().setMax(network.getDoubleFactory().getNew(1.0));
 
         double rdmDouble = rdm.nextDouble();
 
-       // System.out.println(ident + " " + rdmDouble);
-
-       // System.out.println(ident + " " + frequencies);
-
         Domain.DomainValue samplePercept = FrequencyRange.dichotomicSearch(frequencies, network.getDoubleFactory().getNew(rdmDouble));
-
-        //System.out.println("SAMPLE PERCEPT : "+samplePercept);
 
         return asList(new AbstractMap.SimpleEntry(samplePercept, perceptsMap.get(samplePercept)));
     }

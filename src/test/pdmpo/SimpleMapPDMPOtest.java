@@ -202,9 +202,9 @@ public class SimpleMapPDMPOtest {
         };
 
         PDMPOexploration search = new PDMPOexplorationFullPercept(
-                new MyDoubleFactory(), 0, 0.75, 0.1, 0.2);
+                new MyDoubleFactory(), 0.0, 0.75, 0.1, 0.2);
 
-        PDMPOexplorationPerceptTest(search, map2, 4, new Position(1,6));
+        PDMPOexplorationPerceptTest(search, map2, 5, new Position(1,1));
     }
 
     @Test
@@ -213,25 +213,22 @@ public class SimpleMapPDMPOtest {
         //algorithme qui ne fait des prevision de percepts que sur un seul echantilloné
         //à partir de la distribution sur les percepts, maleuresement parfois il echantillone des percepts trop improbable
         //au detriment des plus probables
-/*
-        String map[] = new String[]{
+        String map1[] = new String[]{
                 "   +",
                 " # -",
                 "    "
         };
-*/
-        String map[] = new String[]{
-                "  #  +",
-                " #    ",
-                "   # -",
-                " # #  ",
-                "      "
+
+        String map2[] = new String[]{
+                "   # +",
+                " #   -",
+                "   #  "
         };
 
+        PDMPOexploration search = new PDMPOexplorationSamplingPercept(
+                new MyDoubleFactory(), 0.0, 0.1, 0.2);
 
-        PDMPOexploration search = new PDMPOexplorationSamplingPercept(new MyDoubleFactory(), 0.01, 0.1);
-
-        PDMPOexplorationPerceptTest(search, map, 6, new Position(1,2));
+        PDMPOexplorationPerceptTest(search, map2, 5, new Position(1,1));
 
     }
 

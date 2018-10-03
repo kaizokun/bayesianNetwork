@@ -38,6 +38,10 @@ public interface PDMPO {
 
     boolean iStateOfBelieveRisky(Distribution forwardPrevision, AbstractDouble minRiskProb);
 
+    boolean isGoal(Distribution forward);
+
+    boolean isOppositeAction(Domain.DomainValue action, Domain.DomainValue lastAction);
+
     class RsState {
 
         private Domain.DomainValue state;

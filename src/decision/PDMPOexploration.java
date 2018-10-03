@@ -33,15 +33,17 @@ public abstract class PDMPOexploration {
 
     protected PDMPO pdmpo;
 
-    protected AbstractDouble minStateProb, minRiskProb;
+    protected AbstractDouble minStateProb, minRiskProb, minPerceptProb;
 
-    public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb) {
+    public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb, double minPerceptProb) {
 
         this.df = doubleFactory;
 
         this.minStateProb = this.df.getNew(minStateProb);
 
         this.minRiskProb = this.df.getNew(minRiskProb);
+
+        this.minPerceptProb = this.df.getNew(minPerceptProb);
     }
 
     public PDMPOexploration(AbstractDoubleFactory doubleFactory, DynamicBayesianNetwork dynamicBayesianNetwork, PDMPO pdmpo, double minStateProb) {
@@ -61,10 +63,10 @@ public abstract class PDMPOexploration {
 
         cptPercepts = 0;
 
-        return getBestAction(forward, 0, limit, df.getNew(0.0));
+        return getBestAction(forward, 0, limit, df.getNew(0.0), pdmpo.getNoAction());
     }
 
-    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward) {
+    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward, Domain.DomainValue lastAction) {
 
         String ident = null;
 
@@ -79,18 +81,6 @@ public abstract class PDMPOexploration {
 
         if (showlog)
             System.out.println("ACTIONS : " + actions);
-
-        //si aucune action n'est disponible c'est que le forward ne contient que des positions
-        //dont la probabilité est superieure au seuil defini et qui sont finales (but ou echec)
-        if (actions.isEmpty()) {
-
-            //System.out.println("NO ACTIONS "+time);
-
-            //System.out.println(forward);
-
-            //dans ce cas retourner une action vide avec une utilité correspondant à l'état final
-            return new PDMPOsearchResult(pdmpo.getNoAction(), pdmpo.getUtility(forward));
-        }
 
         //on etend le network pour le temps time si necessaire
         if (network.getTime() <= time) {
@@ -108,6 +98,11 @@ public abstract class PDMPOexploration {
         //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
         //pour une combinaison d'action ou aura un object DomainValue composite
         for (Domain.DomainValue action : actions) {
+
+            if (pdmpo.isOppositeAction(action, lastAction)) {
+
+                continue;
+            }
 
             //initialisation de la valeur de la variable action du reseau
             Variable actionVar = pdmpo.getActionVar();
@@ -135,20 +130,8 @@ public abstract class PDMPOexploration {
 
             //vérifie si l'état de croyance comprte des états finaux d'echec ayant une probabilité supérieur à un seuil
             //dans ce cas l'action doit être évité
-            if(pdmpo.iStateOfBelieveRisky(forwardPrevision, minRiskProb)){
-/*
-                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            if (pdmpo.iStateOfBelieveRisky(forwardPrevision, minRiskProb)) {
 
-                System.out.println(forward);
-
-                System.out.println("RISKY ACTIONS "+action);
-
-                System.out.println(forwardPrevision);
-
-                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-                System.out.println();
-*/
                 continue;
             }
 
@@ -187,12 +170,12 @@ public abstract class PDMPOexploration {
                 AbstractDouble forwardReward = pdmpo.getUtility(nextForward);
                 //recompense totale l'ancienne plus la courante
                 AbstractDouble currentTotalReward = forwardReward.add(reward);
-                //tant que l'on a pas atteind un état final
-                if (time < limit) {
+                //tant que l'on a pas atteind un état final ou la limite
+                if (time < limit && !pdmpo.isGoal(nextForward)) {
                     //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
                     //recupère la meilleure action et son l'utilité
                     PDMPOsearchResult rs = getBestAction(nextForward, time + 1, limit,
-                            currentTotalReward);
+                            currentTotalReward, action);
                     //utilité fourni par la meilleur action
                     currentTotalReward = rs.bestUtility;
                 }
@@ -229,7 +212,7 @@ public abstract class PDMPOexploration {
         //variable percept pour recuperer la TCP
         Variable perceptVar = network.getVariable(time + 1, pdmpo.getPerceptVar());
         //TCP variable Percept
-        ProbabilityCompute tcpPercept =  perceptVar.getProbabilityCompute();
+        ProbabilityCompute tcpPercept = perceptVar.getProbabilityCompute();
         //pour chaque états
         for (Domain.DomainValue state : forwardPrevision.getRowValues()) {
             //probabilité de l'état
@@ -238,7 +221,7 @@ public abstract class PDMPOexploration {
             Map<Domain.DomainValue, AbstractDouble> statePerceptsProbs = tcpPercept.getTCP().get(tcpPercept.getValueKey(state));
 
             //pour chaque percept
-            for(Domain.DomainValue percept : pdmpo.getPercepts()){
+            for (Domain.DomainValue percept : pdmpo.getPercepts()) {
 
                 //probabilité du percept en fonction de l'état
                 //la probabilité du percept est multipliée par celle de l'état qui le fournit
@@ -246,11 +229,11 @@ public abstract class PDMPOexploration {
                 //recupere la probabilité enregistré dans la map
                 AbstractDouble perceptProb = perceptsMap.get(percept);
                 //si pas encore enregistré on l'initialise
-                if(perceptProb == null){
+                if (perceptProb == null) {
 
                     perceptProb = statePerceptProb;
-                //sinon on cumule les probabilités
-                }else{
+                    //sinon on cumule les probabilités
+                } else {
 
                     perceptProb = perceptProb.add(statePerceptProb);
                 }
@@ -260,8 +243,32 @@ public abstract class PDMPOexploration {
             }
         }
 
-        //System.out.println("METHODE 2");
-        //System.out.println(Util.printMap(perceptsMap));
+        //total des probabilités des percepts
+        AbstractDouble total = df.getNew(0.0);
+        //percepts à retirer
+        Set<Domain.DomainValue> removePercepts = new HashSet<>();
+
+        for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : perceptsMap.entrySet()) {
+
+            if (entry.getValue().compareTo(minPerceptProb) < 0) {
+                //ajout du percept à retirer si probabilité en dessous du seuil
+                removePercepts.add(entry.getKey());
+            } else {
+                //sinon on ajoute la probabilité au total
+                total = total.add(entry.getValue());
+            }
+        }
+        //retrait des percepts hautement improbables
+        for (Domain.DomainValue percept : removePercepts) {
+
+            perceptsMap.remove(percept);
+        }
+
+        //normalisation des percepts sur 100%
+        for (Map.Entry<Domain.DomainValue, AbstractDouble> entry : perceptsMap.entrySet()) {
+
+            entry.setValue(entry.getValue().divide(total));
+        }
 
         return perceptsMap;
     }
@@ -338,7 +345,7 @@ public abstract class PDMPOexploration {
 */
 
         //System.out.println("METHODE 1");
-       // System.out.println(Util.printMap(perceptsMap));
+        // System.out.println(Util.printMap(perceptsMap));
 
         return perceptsMap;
     }
