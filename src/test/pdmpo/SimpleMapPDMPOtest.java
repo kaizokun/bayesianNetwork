@@ -98,6 +98,9 @@ public class SimpleMapPDMPOtest {
         //System.out.println(distribution.normalize());
     }
 
+    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, String[] map, int limit) {
+        PDMPOexplorationPerceptTest(pdmpoSearch, map, limit, null);
+    }
 
     public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, String[] map, int limit, Position startPosition) {
 
@@ -140,6 +143,8 @@ public class SimpleMapPDMPOtest {
 
         System.out.println("--- EXPLO ---");
 
+        Domain.DomainValue lastAction = pdmpo.getNoAction();
+
         int move = 0;
 
         do {
@@ -149,7 +154,9 @@ public class SimpleMapPDMPOtest {
             System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
 
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
-            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, limit);
+            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, limit, lastAction);
+
+            lastAction = result.getAction();
 
             positions.add(simpleMap.getAgentPosition());
 
@@ -181,15 +188,19 @@ public class SimpleMapPDMPOtest {
 
             System.out.println("TOTAL PERCEPTS CHECK : " + pdmpoSearch.cptPercepts);
 
-            System.out.println("TOTAL LOOP : "+pdmpoSearch.cptLoopState);
+            System.out.println("TOTAL LOOP : " + pdmpoSearch.cptLoopState);
 
-            //System.exit(0);
+            move++;
 
-            move ++;
-
-            if(move == 30 ){
+            if (move == 20) {
 
                 break;
+            } else if (move == 4) {
+
+                //  pdmpoSearch.showlog = true;
+            } else {
+
+                pdmpoSearch.showlog = false;
             }
 
         } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
@@ -203,6 +214,27 @@ public class SimpleMapPDMPOtest {
 
     @Test
     public void PDMPOexplorationPerceptAVGTest() {
+
+        //(3,3) :
+        //0 EAST : 1 * 0.013717791878463656 (positif du au fait que la position final est probable même faible donc utilité positive)
+        //1 SOUTH : 1 * -0.042001576893942745,
+        //2 EAST : 1 * -0.04006121963240383
+        //3 EAST : 0.773944727682733 * -0.04000221018315792
+        //4 NORTH : 1 * -0.03469213655272276
+        //5 EAST : 1 * 0.987674679348387
+
+        //TOTAL POUR EAST = 0.6455136214704402
+
+        //(3,3)
+        //0 SOUTH : 1 * -0.042001775057138924
+        //1 EAST : 1 * -0.04006118941108893
+        //2 EAST : 0.7739443267565693 *  -0.04000219300366543
+        //3 NORTH : 1 *  -0.03469213661068924
+        //4 EAST : 1 * 0.9876746715542277
+
+        //TOTAL POUR SOUTH = 0.6348963565448483
+
+        //réglé en enregistrant le forward des le debut dans le set des états de croyance visités
 
         String map1[] = new String[]{
                 "   +",
@@ -219,7 +251,7 @@ public class SimpleMapPDMPOtest {
         PDMPOexploration search = new PDMPOexplorationFullPercept(
                 new MyDoubleFactory(), 0.0, 0.75, 0.1, 0.2);
 
-        PDMPOexplorationPerceptTest(search, map2, Integer.MAX_VALUE, new Position(3,1));
+        PDMPOexplorationPerceptTest(search, map2, Integer.MAX_VALUE/*, new Position(1,3)*/);
     }
 
     @Test

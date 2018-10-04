@@ -21,7 +21,7 @@ public abstract class PDMPOexploration {
      * Distribution forward : état de croyance courant sur les états dans le RBD "réel"
      * */
 
-    private static boolean showlog = false;
+    public static boolean showlog = false;
 
     public static int cptLeaf, cptPercepts, cptLoopState;
 
@@ -57,7 +57,7 @@ public abstract class PDMPOexploration {
         this.minStateProb = df.getNew(minStateProb);
     }
 
-    public PDMPOsearchResult getBestAction(Distribution forward, int limit) {
+    public PDMPOsearchResult getBestAction(Distribution forward, int limit, Domain.DomainValue lastAction) {
 
         cptLeaf = 0;
 
@@ -65,11 +65,18 @@ public abstract class PDMPOexploration {
 
         cptLoopState = 0;
 
-        return getBestAction(forward, 0, limit, df.getNew(0.0), pdmpo.getNoAction(), new HashSet<String>());
+        Set<String> visited = new HashSet<>();
+
+        Map<String, PDMPOsearchResult> resultsSaved = new Hashtable<>();
+
+        visited.add(pdmpo.getApproximationForward(forward));
+
+        return getBestAction(forward, 0, limit, df.getNew(0.0), lastAction, visited, resultsSaved);
     }
 
     protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward,
-                                              Domain.DomainValue lastAction, Set<String> visitedStates) {
+                                              Domain.DomainValue lastAction, Set<String> visitedStates,
+                                              Map<String, PDMPOsearchResult> resultsSaved) {
 
         String ident = null;
 
@@ -82,8 +89,11 @@ public abstract class PDMPOexploration {
         //distribution initiale
         Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward, lastAction, minStateProb);//v
 
-        if (showlog)
-            System.out.println("ACTIONS : " + actions);
+
+        if (showlog) {
+            System.out.println();
+            System.out.println(ident + "ALL ACTIONS [" + time + "]: " + actions);
+        }
 
         //on etend le network pour le temps time si necessaire
         if (network.getTime() <= time) {
@@ -113,7 +123,7 @@ public abstract class PDMPOexploration {
 
             if (showlog) {
                 System.out.println();
-                System.out.println(ident + "--------- ACTION : " + action);
+                System.out.println(ident + "ACTION [" + time + "] : " + action + " - LAST REWARD : " + reward);
             }
 
             //forward sans percept uniquement l'action
@@ -130,6 +140,11 @@ public abstract class PDMPOexploration {
             //dans ce cas l'action doit être évité
             if (pdmpo.iStateOfBelieveRisky(forwardPrevision, minRiskProb)) {
 
+                if (showlog) {
+                    System.out.println();
+                    System.out.println(ident + "!!! FORWARD RISKY !!!");
+                }
+
                 continue;
             }
 
@@ -141,12 +156,17 @@ public abstract class PDMPOexploration {
 
             List<Map.Entry<Domain.DomainValue, AbstractDouble>> percepts = this.filterPercepts(perceptsMap, ident);
 
+            if (showlog)
+                System.out.println(ident + "(0) ALL PERCEPTS (" + percepts.size() + ") : " + percepts);
+
+            if (showlog)
+                System.out.println(ident + "PERCEPTS MAP :  " + perceptsMap);
+
             cptPercepts += percepts.size();
 
-            for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : percepts) {
+            int iPercept = 0;
 
-                if (showlog)
-                    System.out.println(ident + "---------  PERCEPT : " + percept);
+            for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : percepts) {
 
                 AbstractDouble perceptProb = percept.getValue();
                 //recupere la variable  percept
@@ -157,7 +177,7 @@ public abstract class PDMPOexploration {
                 network.initVar(time + 1, perceptVar);
 
                 if (showlog)
-                    System.out.println("ACTION : " + action + " - PERCEPT : " + percept.getKey() + ", " + percept.getValue());
+                    System.out.println(ident + "(0) PERCEPT [" + iPercept + "] : " + percept.getKey() + ", " + percept.getValue());
 
                 //calcule la distribution futur en fonction d'une action et d'un percept possible donné
                 Distribution nextForward = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
@@ -170,11 +190,21 @@ public abstract class PDMPOexploration {
                 AbstractDouble currentTotalReward = forwardReward.add(reward);
                 //tant que l'on a pas atteind un état final ou la limite
 
+                if (showlog)
+                    System.out.println(ident + "FORWARD UTILITY : " + forwardReward);
+
+                if (showlog)
+                    System.out.println(ident + "CURRENT REWARD : " + currentTotalReward);
+
                 String key = pdmpo.getApproximationForward(nextForward);
 
                 if (visitedStates.contains(key)) {
 
-                    cptLoopState ++;
+                    cptLoopState++;
+
+                    if (showlog)
+                        System.out.println(ident + "(0) VISITED ");
+
                     /*
                     System.out.println("visited "+key);
 
@@ -186,23 +216,42 @@ public abstract class PDMPOexploration {
                 if (time < limit && !pdmpo.isGoal(nextForward) && !visitedStates.contains(key)) {
                     //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
                     //recupère la meilleure action et son l'utilité
+                    //verifie si on a déja fait une exploration à partir d'un état de croyance proche
 
-                    visitedStates.add(key);
+                    PDMPOsearchResult rs;
 
-                    PDMPOsearchResult rs = getBestAction(nextForward, time + 1, limit,
-                            currentTotalReward, action, visitedStates);
+                    //if(!resultsSaved.containsKey(key)) {
+                        //marque l'état de croyance comme visité pour le parcour courant
+                        visitedStates.add(key);
 
-                    visitedStates.remove(key);
+                        rs = getBestAction(nextForward, time + 1, limit,
+                                currentTotalReward, action, visitedStates, resultsSaved);
+                        //enregistre l'utilité de la meilleur action depuis le forward (approximation)
+                        //pour l'utiliser dans les autres parcours plutot que de recalculer les utilités
+                        //peut poser des problèmes en provoquant des loops (raison à determiner)
+                        //loop peuvent être éviter si on demarre en indiquant la precedente action
+                        //et qu'on evite les actions qui retourne en arriere
+                        //mais pas forcement le fonctionnement général à adopter dans tout les cas
+                        //resultsSaved.put(key, rs);
+                        //demarque l'état de croyance comme visité
+                        visitedStates.remove(key);
+
+                   // }else{
+                        //retourne l'utilité et action enregistré
+                    //    rs = resultsSaved.get(key);
+                   // }
 
                     //utilité fourni par la meilleur action
                     currentTotalReward = rs.bestUtility;
+
+                    if (showlog)
+                        System.out.println(ident + "UTILITE RETOURNE " + currentTotalReward);
                 }
 
                 actionUtility = actionUtility.add(perceptProb.multiply(currentTotalReward));
+
+                iPercept++;
             }
-
-
-            //System.out.println(ident + "CURRENT REWARD " + forwardReward + " + " + reward + " = " + currentTotalReward);
 
             if (actionUtility.compareTo(maxActionUtility) > 0) {
 
@@ -214,7 +263,7 @@ public abstract class PDMPOexploration {
             cptLeaf++;
 
             if (showlog)
-                System.out.println("UTILITE ESPERE : " + actionUtility);
+                System.out.println(ident + "UTILITE ESPERE ACTION : " + bestAction + " = " + actionUtility);
         }
 
         return new PDMPOsearchResult(bestAction, maxActionUtility);
