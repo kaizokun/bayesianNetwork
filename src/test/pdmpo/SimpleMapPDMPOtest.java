@@ -98,14 +98,9 @@ public class SimpleMapPDMPOtest {
         //System.out.println(distribution.normalize());
     }
 
-    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, String[] map, int limit) {
-        PDMPOexplorationPerceptTest(pdmpoSearch, map, limit, null);
-    }
-
-    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, String[] map, int limit, Position startPosition) {
+    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, SimpleMap simpleMap, int limit) {
 
         //environnement
-        SimpleMap simpleMap = new SimpleMap(map, startPosition);
         //reseau baysien utilié pour l'exploration
         DynamicBayesianNetwork explorationNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
         //reseau bayesien utilisé par l'agent
@@ -137,11 +132,11 @@ public class SimpleMapPDMPOtest {
 
         LinkedList<Position> positions = new LinkedList<>();
 
-        System.out.println("----------- DEPART ---------");
+        //System.out.println("----------- DEPART ---------");
 
-        System.out.println(stateOfBelieve);
+        //System.out.println(stateOfBelieve);
 
-        System.out.println("--- EXPLO ---");
+        //System.out.println("--- EXPLO ---");
 
         Domain.DomainValue lastAction = pdmpo.getNoAction();
 
@@ -149,23 +144,23 @@ public class SimpleMapPDMPOtest {
 
         do {
 
-            System.out.println("AGENT REAL POSITION " + simpleMap.getAgentPosition());
+            // System.out.println("AGENT REAL POSITION " + simpleMap.getAgentPosition());
 
-            System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
+            //System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
 
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
-            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, limit, lastAction);
+            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, limit);
 
             lastAction = result.getAction();
 
             positions.add(simpleMap.getAgentPosition());
 
             actions.add((DirectionMove) result.getAction().getValue());
-            System.out.println("BEST ACTION " + result);
+            //System.out.println("BEST ACTION " + result);
             //deplace l'agent dans l'environnement
             simpleMap.moveAgent((DirectionMove) result.getAction().getValue());
 
-            System.out.println("AGENT NEW REAL POSITION " + simpleMap.getAgentPosition());
+            // System.out.println("AGENT NEW REAL POSITION " + simpleMap.getAgentPosition());
             //recupère le percept courant de l'agant
             PerceptWall perceptWall = simpleMap.getAgentPercept();
             //met à jour l'état de croyance de l'agent
@@ -182,16 +177,16 @@ public class SimpleMapPDMPOtest {
 
             stateOfBelieve = agentNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), agentNetwork.getTime(), stateOfBelieve);
 
-            System.out.println("AGENT STATE OF BELIEVE ");
+            //System.out.println("AGENT STATE OF BELIEVE ");
 
-            System.out.println(stateOfBelieve);
+            //System.out.println(stateOfBelieve);
 
-            System.out.println("TOTAL PERCEPTS CHECK : " + pdmpoSearch.cptPercepts);
+            //System.out.println("TOTAL PERCEPTS CHECK : " + pdmpoSearch.cptPercepts);
 
-            System.out.println("TOTAL LOOP : " + pdmpoSearch.cptLoopState);
+            //System.out.println("TOTAL LOOP : " + pdmpoSearch.cptLoopState);
 
             move++;
-
+/*
             if (move == 20) {
 
                 break;
@@ -202,7 +197,7 @@ public class SimpleMapPDMPOtest {
 
                 pdmpoSearch.showlog = false;
             }
-
+*/
         } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
 
         do {
@@ -215,26 +210,15 @@ public class SimpleMapPDMPOtest {
     @Test
     public void PDMPOexplorationPerceptAVGTest() {
 
-        //(3,3) :
-        //0 EAST : 1 * 0.013717791878463656 (positif du au fait que la position final est probable même faible donc utilité positive)
-        //1 SOUTH : 1 * -0.042001576893942745,
-        //2 EAST : 1 * -0.04006121963240383
-        //3 EAST : 0.773944727682733 * -0.04000221018315792
-        //4 NORTH : 1 * -0.03469213655272276
-        //5 EAST : 1 * 0.987674679348387
 
-        //TOTAL POUR EAST = 0.6455136214704402
+        //test sur map2
+        //l'estimation permet de trouver les bonnes actions
+        //dans certains cas même avec une exploration courte genre limit à 2
+        //alors que sans estimation si on se contente de calculer
+        //la moyenne on obtient des utilités, la limite faisant que
+        //le but est eloigné et peu probable ont obtient des utilités quazi identiques
+        //pour la plupart des actions.
 
-        //(3,3)
-        //0 SOUTH : 1 * -0.042001775057138924
-        //1 EAST : 1 * -0.04006118941108893
-        //2 EAST : 0.7739443267565693 *  -0.04000219300366543
-        //3 NORTH : 1 *  -0.03469213661068924
-        //4 EAST : 1 * 0.9876746715542277
-
-        //TOTAL POUR SOUTH = 0.6348963565448483
-
-        //réglé en enregistrant le forward des le debut dans le set des états de croyance visités
 
         String map1[] = new String[]{
                 "   +",
@@ -248,10 +232,29 @@ public class SimpleMapPDMPOtest {
                 "   #  "
         };
 
+        String map3[] = new String[]{
+                "###########",
+                "#   #     +",
+                "# #   ### -",
+                "# ###     #",
+                "#   #### ##",
+                "#         #",
+                "###########"
+        };
+
         PDMPOexploration search = new PDMPOexplorationFullPercept(
                 new MyDoubleFactory(), 0.0, 0.75, 0.1, 0.2);
 
-        PDMPOexplorationPerceptTest(search, map2, Integer.MAX_VALUE/*, new Position(1,3)*/);
+        SimpleMap simpleMap = new SimpleMap(map2);
+
+        for (Position position : simpleMap.getNotFinalStates()) {
+
+            System.out.println("-------TEST "+position+"------");
+
+            simpleMap.setAgentPosition(position);
+
+            PDMPOexplorationPerceptTest(search, simpleMap, 10);
+        }
     }
 
     @Test
@@ -275,9 +278,9 @@ public class SimpleMapPDMPOtest {
         PDMPOexploration search = new PDMPOexplorationSamplingPercept(
                 new MyDoubleFactory(), 0.0, 0.1, 0.2);
 
-        PDMPOexplorationPerceptTest(search, map2, 6, null);
+        SimpleMap simpleMap = new SimpleMap(map1);
 
+        PDMPOexplorationPerceptTest(search, simpleMap, 6);
     }
-
 
 }

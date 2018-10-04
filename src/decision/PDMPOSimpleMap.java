@@ -20,6 +20,18 @@ import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.WALL_PERCEPT;
 
 public class PDMPOSimpleMap implements PDMPO {
 
+    protected static final double
+            BAD_REWARD = -0.04,
+            GOOD_REWARD = 1,
+            GAME_OVER = -1,
+            MIN_PROB_GOAL = 0.6,
+            STRAIGHT_MOVE_PROB = 0.8,
+            LEFT_MOVE_PROB = 0.1,
+            RIGHT_MOVE_PROB = 0.1;
+
+    //nombre de chiffre àprès la virgule pour la clé d'estimation du forward
+    protected static final int KEY_FORWARD_SCALE = 1;
+
     protected SimpleMap simpleMap;
 
     protected IDomain actionDomain, perceptDomain, stateDomain;
@@ -87,12 +99,12 @@ public class PDMPOSimpleMap implements PDMPO {
 
         for (Position position : simpleMap.getNotFinalStates()) {
 
-            statesUtility.put(position, doubleFactory.getNew(-0.04));
+            statesUtility.put(position, doubleFactory.getNew(BAD_REWARD));
         }
 
-        statesUtility.put(simpleMap.getGoodExit(), doubleFactory.getNew(1.0));
+        statesUtility.put(simpleMap.getGoodExit(), doubleFactory.getNew(GOOD_REWARD));
 
-        statesUtility.put(simpleMap.getBadExit(), doubleFactory.getNew(-1.0));
+        statesUtility.put(simpleMap.getBadExit(), doubleFactory.getNew(GAME_OVER));
     }
 
     @Override
@@ -149,7 +161,7 @@ public class PDMPOSimpleMap implements PDMPO {
      * */
 
     @Override
-    public Set<Domain.DomainValue> getActionsFromState(Distribution forward, Domain.DomainValue lastAction, AbstractDouble minProb) {
+    public Set<Domain.DomainValue> getActionsFromState(Distribution forward, AbstractDouble minProb) {
 
         Set<Domain.DomainValue> actions = new HashSet<>();
 
@@ -173,13 +185,6 @@ public class PDMPOSimpleMap implements PDMPO {
         //autre solution utilisée ignorer les actions qui
         //fournissent un état ou les position echec sont probables
         //this.removeRiskyActions(forward, actions, minProb);
-
-        //retire l'action directement opposée à la precedente
-        DirectionMove lastDirection = (DirectionMove) lastAction.getValue();
-
-        DirectionMove oppositeDirection = lastDirection.getOppositeDirection();
-
-        actions.remove(actionDomain.getDomainValue(oppositeDirection));
 
         return actions;
     }
@@ -244,11 +249,11 @@ public class PDMPOSimpleMap implements PDMPO {
 
         DirectionMove move = (DirectionMove) action.getValue();
 
-        this.addNewPosition(rsStates, positionOrigin, move, 0.8);
+        this.addNewPosition(rsStates, positionOrigin, move, STRAIGHT_MOVE_PROB);
 
-        this.addNewPosition(rsStates, positionOrigin, move.getRelativeRight(), 0.1);//v
+        this.addNewPosition(rsStates, positionOrigin, move.getRelativeRight(), RIGHT_MOVE_PROB);//v
 
-        this.addNewPosition(rsStates, positionOrigin, move.getRelativeLeft(), 0.1);
+        this.addNewPosition(rsStates, positionOrigin, move.getRelativeLeft(), LEFT_MOVE_PROB);
 
         stateActionResultMap.put(stateActionKey, rsStates.values());
 
@@ -312,9 +317,9 @@ public class PDMPOSimpleMap implements PDMPO {
 
     @Override
     public boolean isGoal(Distribution forward) {
-        //retourne vrai si la probabilité de la position but est supérieur ou égal à 80 %
+        //retourne vrai si la probabilité de la position but est supérieur à un certain seuil
         return forward.get(stateDomain.getDomainValue(simpleMap.getGoodExit()))
-                .compareTo(doubleFactory.getNew(0.8)) >= 0;
+                .compareTo(doubleFactory.getNew(MIN_PROB_GOAL)) >= 0;
     }
 
     @Override
@@ -334,7 +339,7 @@ public class PDMPOSimpleMap implements PDMPO {
     }
 
     @Override
-    public String getApproximationForward(Distribution forward) {
+    public String getKeyForward(Distribution forward) {
 
         StringBuilder builder = new StringBuilder();
 
@@ -342,12 +347,50 @@ public class PDMPOSimpleMap implements PDMPO {
 
             AbstractDouble abstractDouble = forward.getValue(row);
 
-            builder.append(String.format("%.1f", abstractDouble.getDoubleValue()));
+            builder.append(String.format("%." + KEY_FORWARD_SCALE + "f", abstractDouble.getDoubleValue()));
+
             builder.append('.');
         }
 
         return builder.toString();
     }
 
+    @Override
+    public AbstractDouble getEstimationForward(Distribution forward) {
 
+        /*
+         * Pour chaque position on calcule la distance qui la separe du but
+         * à vol d'oiseau (bien sur dans un labyrinthe il pourrait y avoir des obstacles
+         * qui comprometraient cet heuristique)
+         *
+         * la distance est multiplié par le nombre de mauvaise recompense
+         * pour atteindre le but auquel on additionne la recompense du but
+         *
+         * ce resultat est pondéré par la probabilité de la position de depart
+         *
+         * chacun des resultats pondéré est additionné pour former l'estimation
+         * */
+
+        AbstractDouble estimation = doubleFactory.getNew(0.0);
+
+        for (Domain.DomainValue value : forward.getRowValues()) {
+
+            Position position = (Position) value.getValue();
+
+            AbstractDouble prob = forward.get(value);
+
+            //distance sur l'axe des x entre une position et le but
+            int deltaX = Math.abs(simpleMap.getGoodExit().getX() - position.getX());
+            //distance sur l'axe des y entre une position et le but
+            int deltaY = Math.abs(simpleMap.getGoodExit().getY() - position.getY());
+            //distance diagonale
+            double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+            //distance multiplié par la recompense obtenu dans les positions non finales
+            AbstractDouble reachGoodPositionReward = doubleFactory.getNew((distance * BAD_REWARD) + GOOD_REWARD);
+
+            estimation = estimation.add(prob.multiply(reachGoodPositionReward));
+        }
+
+        return estimation;
+    }
 }

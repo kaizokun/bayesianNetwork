@@ -6,10 +6,8 @@ import domain.data.AbstractDoubleFactory;
 import inference.dynamic.Util;
 import math.Distribution;
 import network.ProbabilityCompute;
-import network.ProbabilityComputeFromTCP;
 import network.Variable;
 import network.dynamic.DynamicBayesianNetwork;
-import network.dynamic.Model;
 
 import java.util.*;
 
@@ -57,7 +55,7 @@ public abstract class PDMPOexploration {
         this.minStateProb = df.getNew(minStateProb);
     }
 
-    public PDMPOsearchResult getBestAction(Distribution forward, int limit, Domain.DomainValue lastAction) {
+    public PDMPOsearchResult getBestAction(Distribution forward, int limit) {
 
         cptLeaf = 0;
 
@@ -68,15 +66,38 @@ public abstract class PDMPOexploration {
         Set<String> visited = new HashSet<>();
 
         Map<String, PDMPOsearchResult> resultsSaved = new Hashtable<>();
+        //enregistrer le forward de base pour eviter les boucles des le depart
+        //depend de la precision de la clé !
+        visited.add(pdmpo.getKeyForward(forward));
 
-        visited.add(pdmpo.getApproximationForward(forward));
-
-        return getBestAction(forward, 0, limit, df.getNew(0.0), lastAction, visited, resultsSaved);
+        return getBestAction(forward, 0, limit, df.getNew(0.0), visited, resultsSaved);
     }
 
-    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward,
-                                              Domain.DomainValue lastAction, Set<String> visitedStates,
+    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward, Set<String> visitedStates,
                                               Map<String, PDMPOsearchResult> resultsSaved) {
+
+
+        boolean isGoal = pdmpo.isGoal(forward);
+
+        //limite atteinte but non atteind
+        //estimation
+        if(time > limit && !isGoal){
+
+            AbstractDouble estimation = pdmpo.getEstimationForward(forward);
+
+            //System.out.println("LIMIT "+time+" "+estimation);
+
+            return new PDMPOsearchResult(pdmpo.getNoAction(), estimation);
+            //return new PDMPOsearchResult(pdmpo.getNoAction(), reward);
+        }
+
+        //limite non atteinte but atteind
+        if(isGoal){
+
+            //System.out.println("GOAL : "+time+" = "+reward);
+            //l'utilité de l'état de croyance potentiellement but a été calculé precedemment
+            return new PDMPOsearchResult(pdmpo.getNoAction(), reward);
+        }
 
         String ident = null;
 
@@ -87,7 +108,7 @@ public abstract class PDMPOexploration {
             System.out.println(ident + "========== BEST ACTION - TIME : " + time + " ===============\n");
         }
         //distribution initiale
-        Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward, lastAction, minStateProb);//v
+        Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward, minStateProb);//v
 
 
         if (showlog) {
@@ -196,7 +217,7 @@ public abstract class PDMPOexploration {
                 if (showlog)
                     System.out.println(ident + "CURRENT REWARD : " + currentTotalReward);
 
-                String key = pdmpo.getApproximationForward(nextForward);
+                String key = pdmpo.getKeyForward(nextForward);
 
                 if (visitedStates.contains(key)) {
 
@@ -213,7 +234,7 @@ public abstract class PDMPOexploration {
                 //le système d'approcimation sur les états de croyance pour eviter les loops
                 //fonctionne sans limite imposé laprecision est reglable dans le pdmpo à 1 ou plusieurs
                 //chiffre après la virgule ce qui crée un ensemble pouvant englober plusieurs états de croyances proches
-                if (time < limit && !pdmpo.isGoal(nextForward) && !visitedStates.contains(key)) {
+                if (!visitedStates.contains(key)) {
                     //rapelle la fonction avec le nouvel état de croyance et la recompense obtenu ajouté à la précedente
                     //recupère la meilleure action et son l'utilité
                     //verifie si on a déja fait une exploration à partir d'un état de croyance proche
@@ -221,26 +242,33 @@ public abstract class PDMPOexploration {
                     PDMPOsearchResult rs;
 
                     //if(!resultsSaved.containsKey(key)) {
-                        //marque l'état de croyance comme visité pour le parcour courant
-                        visitedStates.add(key);
+                    //marque l'état de croyance comme visité pour le parcour courant
+                    visitedStates.add(key);
 
-                        rs = getBestAction(nextForward, time + 1, limit,
-                                currentTotalReward, action, visitedStates, resultsSaved);
-                        //enregistre l'utilité de la meilleur action depuis le forward (approximation)
-                        //pour l'utiliser dans les autres parcours plutot que de recalculer les utilités
-                        //peut poser des problèmes en provoquant des loops (raison à determiner)
-                        //loop peuvent être éviter si on demarre en indiquant la precedente action
-                        //et qu'on evite les actions qui retourne en arriere
-                        //mais pas forcement le fonctionnement général à adopter dans tout les cas
-                        //resultsSaved.put(key, rs);
-                        //demarque l'état de croyance comme visité
-                        visitedStates.remove(key);
+                    rs = getBestAction(nextForward, time + 1, limit,
+                            currentTotalReward, visitedStates, resultsSaved);
+                    //enregistre l'utilité de la meilleur action depuis le forward (approximation)
+                    //pour l'utiliser dans les autres parcours plutot que de recalculer les utilités
+                    //peut poser des problèmes en provoquant des loops (raison à determiner)
+                    //loop peuvent être éviter si on demarre en indiquant la precedente action
+                    //et qu'on evite les actions qui retourne en arriere
+                    //mais pas forcement le fonctionnement général à adopter dans tout les cas
+                    resultsSaved.put(key, rs);
+                    //demarque l'état de croyance comme visité
+                    visitedStates.remove(key);
 
-                   // }else{
-                        //retourne l'utilité et action enregistré
-                    //    rs = resultsSaved.get(key);
-                   // }
 
+                    // }else{
+                    //retourne l'utilité et action enregistré
+                    //  rs = resultsSaved.get(key);
+                    //  }
+
+/*
+                    System.out.println("PROFONDEUR "+time);
+                    System.out.println(time+" "+key);
+                    System.out.println(rs);
+                    System.out.println();
+                    */
                     //utilité fourni par la meilleur action
                     currentTotalReward = rs.bestUtility;
 

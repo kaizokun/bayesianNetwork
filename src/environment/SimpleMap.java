@@ -25,16 +25,6 @@ public class SimpleMap implements Environment<Position> {
 
     protected Map<Position, PerceptWall> positionPercept = new Hashtable<>();
 
-    public SimpleMap(String[] map, Position startPosition) {
-
-        this(map);
-
-        if(startPosition != null) {
-
-            this.agentPosition = startPosition;
-        }
-    }
-
     public SimpleMap(String[] map) {
 
         this.map = map;
@@ -247,5 +237,9 @@ public class SimpleMap implements Environment<Position> {
     public Set<Position> getRiskyPositions() {
 
         return riskyPositions;
+    }
+
+    public void setAgentPosition(Position agentPosition) {
+        this.agentPosition = agentPosition;
     }
 }
