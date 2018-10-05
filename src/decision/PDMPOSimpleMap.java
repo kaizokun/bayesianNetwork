@@ -24,13 +24,14 @@ public class PDMPOSimpleMap implements PDMPO {
             BAD_REWARD = -0.04,
             GOOD_REWARD = 1,
             GAME_OVER = -1,
-            MIN_PROB_GOAL = 0.6,
             STRAIGHT_MOVE_PROB = 0.8,
             LEFT_MOVE_PROB = 0.1,
             RIGHT_MOVE_PROB = 0.1;
 
     //nombre de chiffre àprès la virgule pour la clé d'estimation du forward
-    protected static final int KEY_FORWARD_SCALE = 1;
+    protected int KEY_FORWARD_SCALE = 1;
+
+    protected double MIN_PROB_GOAL = 0.6;
 
     protected SimpleMap simpleMap;
 
@@ -46,7 +47,7 @@ public class PDMPOSimpleMap implements PDMPO {
 
     protected Map<Position, Set<Domain.DomainValue>> positionsMoves = new Hashtable<>();
 
-    public PDMPOSimpleMap(SimpleMap simpleMap, AbstractDoubleFactory doubleFactory) {
+    public PDMPOSimpleMap(SimpleMap simpleMap, AbstractDoubleFactory doubleFactory, double minProbGoal, int forwardKeyScale) {
 
         this.simpleMap = simpleMap;
 
@@ -70,6 +71,10 @@ public class PDMPOSimpleMap implements PDMPO {
         this.initStatesUtility();
 
         this.initPositionsMoves();
+
+        this.KEY_FORWARD_SCALE = forwardKeyScale;
+
+        this.MIN_PROB_GOAL = minProbGoal;
     }
 
     private void initPositionsMoves() {

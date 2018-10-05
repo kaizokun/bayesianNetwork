@@ -33,7 +33,7 @@ public abstract class PDMPOexploration {
 
     protected AbstractDouble minStateProb, minRiskProb, minPerceptProb;
 
-    protected  Map<String, PDMPOsearchResult> resultsSaved;
+    protected Map<String, PDMPOsearchResult> resultsSaved;
 
     public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb, double minPerceptProb) {
 
@@ -62,7 +62,7 @@ public abstract class PDMPOexploration {
         return getBestAction(forward, limit, new Hashtable<>());
     }
 
-    public PDMPOsearchResult getBestAction(Distribution forward, int limit, Map<String, PDMPOsearchResult> resultsSaved ) {
+    public PDMPOsearchResult getBestAction(Distribution forward, int limit, Map<String, PDMPOsearchResult> resultsSaved) {
 
         cptLeaf = 0;
 
@@ -112,13 +112,14 @@ public abstract class PDMPOexploration {
         //limite atteinte but non atteind
         //estimation
         if (time > limit && !isGoal) {
-
+            //l'estimation fourni de bons resultats même avec une limite
+            //de profondeur courte
             AbstractDouble estimation = pdmpo.getEstimationForward(forward);
 
             //AbstractDouble estimation = pdmpo.getUtility(forward);
 
             if (showlog)
-                System.out.println(ident + "LIMIT " + time + " " + estimation);
+            System.out.println(ident + "LIMIT " + time + " " + estimation);
 
             //on ajoute le reward courant à l'utilité de l'estimation
             return new PDMPOsearchResult(pdmpo.getNoAction(), reward.add(estimation));
@@ -132,7 +133,7 @@ public abstract class PDMPOexploration {
         if (isGoal) {
 
             if (showlog)
-                System.out.println(ident + "GOAL : " + time + " = " + reward);
+            System.out.println(ident + "GOAL : " + time + " = " + reward);
 
             return new PDMPOsearchResult(pdmpo.getNoAction(), reward);
         }
