@@ -341,13 +341,23 @@ public class PDMPOSimpleMap implements PDMPO {
     @Override
     public String getKeyForward(Distribution forward) {
 
+        return getKeyForward(forward,KEY_FORWARD_SCALE);
+    }
+
+    @Override
+    public String getKeyForward(Distribution forward, int scale) {
+
         StringBuilder builder = new StringBuilder();
 
         for (int row = 0; row < forward.getRowCount(); row++) {
 
             AbstractDouble abstractDouble = forward.getValue(row);
 
-            builder.append(String.format("%." + KEY_FORWARD_SCALE + "f", abstractDouble.getDoubleValue()));
+            //builder.append(forward.getRowValue(row));
+
+            //builder.append(" ");
+
+            builder.append(String.format("%." + scale + "f", abstractDouble.getDoubleValue()));
 
             builder.append('.');
         }

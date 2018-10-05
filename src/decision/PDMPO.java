@@ -44,6 +44,8 @@ public interface PDMPO {
 
     String getKeyForward(Distribution forward);
 
+    String getKeyForward(Distribution forward, int scale);
+
     AbstractDouble getEstimationForward(Distribution forward);
 
     class RsState {
