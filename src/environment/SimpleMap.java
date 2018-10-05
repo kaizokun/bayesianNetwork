@@ -41,7 +41,7 @@ public class SimpleMap implements Environment<Position> {
 
                 char symbol = row.charAt(iCol);
 
-                int y =  this.yLimit - iRow, x = iCol + 1;
+                int y = this.yLimit - iRow, x = iCol + 1;
 
                 if (symbol == WALL) {
 
@@ -57,7 +57,7 @@ public class SimpleMap implements Environment<Position> {
 
                 } else {
 
-                    this.notFinalStates.add(new Position( this.yLimit - iRow, iCol + 1));
+                    this.notFinalStates.add(new Position(this.yLimit - iRow, iCol + 1));
                 }
             }
         }
@@ -66,22 +66,20 @@ public class SimpleMap implements Environment<Position> {
 
         this.finalStates.add(this.badExit);
 
-        this.notFinalStates.removeAll( this.finalStates);
+        this.notFinalStates.removeAll(this.finalStates);
 
-        this.allStates.addAll( this.notFinalStates);
+        this.allStates.addAll(this.notFinalStates);
 
-        this.allStates.addAll( this.finalStates);
-
-        this.agentPosition = new ArrayList<>( this.notFinalStates).get(new Random().nextInt( this.notFinalStates.size()));
+        this.allStates.addAll(this.finalStates);
 
         this.initRiskyPositions();
     }
 
     private void initRiskyPositions() {
 
-        for(Position nearPosition : badExit.getNearbyPositions()){
+        for (Position nearPosition : badExit.getNearbyPositions()) {
 
-            if(isPositionReachable(nearPosition)){
+            if (isPositionReachable(nearPosition)) {
 
                 riskyPositions.add(nearPosition);
             }
@@ -241,5 +239,10 @@ public class SimpleMap implements Environment<Position> {
 
     public void setAgentPosition(Position agentPosition) {
         this.agentPosition = agentPosition;
+    }
+
+    public void initRdmAgentPosition() {
+
+        this.setAgentPosition(this.agentPosition = new ArrayList<>(this.notFinalStates).get(new Random().nextInt(this.notFinalStates.size())));
     }
 }

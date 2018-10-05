@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list id="a68865f3-5ded-48e5-8992-9b37d321358e" name="Revert &quot;forward simplifié&quot;" comment="Revert &quot;forward simplifié&quot;&#10;&#10;This reverts commit c2747ef" />
-    <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="modification de la manière d'enregistrer l' utilité des états de croyance&#10;pour éviter de les explorer à nouveau, si un état de croyance est exploré à une profondeur inférieur&#10;il doit fournir une meilleur utilité car permet une exploration plus profonde">
+    <list default="true" id="0e82604d-9fcf-4062-bf3c-266c9cf2af97" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/../probability/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/decision/PDMPOSimpleMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/decision/PDMPOSimpleMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/decision/PDMPOexploration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/decision/PDMPOexploration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../probability/src/environment/SimpleMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/environment/SimpleMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../probability/src/test/pdmpo/SimpleMapPDMPOtest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../probability/src/test/pdmpo/SimpleMapPDMPOtest.java" afterDir="false" />
     </list>
+    <list id="a68865f3-5ded-48e5-8992-9b37d321358e" name="Revert &quot;forward simplifié&quot;" comment="Revert &quot;forward simplifié&quot;&#10;&#10;This reverts commit c2747ef" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -45,11 +47,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SimpleMapPDMPOtest.java" pinned="true" current-in-tab="false">
+      <file leaf-file-name="SimpleMapPDMPOtest.java" pinned="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../probability/src/test/pdmpo/SimpleMapPDMPOtest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="623">
-              <caret line="254" column="61" selection-start-line="254" selection-start-column="61" selection-end-line="254" selection-end-column="61" />
+            <state relative-caret-position="111">
+              <caret line="159" column="12" selection-start-line="159" selection-start-column="12" selection-end-line="159" selection-end-column="12" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -57,20 +59,22 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PDMPOexploration.java" pinned="true" current-in-tab="true">
+      <file leaf-file-name="PDMPOexploration.java" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/PDMPOexploration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="479">
-              <caret line="285" column="69" selection-start-line="285" selection-start-column="69" selection-end-line="285" selection-end-column="69" />
+            <state relative-caret-position="-1780">
+              <caret line="253" lean-forward="true" selection-start-line="253" selection-end-line="253" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#getPerceptsProb#0;class#PDMPOexploration#0" />
-                <element signature="e#22079#22080#0" expanded="true" />
-                <element signature="e#22117#22118#0" expanded="true" />
-                <element signature="e#22158#22159#0" expanded="true" />
-                <element signature="e#22192#22193#0" expanded="true" />
-                <element signature="e#22256#22257#0" expanded="true" />
-                <element signature="e#22304#22305#0" expanded="true" />
+                <element signature="e#24077#24078#0" expanded="true" />
+                <element signature="e#24115#24116#0" expanded="true" />
+                <element signature="e#24156#24157#0" expanded="true" />
+                <element signature="e#24190#24191#0" expanded="true" />
+                <element signature="e#24254#24255#0" expanded="true" />
+                <element signature="e#24302#24303#0" expanded="true" />
+                <element signature="e#24747#24748#0" expanded="true" />
+                <element signature="e#24782#24783#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -79,7 +83,7 @@
       <file leaf-file-name="PDMPO.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/PDMPO.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="648">
+            <state relative-caret-position="285">
               <caret line="44" column="11" selection-start-line="44" selection-start-column="11" selection-end-line="44" selection-end-column="11" />
             </state>
           </provider>
@@ -88,8 +92,8 @@
       <file leaf-file-name="PDMPOSimpleMap.java" pinned="true" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/decision/PDMPOSimpleMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="353">
-              <caret line="357" column="14" selection-start-line="357" selection-start-column="14" selection-end-line="357" selection-end-column="14" />
+            <state relative-caret-position="303">
+              <caret line="344" column="5" lean-forward="true" selection-start-line="344" selection-start-column="5" selection-end-line="344" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -100,9 +104,10 @@
       <file leaf-file-name="SimpleMap.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../probability/src/environment/SimpleMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4122">
-              <caret line="241" column="58" selection-start-line="241" selection-start-column="58" selection-end-line="241" selection-end-column="58" />
+            <state relative-caret-position="-202">
+              <caret line="27" column="36" lean-forward="true" selection-start-line="27" selection-start-column="36" selection-end-line="27" selection-end-column="36" />
               <folding>
+                <element signature="e#5573#5574#0" expanded="true" />
                 <element signature="e#5623#5624#0" expanded="true" />
               </folding>
             </state>
@@ -122,13 +127,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,99.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,01.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.</find>
-      <find>40,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,99.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,01.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.</find>
-      <find>11 0,00.0,01.0,00.0,01.0,00.0,99.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.</find>
-      <find>43 0,00.0,01.0,00.0,01.0,00.0,99.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.</find>
-      <find>41 0,01.0,99.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,01.</find>
-      <find>3 0,0.0,0.0,0.0,0.0,0.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.</find>
-      <find>0,0.0,2.0,0.0,0.0,6.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.0,0.1</find>
       <find>0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.1,0.0,0.0,0.0,0.0,0.5</find>
       <find>0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.1,0.0,0.0,0.4</find>
       <find>[2,3] 0,0.[1,2] 0,0.[3,3] 0,0.[1,1] 0,0.[3,2] 0,0.[2,1] 0,0.[3,1] 1,0.[1,6] 0,0.[1,5] 0,0.[2,6] 0,0.[2,5] 0,0.[3,6] 0,0.[3,5] 0,0.[2,4] 0,0.[1,3] 0,0.4</find>
@@ -143,7 +141,6 @@
       <find>{3}</find>
       <find>[2,3] 0,01.[1,2] 0,00.[3,3] 0,01.[1,1] 0,00.[3,2] 0,99.[2,1] 0,00.[3,1] 0,00.[1,6] 0,00.[1,5] 0,00.[2,6] 0,00.[2,5] 0,00.[3,6] 0,00.[3,5] 0,00.[2,4] 0,00.[1,3] 0,00.{3}</find>
       <find>[2,3] 0,01.[1,2] 0,00.[3,3] 0,01.[1,1] 0,00.[3,2] 0,99.[2,1] 0,00.[3,1] 0,00.[1,6] 0,00.[1,5] 0,00.[2,6] 0,00.[2,5] 0,00.[3,6] 0,00.[3,5] 0,00.[2,4] 0,00.[1,3] 0,00</find>
-      <find>ACTION [0]</find>
       <find>VISITED</find>
       <find>0,01.0,00.0,01.0,00.0,98.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.1</find>
       <find>0,01.0,00.0,01.0,00.0,99.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.2</find>
@@ -152,6 +149,14 @@
       <find>0,99.0,00.0,01.0,00.0,01.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.3</find>
       <find>RS STATE SAVED</find>
       <find>0,00.0,00.0,00.0,00.0,01.0,00.0,98.0,00.0,00.0,00.0,00.0,00.0,01.0,00.0,00.</find>
+      <find>1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.</find>
+      <find>FIRST VISIT 0,99.0,00.0,01.0,00.0,01.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.</find>
+      <find>0,99.0,00.0,01.0,00.0,01.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.0,00.</find>
+      <find>ACTION [1]</find>
+      <find>ACTION [1]</find>
+      <find>ACTION [0]</find>
+      <find>LIMIT</find>
+      <find>forwardKey</find>
     </findStrings>
     <replaceStrings>
       <replace>models</replace>
@@ -189,10 +194,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/decision/PDMPO.java" />
-        <option value="$PROJECT_DIR$/src/decision/PDMPOexploration.java" />
-        <option value="$PROJECT_DIR$/src/network/FrequencyRange.java" />
-        <option value="$PROJECT_DIR$/src/decision/PDMPOexplorationSamplingPercept.java" />
         <option value="$PROJECT_DIR$/src/environment/SimpleMap.java" />
         <option value="$PROJECT_DIR$/src/decision/PDMPOSimpleMap.java" />
         <option value="$PROJECT_DIR$/src/test/pdmpo/SimpleMapPDMPOtest.java" />
@@ -237,6 +238,10 @@
         <option value="$PROJECT_DIR$/src/test/pdmpo/SimpleMapPDMPOtest.java" />
         <option value="$PROJECT_DIR$/src/decision/PDMPOexploration.java" />
         <option value="$PROJECT_DIR$/src/test/pdmpo/SimpleMapPDMPOtest.java" />
+        <option value="$PROJECT_DIR$/src/decision/PDMPOSimpleMap.java" />
+        <option value="$PROJECT_DIR$/src/decision/PDMPOexploration.java" />
+        <option value="$PROJECT_DIR$/src/test/pdmpo/SimpleMapPDMPOtest.java" />
+        <option value="$PROJECT_DIR$/../probability/src/environment/SimpleMap.java" />
         <option value="$PROJECT_DIR$/../probability/src/decision/PDMPOSimpleMap.java" />
         <option value="$PROJECT_DIR$/../probability/src/decision/PDMPOexploration.java" />
         <option value="$PROJECT_DIR$/../probability/src/test/pdmpo/SimpleMapPDMPOtest.java" />
@@ -274,8 +279,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -422,7 +425,9 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -431,7 +436,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/..//////////////////////////////////////////////////////////////////////ShareUrDocMavenMultiModule" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/..///////////////////////////////////////////////////////////////////////ShareUrDocMavenMultiModule" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
@@ -879,14 +884,8 @@
       <workItem from="1538636377358" duration="8914000" />
       <workItem from="1538666447868" duration="8061000" />
       <workItem from="1538679666019" duration="2216000" />
-      <workItem from="1538725545546" duration="8619000" />
-    </task>
-    <task id="LOCAL-00116" summary="most likely path forward pour le labyrinthe MMC et DBN">
-      <created>1531823425209</created>
-      <option name="number" value="00116" />
-      <option name="presentableId" value="LOCAL-00116" />
-      <option name="project" value="LOCAL" />
-      <updated>1531823425210</updated>
+      <workItem from="1538725545546" duration="8746000" />
+      <workItem from="1538744099681" duration="5959000" />
     </task>
     <task id="LOCAL-00117" summary="création dbn battery">
       <created>1531993980796</created>
@@ -1224,43 +1223,50 @@
       <option name="project" value="LOCAL" />
       <updated>1538733021742</updated>
     </task>
-    <option name="localTasksCounter" value="165" />
+    <task id="LOCAL-00165" summary="modification de la manière d'enregistrer l' utilité des états de croyance&#10;pour éviter de les explorer à nouveau, si un état de croyance peut être exploré à une profondeur inférieur, il doit fournir une meilleur utilité car exploration plus profonde (si limitée).">
+      <created>1538734263069</created>
+      <option name="number" value="00165" />
+      <option name="presentableId" value="LOCAL-00165" />
+      <option name="project" value="LOCAL" />
+      <updated>1538734263069</updated>
+    </task>
+    <option name="localTasksCounter" value="166" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 11h 46m 50s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 22m 30s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 11h 47m 06s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 23m 09s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 11h 47m 22s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 23m 31s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 11h 47m 30s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 25m 17s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 11h 47m 35s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 29m 31s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 11h 47m 45s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 29m 51s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 12h 02m 03s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 30m 25s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 12h 03m 09s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 31m 16s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 12h 05m 31s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 31m 21s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 12h 05m 43s.xml">
+    <history-entry file="SimpleMapPDMPOtest_PDMPOexplorationPerceptAVGTest - 2018.10.05 at 16h 34m 22s.xml">
       <configuration name="SimpleMapPDMPOtest.PDMPOexplorationPerceptAVGTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1018791000" />
+    <option name="totallyTimeSpent" value="1024877000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1284,12 +1290,12 @@
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5042644" side_tool="true" weight="0.32928178" />
       <window_info anchor="right" id="Maven Projects" order="9" weight="0.32995737" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" type="FLOATING" visible="true" weight="0.2994475" />
+      <window_info anchor="bottom" x="1920" y="0" width="1920" height="1050" id="Run" order="2" weight="0.70718235" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" weight="0.15801105" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49573562" weight="0.24861878" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.195629" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7922652" visible="true" weight="0.1609808" />
       <window_info anchor="right" id="Database" order="8" side_tool="true" weight="0.32995737" />
       <window_info id="Structure" order="1" sideWeight="0.20773481" side_tool="true" weight="0.18976545" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -1344,7 +1350,6 @@
       <path value="$PROJECT_DIR$" />
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="suite reflexions implementation agent en ligne pdmpo&#10;modification forward pour prendre en compte un forward precedent et&#10;gerer variables actions" />
     <MESSAGE value="debut implementation RDD simplemap" />
     <MESSAGE value="suite implementation RDD simplemap &#10;&#10;TCP états 0, transition, percepts" />
     <MESSAGE value="suite implementation RDD simplemap &#10;&#10;essaie extension du reseau" />
@@ -1369,7 +1374,8 @@
     <MESSAGE value="ajout des le depart de l'état de croyance dans la liste des états visités&#10;pour eviter les boucles. Le problemes precedent était du au fait que malgré le fait&#10;que le robot butait sur un mur, comme la probabilité d'arriver au but final (même &#10;faible) fournissait une utilité positif ça restait plus interessant que&#10;de se deplacer vers la bonne case." />
     <MESSAGE value="commit" />
     <MESSAGE value="correction de la manière dont sont enregistrés les utilités&#10;des forward pour l'exploration globale ou il fallait retirer la recopense precedente&#10;afin d'avoir l'utilité A partir d'un forward uniquement" />
-    <option name="LAST_COMMIT_MESSAGE" value="correction de la manière dont sont enregistrés les utilités&#10;des forward pour l'exploration globale ou il fallait retirer la recopense precedente&#10;afin d'avoir l'utilité A partir d'un forward uniquement" />
+    <MESSAGE value="modification de la manière d'enregistrer l' utilité des états de croyance&#10;pour éviter de les explorer à nouveau, si un état de croyance peut être exploré à une profondeur inférieur, il doit fournir une meilleur utilité car exploration plus profonde (si limitée)." />
+    <option name="LAST_COMMIT_MESSAGE" value="modification de la manière d'enregistrer l' utilité des états de croyance&#10;pour éviter de les explorer à nouveau, si un état de croyance peut être exploré à une profondeur inférieur, il doit fournir une meilleur utilité car exploration plus profonde (si limitée)." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1709,9 +1715,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/environment/SimpleMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4122">
-          <caret line="241" column="58" selection-start-line="241" selection-start-column="58" selection-end-line="241" selection-end-column="58" />
+        <state relative-caret-position="-202">
+          <caret line="27" column="36" lean-forward="true" selection-start-line="27" selection-start-column="36" selection-end-line="27" selection-end-column="36" />
           <folding>
+            <element signature="e#5573#5574#0" expanded="true" />
             <element signature="e#5623#5624#0" expanded="true" />
           </folding>
         </state>
@@ -1719,25 +1726,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/decision/PDMPO.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
+        <state relative-caret-position="285">
           <caret line="44" column="11" selection-start-line="44" selection-start-column="11" selection-end-line="44" selection-end-column="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/decision/PDMPOSimpleMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="357" column="14" selection-start-line="357" selection-start-column="14" selection-end-line="357" selection-end-column="14" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../probability/src/test/pdmpo/SimpleMapPDMPOtest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="623">
-          <caret line="254" column="61" selection-start-line="254" selection-start-column="61" selection-end-line="254" selection-end-column="61" />
+        <state relative-caret-position="303">
+          <caret line="344" column="5" lean-forward="true" selection-start-line="344" selection-start-column="5" selection-end-line="344" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1746,17 +1743,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../probability/src/decision/PDMPOexploration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="479">
-          <caret line="285" column="69" selection-start-line="285" selection-start-column="69" selection-end-line="285" selection-end-column="69" />
+        <state relative-caret-position="-1780">
+          <caret line="253" lean-forward="true" selection-start-line="253" selection-end-line="253" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#getPerceptsProb#0;class#PDMPOexploration#0" />
-            <element signature="e#22079#22080#0" expanded="true" />
-            <element signature="e#22117#22118#0" expanded="true" />
-            <element signature="e#22158#22159#0" expanded="true" />
-            <element signature="e#22192#22193#0" expanded="true" />
-            <element signature="e#22256#22257#0" expanded="true" />
-            <element signature="e#22304#22305#0" expanded="true" />
+            <element signature="e#24077#24078#0" expanded="true" />
+            <element signature="e#24115#24116#0" expanded="true" />
+            <element signature="e#24156#24157#0" expanded="true" />
+            <element signature="e#24190#24191#0" expanded="true" />
+            <element signature="e#24254#24255#0" expanded="true" />
+            <element signature="e#24302#24303#0" expanded="true" />
+            <element signature="e#24747#24748#0" expanded="true" />
+            <element signature="e#24782#24783#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../probability/src/test/pdmpo/SimpleMapPDMPOtest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="111">
+          <caret line="159" column="12" selection-start-line="159" selection-start-column="12" selection-end-line="159" selection-end-column="12" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

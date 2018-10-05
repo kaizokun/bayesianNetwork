@@ -341,7 +341,7 @@ public class PDMPOSimpleMap implements PDMPO {
     @Override
     public String getKeyForward(Distribution forward) {
 
-        return getKeyForward(forward,KEY_FORWARD_SCALE);
+        return getKeyForward(forward, KEY_FORWARD_SCALE);
     }
 
     @Override
