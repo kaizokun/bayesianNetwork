@@ -239,7 +239,7 @@ public abstract class PDMPOexploration {
                 //si il y a une limite, sans limite jusqu'à atteindre un but normalement elle devrait être le même
                 //une precision de deux chiffres après la virgule sans donner la même utlité et même action
                 //pour tout les etats de croyance approximés
-                String savedKey = pdmpo.getKeyForward(nextForward, 2) + "" + time;
+                String savedKey = pdmpo.getKeyForward(nextForward, 2);
 
                 if (visited.containsKey(visitedKey)) {
 
@@ -265,9 +265,10 @@ public abstract class PDMPOexploration {
 
                     PDMPOsearchResult rs;
 
-                    //ici un forward déja rencontré à une profondeur inférieure dont avec une utilité plus fine
-                    //pourriat fournir une utilité valable
-                    if (!savedResults.containsKey(savedKey)) {
+                    //Si un état de croyance n'a pas déja été évalué ( au temps suivant (time + 1) )
+                    //ou qu'il l'a été à un temps supérieur une exploration limité à partir d'un temps inférieur
+                    //pourrait fournir une meilleur approximation
+                    if (!savedResults.containsKey(savedKey) || savedResults.get(savedKey).getTime() > time + 1) {
                         //marque l'état de croyance comme visité pour le parcour courant
 
                         rs = getBestAction(nextForward, time + 1, limit,
@@ -281,9 +282,14 @@ public abstract class PDMPOexploration {
 
                         //on enregitre pour la clé du prochain état de croyance l'utilité DEPUIS cet état de croyance,
                         //(donc sans le reward courant) et l'action qui l'a fourni.
+                        //Si une meilleur évaluation d'un état de croyance (çàd exploré à partir d'un temps inférieur permettant une
+                        //exploration plus profonde) l'utilité sera écrasé
                         savedResults.put(
                                 savedKey,
-                                new PDMPOsearchResult(rs.getAction(), rs.getBestUtility().substract(reward)));
+                                new PDMPOsearchResult(
+                                        rs.getAction(),
+                                        rs.getBestUtility().substract(reward),
+                                        time + 1));
 
                         exploReward = rs.getBestUtility();
                         //demarque l'état de croyance comme visité
@@ -294,8 +300,9 @@ public abstract class PDMPOexploration {
                         //on ajoute la recompense courante
                         exploReward = rs.getBestUtility().add(reward);
 
-                        System.out.println(ident+"RS STATE SAVED "+rs);
-                        System.out.println(ident+" "+savedKey);
+                        System.out.println(ident + time+" RS STATE SAVED " + rs);
+
+                        System.out.println(ident + " " + savedKey);
                     }
 
                     if (showlog)
@@ -482,11 +489,20 @@ public abstract class PDMPOexploration {
     public class PDMPOsearchResult {
 
         private Domain.DomainValue action;
+
         private AbstractDouble bestUtility;
+
+        private int time;
 
         public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility) {
             this.action = action;
             this.bestUtility = bestUtility;
+        }
+
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, int time) {
+            this.action = action;
+            this.bestUtility = bestUtility;
+            this.time = time;
         }
 
         public Domain.DomainValue getAction() {
@@ -505,11 +521,20 @@ public abstract class PDMPOexploration {
             this.bestUtility = bestUtility;
         }
 
+        public int getTime() {
+            return time;
+        }
+
+        public void setTime(int time) {
+            this.time = time;
+        }
+
         @Override
         public String toString() {
             return "PDMPOsearchResult{" +
                     "action=" + action +
                     ", bestUtility=" + bestUtility +
+                    ", time=" + time +
                     '}';
         }
     }

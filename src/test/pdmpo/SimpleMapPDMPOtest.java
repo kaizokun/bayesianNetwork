@@ -252,7 +252,7 @@ public class SimpleMapPDMPOtest {
 
             simpleMap.setAgentPosition(new Position(3,3));
 
-            PDMPOexplorationPerceptTest(search, simpleMap, 6);
+            PDMPOexplorationPerceptTest(search, simpleMap, 10);
       //  }
     }
 
