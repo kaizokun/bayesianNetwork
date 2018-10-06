@@ -35,6 +35,17 @@ public abstract class PDMPOexploration {
 
     protected Map<String, PDMPOsearchResult> resultsSaved;
 
+    protected Comparator<ActionResult> actionResultComparator;
+
+    {
+        actionResultComparator = new Comparator<ActionResult>() {
+            @Override
+            public int compare(ActionResult o1, ActionResult o2) {
+                return o2.estimation.compareTo(o1.estimation);
+            }
+        };
+    }
+
     public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb, double minPerceptProb) {
 
         this.df = doubleFactory;
@@ -119,7 +130,7 @@ public abstract class PDMPOexploration {
             //AbstractDouble estimation = pdmpo.getUtility(forward);
 
             if (showlog)
-            System.out.println(ident + "LIMIT " + time + " " + estimation);
+                System.out.println(ident + "LIMIT " + time + " " + estimation);
 
             //on ajoute le reward courant à l'utilité de l'estimation
             return new PDMPOsearchResult(pdmpo.getNoAction(), reward.add(estimation));
@@ -133,9 +144,9 @@ public abstract class PDMPOexploration {
         if (isGoal) {
 
             if (showlog)
-            System.out.println(ident + "GOAL : " + time + " = " + reward);
+                System.out.println(ident + "GOAL : " + time + " = " + reward);
 
-            return new PDMPOsearchResult(pdmpo.getNoAction(), reward);
+            return new PDMPOsearchResult(pdmpo.getNoAction(), reward, true);
         }
 
         if (showlog) {
@@ -169,13 +180,10 @@ public abstract class PDMPOexploration {
             if (showlog)
                 System.out.println(network.toString(ident));*/
         }
-        //utilité fourni par l'action maximum
-        AbstractDouble maxActionUtility = network.getDoubleFactory().getNew(Double.NEGATIVE_INFINITY);
-        //meilleur action
-        Domain.DomainValue bestAction = null;
 
-        //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
-        //pour une combinaison d'action ou aura un object DomainValue composite
+        //liste d'actions avec leur resultat sans les percepts et l'estimation
+        List<ActionResult> actionResults = new ArrayList<>(actions.size());
+
         for (Domain.DomainValue action : actions) {
 
             //initialisation de la valeur de la variable action du reseau
@@ -184,42 +192,54 @@ public abstract class PDMPOexploration {
             actionVar.setDomainValue(action);
 
             network.initVar(time, actionVar);
+            //reset de la variable percept pour prevision
+            network.resetVar(time + 1, pdmpo.getPerceptVar());
+            //calcul de la prevision d'état
+            Distribution forwardPrevision = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
+            //vérifie si l'état de croyance comporte des états finaux d'echec ayant une probabilité supérieur à un seuil
+            //donné, dans ce cas l'action doit être évité
+            if (pdmpo.iStateOfBelieveRisky(forwardPrevision, minRiskProb)) {
+
+                if (showlog) System.out.println("\n" + ident + "!!! FORWARD RISKY !!!");
+                continue;
+            }
+            //ajout du resultat de l'action avec l'estimation de son utilité
+            actionResults.add(new ActionResult(action, forwardPrevision, pdmpo.getEstimationForward(forwardPrevision)));
+        }
+        //trie decroissant par estimation
+        Collections.sort(actionResults, actionResultComparator);
+
+        //utilité fourni par l'action maximum
+        AbstractDouble maxActionUtility = network.getDoubleFactory().getNew(Double.NEGATIVE_INFINITY);
+        //meilleur action
+        Domain.DomainValue bestAction = null;
+        //l'action mèene à tout les coups vers un but
+        boolean bestActionReachGoal = false;
+
+        //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
+        //pour une combinaison d'action ou aura un object DomainValue composite
+        for (ActionResult actionRs : actionResults) {
+
+            //initialisation de la valeur de la variable action du reseau
+            Variable actionVar = pdmpo.getActionVar();
+
+            actionVar.setDomainValue(actionRs.action);
+
+            network.initVar(time, actionVar);
 
             AbstractDouble actionUtility = network.getDoubleFactory().getNew(0.0);
 
             if (showlog) {
                 System.out.println();
-                System.out.println(ident + "ACTION [" + time + "] : " + action + " - LAST REWARD : " + reward);
+                System.out.println(ident + "ACTION [" + time + "] : " + actionRs.action + " - LAST REWARD : " + reward);
             }
-
-            //forward sans percept uniquement l'action
-            //reset des observations necessaires car le reseau étant déja potentiellement etendu
-            //les variables d'observations peuvent avoir été initialisées
-            //ça ne pose pas de problème ensuite où les valeurs sont juste ecrasées par les nouvelles
-            network.resetVar(time + 1, pdmpo.getPerceptVar());
-
-            Distribution forwardPrevision = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
-            //prevision des percepts à partir de l'état de croyance brut après application
-            //de l'action sur l'état de croyance courant
-
-            //vérifie si l'état de croyance comprte des états finaux d'echec ayant une probabilité supérieur à un seuil
-            //dans ce cas l'action doit être évité
-            if (pdmpo.iStateOfBelieveRisky(forwardPrevision, minRiskProb)) {
-
-                if (showlog) {
-                    System.out.println();
-                    System.out.println(ident + "!!! FORWARD RISKY !!!");
-                }
-
-                continue;
-            }
+            //Distribution forwardPrevision = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
+            Distribution forwardPrevision = actionRs.forwardPrevision;
 
             Map<Domain.DomainValue, AbstractDouble> perceptsMap = this.loadPerceptsPrevision(forwardPrevision, time, ident);//v
 
-            //crée une liste de percepts possible après avoir appliqué l'action aux états probables
-            //netiens pas compte des bruits dans les capteurs... contrairement à loadPerceptsPrevision()
-            //Map<Domain.DomainValue, AbstractDouble> perceptsMap = getPerceptsProb(forward, action, ident, minStateProb);//v&f
-
+            //liste des percepts possible avec probabilité en fonction de l'état de croyance previsionel
+            //et du bruit dans les capteurs definies dans le reseau bayesien
             List<Map.Entry<Domain.DomainValue, AbstractDouble>> percepts = this.filterPercepts(perceptsMap, ident);
 
             if (showlog)
@@ -231,6 +251,8 @@ public abstract class PDMPOexploration {
             cptPercepts += percepts.size();
 
             int iPercept = 0;
+
+            boolean allGoals = false;
 
             for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : percepts) {
 
@@ -278,6 +300,7 @@ public abstract class PDMPOexploration {
 
                         rs = getBestAction(nextForward, time + 1, limit,
                                 reward, visited, savedResults);
+
                         //enregistre l'utilité de la meilleur action depuis le forward (approximation)
                         //pour l'utiliser dans les autres parcours plutot que de recalculer les utilités
                         //peut poser des problèmes en provoquant des loops (raison à determiner)
@@ -294,7 +317,7 @@ public abstract class PDMPOexploration {
                                 new PDMPOsearchResult(
                                         rs.getAction(),
                                         rs.getBestUtility().substract(reward),
-                                        time + 1));
+                                        time + 1, rs.isGoal));
 
                         exploReward = rs.getBestUtility();
                         //demarque l'état de croyance comme visité
@@ -312,6 +335,12 @@ public abstract class PDMPOexploration {
                         }
                     }
 
+                    //si un des resultats n'est pas un but on testera une autre action
+                    if (!rs.isGoal) {
+
+                        allGoals = false;
+                    }
+
                     if (showlog)
                         System.out.println(ident + "UTILITE RETOURNE " + exploReward);
 
@@ -325,6 +354,8 @@ public abstract class PDMPOexploration {
                     }
                     //si état déja visité lors du parcour courant (boucle) on ajoute son utilité pur au reward courant
                     exploReward = reward.add(visited.get(nextForwardKey));
+                    //logiquement si un etats de croyance affiné par un percept est une loupe on a pas atteind le but...
+                    allGoals = false;
                 }
                 //pour chaque percept fourni par le résultat d'une action sur l'état de croyance
                 //on pondere l'utilité de l'exploration fourni l' état de croyance résultat,
@@ -334,7 +365,7 @@ public abstract class PDMPOexploration {
 
                 if (showlog) {
 
-                    System.out.println(ident + "ACTION UTILITY " + action + " : " + perceptProb + " * " + exploReward + " =  " + (perceptProb.multiply(exploReward)));
+                    System.out.println(ident + "ACTION UTILITY " + actionRs.action + " : " + perceptProb + " * " + exploReward + " =  " + (perceptProb.multiply(exploReward)));
                 }
 
                 iPercept++;
@@ -344,14 +375,22 @@ public abstract class PDMPOexploration {
 
                 maxActionUtility = actionUtility;
 
-                bestAction = action;
+                bestAction = actionRs.action;
+
+                bestActionReachGoal = allGoals;
             }
 
             cptLeaf++;
 
             if (showlog)
-                System.out.println(ident + "UTILITE ESPERE ACTION : " + action + " = " + actionUtility);
+                System.out.println(ident + "UTILITE ESPERE ACTION : " + actionRs.action + " = " + actionUtility);
 
+            //si l'action mène à un but à tout les coups
+            //on en teste pas d'autres elle sont censé être trié par ordre de bénéfice
+            if(allGoals){
+
+                break;
+            }
         }
 
         visited.remove(forwardKey);
@@ -359,7 +398,7 @@ public abstract class PDMPOexploration {
         if (showlog)
             System.out.println(ident + "MAX UTILITE ESPERE ACTION : " + bestAction + " = " + maxActionUtility);
 
-        return new PDMPOsearchResult(bestAction, maxActionUtility);
+        return new PDMPOsearchResult(bestAction, maxActionUtility, bestActionReachGoal);
     }
 
     protected Map<Domain.DomainValue, AbstractDouble> loadPerceptsPrevision(Distribution forwardPrevision,
@@ -516,16 +555,22 @@ public abstract class PDMPOexploration {
 
         private AbstractDouble bestUtility;
 
+        private boolean isGoal;
+
         private int time;
 
-        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility) {
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, boolean isGoal) {
             this.action = action;
             this.bestUtility = bestUtility;
+            this.isGoal = isGoal;
         }
 
-        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, int time) {
-            this.action = action;
-            this.bestUtility = bestUtility;
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility) {
+            this(action, bestUtility, false);
+        }
+
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, int time, boolean isGoal) {
+            this(action, bestUtility, isGoal);
             this.time = time;
         }
 
@@ -553,13 +598,61 @@ public abstract class PDMPOexploration {
             this.time = time;
         }
 
+        public boolean isGoal() {
+            return isGoal;
+        }
+
+        public void setGoal(boolean goal) {
+            isGoal = goal;
+        }
+
         @Override
         public String toString() {
             return "PDMPOsearchResult{" +
                     "action=" + action +
                     ", bestUtility=" + bestUtility +
+                    ", isGoal=" + isGoal +
                     ", time=" + time +
                     '}';
+        }
+    }
+
+    class ActionResult {
+
+        private Domain.DomainValue action;
+
+        private Distribution forwardPrevision;
+
+        private AbstractDouble estimation;
+
+        public ActionResult(Domain.DomainValue action, Distribution forwardPrevision, AbstractDouble estimation) {
+            this.action = action;
+            this.forwardPrevision = forwardPrevision;
+            this.estimation = estimation;
+        }
+
+        public Domain.DomainValue getAction() {
+            return action;
+        }
+
+        public void setAction(Domain.DomainValue action) {
+            this.action = action;
+        }
+
+        public Distribution getForwardPrevision() {
+            return forwardPrevision;
+        }
+
+        public void setForwardPrevision(Distribution forwardPrevision) {
+            this.forwardPrevision = forwardPrevision;
+        }
+
+        public AbstractDouble getEstimation() {
+            return estimation;
+        }
+
+        public void setEstimation(AbstractDouble estimation) {
+            this.estimation = estimation;
         }
     }
 
