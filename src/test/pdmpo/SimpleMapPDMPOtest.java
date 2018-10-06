@@ -241,11 +241,11 @@ public class SimpleMapPDMPOtest {
 
     private String map3[] = new String[]{
             "#   ##  + ",//5
-            "# #     - ",//4
+            "# # #   - ",//4
             "# ##### # ",//3
             "   #    # ",//2
             " #   ##   " //1
-            //1234567891
+          // 1234567891
             //         0
     };
 
@@ -261,11 +261,15 @@ public class SimpleMapPDMPOtest {
         //reseau bayesien utilisé par l'agent
         DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
 
+        //estimation : ne fonctionne pas avec des murs qui rendent l'estimation à vol d'oiseau
+        //erronée (une meilleur estimation pourrait faire mieux) par exemple avec la map3 et depart position(4,4)
+        //sans estimation ca passe.
         PDMPOexploration search = new PDMPOexplorationFullPercept(
-                new MyDoubleFactory(), 0.05, 0.75, 0.2, 0.2);
+                new MyDoubleFactory(), 0.05, 0.75, 0.3,
+                0.3, false);
 
         //PDMPO simplemap
-        PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.8, 1);
+        PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 1, 1);
 
         for (Position position : simpleMap.getNotFinalStates()) {
 
@@ -275,7 +279,7 @@ public class SimpleMapPDMPOtest {
 
             List<Integer> leafsCpt = PDMPOexplorationPerceptTest(explorationNetwork,
                     agentNetwork, search, simpleMap, pdmpo,
-                    15, 2, true);
+                    0, 10, false);
 
             System.out.println("LEAFS : " + leafsCpt);
 
@@ -294,7 +298,7 @@ public class SimpleMapPDMPOtest {
         DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
 
         PDMPOexploration search = new PDMPOexplorationFullPercept(
-                new MyDoubleFactory(), 0.05, 0.75, 0.2, 0.2);
+                new MyDoubleFactory(), 0.05, 0.75, 0.2, 0.2, false);
 
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.8, 1);
@@ -321,7 +325,7 @@ public class SimpleMapPDMPOtest {
         DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
 
         PDMPOexploration search = new PDMPOexplorationSamplingPercept(
-                new MyDoubleFactory(), 0.0, 0.1, 0.2);
+                new MyDoubleFactory(), 0.0, 0.1, 0.2, false);
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.6, 1);
 

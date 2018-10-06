@@ -28,18 +28,6 @@ public class PDMPOexplorationFullPercept extends PDMPOexploration {
         };
     }
 
-    public PDMPOexplorationFullPercept(AbstractDoubleFactory doubleFactory,
-                                       DynamicBayesianNetwork dynamicBayesianNetwork,
-                                       PDMPO pdmpo,
-                                       double minStateProb,
-                                       double maxPerceptProb) {
-
-        super(doubleFactory, dynamicBayesianNetwork, pdmpo, minStateProb);
-
-        this.maxPerceptProb = df.getNew(maxPerceptProb);
-    }
-
-
     /**
      * @param doubleFactory  : fabrique de double ou bigdecimal
      * @param minStateProb   : probabilité minimum en deça de laquelle un état est ignoré
@@ -47,9 +35,9 @@ public class PDMPOexplorationFullPercept extends PDMPOexploration {
      * @param minPerceptProb : probabilité minimum en deça de laquelle un percept est ignoré
      */
     public PDMPOexplorationFullPercept(AbstractDoubleFactory doubleFactory, double minStateProb, double maxPerceptProb,
-                                       double minPerceptProb, double minRiskProb) {
+                                       double minPerceptProb, double minRiskProb, boolean limitEstimation) {
 
-        super(doubleFactory, minStateProb, minRiskProb, minPerceptProb);
+        super(doubleFactory, minStateProb, minRiskProb, minPerceptProb, limitEstimation);
 
         this.maxPerceptProb = doubleFactory.getNew(maxPerceptProb);
     }

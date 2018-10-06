@@ -20,19 +20,12 @@ public class PDMPOexplorationSamplingPercept extends PDMPOexploration {
      * DynamicBayesianNetwork network : nouveau reseau bayesien ou dumoins réinitialisé à zero pour exploration
      * Distribution forward : état de croyance courant sur les états dans le RBD "réel"
      * */
-/*
-    public PDMPOexplorationSamplingPercept(AbstractDoubleFactory doubleFactory,
-                                           DynamicBayesianNetwork dynamicBayesianNetwork,
-                                           PDMPO pdmpo, double minStateProb) {
-
-        super(doubleFactory, dynamicBayesianNetwork, pdmpo, minStateProb);
-    }
-*/
 
     public PDMPOexplorationSamplingPercept(AbstractDoubleFactory doubleFactory,
-                                           double minStateProb,double minPerceptProb, double minRiskProb) {
+                                           double minStateProb,double minPerceptProb, double minRiskProb,
+                                           boolean limitEstimation) {
 
-        super(doubleFactory, minStateProb, minRiskProb, minPerceptProb);
+        super(doubleFactory, minStateProb, minRiskProb, minPerceptProb, limitEstimation);
     }
 
     @Override

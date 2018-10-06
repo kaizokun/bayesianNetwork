@@ -35,6 +35,8 @@ public abstract class PDMPOexploration {
 
     protected Map<String, PDMPOsearchResult> resultsSaved = new Hashtable<>();
 
+    protected boolean limitEstimation;
+
     protected Comparator<ActionResult> actionResultComparator;
 
     {
@@ -51,7 +53,8 @@ public abstract class PDMPOexploration {
         this.resultsSaved.clear();
     }
 
-    public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb, double minPerceptProb) {
+    public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb,
+                            double minPerceptProb, boolean limitEstimation) {
 
         this.df = doubleFactory;
 
@@ -60,17 +63,8 @@ public abstract class PDMPOexploration {
         this.minRiskProb = this.df.getNew(minRiskProb);
 
         this.minPerceptProb = this.df.getNew(minPerceptProb);
-    }
 
-    public PDMPOexploration(AbstractDoubleFactory doubleFactory, DynamicBayesianNetwork dynamicBayesianNetwork, PDMPO pdmpo, double minStateProb) {
-
-        this.df = doubleFactory;
-
-        this.network = dynamicBayesianNetwork;
-
-        this.pdmpo = pdmpo;
-
-        this.minStateProb = df.getNew(minStateProb);
+        this.limitEstimation = limitEstimation;
     }
 
     public PDMPOsearchResult getBestAction(Distribution forward, int firstLimit, double secLimit) {
@@ -81,7 +75,7 @@ public abstract class PDMPOexploration {
 
         cptLoopState = 0;
 
-        PDMPOsearchResult rs;
+        PDMPOsearchResult rs, previousRs = null;
 
         int limit = 0;
 
@@ -113,18 +107,35 @@ public abstract class PDMPOexploration {
             //enregistrer le forward de base pour eviter les boucles des le depart
             //depend de la precision de la clé !
             rs = getBestAction(forward, 0, limit, df.getNew(0.0),
-                    new Hashtable<>(), new Hashtable<>(), new LinkedList<>());
-            //pour environnement statique les resultats sauvegardé restent valables
+                    new Hashtable<>(), new Hashtable<>(), new LinkedList<>(), t1, secLimit);
 
-            // System.out.println("NEW LIMIT : " + limit + " - RESULT : " + rs);
+            //System.out.println("NEW LIMIT : " + limit + " - RESULT : " + rs);
+            //si l'exploration a été interrompu
+            if (rs.timeCut) {
 
-            limit++;
+                //System.out.println("TIMECUT");
+
+                if (previousRs != null) {
+                    //on considere le resultat precedent si il est non nul
+                    rs = previousRs;
+                }
+                //interruption de la boucle
+                break;
+            }
+
             //si le temps passé depuis le debut de l'exploration est supérieur à la limite
             //on stope l'exploration
-            if(System.currentTimeMillis() - t1 > (secLimit * 1000)){
+            if (System.currentTimeMillis() - t1 > (secLimit * 1000)) {
+
+                //System.out.println("TIME BREAK");
 
                 break;
             }
+
+            //On sauvegarde le résultat au cas ou une interuption du au manque de temps à lieu
+            previousRs = rs;
+
+            limit++;
 
             //tant que l'utilité est négative
             //des qu'elle est positive c'est que l'on a atteind un but
@@ -140,7 +151,9 @@ public abstract class PDMPOexploration {
 
     protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit,
                                               AbstractDouble reward, Map<String, AbstractDouble> visited,
-                                              Map<String, PDMPOsearchResult> savedResults, LinkedList<Domain.DomainValue> lastActions) {
+                                              Map<String, PDMPOsearchResult> savedResults,
+                                              LinkedList<Domain.DomainValue> lastActions,
+                                              long t1, double secLimit) {
         String ident = "";
 
         if (showlog) {
@@ -148,16 +161,40 @@ public abstract class PDMPOexploration {
             ident = Util.getIdent(time);
         }
 
-        boolean isGoal = pdmpo.isGoal(forward);
+        //utilité du forward
+        AbstractDouble forwardReward = pdmpo.getUtility(forward);
+        //But atteint
+        if (pdmpo.isGoal(forward)) {
 
-        //limite fixe ou en millisecondes atteinte et but non atteind
+            if (showlog) {
+
+                System.out.println(ident + "GOAL : " + time + " = " + reward);
+
+                System.out.println("ACTIONS " + lastActions);
+            }
+
+            cptLeaf++;
+
+            return new PDMPOsearchResult(pdmpo.getNoAction(), reward.add(forwardReward), true, false, time);
+        }
+        //limite fixe ou en millisecondes atteinte
         //estimation
-        if (time > limit && !isGoal) {
+        boolean timeCut = false;
+
+        if (time > limit || (timeCut = System.currentTimeMillis() - t1 > (secLimit * 1000))) {
             //l'estimation fourni de bons resultats même avec une limite
             //de profondeur courte
-            // AbstractDouble estimation = pdmpo.getEstimationForward(forward);
 
-            AbstractDouble estimation = pdmpo.getUtility(forward);
+            AbstractDouble estimation;
+
+            if (limitEstimation) {
+
+                estimation = pdmpo.getEstimationForward(forward);
+
+            } else {
+
+                estimation = forwardReward;
+            }
 
             if (showlog) {
 
@@ -169,28 +206,11 @@ public abstract class PDMPOexploration {
             cptLeaf++;
 
             //on ajoute le reward courant à l'utilité de l'estimation
-            return new PDMPOsearchResult(pdmpo.getNoAction(), reward.add(estimation));
+            return new PDMPOsearchResult(pdmpo.getNoAction(), reward.add(estimation), false, timeCut, time);
         }
-        //on ajoute le reward courant à l'utilité du forward
-        AbstractDouble forwardReward = pdmpo.getUtility(forward);
 
+        //ajout l'utilité du forward au reward précédent
         reward = reward.add(forwardReward);
-        //limite non atteinte but atteint
-        if (isGoal) {
-
-            if (showlog) {
-
-                System.out.println(ident + "GOAL : " + time + " = " + reward);
-
-                System.out.println("ACTIONS " + lastActions);
-
-                //System.out.println(forward);
-            }
-
-            cptLeaf++;
-
-            return new PDMPOsearchResult(pdmpo.getNoAction(), reward, true);
-        }
 
         if (showlog) {
 
@@ -204,7 +224,7 @@ public abstract class PDMPOexploration {
         }
 
         String forwardKey = pdmpo.getKeyForward(forward);
-        //on associe l'utilité pur de l'état de croyance à la clé approximative
+        //on associe l'état de croyance à la clé approximative
         visited.put(forwardKey, forwardReward);
 
         //distribution initiale
@@ -349,7 +369,9 @@ public abstract class PDMPOexploration {
                         exploration = true;
 
                         rs = getBestAction(nextForward, time + 1, limit,
-                                reward, visited, savedResults, lastActions);
+                                reward, visited, savedResults, lastActions, t1, secLimit);
+
+                        timeCut = rs.isTimeCut();
 
                         //enregistre l'utilité de la meilleur action depuis le forward (approximation)
                         //pour l'utiliser dans les autres parcours plutot que de recalculer les utilités
@@ -367,7 +389,7 @@ public abstract class PDMPOexploration {
                                 new PDMPOsearchResult(
                                         rs.getAction(),
                                         rs.getBestUtility().substract(reward),
-                                        time + 1, rs.isGoal));
+                                        rs.isGoal, time + 1));
 
                         exploReward = rs.getBestUtility();
                         //demarque l'état de croyance comme visité
@@ -419,6 +441,11 @@ public abstract class PDMPOexploration {
                 }
 
                 iPercept++;
+                //si l'exploration a été interrompu par un depassement de temps on arrete la boucle
+
+                if (timeCut) {
+                    break;
+                }
             }
 
             if (actionUtility.compareTo(maxActionUtility) > 0) {
@@ -437,6 +464,11 @@ public abstract class PDMPOexploration {
 
             //si l'action mène à un but à tout les coups
             //on en teste pas d'autres elle sont censé être trié par ordre de bénéfice
+
+            if (timeCut) {
+                break;
+            }
+
             if (allGoals) {
 
                 //System.out.println("ALLGOALS ");
@@ -458,7 +490,7 @@ public abstract class PDMPOexploration {
             cptLeaf++;
         }
 
-        return new PDMPOsearchResult(bestAction, maxActionUtility, bestActionReachGoal);
+        return new PDMPOsearchResult(bestAction, maxActionUtility, bestActionReachGoal, timeCut, time);
     }
 
     protected Map<Domain.DomainValue, AbstractDouble> loadPerceptsPrevision(Distribution forwardPrevision,
@@ -615,27 +647,19 @@ public abstract class PDMPOexploration {
 
         private AbstractDouble bestUtility;
 
-        private boolean isGoal;
+        private boolean isGoal, timeCut;
 
         private int time;
 
-        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, boolean isGoal) {
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, boolean isGoal, int time) {
+            this(action, bestUtility, isGoal, false, time);
+        }
+
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, boolean isGoal, boolean timeCut, int time) {
             this.action = action;
             this.bestUtility = bestUtility;
             this.isGoal = isGoal;
-        }
-
-        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility) {
-            this(action, bestUtility, false);
-        }
-
-        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, int time) {
-            this(action, bestUtility, false);
-            this.time = time;
-        }
-
-        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, int time, boolean isGoal) {
-            this(action, bestUtility, isGoal);
+            this.timeCut = timeCut;
             this.time = time;
         }
 
@@ -669,6 +693,14 @@ public abstract class PDMPOexploration {
 
         public void setGoal(boolean goal) {
             isGoal = goal;
+        }
+
+        public boolean isTimeCut() {
+            return timeCut;
+        }
+
+        public void setTimeCut(boolean timeCut) {
+            this.timeCut = timeCut;
         }
 
         @Override
@@ -729,7 +761,8 @@ public abstract class PDMPOexploration {
         }
     }
 
-    protected abstract List<Map.Entry<Domain.DomainValue, AbstractDouble>> filterPercepts(Map<Domain.DomainValue, AbstractDouble> perceptsMap, String ident);
+    protected abstract List<Map.Entry<Domain.DomainValue, AbstractDouble>> filterPercepts(
+            Map<Domain.DomainValue, AbstractDouble> perceptsMap, String ident);
 
     public void setNetwork(DynamicBayesianNetwork network) {
         this.network = network;
