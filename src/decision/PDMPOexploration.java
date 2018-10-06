@@ -46,7 +46,7 @@ public abstract class PDMPOexploration {
         };
     }
 
-    public void resetSharedResults(){
+    public void resetSharedResults() {
 
         this.resultsSaved.clear();
     }
@@ -73,12 +73,7 @@ public abstract class PDMPOexploration {
         this.minStateProb = df.getNew(minStateProb);
     }
 
-    public PDMPOsearchResult getBestAction(Distribution forward, int limit, boolean shareResult) {
-
-        return getBestAction(forward, limit, shareResult ? resultsSaved : new Hashtable<>());
-    }
-
-    public PDMPOsearchResult getBestAction(Distribution forward, int limit, Map<String, PDMPOsearchResult> resultsSaved) {
+    public PDMPOsearchResult getBestAction(Distribution forward) {
 
         cptLeaf = 0;
 
@@ -86,35 +81,59 @@ public abstract class PDMPOexploration {
 
         cptLoopState = 0;
 
-        //contient une clé approximative d'un état est la récompense pur de cet état
-        //permet de detecter le retour sur un état (boucle)
-        //on a ici besoin d'enregistrer également l'utilité de cet état pur
-        //pour l'ajouter à la recompense courante quand on le rencontre à nouveau
-        Map<String, AbstractDouble> visited = new Hashtable<>();
+        PDMPOsearchResult rs;
 
-        //pour la MAP resultsSave
-        //même principe que pour la map visited à la difference
-        //qu'on enregistre le resultat fournit par un état plus l'utilité fourni par l'exploration qui suit
-        //sans le reward qui le precede. permet de retrouver la meilleur utilité fourni par une action
-        //depuis un état de croyance si on le retrouve dans plusieurs explorations en profondeur differentes
-        //l'utilité est enregistré pour un états de royance avec l'action et le temps auquel l'état à été rencontré
-        //en effet avec une exploration limité un état exploré plutot peut aller plus en profondeur
-        //et donc calculer une utilité plus precise. Pendant l'exploration si on recontre un forward mais
-        //que son utilité est enregistré pour un temps superieur on effectue à nouveau l'exploration
-        //et on ecrase l'ancienne utilité enregistrée
+        int limit = 0;
 
-        //enregistrer le forward de base pour eviter les boucles des le depart
-        //depend de la precision de la clé !
-        PDMPOsearchResult rs = getBestAction(forward, 0, limit, df.getNew(0.0), visited, resultsSaved);
-        //pour environnement statique les resultats sauvegardé restent valables
+        AbstractDouble lastUtility = df.getNew(Double.NEGATIVE_INFINITY);
+
+        boolean nextLimit = true;
+
+        do {
+
+            // MAP visited
+            // contient une clé approximative d'un état est la récompense pur de cet état
+            //permet de detecter le retour sur un état (boucle)
+            //on a ici besoin d'enregistrer également l'utilité de cet état pur
+            //pour l'ajouter à la recompense courante quand on le rencontre à nouveau
+
+            //pour la MAP savedResults
+            //même principe que pour la map visited à la difference
+            //qu'on enregistre le resultat fournit par un état plus l'utilité fourni par l'exploration qui suit
+            //sans le reward qui le precede. permet de retrouver la meilleur utilité fourni par une action
+            //depuis un état de croyance si on le retrouve dans plusieurs explorations en profondeur differentes
+            //l'utilité est enregistré pour un états de royance avec l'action et le temps auquel l'état à été rencontré
+            //en effet avec une exploration limité un état exploré plutot peut aller plus en profondeur
+            //et donc calculer une utilité plus precise. Pendant l'exploration si on recontre un forward mais
+            //que son utilité est enregistré pour un temps superieur on effectue à nouveau l'exploration
+            //et on ecrase l'ancienne utilité enregistrée
+
+            //enregistrer le forward de base pour eviter les boucles des le depart
+            //depend de la precision de la clé !
+            rs = getBestAction(forward, 0, limit, df.getNew(0.0), new Hashtable<>(), new Hashtable<>(), new LinkedList<>());
+            //pour environnement statique les resultats sauvegardé restent valables
+
+            // System.out.println("NEW LIMIT : " + limit + " - RESULT : " + rs);
+
+            limit++;
+
+            //tant que l'utilité est négative
+            //des qu'elle est positive c'est que l'on a atteind un but
+            //et l'exploration étant en profondeur limité on sait qu'on a atteind le but le plus proche
+
+        } while (rs.getBestUtility().getDoubleValue() < 0.0);
+
+        //System.out.println("BEST ACTION " + rs);
+
+        // System.exit(0);
+
         return rs;
     }
 
-
     protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward,
                                               Map<String, AbstractDouble> visited,
-                                              Map<String, PDMPOsearchResult> savedResults) {
-        String ident = null;
+                                              Map<String, PDMPOsearchResult> savedResults, LinkedList<Domain.DomainValue> lastActions) {
+        String ident = "";
 
         if (showlog) {
 
@@ -128,18 +147,21 @@ public abstract class PDMPOexploration {
         if (time > limit && !isGoal) {
             //l'estimation fourni de bons resultats même avec une limite
             //de profondeur courte
-            AbstractDouble estimation = pdmpo.getEstimationForward(forward);
+            // AbstractDouble estimation = pdmpo.getEstimationForward(forward);
 
-            //AbstractDouble estimation = pdmpo.getUtility(forward);
+            AbstractDouble estimation = pdmpo.getUtility(forward);
 
-            if (showlog)
+            if (showlog) {
+
                 System.out.println(ident + "LIMIT " + time + " " + estimation);
+
+                System.out.println(ident + "ACTIONS " + lastActions);
+            }
 
             cptLeaf++;
 
             //on ajoute le reward courant à l'utilité de l'estimation
             return new PDMPOsearchResult(pdmpo.getNoAction(), reward.add(estimation));
-            //return new PDMPOsearchResult(pdmpo.getNoAction(), reward);
         }
         //on ajoute le reward courant à l'utilité du forward
         AbstractDouble forwardReward = pdmpo.getUtility(forward);
@@ -148,8 +170,14 @@ public abstract class PDMPOexploration {
         //limite non atteinte but atteint
         if (isGoal) {
 
-            if (showlog)
+            if (showlog) {
+
                 System.out.println(ident + "GOAL : " + time + " = " + reward);
+
+                System.out.println("ACTIONS " + lastActions);
+
+                //System.out.println(forward);
+            }
 
             cptLeaf++;
 
@@ -173,11 +201,6 @@ public abstract class PDMPOexploration {
 
         //distribution initiale
         Set<Domain.DomainValue> actions = pdmpo.getActionsFromState(forward, minStateProb);//v
-
-        if (showlog) {
-            System.out.println();
-            System.out.println(ident + "ALL ACTIONS [" + time + "]: " + actions);
-        }
 
         //on etend le network pour le temps time si necessaire
         if (network.getTime() <= time) {
@@ -218,16 +241,23 @@ public abstract class PDMPOexploration {
         //trie decroissant par estimation
         Collections.sort(actionResults, actionResultComparator);
 
+        if (showlog) {
+            System.out.println();
+            System.out.println(ident + "ALL ACTIONS [" + time + "]: " + actionResults);
+        }
+
         //utilité fourni par l'action maximum
         AbstractDouble maxActionUtility = network.getDoubleFactory().getNew(Double.NEGATIVE_INFINITY);
         //meilleur action
         Domain.DomainValue bestAction = null;
-        //l'action mèene à tout les coups vers un but
+        //l'action mène à tout les coups vers un but
         boolean bestActionReachGoal = false;
 
         //pour chaque action ou combinaison d'actions possible depuis l'état de croyance courant
         //pour une combinaison d'action ou aura un object DomainValue composite
         for (ActionResult actionRs : actionResults) {
+
+            lastActions.addLast(actionRs.action);
 
             //initialisation de la valeur de la variable action du reseau
             Variable actionVar = pdmpo.getActionVar();
@@ -240,7 +270,7 @@ public abstract class PDMPOexploration {
 
             if (showlog) {
                 System.out.println();
-                System.out.println(ident + "ACTION [" + time + "] : " + actionRs.action + " - LAST REWARD : " + reward);
+                System.out.println(ident + "[>>>] ACTION [" + time + "] : " + actionRs.action + " - LAST REWARD : " + reward);
             }
             //Distribution forwardPrevision = network.forward(pdmpo.getStates(), pdmpo.getActions(), time + 1, forward);
             Distribution forwardPrevision = actionRs.forwardPrevision;
@@ -311,7 +341,7 @@ public abstract class PDMPOexploration {
                         exploration = true;
 
                         rs = getBestAction(nextForward, time + 1, limit,
-                                reward, visited, savedResults);
+                                reward, visited, savedResults, lastActions);
 
                         //enregistre l'utilité de la meilleur action depuis le forward (approximation)
                         //pour l'utiliser dans les autres parcours plutot que de recalculer les utilités
@@ -395,10 +425,11 @@ public abstract class PDMPOexploration {
             if (showlog)
                 System.out.println(ident + "UTILITE ESPERE ACTION : " + actionRs.action + " = " + actionUtility);
 
+            lastActions.removeLast();
 
             //si l'action mène à un but à tout les coups
             //on en teste pas d'autres elle sont censé être trié par ordre de bénéfice
-            if(allGoals){
+            if (allGoals) {
 
                 //System.out.println("ALLGOALS ");
 
@@ -412,11 +443,11 @@ public abstract class PDMPOexploration {
             System.out.println(ident + "MAX UTILITE ESPERE ACTION : " + bestAction + " = " + maxActionUtility);
 
 
-        if(!exploration){
+        if (!exploration) {
             //si aucune exploration n'a eu lieu sans qu'on ai atteind un but ni une limite on compte une feuille
             //cette situation peut arriver pour plusieurs raisons : pas d'actions, états déja visité
             //dans le parcour courant, ou dans un parcour precedent.
-            cptLeaf ++;
+            cptLeaf++;
         }
 
         return new PDMPOsearchResult(bestAction, maxActionUtility, bestActionReachGoal);

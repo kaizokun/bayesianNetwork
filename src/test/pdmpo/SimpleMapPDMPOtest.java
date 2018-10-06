@@ -153,7 +153,7 @@ public class SimpleMapPDMPOtest {
                 System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
             }
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
-            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, limit, shareResults);
+            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve);
 
             //rsSaved = pdmpoSearch.getResultsSaved();
 
@@ -240,11 +240,13 @@ public class SimpleMapPDMPOtest {
     };     //123456
 
     private String map3[] = new String[]{
-            "#   #   + #",
-            "# #   # - ",
-            "# ##### # ",
-            "   #    # ",
-            " #   ##   ",
+            "#   ##  + ",//5
+            "# #     - ",//4
+            "# ##### # ",//3
+            "   #    # ",//2
+            " #   ##   " //1
+           //1234567891
+           //         0
     };
 
     @Test
@@ -292,12 +294,12 @@ public class SimpleMapPDMPOtest {
         DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
 
         PDMPOexploration search = new PDMPOexplorationFullPercept(
-                new MyDoubleFactory(), 0.05, 0.75, 0.15, 0.2);
+                new MyDoubleFactory(), 0.05, 0.75, 0.2, 0.2);
 
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.8, 1);
 
-        simpleMap.setAgentPosition(new Position(1, 1));
+        simpleMap.setAgentPosition(new Position(2, 2));
 
         System.out.println("START FROM : " + simpleMap.getAgentPosition());
 
