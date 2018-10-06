@@ -12,10 +12,7 @@ import network.dynamic.DynamicBayesianNetwork;
 import network.factory.SimpleMapRDDFactory;
 import org.junit.Test;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static network.factory.SimpleMapRDDFactory.SIMPLE_MAP_VARS.MOVE;
@@ -100,13 +97,15 @@ public class SimpleMapPDMPOtest {
         //System.out.println(distribution.normalize());
     }
 
-    public void PDMPOexplorationPerceptTest(PDMPOexploration pdmpoSearch, SimpleMap simpleMap, PDMPO pdmpo, int limit, boolean showLog) {
+    public List<Integer> PDMPOexplorationPerceptTest(DynamicBayesianNetwork explorationNetwork,
+                                                     DynamicBayesianNetwork agentNetwork,
+                                                     PDMPOexploration pdmpoSearch,
+                                                     SimpleMap simpleMap,
+                                                     PDMPO pdmpo,
+                                                     int limit,
+                                                     boolean showLog,
+                                                     boolean shareResults) {
 
-        //environnement
-        //reseau baysien utilié pour l'exploration
-        DynamicBayesianNetwork explorationNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
-        //reseau bayesien utilisé par l'agent
-        DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
         //fourni le reseau à l'algo d'exploration
         pdmpoSearch.setNetwork(explorationNetwork);
         //fourni le PDMPO à l'algo d'exploration
@@ -143,17 +142,18 @@ public class SimpleMapPDMPOtest {
 
         int move = 0;
 
-        Map<String, PDMPOexploration.PDMPOsearchResult> rsSaved = new Hashtable<>();
+        List<Integer> leafsCpt = new LinkedList<>();
 
         do {
 
             if (showLog) {
+
                 System.out.println("AGENT REAL POSITION " + simpleMap.getAgentPosition());
 
                 System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
             }
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
-            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, limit, rsSaved);
+            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, limit, shareResults);
 
             //rsSaved = pdmpoSearch.getResultsSaved();
 
@@ -162,10 +162,12 @@ public class SimpleMapPDMPOtest {
             positions.add(simpleMap.getAgentPosition());
 
             actions.add((DirectionMove) result.getAction().getValue());
+
             if (showLog)
                 System.out.println("BEST ACTION " + result);
             //deplace l'agent dans l'environnement
             simpleMap.moveAgent((DirectionMove) result.getAction().getValue());
+
             if (showLog)
                 System.out.println("AGENT NEW REAL POSITION " + simpleMap.getAgentPosition());
             //recupère le percept courant de l'agant
@@ -183,12 +185,16 @@ public class SimpleMapPDMPOtest {
             agentNetwork.initVar(agentNetwork.getTime(), perceptVar);
 
             stateOfBelieve = agentNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), agentNetwork.getTime(), stateOfBelieve);
+
             if (showLog) {
+
                 System.out.println("AGENT STATE OF BELIEVE ");
 
                 System.out.println(stateOfBelieve);
-
             }
+
+            leafsCpt.add(pdmpoSearch.cptLeaf);
+
             //System.out.println("TOTAL PERCEPTS CHECK : " + pdmpoSearch.cptPercepts);
 
             //System.out.println("TOTAL LOOP : " + pdmpoSearch.cptLoopState);
@@ -216,6 +222,8 @@ public class SimpleMapPDMPOtest {
             System.out.println(positions.removeFirst() + " -> " + actions.removeFirst());
 
         } while (!actions.isEmpty());
+
+        return leafsCpt;
     }
 
 
@@ -242,12 +250,17 @@ public class SimpleMapPDMPOtest {
     @Test
     public void PDMPOexplorationPerceptAVGAllPositionsTest() {
 
-        //réduire les percepts focntionne bien pour ce cas ci
+        //réduire les percepts fonctionne bien pour ce cas ci
+
+        //environnement
+        SimpleMap simpleMap = new SimpleMap(map3);
+        //reseau baysien utilié pour l'exploration
+        DynamicBayesianNetwork explorationNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
+        //reseau bayesien utilisé par l'agent
+        DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
 
         PDMPOexploration search = new PDMPOexplorationFullPercept(
-                new MyDoubleFactory(), 0.05, 0.75, 0.3, 0.2);
-
-        SimpleMap simpleMap = new SimpleMap(map3);
+                new MyDoubleFactory(), 0.05, 0.75, 0.2, 0.2);
 
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.8, 1);
@@ -258,26 +271,37 @@ public class SimpleMapPDMPOtest {
 
             simpleMap.setAgentPosition(position);
 
-            PDMPOexplorationPerceptTest(search, simpleMap, pdmpo, 15, false);
+            List<Integer> leafsCpt = PDMPOexplorationPerceptTest(explorationNetwork,
+                    agentNetwork, search, simpleMap, pdmpo,
+                    15, false, true);
+
+            System.out.println("LEAFS : "+leafsCpt);
+
+            search.resetSharedResults();
         }
     }
 
     @Test
     public void PDMPOexplorationPerceptAVGOnePositionsTest() {
 
-        PDMPOexploration search = new PDMPOexplorationFullPercept(
-                new MyDoubleFactory(), 0.05, 0.75, 0.1, 0.2);
-
+        //environnement
         SimpleMap simpleMap = new SimpleMap(map3);
+        //reseau baysien utilié pour l'exploration
+        DynamicBayesianNetwork explorationNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
+        //reseau bayesien utilisé par l'agent
+        DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
+
+        PDMPOexploration search = new PDMPOexplorationFullPercept(
+                new MyDoubleFactory(), 0.05, 0.75, 0.15, 0.2);
 
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.8, 1);
 
         simpleMap.setAgentPosition(new Position(1, 1));
 
-        System.out.println(simpleMap.getAgentPosition());
+        System.out.println("START FROM : " + simpleMap.getAgentPosition());
 
-        PDMPOexplorationPerceptTest(search, simpleMap, pdmpo,30, true);
+        PDMPOexplorationPerceptTest(explorationNetwork, agentNetwork, search, simpleMap, pdmpo, 15, false, true);
     }
 
     @Test
@@ -287,15 +311,19 @@ public class SimpleMapPDMPOtest {
         //à partir de la distribution sur les percepts, maleuresement parfois il echantillone des percepts trop improbable
         //au detriment des plus probables
 
+        //environnement
+        SimpleMap simpleMap = new SimpleMap(map1);
+        //reseau baysien utilié pour l'exploration
+        DynamicBayesianNetwork explorationNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
+        //reseau bayesien utilisé par l'agent
+        DynamicBayesianNetwork agentNetwork = new SimpleMapRDDFactory(simpleMap).initNetwork();
+
         PDMPOexploration search = new PDMPOexplorationSamplingPercept(
                 new MyDoubleFactory(), 0.0, 0.1, 0.2);
-
-        SimpleMap simpleMap = new SimpleMap(map1);
-
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.6, 1);
 
-        PDMPOexplorationPerceptTest(search, simpleMap, pdmpo, 6, false);
+        PDMPOexplorationPerceptTest(explorationNetwork, agentNetwork, search, simpleMap, pdmpo, 6, false, true);
     }
 
 }

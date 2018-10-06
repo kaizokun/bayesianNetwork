@@ -33,7 +33,7 @@ public abstract class PDMPOexploration {
 
     protected AbstractDouble minStateProb, minRiskProb, minPerceptProb;
 
-    protected Map<String, PDMPOsearchResult> resultsSaved;
+    protected Map<String, PDMPOsearchResult> resultsSaved = new Hashtable<>();
 
     protected Comparator<ActionResult> actionResultComparator;
 
@@ -44,6 +44,11 @@ public abstract class PDMPOexploration {
                 return o2.estimation.compareTo(o1.estimation);
             }
         };
+    }
+
+    public void resetSharedResults(){
+
+        this.resultsSaved.clear();
     }
 
     public PDMPOexploration(AbstractDoubleFactory doubleFactory, double minStateProb, double minRiskProb, double minPerceptProb) {
@@ -68,9 +73,9 @@ public abstract class PDMPOexploration {
         this.minStateProb = df.getNew(minStateProb);
     }
 
-    public PDMPOsearchResult getBestAction(Distribution forward, int limit) {
+    public PDMPOsearchResult getBestAction(Distribution forward, int limit, boolean shareResult) {
 
-        return getBestAction(forward, limit, new Hashtable<>());
+        return getBestAction(forward, limit, shareResult ? resultsSaved : new Hashtable<>());
     }
 
     public PDMPOsearchResult getBestAction(Distribution forward, int limit, Map<String, PDMPOsearchResult> resultsSaved) {
@@ -102,8 +107,6 @@ public abstract class PDMPOexploration {
         //depend de la precision de la clé !
         PDMPOsearchResult rs = getBestAction(forward, 0, limit, df.getNew(0.0), visited, resultsSaved);
         //pour environnement statique les resultats sauvegardé restent valables
-        this.resultsSaved = resultsSaved;
-
         return rs;
     }
 
@@ -132,6 +135,8 @@ public abstract class PDMPOexploration {
             if (showlog)
                 System.out.println(ident + "LIMIT " + time + " " + estimation);
 
+            cptLeaf++;
+
             //on ajoute le reward courant à l'utilité de l'estimation
             return new PDMPOsearchResult(pdmpo.getNoAction(), reward.add(estimation));
             //return new PDMPOsearchResult(pdmpo.getNoAction(), reward);
@@ -145,6 +150,8 @@ public abstract class PDMPOexploration {
 
             if (showlog)
                 System.out.println(ident + "GOAL : " + time + " = " + reward);
+
+            cptLeaf++;
 
             return new PDMPOsearchResult(pdmpo.getNoAction(), reward, true);
         }
@@ -180,6 +187,8 @@ public abstract class PDMPOexploration {
             if (showlog)
                 System.out.println(network.toString(ident));*/
         }
+
+        boolean exploration = false;
 
         //liste d'actions avec leur resultat sans les percepts et l'estimation
         List<ActionResult> actionResults = new ArrayList<>(actions.size());
@@ -252,7 +261,7 @@ public abstract class PDMPOexploration {
 
             int iPercept = 0;
 
-            boolean allGoals = false;
+            boolean allGoals = true;
 
             for (Map.Entry<Domain.DomainValue, AbstractDouble> percept : percepts) {
 
@@ -297,6 +306,9 @@ public abstract class PDMPOexploration {
 
                         if (showlog)
                             System.out.println(ident + "FIRST VISIT " + nextForwardKey);
+
+                        //permet de savoir si une epxloration au moins a eu lieu lors de cet appel
+                        exploration = true;
 
                         rs = getBestAction(nextForward, time + 1, limit,
                                 reward, visited, savedResults);
@@ -380,14 +392,15 @@ public abstract class PDMPOexploration {
                 bestActionReachGoal = allGoals;
             }
 
-            cptLeaf++;
-
             if (showlog)
                 System.out.println(ident + "UTILITE ESPERE ACTION : " + actionRs.action + " = " + actionUtility);
+
 
             //si l'action mène à un but à tout les coups
             //on en teste pas d'autres elle sont censé être trié par ordre de bénéfice
             if(allGoals){
+
+                //System.out.println("ALLGOALS ");
 
                 break;
             }
@@ -397,6 +410,14 @@ public abstract class PDMPOexploration {
 
         if (showlog)
             System.out.println(ident + "MAX UTILITE ESPERE ACTION : " + bestAction + " = " + maxActionUtility);
+
+
+        if(!exploration){
+            //si aucune exploration n'a eu lieu sans qu'on ai atteind un but ni une limite on compte une feuille
+            //cette situation peut arriver pour plusieurs raisons : pas d'actions, états déja visité
+            //dans le parcour courant, ou dans un parcour precedent.
+            cptLeaf ++;
+        }
 
         return new PDMPOsearchResult(bestAction, maxActionUtility, bestActionReachGoal);
     }
@@ -654,6 +675,14 @@ public abstract class PDMPOexploration {
         public void setEstimation(AbstractDouble estimation) {
             this.estimation = estimation;
         }
+
+        @Override
+        public String toString() {
+            return "ActionResult{" +
+                    "action=" + action +
+                    ", estimation=" + estimation +
+                    '}';
+        }
     }
 
     protected abstract List<Map.Entry<Domain.DomainValue, AbstractDouble>> filterPercepts(Map<Domain.DomainValue, AbstractDouble> perceptsMap, String ident);
@@ -670,7 +699,4 @@ public abstract class PDMPOexploration {
         this.minStateProb = minStateProb;
     }
 
-    public Map<String, PDMPOsearchResult> getResultsSaved() {
-        return resultsSaved;
-    }
 }
