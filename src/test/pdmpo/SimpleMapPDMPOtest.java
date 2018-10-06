@@ -102,9 +102,9 @@ public class SimpleMapPDMPOtest {
                                                      PDMPOexploration pdmpoSearch,
                                                      SimpleMap simpleMap,
                                                      PDMPO pdmpo,
-                                                     int limit,
-                                                     boolean showLog,
-                                                     boolean shareResults) {
+                                                     int firstDepth,
+                                                     double limitSec,
+                                                     boolean showLog) {
 
         //fourni le reseau à l'algo d'exploration
         pdmpoSearch.setNetwork(explorationNetwork);
@@ -153,7 +153,7 @@ public class SimpleMapPDMPOtest {
                 System.out.println("AGENT REAL PERCEPT " + simpleMap.getAgentPercept());
             }
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
-            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve);
+            PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, firstDepth, limitSec);
 
             //rsSaved = pdmpoSearch.getResultsSaved();
 
@@ -245,8 +245,8 @@ public class SimpleMapPDMPOtest {
             "# ##### # ",//3
             "   #    # ",//2
             " #   ##   " //1
-           //1234567891
-           //         0
+            //1234567891
+            //         0
     };
 
     @Test
@@ -275,9 +275,9 @@ public class SimpleMapPDMPOtest {
 
             List<Integer> leafsCpt = PDMPOexplorationPerceptTest(explorationNetwork,
                     agentNetwork, search, simpleMap, pdmpo,
-                    15, false, true);
+                    15, 2, true);
 
-            System.out.println("LEAFS : "+leafsCpt);
+            System.out.println("LEAFS : " + leafsCpt);
 
             search.resetSharedResults();
         }
@@ -299,11 +299,11 @@ public class SimpleMapPDMPOtest {
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.8, 1);
 
-        simpleMap.setAgentPosition(new Position(2, 2));
+        simpleMap.setAgentPosition(new Position(1, 1));
 
         System.out.println("START FROM : " + simpleMap.getAgentPosition());
 
-        PDMPOexplorationPerceptTest(explorationNetwork, agentNetwork, search, simpleMap, pdmpo, 15, false, true);
+        PDMPOexplorationPerceptTest(explorationNetwork, agentNetwork, search, simpleMap, pdmpo, 0, 1, false);
     }
 
     @Test
@@ -325,7 +325,7 @@ public class SimpleMapPDMPOtest {
         //PDMPO simplemap
         PDMPO pdmpo = new PDMPOSimpleMap(simpleMap, new MyDoubleFactory(), 0.6, 1);
 
-        PDMPOexplorationPerceptTest(explorationNetwork, agentNetwork, search, simpleMap, pdmpo, 6, false, true);
+        PDMPOexplorationPerceptTest(explorationNetwork, agentNetwork, search, simpleMap, pdmpo, 6, 2, true);
     }
 
 }

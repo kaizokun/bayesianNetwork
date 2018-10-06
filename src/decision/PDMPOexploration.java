@@ -73,7 +73,7 @@ public abstract class PDMPOexploration {
         this.minStateProb = df.getNew(minStateProb);
     }
 
-    public PDMPOsearchResult getBestAction(Distribution forward) {
+    public PDMPOsearchResult getBestAction(Distribution forward, int firstLimit, double secLimit) {
 
         cptLeaf = 0;
 
@@ -88,6 +88,8 @@ public abstract class PDMPOexploration {
         AbstractDouble lastUtility = df.getNew(Double.NEGATIVE_INFINITY);
 
         boolean nextLimit = true;
+
+        long t1 = System.currentTimeMillis();
 
         do {
 
@@ -110,17 +112,23 @@ public abstract class PDMPOexploration {
 
             //enregistrer le forward de base pour eviter les boucles des le depart
             //depend de la precision de la clé !
-            rs = getBestAction(forward, 0, limit, df.getNew(0.0), new Hashtable<>(), new Hashtable<>(), new LinkedList<>());
+            rs = getBestAction(forward, 0, limit, df.getNew(0.0),
+                    new Hashtable<>(), new Hashtable<>(), new LinkedList<>());
             //pour environnement statique les resultats sauvegardé restent valables
 
             // System.out.println("NEW LIMIT : " + limit + " - RESULT : " + rs);
 
             limit++;
+            //si le temps passé depuis le debut de l'exploration est supérieur à la limite
+            //on stope l'exploration
+            if(System.currentTimeMillis() - t1 > (secLimit * 1000)){
+
+                break;
+            }
 
             //tant que l'utilité est négative
             //des qu'elle est positive c'est que l'on a atteind un but
             //et l'exploration étant en profondeur limité on sait qu'on a atteind le but le plus proche
-
         } while (rs.getBestUtility().getDoubleValue() < 0.0);
 
         //System.out.println("BEST ACTION " + rs);
@@ -130,8 +138,8 @@ public abstract class PDMPOexploration {
         return rs;
     }
 
-    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit, AbstractDouble reward,
-                                              Map<String, AbstractDouble> visited,
+    protected PDMPOsearchResult getBestAction(Distribution forward, int time, int limit,
+                                              AbstractDouble reward, Map<String, AbstractDouble> visited,
                                               Map<String, PDMPOsearchResult> savedResults, LinkedList<Domain.DomainValue> lastActions) {
         String ident = "";
 
@@ -142,7 +150,7 @@ public abstract class PDMPOexploration {
 
         boolean isGoal = pdmpo.isGoal(forward);
 
-        //limite atteinte but non atteind
+        //limite fixe ou en millisecondes atteinte et but non atteind
         //estimation
         if (time > limit && !isGoal) {
             //l'estimation fourni de bons resultats même avec une limite
@@ -619,6 +627,11 @@ public abstract class PDMPOexploration {
 
         public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility) {
             this(action, bestUtility, false);
+        }
+
+        public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, int time) {
+            this(action, bestUtility, false);
+            this.time = time;
         }
 
         public PDMPOsearchResult(Domain.DomainValue action, AbstractDouble bestUtility, int time, boolean isGoal) {
