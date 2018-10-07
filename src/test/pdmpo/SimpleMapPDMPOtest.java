@@ -97,14 +97,15 @@ public class SimpleMapPDMPOtest {
         //System.out.println(distribution.normalize());
     }
 
-    public List<Integer> PDMPOexplorationPerceptTest(DynamicBayesianNetwork explorationNetwork,
-                                                     DynamicBayesianNetwork agentNetwork,
-                                                     PDMPOexploration pdmpoSearch,
-                                                     SimpleMap simpleMap,
-                                                     PDMPO pdmpo,
-                                                     int firstDepth,
-                                                     double limitSec,
-                                                     boolean showLog) {
+    public Politic PDMPOexplorationPerceptTest(DynamicBayesianNetwork explorationNetwork,
+                                               DynamicBayesianNetwork agentNetwork,
+                                               PDMPOexploration pdmpoSearch,
+                                               SimpleMap simpleMap,
+                                               PDMPO pdmpo,
+                                               int firstDepth,
+                                               double limitSec,
+                                               boolean showLog) {
+
 
         //fourni le reseau à l'algo d'exploration
         pdmpoSearch.setNetwork(explorationNetwork);
@@ -127,9 +128,9 @@ public class SimpleMapPDMPOtest {
 
         Distribution stateOfBelieve = agentNetwork.forward(pdmpo.getStates(), pdmpo.getActions(), 1, null);
 
-        LinkedList<DirectionMove> actions = new LinkedList<>();
+        //LinkedList<DirectionMove> actions = new LinkedList<>();
 
-        LinkedList<Position> positions = new LinkedList<>();
+        // LinkedList<Position> positions = new LinkedList<>();
 
         if (showLog) {
 
@@ -138,11 +139,9 @@ public class SimpleMapPDMPOtest {
             System.out.println(stateOfBelieve);
         }
 
-        Domain.DomainValue lastAction = pdmpo.getNoAction();
+        Map<Position, DirectionMove> politic = new Hashtable<>();
 
-        int move = 0;
-
-        List<Integer> leafsCpt = new LinkedList<>();
+        int moves = 0;
 
         do {
 
@@ -155,21 +154,21 @@ public class SimpleMapPDMPOtest {
             //exploration à partir de l'état de croyance courant retourne une action ayant la plus haute utilité
             PDMPOexploration.PDMPOsearchResult result = pdmpoSearch.getBestAction(stateOfBelieve, firstDepth, limitSec);
 
-            //rsSaved = pdmpoSearch.getResultsSaved();
+            politic.put(simpleMap.getAgentPosition(), (DirectionMove) result.getAction().getValue());
 
-            //lastAction = result.getAction();
+            //positions.add(simpleMap.getAgentPosition());
 
-            positions.add(simpleMap.getAgentPosition());
-
-            actions.add((DirectionMove) result.getAction().getValue());
+            //actions.add((DirectionMove) result.getAction().getValue());
 
             if (showLog)
                 System.out.println("BEST ACTION " + result);
+
             //deplace l'agent dans l'environnement
             simpleMap.moveAgent((DirectionMove) result.getAction().getValue());
 
             if (showLog)
                 System.out.println("AGENT NEW REAL POSITION " + simpleMap.getAgentPosition());
+
             //recupère le percept courant de l'agant
             PerceptWall perceptWall = simpleMap.getAgentPercept();
             //met à jour l'état de croyance de l'agent
@@ -193,39 +192,21 @@ public class SimpleMapPDMPOtest {
                 System.out.println(stateOfBelieve);
             }
 
-            leafsCpt.add(pdmpoSearch.cptLeaf);
+            moves++;
 
-            //System.out.println("TOTAL PERCEPTS CHECK : " + pdmpoSearch.cptPercepts);
+        } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()) && moves < 20);
 
-            //System.out.println("TOTAL LOOP : " + pdmpoSearch.cptLoopState);
-
-            move++;
-
-            /*
-            if (move == 20) {
-
-                break;
-
-            } else if (move == 1) {
-
-                pdmpoSearch.showlog = true;
-
-            } else {
-
-                pdmpoSearch.showlog = false;
+        return new Politic() {
+            @Override
+            public Action getAction(State state) {
+                return politic.get(state);
             }
-*/
-        } while (!simpleMap.getAgentPosition().equals(simpleMap.getGoodExit()));
 
-        do {
-
-            System.out.println(positions.removeFirst() + " -> " + actions.removeFirst());
-
-        } while (!actions.isEmpty());
-
-        return leafsCpt;
+            @Override
+            public void setAction(Action action, State state) {
+            }
+        };
     }
-
 
     private String map1[] = new String[]{
             "   +",
@@ -277,11 +258,11 @@ public class SimpleMapPDMPOtest {
 
             simpleMap.setAgentPosition(position);
 
-            List<Integer> leafsCpt = PDMPOexplorationPerceptTest(explorationNetwork,
+            Politic politic = PDMPOexplorationPerceptTest(explorationNetwork,
                     agentNetwork, search, simpleMap, pdmpo,
                     0, 10, false);
 
-            System.out.println("LEAFS : " + leafsCpt);
+            System.out.println("POLITIC : \n" + simpleMap.getPoliticMap(politic));
 
             search.resetSharedResults();
         }

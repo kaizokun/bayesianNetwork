@@ -77,11 +77,7 @@ public abstract class PDMPOexploration {
 
         PDMPOsearchResult rs, previousRs = null;
 
-        int limit = 0;
-
-        AbstractDouble lastUtility = df.getNew(Double.NEGATIVE_INFINITY);
-
-        boolean nextLimit = true;
+        int limit = firstLimit;
 
         long t1 = System.currentTimeMillis();
 

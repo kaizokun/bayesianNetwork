@@ -15,6 +15,8 @@ public enum DirectionMove implements Action {
 
     private static final DirectionMove[] oppositeMoves = new DirectionMove[]{SOUTH, WEST, NORTH, EAST, ON_THE_SPOT};
 
+    private static char[] moveSymbols = new char[]{'^', '>', 'v', '<'};
+
     public int getDeltaY() {
 
         return delta[this.ordinal()][0];
@@ -62,4 +64,10 @@ public enum DirectionMove implements Action {
 
         return oppositeMoves[ordinal()];
     }
+
+    public char getSymbol() {
+
+        return moveSymbols[this.ordinal()];
+    }
+
 }

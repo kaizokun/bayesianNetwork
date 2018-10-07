@@ -193,11 +193,10 @@ public class SimpleMap implements Environment<Position> {
         return agentPosition;
     }
 
+
     public String getPoliticMap(Politic politic) {
 
         StringBuilder builder = new StringBuilder();
-
-        char[] movSymbols = new char[]{'^', '>', 'v', '<'};
 
         Map<State, String> statesSymbols = new Hashtable<>();
 
@@ -205,9 +204,16 @@ public class SimpleMap implements Environment<Position> {
 
             Action action = politic.getAction(state);
 
-            DirectionMove directionMove = (DirectionMove) action;
+            if (action != null) {
 
-            statesSymbols.put(state, "[" + movSymbols[directionMove.ordinal()] + "]");
+                DirectionMove directionMove = (DirectionMove) action;
+
+                statesSymbols.put(state, "[" + directionMove.getSymbol() + "]");
+
+            } else {
+
+                statesSymbols.put(state, "[ ]");
+            }
         }
 
         statesSymbols.put(badExit, "[-]");
@@ -223,14 +229,24 @@ public class SimpleMap implements Environment<Position> {
 
             for (int x = 1; x <= xLimit; x++) {
 
+                if (x == 1) builder.append("[" + y + "]");
+
                 builder.append(statesSymbols.get(new Position(y, x)));
             }
 
             builder.append('\n');
         }
 
+        for (int x = 0; x <= xLimit; x++) {
+
+            builder.append("[" + x + "]");
+        }
+
+        builder.append('\n');
+
         return builder.toString();
     }
+
 
     public Set<Position> getRiskyPositions() {
 
